@@ -1,2 +1,18 @@
-# apps
-Plugin packages that provide custom visualizations and analytics capabilities to Trisul Network Analytics.
+# Trisul Apps 
+
+Installable dashboards, custom analytics, and other extensions to the Trisul Network Analytics Platform
+
+
+1. Dashboards : New visualization and dashboards 
+2. Analytics : Real Time packet analysis tools, metrics, and other extensions
+3. Hunting : Tools to analyze saved data 
+
+
+# Installing
+
+To install these tools
+
+1. Login as admin
+2. Open Plugins.
+
+TODO 
