@@ -15,3 +15,5 @@ description:
 apptype: dashboard_js
 
 appresources: search_hosts.tar.gz 
+
+dependencies: 

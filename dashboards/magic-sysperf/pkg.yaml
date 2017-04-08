@@ -16,3 +16,5 @@ description:
 apptype: dashboard_share
 
 appresources: dash.tar.gz 
+
+dependencies : 
