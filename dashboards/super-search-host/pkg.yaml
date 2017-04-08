@@ -1,0 +1,17 @@
+name: Super search host
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: Search all  hosts by its name
+   long:  |
+      Search google.com
+      It will give all google.com ips seen by trisul  
+
+
+apptype: dashboard_js
+
+appresources: search_hosts.tar.gz 
