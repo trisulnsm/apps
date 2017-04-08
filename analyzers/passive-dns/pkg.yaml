@@ -8,7 +8,7 @@ description:
    short: Extracts IP to Domain map
    long:  |
       Builds a real time LevelDB database containing IP to Host Name
-	  lookup. 
+      lookup. 
 
 apptype: lua
 
