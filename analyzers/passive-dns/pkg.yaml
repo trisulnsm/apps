@@ -1,0 +1,17 @@
+name: Passive DNS Extractor
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Extracts IP to Domain map
+   long:  |
+      Builds a real time LevelDB database containing IP to Host Name
+	  lookup. 
+
+apptype: lua
+
+appresources: passive-dns-creator.lua  tris_leveldb.lua 
+
+dependencies:  LevelDB 
