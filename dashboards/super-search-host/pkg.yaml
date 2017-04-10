@@ -6,7 +6,7 @@ author: trisul
 
 
 description: 
-   short: Search all  hosts by its name
+   short: Search all hosts by name and print total usage of each.
    long:  |
       Search google.com
       It will give all google.com ips seen by trisul  
@@ -14,6 +14,6 @@ description:
 
 apptype: dashboard_js
 
-appresources: search_hosts.tar.gz 
+appresources: search_hosts.js
 
 dependencies: 
