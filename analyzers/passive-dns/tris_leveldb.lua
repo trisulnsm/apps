@@ -6,7 +6,7 @@
 --
 -- 
 local ffi=require'ffi'
-local L=ffi.load'./libleveldb.so'
+local L=ffi.load'libleveldb'
 
 
 -- 
