@@ -9,7 +9,7 @@ description:
    long:  |
       Builds a real time LevelDB database containing IP to Host Name
       lookup. A number of apps can be built on top of this mapping.
-	  Requires leveldb installed on probes. 
+      Requires leveldb installed on probes. 
 
 apptype: lua
 
