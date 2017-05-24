@@ -1,0 +1,106 @@
+{
+  "WebtrisulDashboard": [
+    [
+      {
+        "id": 10005,
+        "webtrisul_addon_package_id": 1,
+        "trisul_web_user_id": 2,
+        "key": "flood",
+        "name": "Common Flood - DNS/TCPSYN",
+        "description": "Common Flood and Denial of Service protocols",
+        "moduri": "/webtrisul_module/getmod",
+        "axupdateuri": "/newdash/traffic_axsavepos",
+        "collapsedmods": "",
+        "undecoratedmods": null,
+        "pos_head": null,
+        "pos_left": "",
+        "pos_right": "",
+        "pos_foot": null,
+        "pos_top1": "10018,10015,10014,10002,17,10003",
+        "pos_top2": "",
+        "pos_mid3": "",
+        "pos_bot2": "",
+        "pos_bot1": "",
+        "pos_mid4": "",
+        "pos_reserved1": null,
+        "pos_reserved2": null,
+        "pos_reserved3": null,
+        "dashboard_type": "LIVE"
+      }
+    ],
+    [
+      {
+        "id": 10018,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "Unique Hosts",
+        "description": "Unique Hosts",
+        "options": "{\"recentsecs\":43200,\"width\":350,\"bucketsize\":\"0\",\"height\":270,\"surface\":\"LINE\",\"title\":\"Unique Hosts\",\"models\":\"[\\r\\n  [\\r\\n    \\\"{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}\\\",\\r\\n    \\\"{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}\\\",\\r\\n    7,\\r\\n    \\\"Unique Hosts\\\"\\r\\n  ],\\r\\n  [\\r\\n    \\\"{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}\\\",\\r\\n    \\\"{889900CC-0063-11A5-8380-FEBDBABBDBEA}\\\",\\r\\n    7,\\r\\n    \\\"Unique Internal Hosts\\\"\\r\\n  ]\\r\\n]\"}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10015,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 9,
+        "name": "DNS Traffic",
+        "description": "DNS traffic",
+        "options": "{\"recentsecs\":43200,\"statids\":\"0\",\"bucketsize\":\"0\",\"height\":270,\"surface\":\"LINE\",\"key\":\"p-0035\",\"guid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"width\":500,\"ajaxfreq\":60,\"ajaxurl\":\"/axupdate/gerbilRefresh\",\"title\":\"Total DNS Traffic\"}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10014,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "Unique DNS hosts",
+        "description": "Unique DNS hosts",
+        "options": "{\"recentsecs\":43200,\"width\":350,\"bucketsize\":\"0\",\"height\":270,\"surface\":\"LINE\",\"title\":\"Unique DNS hosts\",\"models\":\"[[\\\"{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}\\\",\\\"{ABD3C4A5-29AD-17D6-7AC0-822827AB2365}\\\",7,\\\"Unflushed Keys\\\"]]\"}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10002,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "DNS connections",
+        "description": "Key Traffic module",
+        "options": "{\"models\":\"[[\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"domain\\\",4,\\\"Connections\\\"]]\",\"title\":\"DNS connections (DDoS track)\",\"height\":300,\"recentsecs\":86400,\"surface\":\"AREA\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 17,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 9,
+        "name": "Total Bandwidth Seen",
+        "description": "Total bandwidth seen by Trisul in the past T hours",
+        "options": "{\"recentsecs\":86400,\"statids\":\"0\",\"bucketsize\":\"0\",\"height\":300,\"surface\":\"SQUARELINE\",\"key\":\"TOTALBW\",\"guid\":\"{393B5EBC-AB41-4387-8F31-8077DB917336}\",\"width\":500,\"ajaxfreq\":60,\"ajaxurl\":\"/axupdate/gerbilRefresh\",\"title\":\"Total bandwidth\"}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10003,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "TCP SYN Activity (SYNFLOOD Detect)",
+        "description": "Key Traffic module",
+        "options": "{\"models\":\"[[\\\"{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}\\\",\\\"SYS:GROUP_TOTALS\\\",8,\\\"TCP SYN sent\\\"],[\\\"{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}\\\",\\\"SYS:GROUP_TOTALS\\\",9,\\\"TCP SYN recv\\\"],[\\\"{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}\\\",\\\"SYS:GROUP_TOTALS\\\",10,\\\"TCP SYNACK sent\\\"]]\",\"title\":\"TCP SYN Activity (SYNFLOOD Detect)\",\"height\":300,\"recentsecs\":86400,\"surface\":\"LINE\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      }
+    ]
+  ]
+}

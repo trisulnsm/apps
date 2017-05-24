@@ -1,0 +1,34 @@
+{
+  "TrisulCounterGroupFilter": [
+    [
+      {
+        "id": 6,
+        "CounterGUID": "{ABD3C4A5-29AD-17D6-7AC0-822827AB2365}",
+        "ParentCounterGUID": "{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}",
+        "FilterCounterGUID": "{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}",
+        "FilterKeyList": "p-0035",
+        "FilterKeyInvList": null
+      }
+    ],
+    [
+      {
+        "id": 43,
+        "CounterGUID": "{ABD3C4A5-29AD-17D6-7AC0-822827AB2365}",
+        "Name": "DNSServers",
+        "Description": "DNS Servers tracking usual target of ",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 60000,
+        "TrackHiWater": 50000,
+        "TrackLoWater": 20000,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Active",
+        "CardinalityEstimateBits": "",
+        "TopperTrafficOnly": "True",
+        "EnableSliceKeys": 0,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1488044396
+      }
+    ]
+  ]
+}

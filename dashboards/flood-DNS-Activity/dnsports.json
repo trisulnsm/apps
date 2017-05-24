@@ -1,0 +1,34 @@
+{
+  "TrisulCounterGroupFilter": [
+    [
+      {
+        "id": 91,
+        "CounterGUID": "{3D15F8B1-C4FE-6815-79F5-94631BFDB39C}",
+        "ParentCounterGUID": "{C0B04CA7-95FA-44EF-8475-3835F3314761}",
+        "FilterCounterGUID": "{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}",
+        "FilterKeyList": "p-0035",
+        "FilterKeyInvList": null
+      }
+    ],
+    [
+      {
+        "id": 128,
+        "CounterGUID": "{3D15F8B1-C4FE-6815-79F5-94631BFDB39C}",
+        "Name": "DNSPorts",
+        "Description": "Ports with max DNS",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 60000,
+        "TrackHiWater": 500,
+        "TrackLoWater": 100,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Active",
+        "CardinalityEstimateBits": null,
+        "TopperTrafficOnly": null,
+        "EnableSliceKeys": null,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1494008283
+      }
+    ]
+  ]
+}
