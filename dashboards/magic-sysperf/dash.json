@@ -1,0 +1,142 @@
+{
+  "WebtrisulDashboard": [
+    [
+      {
+        "id": 39,
+        "webtrisul_addon_package_id": 1,
+        "trisul_web_user_id": 2,
+        "key": "sysperf",
+        "name": "System Performance",
+        "description": "System performance dashboard - CPU Memory Disk",
+        "moduri": "/webtrisul_module/getmod",
+        "axupdateuri": "/newdash/traffic_axsavepos",
+        "collapsedmods": null,
+        "undecoratedmods": null,
+        "pos_head": null,
+        "pos_left": "",
+        "pos_right": "",
+        "pos_foot": null,
+        "pos_top1": "",
+        "pos_top2": "17,201,202,205,210|204,206,208,211",
+        "pos_mid3": "",
+        "pos_bot2": "",
+        "pos_bot1": "",
+        "pos_mid4": "",
+        "pos_reserved1": null,
+        "pos_reserved2": null,
+        "pos_reserved3": null,
+        "dashboard_type": "LIVE"
+      }
+    ],
+    [
+      {
+        "id": 17,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 9,
+        "name": "Total Bandwidth Seen",
+        "description": "Total bandwidth seen by Trisul in the past T hours",
+        "options": "{\"recentsecs\":43200,\"statids\":\"0\",\"bucketsize\":\"0\",\"height\":300,\"surface\":\"SQUARELINE\",\"key\":\"TOTALBW\",\"guid\":\"{393B5EBC-AB41-4387-8F31-8077DB917336}\",\"width\":500,\"ajaxfreq\":60,\"ajaxurl\":\"/axupdate/gerbilRefresh\",\"title\":\"Total bandwidth\"}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 201,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "Trisul Global Flush Time",
+        "description": "Key Traffic module",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"LINE\",\"title\":\"Flush Time (usecs)\",\"models\":\"[[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"engine-1\\\",0,\\\"GlobalFlush-1 Time\\\"],[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"engine-0\\\",8,\\\"GlobalFlush-0 Time\\\"]]\"}",
+        "stretch_to_fit": 0,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 0
+      },
+      {
+        "id": 202,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "CPU Usage",
+        "description": "Key Traffic module",
+        "options": "{\"models\":\"[[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"engine-1\\\",1,\\\"CPU Total\\\"],[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"engine-0\\\",2,\\\"CPU Trisul\\\"]]\",\"title\":\"CPU Percent\",\"height\":300,\"recentsecs\":86400,\"surface\":\"LINE\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 205,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "Packets IN",
+        "description": "Packets In",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"LINE\",\"title\":\"Packets(processed)\",\"models\":\"[[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"inputfilter-1\\\",10,\\\"Packets Processed-1\\\"],[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"inputfilter-0\\\",10,\\\"Packets Processed-0\\\"]]\"}",
+        "stretch_to_fit": 0,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 0
+      },
+      {
+        "id": 210,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "PCAP Disk Bandwidth",
+        "description": "Key Traffic module",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"LINE\",\"title\":\"PCAP Disk Bandwidth\",\"models\":\"[[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"inputfilter\\\",14,\\\"PCAP Write Disk BW \\\"]]\"}",
+        "stretch_to_fit": 0,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 0
+      },
+      {
+        "id": 204,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "Memory Usage",
+        "description": "Key Traffic module",
+        "options": "{\"models\":\"[[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"engine-0\\\",3,\\\"Mem Total\\\"],[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"engine-0\\\",4,\\\"Mem System\\\"],[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"engine-0\\\",5,\\\"Mem Trisul\\\"]]\",\"title\":\"Trisul memory usage\",\"height\":300,\"recentsecs\":86400,\"surface\":\"LINE\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 206,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "Dropped Packets",
+        "description": "Dropped  packets",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"LINE\",\"title\":\"Packets(dropped)\",\"models\":\"[[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"inputfilter-1\\\",9,\\\"Dropped packets-1\\\"],[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"inputfilter-0\\\",9,\\\"Dropped packets-0\\\"]]\"}",
+        "stretch_to_fit": 0,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 0
+      },
+      {
+        "id": 208,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "Dropped Packets Percent",
+        "description": "Dropped  packets Percent",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"LINE\",\"title\":\"Packets(dropped %)\",\"models\":\"[[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"inputfilter\\\",11,\\\"Dropped percent\\\"]]\"}",
+        "stretch_to_fit": 0,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 0
+      },
+      {
+        "id": 211,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "Disk Read Write IOP",
+        "description": "Key Traffic module",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"LINE\",\"title\":\"Read Write IO\",\"models\":\"[[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"engine-0\\\",12,\\\"Read IOP\\\"],[\\\"{0D39F2A7-2627-49D5-9DCF-707E6F1C0571}\\\",\\\"engine-0\\\",13,\\\"Write IOP\\\"]]\"}",
+        "stretch_to_fit": 0,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 0
+      }
+    ]
+  ]
+}
