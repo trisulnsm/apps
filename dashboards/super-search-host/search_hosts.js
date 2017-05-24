@@ -49,7 +49,7 @@ var HostTotal   =  $.klass({
               });
     return  get_response(req,function(resp){
       _.each(resp.keys,$.proxy(function(key){
-        this.available_host.push({key:key.key,label:key.label,readable:key.readable,total:0})
+        this.available_host.push({key:key.key,label:key.label,readable:key.readable,total:0,recv:0,transmit:0})
       },cthis));
     });
   },
@@ -69,8 +69,18 @@ var HostTotal   =  $.klass({
                       .collect( function(ai) { return  ai.values[0].toNumber()})
                       .reduce(function(acc, i){return acc+i;}, 0)
                       .value();
+          var recv = _.chain(resp.stats)
+                      .collect( function(ai) { return  ai.values[1].toNumber()})
+                      .reduce(function(acc, i){return acc+i;}, 0)
+                      .value();
+          var transmit = _.chain(resp.stats)
+                      .collect( function(ai) { return  ai.values[2].toNumber()})
+                      .reduce(function(acc, i){return acc+i;}, 0)
+                      .value();
             
           k.total = total*cthis.bucketsize;
+          k.recv = recv*cthis.bucketsize;
+          k.transmit = transmit*cthis.bucketsize;
           cthis.processed = cthis.processed+1;
           cthis.redraw();
         });
@@ -97,7 +107,7 @@ var HostTotal   =  $.klass({
     var table = get_table_shell();
     table.addClass('table-sysdata hide'); 
     table.attr("id","search_host_tbl");
-    table.find("thead tr").append("<th>Host</th><th>IP</th><th>Total</th>");
+    table.find("thead tr").append("<th>Host</th><th>IP</th><th>Total</th><th>Received</th><th>Transmit</th>");
     $('#trp_data_hosts').append(table);
   },
 
@@ -115,7 +125,7 @@ var HostTotal   =  $.klass({
       dash_key:'key'
     }
     var anchor  = "<a href='/newdash/index?key={{key}}&" + $.param(params) + "' target='_blank'>{{label}}</a>";
-    var table_tmpl = "<td>"+anchor+"</td><td>{{readable}}</td><td>{{h_total}}B";
+    var table_tmpl = "<td>"+anchor+"</td><td>{{readable}}</td><td>{{h_total}}B</td><td>{{h_recv}}B</td><td>{{h_trans}}B</td>";
             
     var trs = d3.select('table#search_host_tbl' + " tbody")
                 .selectAll("tr")
@@ -124,12 +134,14 @@ var HostTotal   =  $.klass({
     trs.enter()
             .insert("tr","tr")
             .html(function(d){ 
-              return Mustache.to_html(table_tmpl,$.extend({h_total:h_fmtvol(d.total)},d));
+              return Mustache.to_html(table_tmpl,$.extend(
+                {h_total:h_fmtvol(d.total),h_recv:h_fmtvol(d.recv),h_trans:h_fmtvol(d.transmit)},d));
             });
 
     trs
          .html(function(d){ 
-            return Mustache.to_html(table_tmpl,$.extend({h_total:h_fmtvol(d.total)},d));
+            return Mustache.to_html(table_tmpl,$.extend(
+                {h_total:h_fmtvol(d.total),h_recv:h_fmtvol(d.recv),h_trans:h_fmtvol(d.transmit)},d));
           });
 
     trs.exit().remove();
@@ -141,4 +153,3 @@ function run(opts)
   host_totals = new HostTotal(opts);
 }
 
-//# sourceURL=host_total.js

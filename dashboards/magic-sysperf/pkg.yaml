@@ -1,6 +1,6 @@
 name: Magic Probe Perf
 
-version: 0.0.2
+version: 0.0.3
 
 author: trisul
 
@@ -15,6 +15,6 @@ description:
 
 apptype: dashboard_share
 
-appresources: dash.tar.gz 
+appresources: dash.json
 
 dependencies : 
