@@ -1,0 +1,17 @@
+name: Suricata via EVE UnixSocket
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Suricata alerts via EVE
+   long:  |
+      Listen to alerts in EVE format on Suricata Unix Socket (dgram)
+	  The default Unix Socket is '/var/log/nsm/eve.socket'
+
+apptype: lua
+
+appresources: suricata_eve_unixsocket.lua
+
+dependencies:  
