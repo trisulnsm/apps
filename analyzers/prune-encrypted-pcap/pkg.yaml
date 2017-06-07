@@ -9,7 +9,7 @@ description:
    long:  |
       Dramatically reduce disk storage and throughput requirements by 
       automatically pruninng based on domain names (youtube, netflix, 
-	  facebook, etc)
+      facebook, etc)
 
 apptype: lua
 
