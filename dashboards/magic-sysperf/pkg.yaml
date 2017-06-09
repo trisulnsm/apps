@@ -1,4 +1,4 @@
-name: Magic Probe Perf
+name: Probe Performance
 
 version: 0.0.3
 
@@ -6,11 +6,11 @@ author: trisul
 
 
 description: 
-   short: Monitor performance of Trisul Probe
+   short: System performance of Trisul Probes
    long:  |
-      Dashboard show CPU usage, memory usage, packet drops,
-      I/O stats for PCAP storage, Disk Bandwidth for PCAPs,
-      Stream flush performance. 
+      This dashboard shows CPU usage, Memory usage, Packet drops,
+      Disk Bandwidth for PCAPs, Read IOPs, Write IOPs, 
+      Stream flush performance, along with Total Bandwidth. 
 
 
 apptype: dashboard_share

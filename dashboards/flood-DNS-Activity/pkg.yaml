@@ -1,15 +1,16 @@
-name: Flood - DNS/TCPSYN
+name: DNS monitoring
 
-version: 0.0.1
+version: 0.0.2
 
 author: trisul
 
 
 description: 
-   short: Common flood and DNS activity
+   short: DNS Custom Metrics and dashboards
    long:  |
-      Common flood and Denial of service protocol
-
+      A new Filtered Counter Group - DNS Hosts and the following
+	  dashboard modules.  Total Traffic, Total DNS Traffic, Top DNS Hosts
+	  Unique DNS Hosts over time, Active DNS Connections, Total TCP SYN
 
 apptype: dashboard_share
 

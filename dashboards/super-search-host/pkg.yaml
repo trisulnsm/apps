@@ -6,11 +6,11 @@ author: trisul
 
 
 description: 
-   short: Search all hosts by name and print total usage of each.
+   short: Search all hosts by domain name and print total usage of each.
    long:  |
-      Search google.com
-      It will give all google.com ips seen by trisul  
-
+      For example : if you type google.com, this tool will first figure out 
+	  all IPs that resolved to *.google.com , then for each IP print volume of 
+	  data transferred per day. This is a custom Javascript Dashboard.
 
 apptype: dashboard_js
 
