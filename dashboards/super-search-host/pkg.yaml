@@ -9,8 +9,8 @@ description:
    short: Search all hosts by domain name and print total usage of each.
    long:  |
       For example : if you type google.com, this tool will first figure out 
-	  all IPs that resolved to *.google.com , then for each IP print volume of 
-	  data transferred per day. This is a custom Javascript Dashboard.
+      all IPs that resolved to *.google.com , then for each IP print volume of 
+      data transferred per day. This is a custom Javascript Dashboard.
 
 apptype: dashboard_js
 

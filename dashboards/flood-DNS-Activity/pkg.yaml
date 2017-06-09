@@ -9,8 +9,8 @@ description:
    short: DNS Custom Metrics and dashboards
    long:  |
       A new Filtered Counter Group - DNS Hosts and the following
-	  dashboard modules.  Total Traffic, Total DNS Traffic, Top DNS Hosts
-	  Unique DNS Hosts over time, Active DNS Connections, Total TCP SYN
+      dashboard modules.  Total Traffic, Total DNS Traffic, Top DNS Hosts
+      Unique DNS Hosts over time, Active DNS Connections, Total TCP SYN
 
 apptype: dashboard_share
 
