@@ -5,7 +5,7 @@ version: 0.0.1
 author: trisul
 
 description: 
-   short: Prunes encrypted Youtube/Netflix/etc pcaps
+   short: Prunes high volume encrypted Netflix/YouTube from PCAP storage 
    long:  |
       Dramatically reduce disk storage and throughput requirements by 
       automatically pruning raw PCAP storage. You do this by excluding high volume
