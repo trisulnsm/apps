@@ -8,8 +8,9 @@ description:
    short: Prunes encrypted Youtube/Netflix/etc pcaps
    long:  |
       Dramatically reduce disk storage and throughput requirements by 
-      automatically pruninng based on domain names (youtube, netflix, 
-      facebook, etc)
+      automatically pruning raw PCAP storage. You do this by excluding high volume
+	  trusted and encrypted traffic from (youtube, netflix, facebook, etc).
+	  NOTE: This requires the Passive DNS Creator plugin 
 
 apptype: lua
 
