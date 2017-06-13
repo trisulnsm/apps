@@ -1,6 +1,6 @@
 # Prune PCAP storage 
 
-NSM Practitioners  !! 
+### Calling NSM Practitioners  !! 
 
 Don't waste precious Disk Space and Write IOPs storing encrypted packets from
 Netflix/YouTube/Facebook/Twitter.   Save anywhere from 60-80% disk space 
@@ -9,8 +9,8 @@ with this Trisul Network Analytics plugin.
 1. Save disk space -- extend your PCAP retention
 2. Lower disk throughput -- lower RAID0 requirements 
 3. Fast PCAP retrieval for useful queries 
-4. Due to PFS you are never going to be able to read the PCAPs
-5. Even though the PCAPs arent saved, the flows,SSL certs, and metrics are so you dont lose visibility
+4. These packets are almost useless -- YouTube is moving to QUIC (UDP) others uses PFS encryption.
+5. Trisul still processes the metrics,flows,SSL certs so you dont lose visibility
 
 ## Traffic not saved:  Netflix, Youtube
 
