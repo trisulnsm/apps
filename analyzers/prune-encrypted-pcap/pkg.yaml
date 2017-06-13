@@ -1,6 +1,6 @@
 name: Prune Encrypted PCAP
 
-version: 0.0.1
+version: 0.0.3
 
 author: trisul
 
@@ -14,6 +14,6 @@ description:
 
 apptype: lua
 
-appresources: passive-dns-creator.lua  tris_leveldb.lua 
+appresources: skip_youtube.lua  tris_leveldb.lua 
 
 dependencies:  passive-dns-creator  
