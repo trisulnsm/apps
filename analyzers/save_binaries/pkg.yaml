@@ -9,7 +9,7 @@ description:
    long:  |
       Install this plugin to extract files that are potentially malicious into a
       directory. This plugin does not trust the Content-Type but relies on 
-	  reconstructing the file and using the Magic Number.
+      reconstructing the file and using the Magic Number.
 
 apptype: lua
 
