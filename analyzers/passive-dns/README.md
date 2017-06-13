@@ -45,3 +45,5 @@ then change the CreateFTSDocument parameter to 'true'
 ````
 
 
+Then restart the Probes. 
+
