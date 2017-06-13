@@ -11,7 +11,7 @@ This app requires two things on the probe.
 2. Modify the DNS config file to enable FTS (Full Text) extraction 
 
 
-### Installing LevelDB 
+### 1. Installing LevelDB 
 
 On CentOS 7
 
@@ -24,8 +24,16 @@ yum install leveldb
 ````
 
 
+On Ubuntu 14.04 and 16.04
 
-### Enable DNS FTS
+LevelDB is found in the libleveldb1 package
+
+````
+sudo apt-get install libleveldb1 
+````
+
+
+### 2. Enable DNS FTS
 
 On the probe edit the DNS configuration file. This is identified by a GUID PI-CCC..
 You can type /usr/local/share/trisul-probe/cfgedit  to find the file.
