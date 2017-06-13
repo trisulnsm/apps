@@ -37,7 +37,7 @@ TrisulPlugin = {
   -- close 
   onunload = function()
     if T.owner then 
-      print("Closing Leveldb from owner")
+      T.log("Closing Leveldb from owner")
       T.LevelCloser()
     end 
   end, 
