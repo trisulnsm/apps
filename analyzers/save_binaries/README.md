@@ -4,6 +4,17 @@ Install this app and immediately start dumping potentially malicious binaries
 transferred via HTTP to @/tmp/savedfiles@ 
 
 
+## Installing - enable FileExtraction
+
+You also need to ensure that FileExtraction is enabled.
+
+1. Check the Probe Config @/usr/local/etc/trisul-probe/domain0/probe0/context0/trisulProbeConfig.xml@ file
+2. Verify if the @FileExtraction > Enabled@ option is @TRUE@
+3. You also need to create a RAMFS/TMPFS  partition for this feature. To do this run @trisulctl_probe createramfs probe0 default@ and specify a size of say 40M 
+
+For more details see [https://www.trisul.org/docs/lua/fileextractoverview.html](File Extraction Overview) 
+
+
 ## What is dumped
 
 Any file of any size whose _Magic Number_ string meets the following RegEx. You can test 
