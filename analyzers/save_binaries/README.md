@@ -10,7 +10,7 @@ For this plugin to work you need to ensure that the FileExtraction feature is en
 1. Check the Probe Config `/usr/local/etc/trisul-probe/domain0/probe0/context0/trisulProbeConfig.xml` file
 2. Verify if the `FileExtraction > Enabled` option is `TRUE`
 3. You also need to create a RAMFS/TMPFS  partition for this feature. To do this 
-  3.1. run `trisulctl_probe createramfs probe0 default` and specify a size of say 40M 
+  1. run `trisulctl_probe createramfs probe0 default` and specify a size of say 40M 
 
 For more details see [File Extraction Overview](https://www.trisul.org/docs/lua/fileextractoverview.html) 
 
