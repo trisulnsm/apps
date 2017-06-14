@@ -35,13 +35,23 @@ sudo apt-get install libleveldb1
 
 ### 2. Enable DNS FTS
 
-On the probe edit the DNS configuration file. This is identified by a GUID PI-CCC..
-You can type /usr/local/share/trisul-probe/cfgedit  to find the file.
+On the probe edit the *DNS configuration file*. This is identified by a GUID PI-CCC..
+You can type @/usr/local/share/trisul-probe/cfgedit@  to find and edit the file.
 
 ````
+sudo -i 
 cd /usr/local/etc/trisul-probe/domain0/probe0/context0
 nano PI-CCCBBBB3-125E-48D0-8AC9-A7E3AD2F60FD.xml
 then change the CreateFTSDocument parameter to 'true'
+````
+
+or 
+
+
+````
+/usr/local/share/trisul-probe/cfgedit
+#  then locate the DNS Config file and select "edit" 
+
 ````
 
 
