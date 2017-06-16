@@ -73,7 +73,7 @@ TrisulPlugin = {
   -- 
   onload = function()
 
-  	local eve_socket_filename = T.env("App>RunStateDirectory")..EVE_SOCKETFILE_NAME
+  	local eve_socket_filename = T.env.get_config("App>RunStateDirectory").."/"..EVE_SOCKETFILE_NAME
 
     T.log(T.K.loglevel.INFO, "Suricata EVE Unix Socket script - setting up the socket : ".. eve_socket_filename)
 
