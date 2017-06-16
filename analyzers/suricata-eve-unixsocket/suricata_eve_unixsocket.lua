@@ -81,13 +81,13 @@ TrisulPlugin = {
     local socket = ffi.C.socket( K.AF_UNIX, K.SOCK_DGRAM, 0 );
     if  socket == -1 then 
       T.log(T.K.loglevel.ERROR,"Error socket() " .. strerror())
-      return 
+      return  false 
     end 
 
     -- bind to unix socket endpoint
     local addr = ffi.new("struct sockaddr_un");
     addr.sun_family = K.AF_UNIX;
-    addr.sun_path = EVE_SOCKETFILE
+    addr.sun_path = eve_socket_filename
     ffi.C.unlink(addr.sun_path);
     local ret = ffi.C.bind( socket,  ffi.cast("const struct sockaddr *", addr) , ffi.sizeof(addr));
 
