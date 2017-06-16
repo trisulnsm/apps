@@ -16,7 +16,7 @@
 
 local ffi=require'ffi'
 local JSON=require'JSON'
-local EVE_SOCKETFILE='/var/log/nsm/eve.socket'
+local EVE_SOCKETFILE_NAME='suricata_eve.socket'
 
 -- need to do this mapping .. :-(
 -- takes time to get used to LuaJIT FFI but quite easy once you get the 
@@ -73,7 +73,9 @@ TrisulPlugin = {
   -- 
   onload = function()
 
-    T.log("Suricata EVE Unix Socket script - setting up the socket : ".. EVE_SOCKETFILE)
+  	local eve_socket_filename = T.env("App>RunStateDirectory")..EVE_SOCKETFILE_NAME
+
+    T.log(T.K.loglevel.INFO, "Suricata EVE Unix Socket script - setting up the socket : ".. eve_socket_filename)
 
     -- socket 
     local socket = ffi.C.socket( K.AF_UNIX, K.SOCK_DGRAM, 0 );
@@ -89,8 +91,6 @@ TrisulPlugin = {
     ffi.C.unlink(addr.sun_path);
     local ret = ffi.C.bind( socket,  ffi.cast("const struct sockaddr *", addr) , ffi.sizeof(addr));
 
-
-    print ("Ret = "..ret.." pah="..ffi.string(addr.sun_path) )
     if ret == -1 then
         T.log(T.K.loglevel.ERROR, "Error bind() " .. strerror())
         return false
@@ -110,7 +110,7 @@ TrisulPlugin = {
     -- 
     step_alert  = function()
 
-      local MAX_MSG_SIZE=2048;
+      local MAX_MSG_SIZE=256000;
       local rbuf  = ffi.new("char[?]", MAX_MSG_SIZE);
 
       -- this block is repeated 

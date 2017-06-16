@@ -29,6 +29,7 @@ On Ubuntu 14.04 and 16.04
 LevelDB is found in the libleveldb1 package
 
 ````
+sudo apt-get update 
 sudo apt-get install libleveldb1 
 ````
 
