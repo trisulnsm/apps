@@ -121,7 +121,6 @@ TrisulPlugin = {
         local ret = ffi.C.recv(T.socket, rbuf,MAX_MSG_SIZE,K.MSG_DONTWAIT)
         if ret < 0 then
           if ffi.errno()  == K.EAGAIN then 
-            print("Nothing to read" )
             return nil
           else 
             print("Error ffi.recv " .. strerror())
@@ -138,6 +137,9 @@ TrisulPlugin = {
         p = JSON:decode(alert_string)
 
         until p["event_type"] ==   "alert" 
+
+
+		print("Adding alert from EVE JSON string "..p)
 
 
         -- basically a mapping of EVE to Trisul Alert
