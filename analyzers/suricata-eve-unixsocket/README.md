@@ -18,9 +18,7 @@ This would make Suricata output EVE to `/var/log/suricata/eve.socket`
 
 2. This App listens on `{Run-State-Directory}/suricata_eve.socket` 
 
-Where Run-State-Directory for a particular context is in the config file for 
-the context. Open `/usr/local/etc/trisul-probe/domain0/probe0/context0/trisulProbeConfig.xml` and
-look for the `RunStateDirectory` option. 
+Run-State-Directory for a particular context is the location where transient files and sockets are stored for the context. To find out the directory name, open `/usr/local/etc/trisul-probe/domain0/probe0/context0/trisulProbeConfig.xml` and look for the `RunStateDirectory` option. 
 
 
 
