@@ -5,15 +5,15 @@ version: 0.0.1
 author: trisul
 
 description: 
-   short: Prunes high volume encrypted Netflix/YouTube from PCAP storage 
+   short: Dont store TLS traffic 
    long:  |
-      Dramatically reduce disk storage and throughput requirements by 
-      automatically pruning raw PCAP storage. You do this by excluding high volume
-      trusted and encrypted traffic from (youtube, netflix, facebook, etc).
-      NOTE: This requires the Passive DNS Creator plugin 
+      Dramatically reduce disk IOPs and storage by not storing SSL/TLS traffic
+      on port 443. The app only prunes TLS traffic on 443 by inspecting the bytes
+      at the start of the flow to ensure TLS handshake is present. 
+      This app also prunes Google QUIC protocol on UDP 443. Used by YouTube.
 
 apptype: lua
 
-appresources: skip_youtube.lua  tris_leveldb.lua 
+appresources: nopcap_tls.lua  
 
-dependencies:  passive-dns-creator  
+dependencies:  
