@@ -10,6 +10,7 @@
 var IPActivity = $.klass({
   init:function(opts){
     //
+    this.dirname = dirname(opts.jsfile);
     this.available_time = opts.available_time;
     this.tint_arr = [];
     this.domid = opts["divid"];
@@ -137,12 +138,12 @@ var IPActivity = $.klass({
     $("<link/>", {
        rel: "stylesheet",
        type: "text/css",
-       href: "/plugins/key_usage_heatmap.css"
+       href: "/plugins/"+this.dirname +"/key_usage_heatmap.css"
     }).appendTo("head");
     var cthis = this;
     const margin = { top: 50, right: 0, bottom: 100, left: 30 },
       width = $('#hm_trp_data').width() - margin.left - margin.right,
-      height = 430 - margin.top - margin.bottom,
+      height = 530 - margin.top - margin.bottom,
       gridSize = Math.floor(width / 24),
       legendElementWidth = gridSize*2,
       buckets = 9,
