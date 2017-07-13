@@ -5,11 +5,12 @@
 -- uses LuaJIT FFI instead of naive version used in save_exe.lua
 --
 -- Saves all Executable files using the magic number method
--- into /tmp/savedfiles
 -- 
--- The regex we are using is (shockwave|msdownload|dosexec|pdf) to save common malware files
--- SWF,PDF,MSI,EXE etc
---
+-- Config params            Defaults
+-- ---------------          --------
+-- OutputDirectory          /tmp/savedfiles
+-- Magic Regex              (shockwave|msdownload|dosexec|pdf|macro) to save common malware files
+--                          SWF,PDF,MSI,EXE etc
 --
 local ffi=require('ffi')
 local C = ffi.load('libmagic.so.1')
@@ -23,6 +24,24 @@ ffi.cdef[[
   const char *magic_file(magic_t, const char *);
   int magic_load(magic_t, const char *);
 ]]
+
+
+function file_exists(name)
+   local f=io.open(name,"r")
+   if f~=nil then io.close(f) return true else return false end
+end
+-- --------------------------------------------
+-- override by trisul_apps_save_exe.config.lua 
+-- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
+--
+DEFAULT_CONFIG = {
+	-- where do you want the extracted files to go
+	OutputDirectory="/tmp/savedfiles",
+
+	-- the strings returned by libmagic you want to save
+	Regex="(?i)(msdos|ms-dos|microsoft|windows|elf|executable|pdf|flash|macro)"
+}
+-- --------------------------------------------
 
 
 -- plugin starts 
@@ -41,6 +60,15 @@ TrisulPlugin = {
   -- make sure the output directory is present 
   onload = function()
 
+	-- load custom config if present 
+	local custom_config_file = T.env.get_config("App>DBRoot").."/config/trisulnsm_save_exe.config.lua"
+	if file_exists(custom_config_file) then 
+		T.active_config = require(custom_config_file) 
+	else 
+		T.active_config = DEFAULT_CONFIG
+	end
+
+
   	T.magic_handle=C.magic_open(C.MAGIC_NONE);
 	if T.magic_handle == nil then
 		T.logerror("Error opening magic handle")
@@ -51,8 +79,8 @@ TrisulPlugin = {
 	  return false
 	end
 
-    os.execute("mkdir -p /tmp/savedfiles")
-	T.trigger_patterns = T.re2("(?i)(msdos|ms-dos|microsoft|windows|elf|executable|pdf|flash)")
+    os.execute("mkdir -p "..T.active_config.OutputDirectory)
+	T.trigger_patterns = T.re2(T.active_config.Regex)
 	T.savechunks={}
   end,
 
@@ -76,7 +104,6 @@ TrisulPlugin = {
 	  end 
 
 	  local magic_filetype=ffi.string(val_c)
-	  print("MAGIIGICICIC".. magic_filetype)
 
 	  -- 
 	  if T.trigger_patterns:partial_match(magic_filetype) then 
@@ -93,12 +120,12 @@ TrisulPlugin = {
 			   local fn,off = path:match("^.+/(.+)%.%d+.part$")
 			   --  just a chunk , concatenate with prev 
 			   --
-			   T.async:cat( path, "/tmp/savedfiles/"..fn)
+			   T.async:cat( path, T.active_config.OutputDirectory.."/"..fn)
 		  else
 			   -- full file 
 			   --
 			   local fn = path:match("^.+/(.+)$")
-			   T.async:copy( path, "/tmp/savedfiles/"..fn)
+			   T.async:copy( path, T.async.OutputDirectory.."/"..fn)
 		  end 
 
 	  end 

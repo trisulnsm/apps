@@ -12,8 +12,35 @@ For this plugin to work you need to ensure :
 3. You also need to create a RAMFS/TMPFS  partition for this feature. To do this 
     1. run `trisulctl_probe createramfs probe0 default` and specify a size of say 40M 
 	2. add this file system to `/etc/fstab` as described in [Creating ramfs](https://www.trisul.org/docs/lua/fileextractoverview.html#the_ramfs_filesystem)
-4. Restart Trisul Probe 
 
+
+## Config parameters
+
+To override the default parameters
+````
+DEFAULT_CONFIG = { 
+	-- where do you want the extracted files to go
+	OutputDirectory="/tmp/savedfiles",
+
+	-- the strings returned by libmagic you want to save
+	Regex="(?i)(msdos|ms-dos|microsoft|windows|elf|executable|pdf|flash|macro)"
+}
+````
+
+create a new config file named `trisulnsm_save_exe.config.lua` in the probe config directory
+`/usr/local/var/lib/trisul-probe/domain0/probe0/context0/config` directory with the following
+
+````
+return { 
+	-- where do you want the extracted files to go
+	OutputDirectory="/my/output/directory,
+
+	-- the strings returned by libmagic you want to save
+	Regex="(?i)(msdos|ms-dos|microsoft|windows|executable)"
+}
+
+````
+				
 
 ## What is dumped
 
@@ -34,12 +61,3 @@ You can send these files for further analysis to platforms like
 * Lockheed's LAIKA BOSS Object Scanning platform : https://github.com/lmco/laikaboss
 * VirusTotal
 
-
-## Tuning
-
-This may also pull in ICO files due to the presence of "Microsoft" in the file type.
-If this is too noisy you can edit the LUA Regex and submit a pull request.
-
-
-## LUA Docs 
-For more details see [File Extraction Overview](https://www.trisul.org/docs/lua/fileextractoverview.html) 
