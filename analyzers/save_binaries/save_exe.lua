@@ -61,15 +61,16 @@ TrisulPlugin = {
   onload = function()
 
 	-- load custom config if present 
+	T.active_config = DEFAULT_CONFIG
 	local custom_config_file = T.env.get_config("App>DBRoot").."/config/trisulnsm_save_exe.config.lua"
 	if file_exists(custom_config_file) then 
 		local newsettings = dofile(custom_config_file) 
-		T.log("Loaded custom settings from ".. custom_config_file)
+		T.log("Loading custom settings from ".. custom_config_file)
 		for k,v in pairs(newsettings) do 
+			T.active_config[k]=v
 			T.log("Loaded new setting "..k.."="..v)
 		end
 	else 
-		T.active_config = DEFAULT_CONFIG
 		T.log("Loaded default settings")
 	end
 
