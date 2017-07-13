@@ -7,13 +7,17 @@
 
 // Run function should automatically called when page is loaded.
 
-var IPActivity = $.klass({
+var KeyActivityUsage = $.klass({
   init:function(opts){
     //
-    this.dirname = dirname(opts.jsfile);
+    this.domid = opts["divid"];
+    if(typeof get_dirname == "undefined"){
+      this.show_error_box();
+      return true;
+    }
+    this.dirname = get_dirname(opts.jsfile);
     this.available_time = opts.available_time;
     this.tint_arr = [];
-    this.domid = opts["divid"];
     this.data = [];
     this.map_days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     this.days = [];
@@ -281,7 +285,7 @@ var IPActivity = $.klass({
   },
 
   show_error_box:function(){
-    var span = "<span>Please click <a href='https://trisul.org/download' target='_blank'> here </a> to  download lastest package </span>";
+    var span = "<span>Please click <a href='https://trisul.org/download' target='_blank'> here </a> to  download lastest package. </span>";
     var error_box = "<div class = 'alert alert-danger'>You need to update your webtrisul package to use this feature.<br/>"+span+"</div>";
 
     $(this.domid).html(error_box);
@@ -291,8 +295,7 @@ var IPActivity = $.klass({
 });
 function run(opts){
   
-  new IPActivity(opts);
+  new KeyActivityUsage(opts);
   
 }
 
-//# sourceURL=ip_heatmap.js
