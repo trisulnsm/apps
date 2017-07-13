@@ -1,0 +1,19 @@
+name: SSH Events
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: SSH Login and Tunnel
+   long:  |
+      Use Traffic analysis to detect successful SSH logins, keystrokes, and detect
+	  obsolete SSH clients and servers. Old and insecure MACs and Ciphers.
+      Detect SSH Tunnel activity which can indicate serious deep breach undetectable
+      by firewalls and IDS 
+
+apptype: lua
+
+appresources: pdurecord.lua  ssh_alert_group.lua  ssh_dissect.lua  ssh-spy.lua  sweepbuf.lua
+
+dependencies:  
