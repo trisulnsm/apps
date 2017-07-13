@@ -63,9 +63,14 @@ TrisulPlugin = {
 	-- load custom config if present 
 	local custom_config_file = T.env.get_config("App>DBRoot").."/config/trisulnsm_save_exe.config.lua"
 	if file_exists(custom_config_file) then 
-		T.active_config = require(custom_config_file) 
+		local newsettings = dofile(custom_config_file) 
+		T.log("Loaded custom settings from ".. custom_config_file)
+		for k,v in pairs(newsettings) do 
+			T.log("Loaded new setting "..k.."="..v)
+		end
 	else 
 		T.active_config = DEFAULT_CONFIG
+		T.log("Loaded default settings")
 	end
 
 
@@ -125,7 +130,7 @@ TrisulPlugin = {
 			   -- full file 
 			   --
 			   local fn = path:match("^.+/(.+)$")
-			   T.async:copy( path, T.async.OutputDirectory.."/"..fn)
+			   T.async:copy( path, T.active_config.OutputDirectory.."/"..fn)
 		  end 
 
 	  end 
