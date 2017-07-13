@@ -1,0 +1,18 @@
+name: Usgage Activity Heatmap
+
+version: 0.0.3
+
+author: trisul
+
+
+description: 
+   short: Shows key activity usage in d3 heatmap visualization Day/Hour
+   long:  |
+      Shows key usage activity hour by hour for recent 7 days.
+      You can plot any key with any meter.
+
+apptype: dashboard_js
+
+appresources: key_usage_heatmap.js key_usage_heatmap.css
+
+dependencies: 

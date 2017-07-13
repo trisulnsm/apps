@@ -1,0 +1,32 @@
+rect.bordered {
+  stroke: #E6E6E6;
+  stroke-width:2px;   
+}
+
+text.mono {
+  font-size: 9pt;
+  font-family: Consolas, courier;
+  fill: #aaa;
+}
+
+text.axis-workweek {
+  fill: #000;
+}
+
+text.axis-worktime {
+  fill: #000;
+}
+div.d3_heatmap_tooltip { 
+  position: absolute;     
+  text-align: center;     
+  width: 120px;          
+  height: 40px;         
+  padding: 2px;       
+  font: 12px sans-serif;    
+  background: lightsteelblue; 
+  border: 0px;    
+  border-radius: 8px;     
+  pointer-events: none;     
+}
+
+
