@@ -42,7 +42,8 @@ var KeyActivityUsage = $.klass({
   },
   //add the from for user to select guid and meter
   add_form:function(){
-    var form = $("<form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'> Counter Group </label> <div class='col-xs-6'> <select name='cgguid' id='hm_cg_id'></select> </div> </div> <div class='form-group'> <label class='control-label col-xs-4'> Key </label> <div class='col-xs-6'> <input type='text' name='key1' id='hm_key'> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'> Meters </label> <div class='col-xs-6'> <select name='meter' id='hm_meter_id'></select> </div> </div> </div> </div> <div class='form-group'> <div class='col-xs-10 col-md-offset-2'> <input type='submit' name='commit' value='Show heatmap' class='btn-submit'> </div> </div> </form> <div id='hm_trp_data'><div id='hm_status_bar'><i class='fa fa-spin fa-spinner fa-fw hide'></i><span id='hm_status_bar_text'></span></div></div>");
+    var form = $("<form class='form-horizontal'> <div class='row'> <div class='col-xs-4'> <div class='form-group'> <label class='control-label col-xs-4'> Counter Group </label> <div class='col-xs-8'> <select name='cgguid' id='hm_cg_id'></select> </div> </div> </div> <div class='col-xs-4'> <div class='form-group'> <label class='control-label col-xs-4'> Meter</label> <div class='col-xs-8'> <select name='meter' id='hm_meter_id'></select> </div> </div> </div> <div class='col-xs-4'> <div class='form-group'> <label class='control-label col-xs-4'> Key </label> <div class='col-xs-8'> <input type='text' name='key1' id='hm_key'> </div> </div> </div> </div> <div class='form-group'> <div class='col-xs-10 col-md-offset-4'> <input type='submit' name='commit' value='Show heatmap' class='btn-submit'> </div> </div> </form> <div id='hm_trp_data'> <div id='hm_status_bar'> <i class='fa fa-spin fa-spinner fa-fw hide'></i> <span id='hm_status_bar_text'></span> </div> </div>");
+
     $(this.domid).append(form);
     var js_params = {meter_details:this.cg_meter_json,
       selected_cg : "",
@@ -147,7 +148,7 @@ var KeyActivityUsage = $.klass({
     var cthis = this;
     const margin = { top: 50, right: 0, bottom: 100, left: 30 },
       width = $('#hm_trp_data').width() - margin.left - margin.right,
-      height = 530 - margin.top - margin.bottom,
+      height = (width/1.7) - margin.top - margin.bottom,
       gridSize = Math.floor(width / 24),
       legendElementWidth = gridSize*2,
       buckets = 9,
@@ -186,14 +187,18 @@ var KeyActivityUsage = $.klass({
     var formatTime = d3.timeFormat("%Y-%m-%d");
 
 
-    $('#d3_heatmap_tooltip').remove();
+    $('.d3_heatmap_tooltip').remove();
     var div = d3.select("body").append("div") 
     .attr("class", "d3_heatmap_tooltip")       
     .style("opacity", 0);
 
     var heatmapChart = function(data){
+      var max = d3.max(data, (d) => d.value)
+      if (max == 0 ){
+        max = 8;
+      }
       const colorScale = d3.scaleQuantile()
-        .domain([0, buckets - 1, d3.max(data, (d) => d.value)])
+        .domain([d3.min(data, (d) => d.value), buckets - 1, max])
         .range(colors);
 
       const cards = svg.selectAll(".hour")
@@ -298,4 +303,3 @@ function run(opts){
   new KeyActivityUsage(opts);
   
 }
-
