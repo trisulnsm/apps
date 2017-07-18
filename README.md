@@ -13,6 +13,9 @@ Installable dashboards, custom analytics, and other extensions to the Trisul Net
 To install these tools
 
 1. Login as admin
-2. Open Plugins.
+2. Go to Webadmin > Manage > Apps 
+3. Click on the App you want to install
+4. For each App click on the README link for additional instructions
 
-TODO 
+
+
