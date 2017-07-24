@@ -77,7 +77,7 @@ TrisulPlugin = {
         local a = doc:gmatch("A%s*IN%s*([%d%.]+)")
 
         for s in a do 
-          print("Engine:".. engine:instanceid().." Saved "..s.." => "..q)
+          -- print("Engine:".. engine:instanceid().." Saved "..s.." => "..q)
           T.LevelWriter(s,q)
         end 
 
