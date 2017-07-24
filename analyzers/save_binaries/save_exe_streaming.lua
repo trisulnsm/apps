@@ -98,6 +98,18 @@ TrisulPlugin = {
   filex_monitor  = {
 
 
+  filter = function( engine, timestamp, flowkey, header)
+	if header:is_request() then
+		return true
+	elseif header:match_value("Content-Type", "(javascript|html|css)")  then
+	    return false
+	else
+		return true
+	end
+
+  end,
+
+
 	-- streaming interface 
     -- save all content to /tmp/savedfiles  
 	-- then check magic number using `file ..` if it matches microsoft pull it out 
