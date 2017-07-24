@@ -36,6 +36,12 @@ local TLSDissector_SNI =
 		  payload:skip(payload:next_u16())    -- over Ciphers 
 		  payload:skip(payload:next_u8())     -- over compression 
 
+		  -- no extensions! older SSL?
+		  if not payload:has_more() then
+			tbl.state="client-hello-done"
+		  	return
+		  end
+
 		  payload:push_fence(payload:next_u16())
 		  while payload:has_more() do
 			local ext_type = payload:next_u16()
@@ -49,6 +55,8 @@ local TLSDissector_SNI =
 				  if #snihostname >=64 then
 				  	snihostname = string.sub(snihostname,1,64)
 				  end
+
+				  print(snihostname)
 
 				  -- hits 
 				  pdur.engine:update_counter("{38497403-23FB-4206-65C2-0AD5C419DD53}",
