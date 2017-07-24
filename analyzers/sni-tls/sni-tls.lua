@@ -56,8 +56,6 @@ local TLSDissector_SNI =
 				  	snihostname = string.sub(snihostname,1,64)
 				  end
 
-				  print(snihostname)
-
 				  -- hits 
 				  pdur.engine:update_counter("{38497403-23FB-4206-65C2-0AD5C419DD53}",
 				  						snihostname, 1, 1)
