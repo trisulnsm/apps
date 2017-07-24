@@ -61,21 +61,20 @@ TrisulPlugin = {
   reassembly_handler   = {
 
 	onnewflow = function(engine, timestsamp, flowkey)
-	  if not flowkey:id():find("p-01BB") then return end 
-          T.Pimpl[flowkey:id()] =   PDURecord.new(flowkey:id(), TLSSNI.new(flowkey)) 
+	  if flowkey:id():find("p-01BB") then 
+		  T.Pimpl[flowkey:id()] =  PDURecord.new(flowkey:id(), TLSSNI.new(flowkey))
+	  end 
 	end,
 
     -- run the PDU streamer , which will callback into the dissector 
+	-- we only worry about OUT direction (==1)
     onpayload = function(engine, timestamp, flowkey, direction, seekpos, buffer) 
 
-	
-	  if direction==1 and flowkey:id():find("p-01BB") then 
-
+	  if flowkey:id():find("p-01BB") and direction==1 then 
 		  local pdur = T.Pimpl[flowkey:id()] 
 		  pdur.engine=engine
 		  pdur.timestamp=timestamp
 		  pdur:push_chunk(seekpos, buffer:tostring())
-
 	  end
 
     end,
