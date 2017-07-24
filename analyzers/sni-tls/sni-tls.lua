@@ -52,7 +52,7 @@ local TLSDissector_SNI =
 				  payload:skip(1)
 				  local snihostname  =  payload:next_str_to_len(payload:next_u16())
 
-				  if #snihostname >=64 then
+				  if #snihostname >=60 then
 				  	snihostname = string.sub(snihostname,1,60)
 				  end
 
