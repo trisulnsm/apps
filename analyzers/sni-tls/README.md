@@ -15,8 +15,3 @@ This app provides three metrics
 
 3. Top SNI Hostnames for each meter by bandwidth and hits 
 
-
-CHANGELOG
-=========
-
-0.0.3      Jul-24-2017    SNI names > 64, truncate to 64 for metering 
