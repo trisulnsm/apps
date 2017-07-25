@@ -1,0 +1,19 @@
+name: Save Binaries Monitoring
+
+version: 0.0.2
+
+author: trisul
+
+
+description: 
+   short: Dashboards for the Save Binaries App
+   long:  |
+      Monitor performance metrics of File Extraction. 
+      Files extracted per minute, throughput, skipped. 
+      Top file types with extraction rate over time, etc 
+
+apptype: dashboard_share
+
+appresources: dashboard1.json
+
+dependencies : 

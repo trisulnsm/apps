@@ -14,6 +14,8 @@ For this plugin to work you need to ensure :
 	2. add this file system to `/etc/fstab` as described in [Creating ramfs](https://www.trisul.org/docs/lua/fileextractoverview.html#the_ramfs_filesystem)
 
 
+## TIP : Also install the "Save Binaries Monitoring" dashboard app to view performance charts 
+
 ## Config parameters
 
 To override the default parameters

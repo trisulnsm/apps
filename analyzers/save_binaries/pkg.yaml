@@ -1,6 +1,6 @@
 name: Save Binaries 
 
-version: 0.0.4
+version: 0.0.5
 
 author: trisul
 
@@ -13,6 +13,6 @@ description:
 
 apptype: lua
 
-appresources: save_exe_streaming.lua 
+appresources: save_exe_streaming.lua  fe_counters.lua 
 
 dependencies:  

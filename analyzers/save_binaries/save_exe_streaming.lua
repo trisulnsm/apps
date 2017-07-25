@@ -14,6 +14,7 @@
 --
 local ffi=require('ffi')
 local C = ffi.load('libmagic.so.1')
+local dbg=require'debugger'
 
 ffi.cdef[[
   static const int MAGIC_NONE=0x000000;
@@ -102,6 +103,7 @@ TrisulPlugin = {
 	if header:is_request() then
 		return true
 	elseif header:match_value("Content-Type", "(javascript|html|css)")  then
+		engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}","ContentTypeSkip",0,1)
 	    return false
 	else
 		return true
@@ -117,7 +119,7 @@ TrisulPlugin = {
     onpayload_http   = function ( engine, timestamp, flow, path, req_header, resp_header, dir , seekpos , buffer )
 
       -- you can get 0 length for HTTP 304, etc - skip it (or log it in other ways etc)
-      if length == 0 then return; end 
+      if buffer:size()  == 0 then return; end 
 
 	  if  seekpos == 0  then 
 
@@ -125,27 +127,34 @@ TrisulPlugin = {
 		  local val_c = C.magic_buffer( T.magic_handle, buffer:tostring(), buffer:length())
 		  if val_c== nil then
 			  T.logerror("magic_file(..) error="..ffi.string(C.magic_error(T.magic_handle)) )
+			  engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}","LibmagicError",0,1)
 			  return
 		  end 
 
 		  local magic_filetype=ffi.string(val_c)
 
-		  -- 
+		  local ctrkey=magic_filetype:match("(%w+%s+%w+)")
+
+	  	  -- saving if this trigger our RE2 pattern 
 		  if T.trigger_patterns:partial_match(magic_filetype) and 
 		     not T.trigger_patterns_inv:partial_match(magic_filetype) then 
 			  T.savechunks[flow:id()]=true 
+			  engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}","Extracted",0,1)
+			  engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}",ctrkey,2,1)
 		  elseif not is_chunk then 
 			  T.savechunks[flow:id()]=false 
+			  engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}","Skipped",0,1)
 			  return false
 		  end 
 
 	  end
 
 
-	  -- does this trigger our RE2 pattern 
+	  -- if previously flagged , add 
 	  if T.savechunks[flow:id()]  then 
 		  local fn = path:match("^.+/(.+)$")
 		  T.async:copybuffer( buffer, T.active_config.OutputDirectory.."/"..fn, seekpos )
+		  engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}","ExtractedBW",1,buffer:size())
 	  end 
 
 	end,
