@@ -36,7 +36,7 @@
         "webtrisul_module_template_id": 34,
         "name": "Extraction Rate /min",
         "description": "Key Traffic module",
-        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"SQUARELINE\",\"title\":\"Extractions / min\",\"models\":\"[[\\\"{282E13BE-9691-4B61-F0A3-21CB90792478}\\\",\\\"Extracted\\\",0,\\\"hits\\\"]]\"}",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"60\",\"height\":300,\"surface\":\"SQUARELINE\",\"title\":\"Extractions / min\",\"models\":\"[[\\\"{282E13BE-9691-4B61-F0A3-21CB90792478}\\\",\\\"Extracted\\\",0,\\\"hits\\\"]]\"}",
         "stretch_to_fit": 0,
         "maintain_aspect_ratio": 0,
         "show_decoration": 0
@@ -72,7 +72,7 @@
         "webtrisul_module_template_id": 34,
         "name": "Extracted Bandwidth (Throughput)",
         "description": "Key Traffic module",
-        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"SQUARELINE\",\"title\":\"Extracted Bandwidth\",\"models\":\"[[\\\"{282E13BE-9691-4B61-F0A3-21CB90792478}\\\",\\\"ExtractedBW\\\",1,\\\"bytes\\\"]]\"}",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"60\",\"height\":300,\"surface\":\"SQUARELINE\",\"title\":\"Extracted Bandwidth\",\"models\":\"[[\\\"{282E13BE-9691-4B61-F0A3-21CB90792478}\\\",\\\"ExtractedBW\\\",1,\\\"bytes\\\"]]\"}",
         "stretch_to_fit": 0,
         "maintain_aspect_ratio": 0,
         "show_decoration": 0
@@ -84,7 +84,7 @@
         "webtrisul_module_template_id": 34,
         "name": "Skipped due to whitelist Content-Type /minute",
         "description": "Key Traffic module",
-        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"SQUARELINE\",\"title\":\"Skipped -content-type /min\",\"models\":\"[[\\\"{282E13BE-9691-4B61-F0A3-21CB90792478}\\\",\\\"ContentTypeSkip\\\",0,\\\"hits\\\"]]\"}",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":\"60\",\"height\":300,\"surface\":\"SQUARELINE\",\"title\":\"Skipped -content-type /min\",\"models\":\"[[\\\"{282E13BE-9691-4B61-F0A3-21CB90792478}\\\",\\\"ContentTypeSkip\\\",0,\\\"hits\\\"]]\"}",
         "stretch_to_fit": 0,
         "maintain_aspect_ratio": 0,
         "show_decoration": 0
@@ -96,7 +96,7 @@
         "webtrisul_module_template_id": 6,
         "name": "File Extraction Types Trend",
         "description": "File Extraction Types Trend",
-        "options": "{\"recentsecs\":43200,\"topcount\":10,\"cgguid\":\"{282E13BE-9691-4B61-F0A3-21CB90792478}\",\"statid\":2,\"cullcount\":\"0\",\"width\":400,\"height\":300,\"bucketsize\":\"0\",\"surface\":\"STACKEDAREA\",\"transformer\":\"OctetToBits.new\",\"title\":\"Flow interfaces\"}",
+        "options": "{\"recentsecs\":43200,\"topcount\":10,\"cgguid\":\"{282E13BE-9691-4B61-F0A3-21CB90792478}\",\"statid\":2,\"cullcount\":\"0\",\"width\":400,\"height\":300,\"bucketsize\":\"60\",\"surface\":\"STACKEDAREA\",\"transformer\":\"OctetToBits.new\",\"title\":\"Flow interfaces\"}",
         "stretch_to_fit": 1,
         "maintain_aspect_ratio": 0,
         "show_decoration": 1
