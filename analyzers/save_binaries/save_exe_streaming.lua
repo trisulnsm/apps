@@ -14,7 +14,7 @@
 --
 local ffi=require('ffi')
 local C = ffi.load('libmagic.so.1')
-local dbg=require'debugger'
+----  local dbg=require'debugger'
 
 ffi.cdef[[
   static const int MAGIC_NONE=0x000000;
@@ -41,7 +41,7 @@ DEFAULT_CONFIG = {
 	OutputDirectory="/tmp/savedfiles",
 
 	-- the strings returned by libmagic you want to save
-	Regex="(?i)(msdos|ms-dos|microsoft|windows|elf|executable|pdf|flash|macro)",
+	Regex="(?i)(msdos|pe32|ms-dos|microsoft|windows|elf|executable|pdf|flash|macro|composite|x86 boot)",
 
 	-- filter out these which make it past Regex (to overcome a limitation of RE2) 
 	Regex_Inv="(?i)(ico)",
@@ -100,12 +100,23 @@ TrisulPlugin = {
 
 
   filter = function( engine, timestamp, flowkey, header)
+
+	-- meter : how many times the decompressor was started vs skipped
+	-- a useful measure of CPU cycles neede
+	local decompressor_needed =  header:is_response() and header:match_value("Content-Encoding","gzip") 
+
 	if header:is_request() then
 		return true
 	elseif header:match_value("Content-Type", "(javascript|html|css)")  then
 		engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}","ContentTypeSkip",0,1)
+		if decompressor_needed then 
+			  engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}","DecompressorSkip",0,1)
+		end
 	    return false
 	else
+		if decompressor_needed then 
+			  engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}","DecompressorStart",0,1)
+		end
 		return true
 	end
 
@@ -133,6 +144,8 @@ TrisulPlugin = {
 
 		  local magic_filetype=ffi.string(val_c)
 
+		  -- print("type = ".. magic_filetype)
+
 		  local ctrkey=magic_filetype:match("(%w+%s+%w+)")
 
 	  	  -- saving if this trigger our RE2 pattern 
@@ -141,7 +154,7 @@ TrisulPlugin = {
 			  T.savechunks[flow:id()]=true 
 			  engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}","Extracted",0,1)
 			  engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}",ctrkey,2,1)
-		  elseif not is_chunk then 
+		  else
 			  T.savechunks[flow:id()]=false 
 			  engine:update_counter_raw("{282E13BE-9691-4B61-F0A3-21CB90792478}","Skipped",0,1)
 			  return false
