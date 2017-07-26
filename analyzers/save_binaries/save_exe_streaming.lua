@@ -41,7 +41,7 @@ DEFAULT_CONFIG = {
 	OutputDirectory="/tmp/savedfiles",
 
 	-- the strings returned by libmagic you want to save
-	Regex="(?i)(msdos|pe32|ms-dos|microsoft|windows|elf|executable|pdf|flash|macro|composite|x86 boot)",
+	Regex="(?i)(msdos|pe32|ms-dos|microsoft|windows|elf|executable|pdf|flash|macro|composite|x86 boot|iso\\s+9660)",
 
 	-- filter out these which make it past Regex (to overcome a limitation of RE2) 
 	Regex_Inv="(?i)(ico)",
