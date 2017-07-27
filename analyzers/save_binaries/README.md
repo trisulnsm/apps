@@ -3,6 +3,12 @@
 Install this app and immediately start dumping potentially malicious binaries 
 transferred via HTTP to `/tmp/savedfiles`
 
+## Features
+1. Files of ANY size  are extracted
+2. Streaming mode uses minimum memory
+3. Actual payload of the file is examined. Cant be cheated by fake Content-Type 
+
+
 ## Installing - enable FileExtraction
 
 1. Open the Probe Config `/usr/local/etc/trisul-probe/domain0/probe0/context0/trisulProbeConfig.xml` file
