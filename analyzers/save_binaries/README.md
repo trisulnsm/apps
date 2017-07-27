@@ -1,20 +1,15 @@
-# Save EXE, PE, DLL, FLASH, PDF 
+# Save EXE, PE, DLL, FLASH, PDF, ISO 
 
 Install this app and immediately start dumping potentially malicious binaries 
 transferred via HTTP to `/tmp/savedfiles`
 
 ## Installing - enable FileExtraction
 
-For this plugin to work you need to ensure :
-
 1. Open the Probe Config `/usr/local/etc/trisul-probe/domain0/probe0/context0/trisulProbeConfig.xml` file
 2. Verify if the `FileExtraction > Enabled` option is `TRUE`
-3. You also need to create a RAMFS/TMPFS  partition for this feature. To do this 
+3. Create a RAMFS/TMPFS  partition for this feature. To do this 
     1. run `trisulctl_probe createramfs probe0 default` and specify a size of say 40M 
 	2. add this file system to `/etc/fstab` as described in [Creating ramfs](https://www.trisul.org/docs/lua/fileextractoverview.html#the_ramfs_filesystem)
-
-
-## TIP : Also install the "Save Binaries Monitoring" dashboard app to view performance charts 
 
 ## Config parameters
 
@@ -63,3 +58,7 @@ You can send these files for further analysis to platforms like
 * Lockheed's LAIKA BOSS Object Scanning platform : https://github.com/lmco/laikaboss
 * VirusTotal
 
+
+## Also install
+
+The **Save Binaries Dashboard App** gives you a neat dashboard of metrics related to this feature. 
