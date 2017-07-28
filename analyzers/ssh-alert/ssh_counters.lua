@@ -23,6 +23,7 @@ TrisulPlugin = {
       guid = "{E6A387F4-5B51-4C8B-86FD-DE6258D3F214}",
       name = "SSH Endpoints",
       description = "SSH Client and Servers",
+	  bucketsize = 60,
     },
 
     -- meters table
