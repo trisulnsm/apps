@@ -25,6 +25,7 @@ local SSHDissector =
   ["hmac-sha2-512"]                   = {etm=false, m=64,      k=96,     t={480}        , rt={84} },
   ["hmac-sha1"]                       = {etm=false, m=20,      k=52,     t={460,296,304}, rt={84} },
   ["hmac-md5"]                        = {etm=false, m=16,      k=48,     t={368,304}    , rt={84} },
+  ["umac-64@openssh.com"]             = {etm=false, m=8,       k=16,     t={320}        , rt={60} },
    } ,
 
    MaxShellSegments = 20, -- how far to continue packet inspection past NEW KEYS
