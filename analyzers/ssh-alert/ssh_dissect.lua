@@ -18,14 +18,14 @@ local SSHDissector =
   ["hmac-sha2-512-etm@openssh.com"]   = {etm=true,  m=64,      k=16,     t={320}        , rt={84} },
   ["hmac-sha1-96-etm@openssh.com"]    = {etm=true,  m=12,      k=16,     t={320}        , rt={84} },
   ["hmac-md5-96-etm@openssh.com"]     = {etm=true,  m=12,      k=16,     t={320}        , rt={84} },
-  ["chacha20-poly1305@openssh.com"]   = {etm=false, m=16,      k=36,     t={376,444,436,288}, rt={76} },   
+  ["chacha20-poly1305@openssh.com"]   = {etm=false, m=16,      k=36,     t={376,92,100,444,436}, rt={76} },   
   ["aes128-gcm@openssh.com"]          = {etm=true,  m=16,      k=36,     t={320}        , rt={76} },   
   ["aes256-gcm@openssh.com"]          = {etm=true,  m=16,      k=36,     t={320}        , rt={76} },   
-  ["hmac-sha2-256"]                   = {etm=false, m=32,      k=64,     t={416,304}    , rt={84} },
+  ["hmac-sha2-256"]                   = {etm=false, m=32,      k=64,     t={416,112}    , rt={84} },
   ["hmac-sha2-512"]                   = {etm=false, m=64,      k=96,     t={480}        , rt={84} },
-  ["hmac-sha1"]                       = {etm=false, m=20,      k=52,     t={460,296,304}, rt={84} },
-  ["hmac-md5"]                        = {etm=false, m=16,      k=48,     t={368,304}    , rt={84} },
-  ["umac-64@openssh.com"]             = {etm=false, m=8,       k=16,     t={320}        , rt={60} },
+  ["hmac-sha1"]                       = {etm=false, m=20,      k=52,     t={460,100}    , rt={84} },
+  ["hmac-md5"]                        = {etm=false, m=16,      k=48,     t={368,96}     , rt={84} },
+  ["umac-64@openssh.com"]             = {etm=false, m=8,       k=16,     t={320,80}     , rt={60} },
    } ,
 
    MaxShellSegments = 20, -- how far to continue packet inspection past NEW KEYS
@@ -162,11 +162,11 @@ local SSHDissector =
       elseif code==21 then
         -- if *-etm  the pktlen available use that 
         if tbl.nego.ctl_table.etm  then 
-          print(tbl.role.. " NEW_KEYS - ETM will continue PDU ") 
+          -- print(tbl.role.. " NEW_KEYS - ETM will continue PDU ") 
           tbl.ssh_state=tbl.ST.ETM_PAYLOAD
           tbl.shell_segments=0
         else
-          print(tbl.role.. " NEW_KEYS - non-ETM work with TCP buff") 
+          -- print(tbl.role.. " NEW_KEYS - non-ETM work with TCP buff") 
           tbl.ssh_state=tbl.ST.NON_ETM_PAYLOAD
           tbl.shell_segments=0
         end
@@ -209,6 +209,8 @@ local SSHDissector =
 		print(tbl.ssh_version_string)
 		print(tbl.paired_with.ssh_version_string)
 
+		tbl.login_ok=true
+		tbl.paired_with.login_ok=true
 
         if not tbl.nego.ctl_table.etm  and
           tbl.nego.encryption_algorithms_client_to_server~="chacha20-poly1305@openssh.com" then 
@@ -217,9 +219,10 @@ local SSHDissector =
                 "WEAKHMAC", 3, 
                 "Successful login using non-ETM MAC "..tbl.nego.encryption_algorithms_client_to_server  );
         end
+        
       end
-      tbl.key_press =  (plen == tbl.nego.ctl_table.k) 
-    elseif not tbl.key_press_alerted  then 
+	  tbl.key_press =  (plen == tbl.nego.ctl_table.k) 
+    elseif not tbl.key_press_alerted  and tbl.login_ok then 
       tbl.key_press =  (plen == tbl.nego.ctl_table.k) 
       if tbl.key_press and tbl.paired_with.key_press then
         print("KEYPRESS ALERT ")
