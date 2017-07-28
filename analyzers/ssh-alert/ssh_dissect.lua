@@ -23,7 +23,8 @@ local SSHDissector =
   ["aes256-gcm@openssh.com"]          = {etm=true,  m=16,      k=36,     t={320}        , rt={76} },   
   ["hmac-sha2-256"]                   = {etm=false, m=32,      k=64,     t={416,304}    , rt={84} },
   ["hmac-sha2-512"]                   = {etm=false, m=64,      k=96,     t={480}        , rt={84} },
-  ["hmac-sha1"]                       = {etm=false, m=20,      k=52,     t={460,304}    , rt={84} },
+  ["hmac-sha1"]                       = {etm=false, m=20,      k=52,     t={460,296,304}, rt={84} },
+  ["hmac-md5"]                        = {etm=false, m=16,      k=48,     t={368,304}    , rt={84} },
    } ,
 
    MaxShellSegments = 20, -- how far to continue packet inspection past NEW KEYS
@@ -49,7 +50,7 @@ local SSHDissector =
   -- 
   what_next =  function( tbl, pdur, swbuf)
     if tbl.ssh_state  == tbl.ST.START  then
-      pdur:want_to_pattern("\r\n")
+      pdur:want_to_pattern("\n")
     elseif tbl.ssh_state == tbl.ST.SHALLOW_ANALYSIS_MODE  then 
       pdur:abort()
     elseif tbl.ssh_state == tbl.ST.NON_ETM_PAYLOAD then 
@@ -65,7 +66,7 @@ local SSHDissector =
   --
   on_newdata = function( tbl, pdur, len, strbuf )
     if tbl.ssh_state == tbl.ST.NON_ETM_PAYLOAD then 
-      tbl:handle_post_newkeys(pdur,strbuf)
+      tbl:handle_post_newkeys(pdur,len,strbuf)
     elseif tbl.ssh_state==tbl.ST.SHALLOW_ANALYSIS_MODE  then
       tbl:check_tunnel_keypress(pdur,len)
     end
@@ -79,12 +80,12 @@ local SSHDissector =
   on_record = function( tbl, pdur, strbuf)
 
     if tbl.ssh_state ==  tbl.ST.START then
-      tbl.ssh_version_string = strbuf
+      tbl.ssh_version_string = strbuf:gsub("[\r\n]","")
       tbl.ssh_state=tbl.ST.BEFORE_NEWKEYS
     elseif tbl.ssh_state == tbl.ST.ETM_PAYLOAD then 
       -- check if login successful using the SSH-MSG-CHANNEL-REQUEST for pty
       -- 
-      tbl:handle_post_newkeys(pdur,strbuf)
+      tbl:handle_post_newkeys(pdur,#strbuf, strbuf)
 
     elseif tbl.ssh_state == tbl.ST.BEFORE_NEWKEYS  then 
 
@@ -148,8 +149,8 @@ local SSHDissector =
             if tbl.nego.ctl_table ==nil then
               -- rare cipher
               pdur.engine:add_alert("{E713ED84-F2D9-4469-148C-00C119992926}",pdur.id,
-                  "RAREHMAC", 1, 
-                  "Rare/usual HMAC algorithm used "..tbl.nego.mac_algorithms_client_to_server );
+                  "INSECURE_HMAC", 1, 
+                  "Insecure or rare HMAC/Ciphers used "..tbl.nego.mac_algorithms_client_to_server );
 
             end
 
@@ -183,9 +184,7 @@ local SSHDissector =
   --    2. login keys pressed after login
   --    3. whether non-etm keys are being used 
   --
-  handle_post_newkeys=function(tbl, pdur, strbuf)
-
-    local plen = #strbuf
+  handle_post_newkeys=function(tbl, pdur, plen, strbuf)
 
     if tbl.nego.ctl_table.etm then
       local sb = SweepBuf.new(strbuf)
@@ -201,6 +200,14 @@ local SSHDissector =
         pdur.engine:add_alert("{E713ED84-F2D9-4469-148C-00C119992926}",pdur.id,
             "LOGIN", 3, 
             "Successful login "  );
+
+
+		pdur.engine:update_counter( "{E6A387F4-5B51-4C8B-86FD-DE6258D3F214}", tbl.ssh_version_string, 0,1);
+		pdur.engine:update_counter( "{E6A387F4-5B51-4C8B-86FD-DE6258D3F214}", tbl.paired_with.ssh_version_string, 1,1);
+
+		print(tbl.ssh_version_string)
+		print(tbl.paired_with.ssh_version_string)
+
 
         if not tbl.nego.ctl_table.etm  and
           tbl.nego.encryption_algorithms_client_to_server~="chacha20-poly1305@openssh.com" then 

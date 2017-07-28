@@ -20,4 +20,9 @@ The scripts uses the `PDURecord` and `SweepBuffer` helpers from the [BitMaul str
 
 
 
+VERSIONS
+========
+
+0.0.2 		Added Counters for servers/client types 
+
 
