@@ -24,5 +24,6 @@ VERSIONS
 ========
 
 0.0.2 		Added Counters for servers/client types 
+            Handle SSH servers that only do \n instead of \r\n 
 
 
