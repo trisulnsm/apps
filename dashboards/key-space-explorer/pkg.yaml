@@ -1,0 +1,19 @@
+name: Key Space Explorer
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: Search all active key space and get total usage
+   long:  |
+      For example : if you type 192.168.1.1~192.168.1.100, this tool will first figure out 
+      all IPs that in  given range , then for each IP print volume of 
+      data transferred per day. This is a custom Javascript Dashboard.
+
+apptype: dashboard_js
+
+appresources: key_space_explorer.js
+
+dependencies: 
