@@ -1,5 +1,5 @@
 /*
-  // File Name   : key_space_explore.js
+  // File Name   : key_space_explorer.js
   // Author      : Unleash Networks
   // Version     : 0.1
   // Description : Show the total usage for subnet ips
@@ -31,10 +31,10 @@ var InKeysMagicMap   =  $.klass({
   // Add a text box to filter the host
   // add table to show keys
   add_form:function(){
-    var form = $("<div id='inkey_search_form'> <form class='form-horizontal' id='fkeymatch'> <div class='row'> <div class='col-xs-5'> <div class='form-group'> <label class='control-label col-xs-4'> Counter Group </label> <div class='col-xs-8'> <select name='counter[guid]' id='inkeys_counter_guid'></select> </div> </div> </div> <div class='col-xs-5'> <div class='form-group'> <label class='control-label col-xs-4'> Key spaces </label> <div class='col-xs-8'> <textarea name='keys' id='in_keys'></textarea> <span class='help-block'>Enter one key range per line Ex.(192.168.1.10~192.168.1.20) (Port-10~Port-50) etc</span> </div> </div> </div> <div class='form-group'> <div class='col-xs-2 col-md-offset-2'> <input type='submit' name='commit' value='Search' class='btn-submit'> </div> <div class='col-xs-3' id='in_keys_status'> </div> </form> </div>");
+    var form = $("<div id='inkey_search_form'> <form class='form-horizontal' id='fkeymatch'> <div class='row'> <div class='col-xs-5'> <div class='form-group'> <label class='control-label col-xs-4'> Counter Group </label> <div class='col-xs-8'> <select name='counter[guid]' id='inkeys_counter_guid'></select> </div> </div> <div class='form-group'> <label class='control-label col-xs-4'> Key spaces </label> <div class='col-xs-8'> <textarea name='keys' id='in_keys'></textarea> <span class='help-block'>Enter one key range per line Ex.(192.168.1.10~192.168.1.20) (Port-10~Port-50) etc</span> </div> </div> </div> <div class='col-xs-5'> <div class='form-group'> <label class='control-label col-xs-4'> Meters </label> <div class='col-xs-8'> <select name='meter[]' id='inkeys_meter_id' multiple='multiple' size='5'> </select> </div> </div> </div> </div> <div class='row'> <div class='form-group'> <div class='col-xs-2 col-md-offset-2'> <input type='submit' name='commit' value='Search' class='btn-submit'> </div> <div class='col-xs-3' id='in_keys_status'> </div> </div> </div> </form> </div>");
     $(this.domid).append(form);
     //auto_complete('in_keys',{cgguid:GUID.GUID_CG_HOSTS()},{});
-    $(this.domid).append("<div id='inkey_treemap' class='col-xs-12' style='padding-top:10px'><div id='inkey_treemap_0' class='col-xs-4'></div><div id='inkey_treemap_1' class='col-xs-4'></div><div id='inkey_treemap_2' class='col-xs-4'></div></div>");
+    $(this.domid).append("<div id='inkey_treemap' class='col-xs-12' style='padding-top:10px'></div>");
     $(this.domid).append("<div id='trp_data_inkeys'></div>");
 
     var js_params = {meter_details:this.cg_meter_json,
@@ -50,7 +50,7 @@ var InKeysMagicMap   =  $.klass({
 
   //submit the form
   submit_form:function(){
-
+    this.meters = {};
     var val = $('#in_keys').val().trim();
     if(val.length ==  0 ){
       alert("Text field can't be empty.")
@@ -84,6 +84,13 @@ var InKeysMagicMap   =  $.klass({
     //trp request 
     var cthis = this;
     cthis.cgguid = $('#inkeys_counter_guid').val();
+    var meters  = $('#inkeys_meter_id').val();
+    var length = meters.length;
+
+    for(i=0;i < length;i++){
+      meters[i] = parseInt(meters[i])
+    }
+    meters = meters.slice(0,3);
     this.bucketsize = this.all_cg_bucketsize[this.cgguid]["bucket_size"] || 60 ;
     var key = "/dash_extra_json/"+dashboard_id;
     var extra_json =  localStorage.getItem(key);
@@ -92,11 +99,16 @@ var InKeysMagicMap   =  $.klass({
       this.recentsecs= recentsecs;
     }
 
-    var meters_arr= _.last(this.cg_meter_json[this.cgguid]).slice(0,3);
-    _.each(meters_arr,function(meter){
-      this.meters[meter[0]] = meter[1];
-    },this);
+    _.chain(this.cg_meter_json[this.cgguid])
+    .last()
+    .each(function(ai){
+      if(meters.includes(ai[0])){
+        this.meters[ai[0]] = ai[1];
+      }
+    },this)
+    .value()
 
+    
 
     this.reset_ui();
 
@@ -118,7 +130,21 @@ var InKeysMagicMap   =  $.klass({
         maxitems:50
       });
     return  get_response(req,function(resp){
-      var inkeys = _.sortBy(resp.hits,function(key){return key.key});
+      var keys = [];
+      var inkeys = _.chain(resp.hits)
+                    .sortBy(function(key){return key.key})
+                    .reject(function(k1){
+                      if(keys.includes(k1.key)){
+                        return true
+                      }
+                      else{
+                        keys.push(k1.key)
+                        return false;
+                      }
+                    })
+                    .slice(0,100)
+                    .value()
+
       var maxitems_per_group = Math.ceil(inkeys.length/cthis.max_group_size);
       var i =  -1;
       _.each(inkeys,$.proxy(function(key,idx){
@@ -128,8 +154,12 @@ var InKeysMagicMap   =  $.klass({
         if(! _.has(cthis.available_inkeys,i)){
           cthis.available_inkeys[i] = [];
         }
-
-        cthis.available_inkeys[i].push({id:key.key,key:key.key,label:key.label||key.readable,readable:key.readable,total:0,recv:0,transmit:0,is_inkey:true})
+        var key_hash = {id:key.key,key:key.key,label:key.label||key.readable,readable:key.readable,is_inkey:true}
+        var data_hsh = {}
+        _.each(cthis.meters,function(name,id){
+          data_hsh[id] = 0
+        });
+        cthis.available_inkeys[i].push(_.extend({},key_hash,data_hsh))
       },cthis));
       cthis.all_inkeys = _.chain(cthis.available_inkeys)
                          .values()
@@ -158,25 +188,20 @@ var InKeysMagicMap   =  $.klass({
       if(resp == undefined ) {
         resp = {stats:[]}
       }
-      var total = _.chain(resp.stats)
-                  .collect( function(ai) { return  ai.values[0].toNumber()})
+      _.each(_.keys(cthis.meters),function(id,idx){
+        var id  = parseInt(id);
+        var value = _.chain(resp.stats)
+                  .collect( function(ai) { return  ai.values[id].toNumber()})
                   .reduce(function(acc, i){return acc+i;}, 0)
                   .value();
-      var recv = _.chain(resp.stats)
-                  .collect( function(ai) { return  ai.values[1].toNumber()})
-                  .reduce(function(acc, i){return acc+i;}, 0)
-                  .value();
-      var transmit = _.chain(resp.stats)
-                  .collect( function(ai) { return  ai.values[2].toNumber()})
-                  .reduce(function(acc, i){return acc+i;}, 0)
-                  .value();
-        
-      k.total = total*cthis.bucketsize;
-      k.recv = recv*cthis.bucketsize;
-      k.transmit = transmit*cthis.bucketsize;
-      cthis.redraw_treemap(0,'total');
-      cthis.redraw_treemap(1,'recv');
-      cthis.redraw_treemap(2,'transmit');
+        var bucketsize = cthis.bucketsize;
+        if(cthis.all_meters_type[cthis.cgguid][id].type != 4 ){
+          bucketsize = 1;
+        }
+        k[id] = value * bucketsize;
+        cthis.redraw_treemap(id);
+      },this);
+      _.each
       cthis.redraw();
       cthis.load_total();
     },this);
@@ -186,12 +211,14 @@ var InKeysMagicMap   =  $.klass({
 
 
   reset_ui:function(){
+    var classname = 'col-xs-'+Math.floor(12/_.size(this.meters))
     $('#trp_data_inkeys').html(" ");
     $('#in_keys_status').html('');
     $('#in_keys_status').append($("<i>",{id:'in_keys_status_fa',class:'fa fa-spinner fa-spin fa-lw'}));
     $('#in_keys_status').append($("<span>",{id:'in_keys_status_text',class:"text-info"}));
     $('#host_search_form').after("<div class='col-xs-4' id='in_keys_status'></div>");
     this.available_inkeys={};
+    this.all_inkeys=[];
     var table = get_table_shell();
     table.addClass('table-sysdata hide'); 
     table.attr("id","in_keys_tbl");
@@ -201,17 +228,19 @@ var InKeysMagicMap   =  $.klass({
     })
     table.find("thead tr").append("<th>Item</th><th>Label</th>"+th);
     $('#trp_data_inkeys').append(table);
-    $('#inkey_treemap_0').html("");
-    $('#inkey_treemap_1').html("");
-    $('#inkey_treemap_2').html("");
+    $('#inkey_treemap').html("");
+    _.each(_.keys(this.meters),function(meterid){
+      $('#inkey_treemap').append($("<div>",{class:classname,id:'inkey_treemap_'+meterid}))
+    });
+   
   },
 
   
-  redraw_treemap : function(meterid,key) {
-    var divid = '#inkey_treemap_'+meterid;
+  redraw_treemap : function(key) {
+    var divid = '#inkey_treemap_'+key;
     var container_div = $(divid);
     container_div.children().remove();
-    container_div.append('<h4>MagicMap click on '+ this.cg_meter_json[this.cgguid][0] +  ' by '+this.meters[meterid]+' for past '+h_fmtduration(this.recentsecs,true) +'</h4>');
+    container_div.append('<h4>MagicMap click on '+ this.cg_meter_json[this.cgguid][0] +  ' by '+this.meters[key]+' for past '+h_fmtduration(this.recentsecs,true) +'</h4>');
     container_div.append( '<svg width=250 height=200></svg>');
     container_div.find("svg").attr('width', container_div.width());
     container_div.find("svg").attr('height', container_div.height()+20);
@@ -290,8 +319,6 @@ var InKeysMagicMap   =  $.klass({
         
     cell.append("title")
       .text(function(d) { return   d.data.label + "\n" + h_fmtvol(d.value); });
-
-
   },
 
   redraw:function(){
@@ -312,26 +339,50 @@ var InKeysMagicMap   =  $.klass({
       guid:this.cgguid,
       dash_key:'key'
     }
+    var meterids = _.keys(this.meters);
+    for(i=0;i < meterids.length;i++){
+      meterids[i] = parseInt(meterids[i])
+    }    
+    var units = _.collect(meterids,function(ai){
+      var unit = this.all_meters_type[this.cgguid][ai].units;
+      if(unit.match(new RegExp(/ps$/))){
+        unit = unit.replace(/ps$/,"");
+      }
+      return unit;
+    },this)
+
     var anchor  = "<a href='/newdash/index?key={{key}}&" + $.param(params) + "' target='_blank'>{{readable}}</a>";
-    var table_tmpl = "<td>"+anchor+"</td><td>{{label}}</td><td>{{h_total}}B</td><td>{{h_recv}}B</td><td>{{h_trans}}B</td>";
-            
+    var table_tmpl = "<td>"+anchor+"</td><td>{{label}}</td>";
+    _.each(meterids,function(meterid,idx){
+      table_tmpl = table_tmpl + "<td>{{h_"+ meterid +"}}"+units[idx]+"</td>";
+    });
     var trs = d3.select('table#in_keys_tbl' + " tbody")
                 .selectAll("tr")
-                .data(_.sortBy(data,function(ai){return -ai.total}));
+                .data(_.sortBy(data,function(ai){return -ai[meterids[0]]}));
+
 
     trs.enter()
             .insert("tr","tr")
-            .html(function(d){ 
-              return Mustache.to_html(table_tmpl,$.extend(
-                {h_total:h_fmtvol(d.total),h_recv:h_fmtvol(d.recv),h_trans:h_fmtvol(d.transmit)},d));
+            .html(function(d){
+              var data_hsh = {};
+              _.each(meterids,function(meterid){
+                key = 'h_'+meterid;
+                value = h_fmtvol(d[meterid]);
+                data_hsh[key] =value;
+              })
+              return Mustache.to_html(table_tmpl,$.extend({},data_hsh,d));
             });
 
     trs
          .html(function(d){ 
-            return Mustache.to_html(table_tmpl,$.extend(
-                {h_total:h_fmtvol(d.total),h_recv:h_fmtvol(d.recv),h_trans:h_fmtvol(d.transmit)},d));
+           var data_hsh = {};
+            _.each(meterids,function(meterid){
+              key = 'h_'+meterid;
+              value = h_fmtvol(d[meterid]);
+              data_hsh[key] =value;
+            })
+            return Mustache.to_html(table_tmpl,$.extend({},data_hsh,d));
           });
-
     trs.exit().remove();
   },
 
@@ -348,18 +399,11 @@ var InKeysMagicMap   =  $.klass({
       $('#in_keys_status_fa').removeClass();
       $('#in_keys_status_fa').addClass("fa fa-info-circle fa-fw fa-lg");
       $('#in_keys_status_text').text("No keys found" );
-
-      setTimeout(function() { 
-        $('#in_keys_status').html( '' );
-      }, 5000);
     }
     else if(processed >= data.length ) {
       $('#in_keys_status_fa').removeClass();
       $('#in_keys_status_fa').addClass("fa fa-check fa-fw fa-lg");      
       $('#in_keys_status_text').text("Completed" );
-      setTimeout(function() { 
-        $('#in_keys_status').html( '' );
-      }, 5000);
     }
 
   }
@@ -369,4 +413,5 @@ function run(opts)
 {
   inkeys_magic_map = new InKeysMagicMap(opts);
 }
+
 
