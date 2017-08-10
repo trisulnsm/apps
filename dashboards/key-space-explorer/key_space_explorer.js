@@ -51,6 +51,7 @@ var InKeysMagicMap   =  $.klass({
   //submit the form
   submit_form:function(){
     this.meters = {};
+    this.units = {};
     var val = $('#in_keys').val().trim();
     if(val.length ==  0 ){
       alert("Text field can't be empty.")
@@ -91,6 +92,21 @@ var InKeysMagicMap   =  $.klass({
       meters[i] = parseInt(meters[i])
     }
     meters = meters.slice(0,3);
+
+    _.chain(this.cg_meter_json[this.cgguid])
+    .last()
+    .each(function(ai){
+      if(meters.includes(ai[0])){
+        this.meters[ai[0]] = ai[1];
+        var unit = cthis.all_meters_type[cthis.cgguid][ai[0]].units;
+        if(unit.match(new RegExp(/ps$/))){
+          unit = unit.replace(/ps$/,"");
+        }
+        this.units[ai[0]] = unit;
+      }
+    },this)
+    .value();
+
     this.bucketsize = this.all_cg_bucketsize[this.cgguid]["bucket_size"] || 60 ;
     var key = "/dash_extra_json/"+dashboard_id;
     var extra_json =  localStorage.getItem(key);
@@ -98,17 +114,6 @@ var InKeysMagicMap   =  $.klass({
     if(recentsecs != 0 ){
       this.recentsecs= recentsecs;
     }
-
-    _.chain(this.cg_meter_json[this.cgguid])
-    .last()
-    .each(function(ai){
-      if(meters.includes(ai[0])){
-        this.meters[ai[0]] = ai[1];
-      }
-    },this)
-    .value()
-
-    
 
     this.reset_ui();
 
@@ -236,11 +241,11 @@ var InKeysMagicMap   =  $.klass({
   },
 
   
-  redraw_treemap : function(key) {
+  redraw_treemap : function(key) { 
+
     var divid = '#inkey_treemap_'+key;
     var container_div = $(divid);
     container_div.children().remove();
-    container_div.append('<h4>MagicMap click on '+ this.cg_meter_json[this.cgguid][0] +  ' by '+this.meters[key]+' for past '+h_fmtduration(this.recentsecs,true) +'</h4>');
     container_div.append( '<svg width=250 height=200></svg>');
     container_div.find("svg").attr('width', container_div.width());
     container_div.find("svg").attr('height', container_div.height()+20);
@@ -261,12 +266,22 @@ var InKeysMagicMap   =  $.klass({
         .paddingInner(1);
 
     var cthis = this;
+
+    var total = 0
    //add value d3.hierarchy need this
     _.each( this.available_inkeys, function (inkeys,idx) {
       _.each(inkeys,function(k){
-        k.value = k[key]
+        k.value = k[key];
+        if(k.key == "C0.A8.01.50"){
+          k.value = 0;
+        }
+        total = total + k.value;
       });
     });
+
+    total = "<strong class='badge'>"+h_fmtvol(total)+this.units[key]+"</strong>";
+    container_div.prepend('<h5>MagicMap click on '+ this.cg_meter_json[this.cgguid][0] +  ' by '+this.meters[key]+' for past '+h_fmtduration(this.recentsecs,true) + ' - '+ total +'</h5>');
+
     var root = d3.hierarchy(cthis.available_inkeys, function(ai) {
       if (_.has(ai,'is_groupindex')) {
           return cthis.available_inkeys[ ai.name ];
@@ -334,7 +349,6 @@ var InKeysMagicMap   =  $.klass({
       return acc + ai.total;
     },0);
 
-   $('#total_usage').html("Total - "+h_fmtvol(total)+"B");
     var params = {
       guid:this.cgguid,
       dash_key:'key'
@@ -343,19 +357,13 @@ var InKeysMagicMap   =  $.klass({
     for(i=0;i < meterids.length;i++){
       meterids[i] = parseInt(meterids[i])
     }    
-    var units = _.collect(meterids,function(ai){
-      var unit = this.all_meters_type[this.cgguid][ai].units;
-      if(unit.match(new RegExp(/ps$/))){
-        unit = unit.replace(/ps$/,"");
-      }
-      return unit;
-    },this)
+  
 
     var anchor  = "<a href='/newdash/index?key={{key}}&" + $.param(params) + "' target='_blank'>{{readable}}</a>";
     var table_tmpl = "<td>"+anchor+"</td><td>{{label}}</td>";
     _.each(meterids,function(meterid,idx){
-      table_tmpl = table_tmpl + "<td>{{h_"+ meterid +"}}"+units[idx]+"</td>";
-    });
+      table_tmpl = table_tmpl + "<td>{{h_"+ meterid +"}}"+this.units[meterid]+"</td>";
+    },this);
     var trs = d3.select('table#in_keys_tbl' + " tbody")
                 .selectAll("tr")
                 .data(_.sortBy(data,function(ai){return -ai[meterids[0]]}));
@@ -415,3 +423,4 @@ function run(opts)
 }
 
 
+//# sourceURL=key_space_explorer.js
