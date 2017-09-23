@@ -139,9 +139,6 @@ TrisulPlugin = {
         until p["event_type"] ==   "alert" 
 
 
-		print("Adding alert from EVE JSON string "..p)
-
-
         -- basically a mapping of EVE to Trisul Alert
         -- notice the AlertGUID 9AF.. this is what Trisul uses to show IDS alerts from Snort
         -- if you want you can create your own AlertGroup using the alert group LUA 
