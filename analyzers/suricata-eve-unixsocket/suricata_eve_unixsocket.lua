@@ -73,7 +73,7 @@ TrisulPlugin = {
   -- 
   onload = function()
 
-  	local eve_socket_filename = T.env.get_config("App>RunStateDirectory").."/"..EVE_SOCKETFILE_NAME
+    local eve_socket_filename = T.env.get_config("App>RunStateDirectory").."/"..EVE_SOCKETFILE_NAME
 
     T.log(T.K.loglevel.INFO, "Suricata EVE Unix Socket script - setting up the socket : ".. eve_socket_filename)
 
@@ -113,6 +113,7 @@ TrisulPlugin = {
       local MAX_MSG_SIZE=256000;
       local rbuf  = ffi.new("char[?]", MAX_MSG_SIZE);
 
+
       -- this block is repeated 
       -- 1. until an 'alert' JSON is found (suricata sends other types of info too via EVE))
       -- 2. EOF on socket 
@@ -134,14 +135,21 @@ TrisulPlugin = {
         end
 
         local alert_string = ffi.string(rbuf)
-        p = JSON:decode(alert_string)
+        if alert_string:match('event_type":"alert') then
+            print(alert_string)
+            p = JSON:decode(alert_string)
+        else
+            p = { ["event_type"] = 'notalert'}
+        end
 
-        until p["event_type"] ==   "alert" 
+      until p["event_type"] ==   "alert" 
 
 
-        -- basically a mapping of EVE to Trisul Alert
-        -- notice the AlertGUID 9AF.. this is what Trisul uses to show IDS alerts from Snort
-        -- if you want you can create your own AlertGroup using the alert group LUA 
+
+
+      -- basically a mapping of EVE to Trisul Alert
+      -- notice the AlertGUID 9AF.. this is what Trisul uses to show IDS alerts from Snort
+      -- if you want you can create your own AlertGroup using the alert group LUA 
       local tv_sec, tv_usec = epoch_secs( p["timestamp"]);
       local ret =  {
 
