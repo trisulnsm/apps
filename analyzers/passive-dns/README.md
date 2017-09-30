@@ -5,10 +5,11 @@ Passive DNS extractor builds a live database of IP to Domain names.
 
 ## How to run
 
-This app requires two things on the probe.
+This app **requires you** to do two things on the probe.
 
-1. Install the LeveDB database library 
-2. Modify the DNS config file to enable FTS (Full Text) extraction 
+
+> 1. Install the LeveDB database library 
+> 2. Modify the DNS config file to enable FTS (Full Text) extraction 
 
 
 ### 1. Installing LevelDB 
@@ -26,11 +27,18 @@ yum install leveldb
 
 On Ubuntu 14.04 and 16.04
 
-LevelDB is found in the libleveldb1 package
+LevelDB is found in the libleveldb1 package (14.04) or libleveldb1v5 (16.04)
 
 ````
 sudo apt-get update 
+
+# for 14.04
 sudo apt-get install libleveldb1 
+
+# for 16.04
+sudo apt-get install libleveldb1v5 
+
+
 ````
 
 
