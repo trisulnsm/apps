@@ -6,7 +6,7 @@
 -- DESCRIPTION: Trying out https://github.com/salesforce/ja3
 -- 
 -- Meter HTTPS based on Server Name Indication 
--- 	 new counter group  + resource group 
+-- 	 new counter group  
 
 -- plugin ; reassembly_handler + resource_group  + counter_group
 local PDURecord=require'pdurecord' 
@@ -19,17 +19,6 @@ TrisulPlugin = {
     description = "TLS Server Name Indicator extension based metrics",
   },
 
-  -- a new SNI resource 
-  -- 
-  resourcegroup  = {
-
-    control = {
-      guid = "{258DEBA6-B40D-4306-A5DA-DE194064DA7D}",
-      name = "SNI",
-      description = "SNI Resource IP<->SNI",
-    },
-
-  },
 
   -- a new counter group 
   countergroup = {

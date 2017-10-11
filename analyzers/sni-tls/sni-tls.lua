@@ -68,14 +68,10 @@ local TLSDissector_SNI =
 						0, 	           -- meter id =0 
 						0)			   -- direction = BOTH 
 
-				  -- resource 
-				  pdur.engine:add_resource("{258DEBA6-B40D-4306-A5DA-DE194064DA7D}",
-				  		tbl.flowkey:id(),
-						snihostname,
-						tbl.flowkey:ipz_readable().."="..snihostname)
+				  -- new add EDGE sni -> flow 
+				  pdur.engine:add_flow_edges(pdur:flowkey:id(), 
+				  			"{38497403-23FB-4206-65C2-0AD5C419DD53}", snihostname)
 
-
-				  -- print("SNI="..snihostname)
 			  end
 			  payload:pop_fence()
 			else

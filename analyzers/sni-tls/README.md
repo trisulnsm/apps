@@ -15,3 +15,9 @@ This app provides three metrics
 
 3. Top SNI Hostnames for each meter by bandwidth and hits 
 
+
+Versions:
+=========
+
+0.0.5  	Oct 11 2017  		Add Edges from TLS SNI to flow vertices 
+
