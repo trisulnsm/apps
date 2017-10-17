@@ -98,7 +98,11 @@ TrisulPlugin = {
 
     T.socket = socket
 
+    -- single buffer into which Socket  msg is read 
+    T.MAX_MSG_SIZE=256000;
+    T.rbuf  = ffi.new("char[?]", T.MAX_MSG_SIZE);
    end,
+
 
 
   inputfilter  = {
@@ -110,8 +114,6 @@ TrisulPlugin = {
     -- 
     step_alert  = function()
 
-      local MAX_MSG_SIZE=256000;
-      local rbuf  = ffi.new("char[?]", MAX_MSG_SIZE);
 
 
       -- this block is repeated 
@@ -119,7 +121,7 @@ TrisulPlugin = {
       -- 2. EOF on socket 
       local p = nil 
       repeat 
-        local ret = ffi.C.recv(T.socket, rbuf,MAX_MSG_SIZE,K.MSG_DONTWAIT)
+        local ret = ffi.C.recv(T.socket, T.rbuf,T.MAX_MSG_SIZE,K.MSG_DONTWAIT)
         if ret < 0 then
           if ffi.errno()  == K.EAGAIN then 
             return nil
@@ -129,12 +131,12 @@ TrisulPlugin = {
           end 
         end
 
-        if ret >= MAX_MSG_SIZE then
+        if ret >= T.MAX_MSG_SIZE then
           T.log("Ignoring large JSON, probably not an alert len="..ret);
           return nil
         end
 
-        local alert_string = ffi.string(rbuf)
+        local alert_string = ffi.string(T.rbuf)
         if alert_string:match('event_type":"alert') then
             print(alert_string)
             p = JSON:decode(alert_string)
@@ -143,8 +145,6 @@ TrisulPlugin = {
         end
 
       until p["event_type"] ==   "alert" 
-
-
 
 
       -- basically a mapping of EVE to Trisul Alert

@@ -31,4 +31,10 @@ suricata -D -l /usr/local/var/lib/trisul-probe/domain0/probe0/context0/run -c /e
 
 
 
+UPDATES
+=======
+
+0.0.5		Oct 17 2017			Reuse a buffer once to avoid allocs on every alert
+
+
 
