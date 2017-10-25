@@ -69,7 +69,7 @@ local TLSDissector_SNI =
 						0)			   -- direction = BOTH 
 
 				  -- new add EDGE sni -> flow 
-				  pdur.engine:add_flow_edges(pdur:flowkey:id(), 
+				  pdur.engine:add_flow_edges(tbl.flowkey:id(), 
 				  			"{38497403-23FB-4206-65C2-0AD5C419DD53}", snihostname)
 
 			  end

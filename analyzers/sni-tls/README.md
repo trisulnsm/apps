@@ -19,5 +19,6 @@ This app provides three metrics
 Versions:
 =========
 
+0.0.6  	Oct 25 2017  		Updated - flowkey() 
 0.0.5  	Oct 11 2017  		Add Edges from TLS SNI to flow vertices 
 
