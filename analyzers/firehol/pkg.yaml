@@ -1,0 +1,16 @@
+name: FireHOL checker
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Alerts if activity seen from FireHOL blacklist 
+   long:  |
+      FireHOL is a well curated set of IP that must be blocked. This list has a very low false positive rate. 
+
+apptype: lua
+
+appresources: firehol.lua  iprangemap.lua README.md  firehol_level1.netset 
+
+dependencies:  
