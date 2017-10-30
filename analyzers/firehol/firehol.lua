@@ -47,7 +47,7 @@ TrisulPlugin = {
     -- As soon as a new key is seen , new keys repeat every X hours 
 	-- real time
     onnewkey = function(engine, timestamp, key)
-      local m = T.fhole:lookup(key)
+      local m = T.fhole:lookup_trisul(key)
       if m then 
         T.log("Found IP in FireHOL Blacklist"..key)
         engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
@@ -58,13 +58,14 @@ TrisulPlugin = {
     -- onflush - used to check if data transfer happend , major alert 
 	-- near real time 1-minute 
     onflush = function(engine, timestamp, key, arrayofmetrics )
-      local m = T.fhole:lookup(key)
+      local m = T.fhole:lookup_trisul(key)
+	  print("On Flush ".. key)
       if m then 
 	    local priority = 2 
 		if arrayofmetrics[2] > 0 and arrayofmetrics[3] > 0 then
 			priority=1
 		end
-        T.log("Flush .. Found IP in FireHOL Blacklist"..key)
+        T.log("Flush .. Found IP in FireHOL Blacklist "..readable_ip(key))
         engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
             nil,"FireHOL",2,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
       end
