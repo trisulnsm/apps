@@ -45,7 +45,7 @@ TrisulPlugin = {
 
     -- As soon as a new key is seen , new keys repeat every X hours 
     onnewkey = function(engine, timestamp, key)
-      local m = fh:lookup(key)
+      local m = T.fhole:lookup(key)
       if m then 
         T.log("Found IP in FireHOL Blacklist"..key)
         engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
