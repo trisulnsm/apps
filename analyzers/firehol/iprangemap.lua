@@ -86,7 +86,7 @@ local IPRangeLookup   = {
 
   -- lookup in trisul format C0.A8.23.FE 
   lookup_trisul = function(tbl, ip_trisul_key)
-    local pmatch,_, b1,b2,b3,b4= ip_dotted:find("(%x+)%.(%x+)%.(%x+)%.(%x+)")
+    local pmatch,_, b1,b2,b3,b4= ip_trisul_key:find("(%x+)%.(%x+)%.(%x+)%.(%x+)")
 	if not pmatch then return nil ; end  
     local ipnum = tonumber(b1,16)*math.pow(2,24) + tonumber(b2,16)*math.pow(2,16) + tonumber(b3,16)*math.pow(2,8) + tonumber(b4,16)*math.pow(2,0) 
     local rcheck = Range.new(ipnum,ipnum)
