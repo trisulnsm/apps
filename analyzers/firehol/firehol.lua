@@ -3,16 +3,14 @@
 --
 -- TYPE:        BACKEND SCRIPT
 -- PURPOSE:     Scan using FIREHOL IP CRIME list http://iplists.firehol.org/
--- DESCRIPTION: NOW ! Trisul users can just plugin this script automatically
---        scan all their Traffic against the excellent (low false positive)
---        FIREHOL list
---        The good thing about this list is - if an alert fires there is 
---        a high likelyhood you need to take action. 
+-- DESCRIPTION: Install this script scan all their Traffic against the excellent 
+--              (low false positive)  FIREHOL list
 --
--- DEV NOTE:  We use a very fast custom built IP Range Map in LUA to match entire
---        ip spaces. 
+-- DEV NOTE:    We use a very fast custom built IP Range Map in LUA to match entire
+--              ip spaces. 
 --
---        Level 3 alert when IP seen, Level 1 alert when Data transfer happens 
+-- OUTPUT:      Low priority alert when IP hits, Level 1 alert when Data transfer happens 
+--              in both directions. 
 -- 
 
 local FH = require'iprangemap'
