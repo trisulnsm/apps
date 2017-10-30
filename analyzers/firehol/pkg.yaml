@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: firehol.lua  iprangemap.lua README.md  firehol_level1.netset 
+appresources: firehol.lua  iprangemap.lua README.md  
 
 dependencies:  
