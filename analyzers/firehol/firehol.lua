@@ -51,7 +51,7 @@ TrisulPlugin = {
       if m then 
         T.log("Found IP in FireHOL Blacklist"..key)
         engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
-            nil,"FireHOL",2,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
+            "06A:"..key..":p-0000_00.00.00.00:p-0000","FireHOL",2,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
       end
     end,
 
@@ -66,7 +66,7 @@ TrisulPlugin = {
 		end
         T.log("Found IP in FireHOL Blacklist "..readable_ip(key))
         engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
-            nil,"FireHOL",2,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
+            "06A:"..key..":p-0000_00.00.00.00:p-0000","FireHOL",2,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
       end
     end,
 
