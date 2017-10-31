@@ -18,12 +18,6 @@ local FH = require'iprangemap'
 local FIREHOL_FILENAME="firehol_level1.netset" 
 local CHECK_SECONDS=1800			
 
--- converts key in trisul format to readable 
-readable_ip = function(key)
-    local pmatch,_, b1,b2,b3,b4= key:find("(%x+)%.(%x+)%.(%x+)%.(%x+)")
-    return string.format("%d.%d.%d.%d",tonumber(b1,16)*math.pow(2,24) + tonumber(b2,16)*math.pow(2,16) + tonumber(b3,16)*math.pow(2,8) + tonumber(b4,16)*math.pow(2,0) )
-end
-
 TrisulPlugin = { 
 
   id =  {
@@ -54,7 +48,6 @@ TrisulPlugin = {
 	-- real time
     onnewkey = function(engine, timestamp, key)
       local m = T.fhole:lookup_trisul(key)
-	  print("On newkey  ".. key.. " read able "..readable_ip(key) )
       if m then 
         T.log("Found IP in FireHOL Blacklist"..key)
         engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
@@ -66,7 +59,6 @@ TrisulPlugin = {
 	-- near real time 1-minute 
     onflush = function(engine, timestamp, key, arrayofmetrics )
       local m = T.fhole:lookup_trisul(key)
-	  print("On Flush ".. key)
       if m then 
 	    local priority = 2 
 		if arrayofmetrics[2] > 0 and arrayofmetrics[3] > 0 then
@@ -90,4 +82,10 @@ TrisulPlugin = {
   },
 }
 
+
+-- converts key in trisul format to readable 
+readable_ip = function(key)
+    local pmatch,_, b1,b2,b3,b4= key:find("(%x+)%.(%x+)%.(%x+)%.(%x+)")
+    return string.format("%d.%d.%d.%d",tonumber(b1,16),tonumber(b2,16),tonumber(b3,16),tonumber(b4,16) )
+end
 
