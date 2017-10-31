@@ -18,6 +18,14 @@ local FH = require'iprangemap'
 local FIREHOL_FILENAME="firehol_level1.netset" 
 local CHECK_SECONDS=1800			
 
+
+-- converts key in trisul format to readable 
+function readable_ip(key)
+    local pmatch,_, b1,b2,b3,b4= key:find("(%x+)%.(%x+)%.(%x+)%.(%x+)")
+    return string.format("%d.%d.%d.%d",tonumber(b1,16),tonumber(b2,16),tonumber(b3,16),tonumber(b4,16) )
+end
+
+
 TrisulPlugin = { 
 
   id =  {
@@ -42,14 +50,14 @@ TrisulPlugin = {
   cg_monitor  = {
 
     -- monitor all hosts 
-    counter_guid = "{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}",
+    counter_guid = "{00AA77BB-0063-11A5-8380-FEBDBABBDBEA}", 
 
     -- As soon as a new key is seen , new keys repeat every X hours 
 	-- real time
     onnewkey = function(engine, timestamp, key)
       local m = T.fhole:lookup_trisul(key)
       if m then 
-        T.log("Found IP in FireHOL Blacklist"..key)
+        T.log("ONNEWKEY Found IP in FireHOL Blacklist"..key)
         engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
             "06A:"..key..":p-0000_00.00.00.00:p-0000","FireHOL",2,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
       end
@@ -64,9 +72,9 @@ TrisulPlugin = {
 		if arrayofmetrics[2] > 0 and arrayofmetrics[3] > 0 then
 			priority=1
 		end
-        T.log("Found IP in FireHOL Blacklist "..readable_ip(key))
+        T.log("ONFLUSH Found IP in FireHOL Blacklist "..readable_ip(key))
         engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
-            "06A:"..key..":p-0000_00.00.00.00:p-0000","FireHOL",2,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
+            "06A:"..key..":p-0000_00.00.00.00:p-0000","FireHOL",priority,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
       end
     end,
 
@@ -81,11 +89,4 @@ TrisulPlugin = {
 
   },
 }
-
-
--- converts key in trisul format to readable 
-readable_ip = function(key)
-    local pmatch,_, b1,b2,b3,b4= key:find("(%x+)%.(%x+)%.(%x+)%.(%x+)")
-    return string.format("%d.%d.%d.%d",tonumber(b1,16),tonumber(b2,16),tonumber(b3,16),tonumber(b4,16) )
-end
 
