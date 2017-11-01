@@ -17,6 +17,8 @@ local FH = require'iprangemap'
 
 local FIREHOL_FILENAME="firehol_level1.netset" 
 local CHECK_SECONDS=1800			
+local VOL_SEV1_ALERT_RECV=10000
+local VOL_SEV1_ALERT_XMIT=20000
 
 
 -- converts key in trisul format to readable 
@@ -55,7 +57,6 @@ TrisulPlugin = {
     -- As soon as a new key is seen , new keys repeat every X hours 
 	-- real time
     onnewkey = function(engine, timestamp, key)
-	  print("ON NEW KEY"..key)
       local m = T.fhole:lookup_trisul(key)
       if m then 
         T.log("ONNEWKEY Found IP in FireHOL Blacklist"..key)
@@ -70,7 +71,7 @@ TrisulPlugin = {
       local m = T.fhole:lookup_trisul(key)
       if m then 
 	    local priority = 3 
-		if arrayofmetrics[2] > 0 and arrayofmetrics[3] > 0 then
+		if arrayofmetrics[2] > VOL_SEV1_ALERT_RECV  and arrayofmetrics[3] > VOL_SEV1_ALERT_XMIT then
 			priority=1
 		end
         T.log("ONFLUSH Found IP in FireHOL Blacklist "..readable_ip(key))
