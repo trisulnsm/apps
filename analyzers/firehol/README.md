@@ -43,15 +43,6 @@ This app automatically refereshes the list every hour.
 Login as admin , go to Context : default > Admin Tasks > Start/Stop Tasks. Restart the probe
 
 
-## Viewing alerts
-
-The FireHOL alerts show up in Trisul as User-Alerts.
-
-1. View alerts real time. Select Alerts > Show All > User Alerts > Click on "View Real Time" 
-
-2. View older alerts. Select Alerts > Show All > click on User Alerts
-
-
 
 Config Parameters
 ==============
@@ -97,6 +88,15 @@ return  {
 
 ````
 
+## Viewing alerts
+
+The FireHOL alerts show up in Trisul as User-Alerts.
+
+1. View alerts real time. Select Alerts > Show All > User Alerts > Click on "View Real Time" 
+2. View older alerts. Select Alerts > Show All > click on User Alerts
+
+
+![Alerts > View All> Real Time Alerts](https://octodex.github.com/images/yaktocat.png)
 
 UPDATES
 =======
