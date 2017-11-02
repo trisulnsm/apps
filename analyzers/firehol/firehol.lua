@@ -15,10 +15,34 @@
 
 local FH = require'iprangemap'
 
-local FIREHOL_FILENAME="firehol_level1.netset" 
-local CHECK_SECONDS=1800			
-local VOL_SEV1_ALERT_RECV=10000
-local VOL_SEV1_ALERT_XMIT=20000
+
+
+function file_exists(name)
+   local f=io.open(name,"r")
+   if f~=nil then io.close(f) return true else return false end
+end
+
+
+-- --------------------------------------------
+-- override by trisul_apps_save_exe.config.lua 
+-- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
+--
+DEFAULT_CONFIG = {
+
+	-- filename of FireHOL Feed 
+	Firehol_Filename ="firehol_level1.netset" 
+
+	-- How frequently to check for new files, sync with your cron update 
+	Check_Seconds=1800			
+
+	-- How much should blacklisted IP Recv for Priority elevation to MAJOR (1)
+	Vol_Sev1_Alert_Recv=10000
+
+	-- How much should blacklisted IP Transmit for Priority elevation to MAJOR (1)
+	Vol_Sev1_Alert_Xmit=20000
+}
+-- --------------------------------------------
+
 
 
 -- converts key in trisul format to readable 
@@ -37,8 +61,24 @@ TrisulPlugin = {
 
   -- load the list 
   onload = function()
+
+      -- load custom config if present 
+      T.active_config = DEFAULT_CONFIG
+      local custom_config_file = T.env.get_config("App>DBRoot").."/config/trisulnsm_filehol.lua"
+      if file_exists(custom_config_file) then 
+        local newsettings = dofile(custom_config_file) 
+        T.log("Loading custom settings from ".. custom_config_file)
+        for k,v in pairs(newsettings) do 
+          T.active_config[k]=v
+          T.log("Loaded new setting "..k.."="..v)
+        end
+      else 
+        T.log("Loaded default settings")
+      end
+
+
 	T.fhole = FH.new()
-    local firehol_intel_file  = T.env.get_config("App>DataDirectory") .. "/plugins/" ..  FIREHOL_FILENAME
+    local firehol_intel_file  = T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename
     local status,errormsg = T.fhole:load(firehol_intel_file)
     if status == false then 
       T.logerror("Error loading filehol list msg="..errormsg)
@@ -70,21 +110,24 @@ TrisulPlugin = {
     onflush = function(engine, timestamp, key, arrayofmetrics )
       local m = T.fhole:lookup_trisul(key)
       if m then 
-	    local priority = 3 
-		if arrayofmetrics[2] > VOL_SEV1_ALERT_RECV  and arrayofmetrics[3] > VOL_SEV1_ALERT_XMIT then
-			priority=1
-		end
         T.log("ONFLUSH Found IP in FireHOL Blacklist "..readable_ip(key))
-        engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
-            "06A:"..key..":p-0000_"..key..":p-0000","FireHOL",priority,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
+		if arrayofmetrics[2] > T.active_config.Vol_Sev1_Alert_Recv  and 
+			arrayofmetrics[3] > T.active_config.Vol_Sev1_Alert_Xmit then
+			engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
+				"06A:"..key..":p-0000_"..key..":p-0000","FireHOL",1,
+				"IP "..readable_ip(key).." in FireHOL range "..tostring(m).." exchanged "..tostring(arrayofmetrics[0]).. " bytes elevated priority")
+		else
+			engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
+				"06A:"..key..":p-0000_"..key..":p-0000","FireHOL",3,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
+		end
       end
     end,
 
 	-- beginflush : reload the list every 30 minutes
 	onbeginflush = function(engine,timestamp)
-		if os.time() - T.last_load  > CHECK_SECONDS then 
+		if os.time() - T.last_load  > T.active_config.Check_Seconds then 
 			T.last_load=os.time()
-			T.log("Reloading FireHOL list after interval "..CHECK_SECONDS)
+			T.log("Reloading FireHOL list after interval "..T.active_config.Check_Seconds)
 			TrisulPlugin.onload()
 		end
 	end
