@@ -56,16 +56,16 @@ From the filehol.lua script these are the settings you can customize.
 DEFAULT_CONFIG = { 
 
 	-- filename of FireHOL Feed 
-	Firehol_Filename ="firehol_level1.netset" 
+	Firehol_Filename ="firehol_level1.netset", 
 
 	-- How frequently to check for new files, sync with your cron update 
-	Check_Seconds=1800			
+	Check_Seconds=1800,			
 
 	-- How much should blacklisted IP Recv for Priority elevation to MAJOR (1)
-	Vol_Sev1_Alert_Recv=10000
+	Vol_Sev1_Alert_Recv=10000,
 
 	-- How much should blacklisted IP Transmit for Priority elevation to MAJOR (1)
-	Vol_Sev1_Alert_Xmit=20000
+	Vol_Sev1_Alert_Xmit=20000,
 }
 ````
 
