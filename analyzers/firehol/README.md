@@ -1,15 +1,13 @@
 # FireHOL Checker
 
-Check all your traffic against the excellent FireHOL blacklist.
-The FireHOL list has a reputation for a  very low false positive rate. 
+Check all your traffic against the excellent FireHOL blacklist. The FireHOL list has a reputation for a  very low false positive rate.  **If you see a FireHOL alert in Trisul, you MUST investigate further.** 
 
 
-**If you see a FireHOL alert in Trisul, you MUST investigate further.** 
+## Installing 
 
+To install this APP logon as admin, then select APP from _Web Admin > Manage > Apps._
 
-## Download latest list 
-
-After installing this app. Do the following to keep it updated
+Post install run the following 3 steps to keep the FireHOL list updated. 
 
 
 ### 1. Download the latest file 
@@ -27,6 +25,7 @@ curl -x https://192.168.2.11:3128 -o /usr/local/share/trisul-probe/plugins/fireh
 
 ### 2.  Keep the list updated every hour
 
+
 ````
 
 crontab -e 
@@ -41,7 +40,6 @@ This app automatically refereshes the list every hour.
 ### 3. Restart probe
 
 Login as admin , go to Context : default > Admin Tasks > Start/Stop Tasks. Restart the probe
-
 
 
 Config Parameters
@@ -98,11 +96,13 @@ The FireHOL alerts show up in Trisul as User-Alerts.
 
 ![Alerts > View All> Real Time Alerts](https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/firehol/screenshot-demo.trisul.org-3000-2017-11-02-13-43-01-686.png?raw=true) 
 
+
 UPDATES
 =======
 
+````
 0.0.2		Nov 2 2017			Custom options 
 0.0.1		Oct 30 2017			Initial release 
-
+````
 
 
