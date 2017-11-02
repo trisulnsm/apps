@@ -96,7 +96,7 @@ The FireHOL alerts show up in Trisul as User-Alerts.
 2. View older alerts. Select Alerts > Show All > click on User Alerts
 
 
-![Alerts > View All> Real Time Alerts](/https://github.com/trisulnsm/apps/analyzers/firehol/screenshot-demo.trisul.org-3000-2017-11-02-13-43-01-686.png)
+![Alerts > View All> Real Time Alerts](/apps/analyzers/firehol/screenshot-demo.trisul.org-3000-2017-11-02-13-43-01-686.png)
 
 UPDATES
 =======
