@@ -1,8 +1,6 @@
 # FireHOL Checker
 
-Check all your traffic against the excellent FireHOL blacklist. The FireHOL list has a reputation for a  very low false positive rate.  
-
-**If you see a FireHOL alert in Trisul, you MUST investigate further.**  To help further, this app elevates the alert priority to 1 when bi-direction adata transfer above a threshold occurs with a blacklisted host. 
+Check all your traffic against the excellent FireHOL blacklist. The FireHOL list has a reputation for a very low false positive rate.  **If you see a FireHOL alert in Trisul, you MUST investigate further.**  To help the analyst further, this app elevates the alert priority to 1 when bi-directional data transfer above a threshold occurs with a blacklisted host. 
 
 
 ## Installing 
