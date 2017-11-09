@@ -45,7 +45,7 @@ DEFAULT_CONFIG = {
   Regex="(?i)(msdos|pe32|ms-dos|microsoft|windows|elf|executable|pdf|flash|macro|composite|x86 boot|iso\\s+9660)",
 
   -- filter out these which make it past Regex (to overcome a limitation of RE2) 
-  Regex_Inv="(?i)(ico)",
+  Regex_Inv="(?i)(ico|jpeg)",
 }
 -- --------------------------------------------
 

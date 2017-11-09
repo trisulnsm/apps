@@ -1,1 +1,2 @@
+09-NOV-2017			0.0.6		updated to exclude JPEG magic from being saved 
 24-JUL-2017			0.0.4		save_streaming.lua uses Streaming interface to extract files, more efficient 
