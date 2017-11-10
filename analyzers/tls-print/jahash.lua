@@ -80,8 +80,9 @@ TrisulPlugin = {
   -- 
   onload = function()
 
+    -- search these paths for fingerprint database 
     local PrintFiles = { 
-      T.env.get_config("App>DataDirectory").."/tls-fingerprints.json" ,
+      T.env.get_config("App>DataDirectory").."/plugins/tls-fingerprints.json" ,
       T.env.get_config("App>DBRoot").."/config/lua/github.com_trisulnsm_apps/tls-print/tls-fingerprints.json"
     }
 

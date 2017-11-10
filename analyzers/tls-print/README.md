@@ -23,13 +23,13 @@ Links:
 The App uses a stock TLS Fingerprint JSON database located at 
 
 ````
-/usr/local/var/lib/trisul-probe/domain0/probe0/context0/lua/..
+/usr/local/var/lib/trisul-probe/domain0/probe0/context0/lua/repo/tls-fingerprints.json 
 ````
 
-If you have a different database you can put it in the share directory at
+If you have a different database you can put it in the share directory at. If a fingerprint file is found at this location it is loaded instead. 
 
 ````
-/usr/local/share/trisul-probe/tls-fingerprints.json 
+/usr/local/share/trisul-probe/plugins/tls-fingerprints.json 
 ````
 
 ## Using 
