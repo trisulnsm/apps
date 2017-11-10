@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: jahash.lua tls-fingerprints.json
+appresources: jahash.lua tls-fingerprints.json sweepbuf.lua 
 
 dependencies:  
