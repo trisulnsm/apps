@@ -57,11 +57,11 @@ local TLSDissector_SNI =
 				  end
 
 				  -- hits 
-				  pdur:engine:update_counter("{38497403-23FB-4206-65C2-0AD5C419DD53}",
+				  pdur.engine:update_counter("{38497403-23FB-4206-65C2-0AD5C419DD53}",
 				  						snihostname, 1, 1)
 
 				  -- flow counter for volume/bandwidth 
-				  pdur:engine:add_flow_counter(
+				  pdur.engine:add_flow_counter(
 				  	    tbl.flowkey:id(), -- flowid 
 						"{38497403-23FB-4206-65C2-0AD5C419DD53}", -- SNI counter group 
 						snihostname,   -- key is the SNI host name 
@@ -69,7 +69,7 @@ local TLSDissector_SNI =
 						0)			   -- direction = BOTH 
 
 				  -- new add EDGE sni -> flow 
-				  pdur:engine:add_flow_edges(tbl.flowkey:id(), 
+				  pdur.engine:add_flow_edges(tbl.flowkey:id(), 
 				  			"{38497403-23FB-4206-65C2-0AD5C419DD53}", snihostname)
 
 			  end
