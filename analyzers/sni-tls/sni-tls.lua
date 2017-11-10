@@ -57,7 +57,7 @@ local TLSDissector_SNI =
 				  end
 
 				  -- hits 
-				  pdur.engine:update_counter("{38497403-23FB-4206-65C2-0AD5C419DD53}",
+				  pdur:engine:update_counter("{38497403-23FB-4206-65C2-0AD5C419DD53}",
 				  						snihostname, 1, 1)
 
 				  -- flow counter for volume/bandwidth 
