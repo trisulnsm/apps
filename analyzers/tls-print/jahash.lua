@@ -15,50 +15,55 @@ local SWP = require'sweepbuf'
 local JSON = require'JSON' 
 
 -- local dbg=require'debugger'
-
 ffi.cdef[[
-    typedef struct MD5state_st
-    {
+  typedef struct MD5state_st
+  {
     unsigned int A,B,C,D;
     unsigned int Nl,Nh;
     unsigned int data[16];
     unsigned int num;
-    } MD5_CTX;
+  } MD5_CTX;
   int MD5_Init(MD5_CTX *c);
   int MD5_Update(MD5_CTX *c, const void *data, size_t len);
   int MD5_Final(unsigned char *md, MD5_CTX *c);
 
 ]]
+
 -- ffi based MD5 
 function md5sum( input)
-    local hashresults = ffi.new("uint8_t[16]")
-    ctx = ffi.new'MD5_CTX'
-    C.MD5_Init(ctx)
-    C.MD5_Update(ctx,input,#input)
-    C.MD5_Final(hashresults,ctx)
-    return T.util.bin2hex(ffi.string(hashresults,16)) 
+  local hashresults = ffi.new("uint8_t[16]")
+  ctx = ffi.new'MD5_CTX'
+  C.MD5_Init(ctx)
+  C.MD5_Update(ctx,input,#input)
+  C.MD5_Final(hashresults,ctx)
+  return T.util.bin2hex(ffi.string(hashresults,16)) 
 end 
+
+function file_exists(name)
+  local f=io.open(name,"r")
+  if f~=nil then io.close(f) return true else return false end
+end
 
 -- you dont want to be messing with these
 -- hi there Chromium !!  https://tools.ietf.org/html/draft-davidben-tls-grease-00
 local GREASE_tbl =
 {
-      [0x0A0A] = true,
-      [0x1A1A] = true,
-      [0x2A2A] = true,
-      [0x3A3A] = true,
-      [0x4A4A] = true,
-      [0x5A5A] = true,
-      [0x6A6A] = true,
-      [0x7A7A] = true,
-      [0x8A8A] = true,
-      [0x9A9A] = true,
-      [0xAAAA] = true,
-      [0xBABA] = true,
-      [0xCACA] = true,
-      [0xDADA] = true,
-      [0xEAEA] = true,
-      [0xFAFA] = true
+  [0x0A0A] = true,
+  [0x1A1A] = true,
+  [0x2A2A] = true,
+  [0x3A3A] = true,
+  [0x4A4A] = true,
+  [0x5A5A] = true,
+  [0x6A6A] = true,
+  [0x7A7A] = true,
+  [0x8A8A] = true,
+  [0x9A9A] = true,
+  [0xAAAA] = true,
+  [0xBABA] = true,
+  [0xCACA] = true,
+  [0xDADA] = true,
+  [0xEAEA] = true,
+  [0xFAFA] = true
 };
 
 
@@ -75,29 +80,46 @@ TrisulPlugin = {
   -- 
   onload = function()
 
-    local prints_file = T.env.get_config("App>DataDirectory").."/tls-fingerprints.json" 
+    local PrintFiles = { 
+      T.env.get_config("App>DataDirectory").."/tls-fingerprints.json" ,
+      T.env.get_config("App>DBRoot").."/config/lua/github.com_trisulnsm_apps/tls-print/tls-fingerprints.json"
+    }
 
-  local f, err = io.open(prints_file)
-  if not f then
-    T.logerror("Unable to open TLS Fingerprints JSON file"..err)
-    return false
-  end
+    local prints_file=nil 
 
-  T.log("Prints file="..prints_file);
-  T.print_tbl = { } 
-
-  local cnt=0
-  for oneline in f:lines() do
-    local jj = JSON:decode(oneline)
-    if jj then 
-      T.print_tbl[jj["ja3_hash"]]=jj["desc"]
-      cnt=cnt+1
+    for _,f in ipairs(PrintFiles) do
+      if file_exists(f) then 
+        prints_file=f
+        break
+      end
     end
-  end
 
-  T.log("Loaded "..cnt.." TLS fingerprints")
+    if not prints_file then
+      T.log("Unable to find TLS Fingerprints JSON file in any search location")
+      return false
+    end
 
-  f:close()
+    local f, err = io.open(prints_file)
+    if not f then
+      T.log("Unable to open TLS Fingerprints JSON file"..err)
+      return false
+    end
+
+    T.log("Prints file="..prints_file);
+    T.print_tbl = { } 
+
+    local cnt=0
+    for oneline in f:lines() do
+      local jj = JSON:decode(oneline)
+      if jj then 
+        T.print_tbl[jj["ja3_hash"]]=jj["desc"]
+        cnt=cnt+1
+      end
+    end
+
+    T.log("Loaded "..cnt.." TLS fingerprints")
+
+    f:close()
   end,
 
   -- a new JA3 PRINT counter stream
