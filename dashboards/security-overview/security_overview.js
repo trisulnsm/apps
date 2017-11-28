@@ -1,6 +1,4 @@
 
-
-
 //security overview 
 SecurityOverview = $.klass({
   init:function(opts){
@@ -154,7 +152,7 @@ SecurityOverview = $.klass({
 
   reset_ui:function(){
     $(this.domid).html("<span id = 'statusline'></span>");
-    this.panel = $("<div id='sec_ip_overview'> <div class='row' id='sec_top_header'> <div class='col-xs-12'> <small class='pull-right text-muted' id='sec_tint_duration'></small> </div> </div> <div class='row total_alerts'> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>High Priority IDS</small> <h2> <span class='pull-left'> <img src='/assets/alert1.png'> </span> <span class='pull-right' id='total_ids_p1'></span> </h2> </div> </div> </div> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>Medium Priority IDS</small> <h2> <span class='pull-left'> <img src='/assets/alert2.png'> </span> <span class='pull-right' id='total_ids_p2'></span> </h2> </div> </div> </div> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>Low Priority IDS</small> <h2> <span class='pull-left'> <img src='/assets/alert3.png'> </span> <span class='pull-right' id='total_ids_p3'></span> </h2> </div> </div> </div> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>Badfellas</small> <h2> <span class='pull-left'> <i class='fa fa-bug fa-lg'></i> </span> <span class='pull-right' id='total_badfellas_p0'></span> </h2> </div> </div> </div> </div> <div class='col-xs-4 breakup_ip'> <div class='panel panel-info'> <div class='panel-heading'> <div class='panel-title'> <h4> <span class='ip_readable'></span> <span class='ip_score label label-success pull-right' style='font-size:20px'></span> </h4> <small class='clearfix ip_label text-muted'></small> </div> </div> <div class='panel-body'> <table class='table table-bordered'> <tbody> <tr> <td class='priority_count'> <h4> <span class='ids_p1 label label-danger'></span> </h4> </td> <td> <h4> <span class='ids_p2 label label-warning'></span> </h4> </td> <td> <h4> <span class='ids_p3 label label-info'></span> </h4> </td> <td> <h4> <span class='badfellas_p0 label label-primary'></span> </h4> </td> </tr> <tr> <td colspan='5'> <ul class='sigids_ids list-unstyled border_bottom'> <li class='info_text text-center'>TOP IDS</li> </ul> <ul class='sigids_badfellas list-unstyled'> <li class='info_text text-center'>TOP Badfells</li> </ul> </td> </tr> </tbody> </table> </div> </div> </div> </div>");
+    this.panel = $("<div id='sec_ip_overview'> <div class='row' id='sec_top_header'> <div class='col-xs-12'> <small class='pull-right text-muted' id='sec_tint_duration'></small> </div> </div> <div class='row total_alerts'> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>High Priority IDS</small> <h2> <span class='pull-left'> <i class='fa fa-snowflake-o fa-lg text-danger'></i> </span> <span class='pull-right' id='total_ids_p1'></span> </h2> </div> </div> </div> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>Medium Priority IDS</small> <h2> <span class='pull-left'> <i class='fa fa-snowflake-o fa-lg text-info'></i> </span> <span class='pull-right' id='total_ids_p2'></span> </h2> </div> </div> </div> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>Low Priority IDS</small> <h2> <span class='pull-left'> <i class='fa fa-snowflake-o fa-lg'></i> </span> <span class='pull-right' id='total_ids_p3'></span> </h2> </div> </div> </div> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>Badfellas</small> <h2> <span class='pull-left'> <i class='fa fa-bug fa-lg'></i> </span> <span class='pull-right' id='total_badfellas_p0'></span> </h2> </div> </div> </div> </div> <div class='col-xs-4 breakup_ip'> <div class='panel panel-info'> <div class='panel-heading'> <div class='panel-title'> <h4> <span class='ip_readable'></span> <span class='ip_score label label-success pull-right' style='font-size:20px'></span> </h4> <small class='clearfix ip_label text-muted'></small> </div> </div> <div class='panel-body'> <table class='table table-bordered'> <tbody> <tr> <td class='priority_count'> <h4> <span class='ids_p1 label label-danger'></span> </h4> </td> <td class='priority_count'> <h4> <span class='ids_p2 label label-warning'></span> </h4> </td> <td class='priority_count'> <h4> <span class='ids_p3 label label-info'></span> </h4> </td> <td class='priority_count'> <h4> <span class='badfellas_p0 label label-primary'></span> </h4> </td> </tr> <tr> <td colspan='5'> <ul class='sigids_ids list-unstyled border_bottom'> <li class='info_text text-center'>TOP IDS</li> </ul> <ul class='sigids_badfellas list-unstyled'> <li class='info_text text-center'>TOP Badfells</li> </ul> </td> </tr> </tbody> </table> </div> </div> </div> </div>");
   },
 
   update_UI:function(){
@@ -205,14 +203,35 @@ SecurityOverview = $.klass({
         $(this.domid).append($("<div>",{class:"row",id:"row_"+idx/3}));
       }
       var panel = this.panel.find('.breakup_ip').clone();
-      panel.find('.panel-title .ip_readable').html(data.keyt.readable);
+
+      var params = {guid:GUID.GUID_CG_INTERNAL_HOSTS(),key:data.keyt.key};
+      var href = "/newdash/index?dash_key=key&"+$.param(params);
+      var anchor = $("<a>",{href:href,target:'_blank'}).html(data.keyt.readable)
+
+      panel.find('.panel-title .ip_readable').html(anchor);
       panel.find('.panel-title .ip_score').html(Math.ceil(score_convert(data.score)));
       panel.find('.panel-title small').html(data.keyt.label);
-      panel.find('.ids_p1').text(data.counts[0]);
-      panel.find('.ids_p2').text(data.counts[1]);
-      panel.find('.ids_p3').text(data.counts[2]);
-      panel.find('.badfellas_p0').text(data.counts[3]);
-      panel.find('.firehol_p0').text(data.counts[4]);
+      
+      params = {agguid:GUID.GUID_AG_IDS(),ip:data.keyt.key,priority:1};
+      href = "/trisul_ids_alerts/show_by_priority?"+$.param(params);
+      anchor = $("<a>",{href:href,target:'_blank'}).html(data.counts[0]);
+
+      panel.find('.ids_p1').html(anchor);
+      params = {agguid:GUID.GUID_AG_IDS(),ip:data.keyt.key,priority:2};
+      href = "/trisul_ids_alerts/show_by_priority?"+$.param(params);
+      anchor = $("<a>",{href:href,target:'_blank'}).html(data.counts[1]);
+      panel.find('.ids_p2').html(anchor);
+
+      params = {agguid:GUID.GUID_AG_IDS(),ip:data.keyt.key,priority:3};
+      href = "/trisul_ids_alerts/show_by_priority?"+$.param(params);
+      anchor = $("<a>",{href:href,target:'_blank'}).html(data.counts[2]);
+      panel.find('.ids_p3').html(anchor);
+
+      params = {agguid:GUID.GUID_AG_BLACKLIST(),ip:data.keyt.key};
+      href = "/trisul_ids_alerts/index?"+$.param(params);
+      anchor = $("<a>",{href:href,target:'_blank'}).html(data.counts[3]);
+      panel.find('.badfellas_p0').html(anchor);
+     
 
       var top_sigids = {};
       top_sigids[GUID.GUID_AG_IDS()]=[]
