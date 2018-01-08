@@ -1,0 +1,16 @@
+name: PingMON 
+
+version: 0.0.2
+
+author: trisul
+
+description: 
+   short: Large scale PING reachability and latency monitor
+   long:  |
+     Monitor thousands of endpoints for reachability and measure latency and packetloss. Email when nodes go down 
+
+apptype: lua
+
+appresources: firehol.lua  iprangemap.lua README.md  
+
+dependencies:  
