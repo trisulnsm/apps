@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: firehol.lua  iprangemap.lua README.md  
+appresources: ping_alert_group.lua  ping_counter_group.lua  trisul_unsock_api.lua README.md  
 
 dependencies:  
