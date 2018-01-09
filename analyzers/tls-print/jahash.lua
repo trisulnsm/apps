@@ -111,11 +111,13 @@ TrisulPlugin = {
 
     local cnt=0
     for oneline in f:lines() do
-      local jj = JSON:decode(oneline)
-      if jj then 
-        T.print_tbl[jj["ja3_hash"]]=jj["desc"]
-        cnt=cnt+1
-      end
+	  if not oneline:match("^%s*#") then 
+		  local jj = JSON:decode(oneline)
+		  if jj then 
+			T.print_tbl[jj["ja3_hash"]]=jj["desc"]
+			cnt=cnt+1
+		  end
+	  end 
     end
 
     T.log("Loaded "..cnt.." TLS fingerprints")
