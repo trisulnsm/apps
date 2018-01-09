@@ -44,8 +44,9 @@ UPDATES
 =======
 
 ````
-0.0.2		Jan 08 2018			Updated with 150+ newprints and also added a new Edge to Graph Analytics when 
-                                no SNI hostname is present. Odd these days
+0.0.2		Jan 08 2018			Updated with 150+ newprints 
+                                Adds a new Edge to Graph Analytics when no SNI hostname is present.
+								Adds  Bottom-K JA3 prints in addition to Top-K to the streaming analytics 
 0.0.1		Nov 10 2017			Initial release 
 ````
 

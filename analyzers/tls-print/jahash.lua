@@ -135,7 +135,7 @@ TrisulPlugin = {
     },
 
     meters = {
-      {0, T.K.vartype.COUNTER, 20, "Hits", "hits",    "hits" },
+      {0, T.K.vartype.COUNTER, 20, 40, "Hits", "hits",    "hits" },
     },  
   },
  
