@@ -250,15 +250,20 @@ TrisulPlugin = {
                     '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', client_desc)
       end
 
-      -- Streaming Graph Analytics : Add Bi-Directional Edge 
-      engine:add_edge('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 
-                        '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', snihostname)
+      if snihostname  then 
+          -- Streaming Graph Analytics : Add Bi-Directional Edge 
+          engine:add_edge('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 
+                            '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', snihostname)
 
-      engine:add_edge('{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', snihostname, 
-              '{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash )
+          engine:add_edge('{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', snihostname, 
+                  '{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash )
+
+          engine:add_flow_edges(flowkey:id(), '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', snihostname)
+      else
+          engine:add_flow_edges(flowkey:id(), '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', "No-SNI-Ext")
+      end 
 
       -- Add Flow edges for both SNI and HASH 
-      engine:add_flow_edges(flowkey:id(), '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', snihostname)
       engine:add_flow_edges(flowkey:id(), '{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash)
 
     end
