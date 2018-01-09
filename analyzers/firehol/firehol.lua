@@ -86,8 +86,10 @@ TrisulPlugin = {
 	  T.last_load=0
       T.logerror("Error loading FireHOL list msg="..errormsg)
       return false
+	else
+	  T.last_load=os.time() 
+      T.log(T.K.loglevel.INFO,"Loaded FireHOL list from "..firehol_intel_file)
     end
-    T.last_load=os.time() 
 
   end,
 
