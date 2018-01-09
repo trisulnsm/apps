@@ -83,6 +83,7 @@ TrisulPlugin = {
     local firehol_intel_file  = T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename
     local status,errormsg = T.fhole:load(firehol_intel_file)
     if status == false then 
+	  T.last_load=0
       T.logerror("Error loading FireHOL list msg="..errormsg)
       return false
     end
