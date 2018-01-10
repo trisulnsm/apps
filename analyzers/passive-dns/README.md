@@ -5,11 +5,10 @@ Passive DNS extractor builds a live database of IP to Domain names.
 
 ## How to run
 
-This app **requires you** to do two things on the probe.
+This app **requires you** to 
 
 
 > 1. Install the LeveDB database library 
-> 2. Modify the DNS config file to enable FTS (Full Text) extraction 
 
 
 ### 1. Installing LevelDB 
@@ -41,28 +40,21 @@ sudo apt-get install libleveldb1v5
 
 ````
 
-
-### 2. Enable DNS FTS
-
-On the probe edit the *DNS configuration file*. This is identified by a GUID PI-CCC..
-You can type `/usr/local/share/trisul-probe/cfgedit`  to find and edit the file
-
-````
-sudo -i 
-cd /usr/local/etc/trisul-probe/domain0/probe0/context0
-nano PI-CCCBBBB3-125E-48D0-8AC9-A7E3AD2F60FD.xml
-then change the CreateFTSDocument parameter to 'true'
-````
-
-or 
-
-
-````
-/usr/local/share/trisul-probe/cfgedit
-#  then locate the DNS Config file and select "edit" 
-
-````
-
-
 Then restart the Probes. 
+
+>  The level DB database will be built from live network traffic and stored in 
+>  the probe  config directory `PassiveDNSDB.level`. The probe config 
+>  directory for each context is at `/usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/`
+
+
+UPDATES
+=======
+
+````
+0.0.3		Jan 08 2018			Now uses `resource_monitor` instead of `fts_monitor` to build the 
+                                DNS database. Must faster. 
+
+0.0.1		Oct 10 2017			Initial release 
+````
+
 
