@@ -80,6 +80,13 @@ TrisulPlugin = {
   -- 
   onload = function()
 
+    -- check if the required config settings are ON
+    local enabled = T.env.get_config("Reassembly>TCPReassembly>Applications>EnableSSLRecordExtraction")
+	  if  enabled:lower() ~= "true" then
+        T.logerror("TLS PRINT: needs the Reassembly>TCPReassembly>Applications>EnableSSLRecordExtraction be TRUE. Cant proceed. ");
+        return false
+	  end
+
     -- search these paths for fingerprint database 
     local PrintFiles = { 
       T.env.get_config("App>DataDirectory").."/plugins/tls-fingerprints.json" ,
