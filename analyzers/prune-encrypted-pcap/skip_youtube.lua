@@ -22,7 +22,7 @@ TrisulPlugin = {
 
   -- pre-Compile the regex 
   onload = function()
-    T.re2x = T.re2("(youtube|googlevideo|twitter|ytimg|twimg|netflix|nflxvideo|nflximg|nflxext)")
+	T.re2x = T.re2("(youtube|googlevideo|twitter|ytimg|twimg|netflix|nflxvideo|nflximg|nflxext|acorn.tv|tubitv|atv-ext.amazon.com|atv-ps.amazon.com|hulu)")
     T.LevelReader = nil 
   end,
 
