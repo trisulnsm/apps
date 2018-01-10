@@ -70,7 +70,6 @@ TrisulPlugin = {
       end
 
       for ip in  resource:label():gmatch("A%s+([%d%.]+)") do
-        print(resource:uri().."="..ip)
         T.LevelWriter(ip,resource:uri())
       end
 
