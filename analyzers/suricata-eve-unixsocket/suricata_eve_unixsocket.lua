@@ -138,7 +138,7 @@ TrisulPlugin = {
 
         local alert_string = ffi.string(T.rbuf)
         if alert_string:match('event_type":"alert') then
-            print(alert_string)
+            -- print(alert_string)
             p = JSON:decode(alert_string)
         else
             p = { ["event_type"] = 'notalert'}
