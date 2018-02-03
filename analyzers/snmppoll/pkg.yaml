@@ -8,7 +8,7 @@ description:
    short: SNMP Poller for Interface Usage
    long:  |
       Basic SNMP Poller to measure traffic on interfaces.
-	  Requires snmp package on probes.
+    Requires snmp package on probes.
 
 apptype: lua
 

@@ -16,7 +16,8 @@ UPDATES
 =======
 
 ````
-0.0.1		Feb 03 2018			Initial release as an App. This was in production earlier as a normal scripts 
+0.0.1		Feb 03 2018			Initial release as an App. This was in 
+                                production earlier as standalone script 
 ````
 
 
