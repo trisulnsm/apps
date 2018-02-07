@@ -1,3 +1,6 @@
+-- A new FLOW TRACKER
+-- that tracks poor quality flows with > 5% retransmission rate 
+
 TrisulPlugin = {
 
   id =  {
@@ -23,12 +26,12 @@ TrisulPlugin = {
     --    m : a number M that is the metric used in the Top-K for this flow tracker (eg, total volume )
     --
     getmetric = function(engine, newflow) 
-		local retrans_rate = 100*newflow:retransmissions()/(newflow:az_packets()+newflow:az_packets());
-		if retrans_rate > 5 then 
-			return retrans_rate 
-		else
-			return 0
-		end 
+      local retrans_rate = 100*newflow:retransmissions()/(newflow:az_packets()+newflow:az_packets());
+      if retrans_rate > 5 then 
+        return retrans_rate 
+      else
+        return 0
+      end 
     end,
 
   },
