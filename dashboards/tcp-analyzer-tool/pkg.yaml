@@ -1,0 +1,20 @@
+name: TCP Analyzer tool
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: TCP analyzer dashboards
+   long:  |
+      Shows Latency,Retransmisson for internal and external hosts
+      Show hosts with high retransmisson rate and timout flows
+      Shows poor quality flows that has more than 5% retransmisson rate.
+      Need TCP analyzer lua
+
+apptype: dashboard_share
+
+appresources: dashboard.json
+
+dependencies : 
