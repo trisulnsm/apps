@@ -5,11 +5,11 @@ version: 0.0.1
 author: trisul
 
 description: 
-   short:  Analyze TCP activity
+   short: TCP Analysis  
    long:  |
-      Calcuate Retranmisson,Latency and packet loss for TCP.
-      Mark Bad Quality flow for timedout.
-      Store Poor quality flows if retransmisson has above 5%
+      Identify hosts experiencing TCP performance issues by 
+      tracking retransmissions,connection setup latency, and timeouts.
+      Marks flows experiencing high retransmissions with flow TAG
 
 apptype: lua
 
