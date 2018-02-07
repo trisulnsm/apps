@@ -9,7 +9,6 @@ local lsqlite3 = require 'lsqlite3'
 local JSON=require'JSON'
 
 local WEBTRISUL_DATABASE="/usr/local/share/webtrisul/db/webtrisul.db"
---local WEBTRISUL_DATABASE= "/home/devbox/bldart/z21/webtrisul/db/webtrisul.db"
 
 -- return { key, value } 
 function do_bulk_walk( agent, version, community, oid  )
@@ -100,7 +99,6 @@ TrisulPlugin = {
           if agent.agent_version == "1"  then oid = "1.3.6.1.2.1.2.2.1.2" end
           local up_key =  do_bulk_walk( agent.agent_ip, agent.agent_version, agent.agent_community, oid)
           for k,v in pairs( up_key) do 
-            --print("UPDAING KEY ".. k .." = " .. v ) 
             engine:update_key_info( "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}", k, v   );
           end
         end
@@ -146,14 +144,14 @@ TrisulPlugin = {
     while stepret  do
       local v = stmt:get_values()
       local  snmp = JSON:decode(v[2])
-	  if T.util.hash( snmp["IP Address"],1) == tonumber(engine_id) then 
-		  targets[ #targets + 1] = { agent_ip = snmp["IP Address"], agent_community = snmp["Community"], agent_version = snmp["Version"] } 
-		  T.log(T.K.loglevel.INFO, "Loaded ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
-		  print("Loaded ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
-	  else
-		  T.log(T.K.loglevel.INFO, "SKIPPED ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
-		  print("SKIPPED ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
-	  end 
+      if T.util.hash( snmp["IP Address"],1) == tonumber(engine_id) then 
+        targets[ #targets + 1] = { agent_ip = snmp["IP Address"], agent_community = snmp["Community"], agent_version = snmp["Version"] } 
+        T.log(T.K.loglevel.INFO, "Loaded ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+        print("Loaded ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+      else
+        T.log(T.K.loglevel.INFO, "SKIPPED ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+        print("SKIPPED ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+      end 
       ok, stepret = pcall(stmt.step, stmt) 
     end
     stmt:finalize()

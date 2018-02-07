@@ -11,6 +11,16 @@ This APP uses the Trisul LUA API to poll SNMP interface usage along with their n
 
 ## How to use 
 
+1. You need to add the ROUTERS/SWITCHES you want to pull interface metrics from
+2. Login as Admin to WebTrisul
+3. Goto Web Admin : Manage > App Settings 
+4. Scroll to the end and find "Manage Extended Settings"
+5. Fill in the SNMP Type details and press create
+6. Repeat this for all routers you want to track
+7. Install this app and restart Trisul-Probe
+
+**All interfaces from all the specified routers** will be tracked and all in/out/total utilizations will be stored at 1-min interval. All Trisul features like Top-K Bottom-K will be available. 
+
 
 UPDATES
 =======
