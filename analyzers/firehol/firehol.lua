@@ -22,17 +22,19 @@ function file_exists(name)
 end
 
 
+local dbg=require'debugger'
+
 -- --------------------------------------------
 -- override by trisul_apps_save_exe.config.lua 
 -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
 --
 DEFAULT_CONFIG = {
 
-  -- filename of FireHOL Feed 
-  Firehol_Filename ="firehol_level1.netset",
+  -- filename of FireHOL level1 Feed  - will trigger Sev-1 alert 
+  Firehol_Filename_Level1 ="firehol_level1.netset",
 
-  -- How frequently to check for new files, sync with your cron update 
-  Check_Seconds=1800,
+  -- optional level3 - will create Sev-3 alert 
+  Firehol_Filename_Level3 ="firehol_level3.netset",
 
   -- How much should blacklisted IP Recv for Priority elevation to MAJOR (1)
   Vol_Sev1_Alert_Recv=10000,
@@ -77,19 +79,20 @@ TrisulPlugin = {
       T.log("Loaded default settings")
     end
 
-
-    -- load the FireHOL into IP Range Map datastruct
-    T.fhole = FH.new()
-    local firehol_intel_file  = T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename
-    local status,errormsg = T.fhole:load(firehol_intel_file)
-    if status == false then 
-	  T.last_load=0
-      T.logerror("Error loading FireHOL list msg="..errormsg)
+    T.intel_file_hashes = {} 
+  
+    -- Firehol 1: required - load into iprangemap struct 
+    T.fhole_1 = TrisulPlugin.check_reload( T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level1) 
+    if T.fhole_1 == nil then 
+      T.logerror("Sorry cant find firehol_level1 intel file")
       return false
-	else
-	  T.last_load=os.time() 
-      T.log(T.K.loglevel.INFO,"Loaded FireHOL list from "..firehol_intel_file)
-    end
+    end 
+
+    -- Firehol 3 : optional 
+    T.fhole_3 = TrisulPlugin.check_reload( T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level3) 
+    if T.fhole_3 == nil then 
+      T.loginfo("firehol_level3 intel file not found, wont generate those alerts")
+    end 
 
   end,
 
@@ -103,40 +106,76 @@ TrisulPlugin = {
     -- As soon as a new key is seen , new keys repeat every X hours 
     -- real time
     onnewkey = function(engine, timestamp, key)
-      local m = T.fhole:lookup_trisul(key)
+      local m = T.fhole_1:lookup_trisul(key)
       if m then 
-        T.log("ONNEWKEY Found IP in FireHOL Blacklist key="..key.. " ip="..readable_ip(key) )
+        T.log("ONNEWKEY Found IP in FireHOL LEVEL1 Blacklist key="..key.. " ip="..readable_ip(key) )
         engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
-            "06A:"..key..":p-0000_"..key..":p-0000","FireHOL",3,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
+            "06A:"..key..":p-0000_"..key..":p-0000","FireHOL-Level1",1,"IP "..readable_ip(key).." in FireHOL Level1 range "..tostring(m))
       end
+
+      if T.fhole_3 then 
+       local m2 = T.fhole_3:lookup_trisul(key)
+       if m2 then 
+          T.log("ONNEWKEY Found IP in FireHOL LEVEL3 Blacklist key="..key.. " ip="..readable_ip(key) )
+          engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
+                "06A:"..key..":p-0000_"..key..":p-0000","FireHOL-Level3",2,"IP "..readable_ip(key).." in FireHOL Level3 range "..tostring(m2))
+        end
+      end 
     end,
 
     -- onflush - used to check if data transfer happend , major alert 
     -- near real time 1-minute. Escalate priority if large data Xfer happens
+    -- arrayofmetrics is an array containing counters , see LUA Docs for cg_monitor 
     onflush = function(engine, timestamp, key, arrayofmetrics )
-      local m = T.fhole:lookup_trisul(key)
-      if m then 
-        T.log("ONFLUSH Found IP in FireHOL Blacklist "..readable_ip(key))
-        if arrayofmetrics[2] > T.active_config.Vol_Sev1_Alert_Recv  and 
-          arrayofmetrics[3] > T.active_config.Vol_Sev1_Alert_Xmit then
-            engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
-              "06A:"..key..":p-0000_"..key..":p-0000","FireHOL",1,
-              "IP "..readable_ip(key).." in FireHOL range "..tostring(m).." exchanged "..tostring(arrayofmetrics[0]).. " bytes Elevated priority")
-        else
-            engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
-              "06A:"..key..":p-0000_"..key..":p-0000","FireHOL",3,"IP "..readable_ip(key).." in FireHOL range "..tostring(m))
+      if T.fhole_3 then 
+        local m = T.fhole_3:lookup_trisul(key)
+        if m then 
+          T.log("ONFLUSH Found IP in FireHOL Level3 Blacklist "..readable_ip(key))
+          if arrayofmetrics[2] > T.active_config.Vol_Sev1_Alert_Recv  and 
+            arrayofmetrics[3] > T.active_config.Vol_Sev1_Alert_Xmit then
+              engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
+                "06A:"..key..":p-0000_"..key..":p-0000","FireHOL-Xfer",1,
+                "IP "..readable_ip(key).." in FireHOL range "..tostring(m).." exchanged "..tostring(arrayofmetrics[0]).. " bytes Elevated priority")
+          end
         end
-      end
+      end 
     end,
 
-    -- beginflush : reload the list every 30 minutes
+    -- beginflush : reload the list if ondisk hash changes 
     onbeginflush = function(engine,timestamp)
-      if os.time() - T.last_load  > T.active_config.Check_Seconds then 
-        T.last_load=os.time()
-        T.log("Reloading FireHOL list after interval "..T.active_config.Check_Seconds)
-        TrisulPlugin.onload()
-      end
-    end
+
+      -- Firehol 1: required - load into iprangemap struct 
+      local new_map = TrisulPlugin.check_reload( T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level1) 
+      if new_map then
+        T.fhole_1 = new_map
+      end 
+
+      -- Firehol 3: optional 
+      local new_map = TrisulPlugin.check_reload( T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level3) 
+      if new_map then
+        T.fhole_3 = new_map
+      end 
+    end,
   },
+
+  -- Uses T.intel_file_hashes to reload intel file if hash changes on disk 
+  check_reload = function(firehol_intel_file )
+    local h = io.popen("md5sum   "..firehol_intel_file)
+    local md5=  h:read("*a"):match('%w+') 
+    if T.intel_file_hashes[ firehol_intel_file ]  ~= md5 then
+      T.log("Reloading FireHOL list , change detected")
+      T.intel_file_hashes[ firehol_intel_file ] = md5
+      local fholemap = FH.new()
+      local status,errormsg = fholemap:load(firehol_intel_file)
+      if status == false then 
+        T.logerror("Error loading FireHOL list msg="..errormsg)
+        return nil 
+      else
+        T.loginfo("Loaded FireHOL list Level-3 from "..firehol_intel_file)
+      end 
+      return fholemap
+    end
+  end 
+
 }
 
