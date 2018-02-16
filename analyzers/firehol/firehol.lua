@@ -135,7 +135,7 @@ TrisulPlugin = {
             arrayofmetrics[3] > T.active_config.Vol_Sev1_Alert_Xmit then
               engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}" ,             
                 "06A:"..key..":p-0000_"..key..":p-0000","FireHOL-Xfer",1,
-                "IP "..readable_ip(key).." in FireHOL range "..tostring(m).." exchanged "..tostring(arrayofmetrics[0]).. " bytes Elevated priority")
+                "IP "..readable_ip(key).." in FireHOL range "..tostring(m).." exchanged "..tostring(arrayofmetrics[1]).. " bytes Elevated priority")
           end
         end
       end 
