@@ -1,6 +1,6 @@
 name:  PCAP Totals
 
-version: 0.0.1
+version: 0.0.2
 
 author: trisul
 
@@ -15,6 +15,6 @@ description:
 
 apptype: dashboard_js
 
-appresources: pcap_total.js
+appresources: pcap_totals.js
 
 dependencies: 
