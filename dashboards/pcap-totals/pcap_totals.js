@@ -236,7 +236,13 @@ function run(opts)
     return mk_time_interval({window_fromts:tmodel.time_duration.from_ts,window_tots:tmodel.time_duration.to_ts})
   }
   tmodel.get_bucketsize = function(guid){
-    return opts["all_cg_bucketsize"][guid].bucket_size;
+    if( opts["all_cg_bucketsize"][guid] == undefinded)
+    {
+      return 60;
+    }
+    else{
+      return opts["all_cg_bucketsize"][guid].bucket_size;
+   }
   }
   $(domid).append( $(HTML_TEMPLATE_O));
   run_model(tmodel,opts)
