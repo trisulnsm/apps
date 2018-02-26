@@ -236,7 +236,7 @@ function run(opts)
     return mk_time_interval({window_fromts:tmodel.time_duration.from_ts,window_tots:tmodel.time_duration.to_ts})
   }
   tmodel.get_bucketsize = function(guid){
-    if( opts["all_cg_bucketsize"][guid] == undefinded)
+    if( opts["all_cg_bucketsize"][guid] == undefined)
     {
       return 60;
     }
