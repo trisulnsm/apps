@@ -4,14 +4,15 @@
 
 //TEMPLATE
 
-const HTML_TEMPLATE_O = "<div class='widget'> <div class='widget-header'> <h4> Totals <small>Click the counts to see data</small> </h4> </div> <div class='widget-body clearfix' id='overall_totals'> <div id='statusline'></div> </div> </div>";
+const HTML_TEMPLATE_O = "<div class='widget'> <div class='widget-header'> <h4> Totals <small>Click the counts to see data</small> </h4> </div> <div class='widget-body clearfix' id='overall_totals'> <div id='statusline'></div> <div class='row'> <div id='chart_data'></div> </div> <div class='row'> <div id='badge_data'></div> </div> </div> </div>";
+const CHART_TEMPLATE = "<div class='col-xs-6'><div class='panel'><div class='panel-body'></div></div></div>";
 const PANEL_TEMPLATE = "<div class='col-xs-2'><div class='panel' style='min-height:110px'><div class='panel-body' style='padding:10px'></div></div></div>";
 var TotalsModel = $.klass({
   init : function() {
     this.time_duration = {title:"Total Duration",from_ts:0,to_ts:0,duration:0};
     this.totals = [
-     {title:"Total Bytes",guid:GUID.GUID_CG_AGGREGATE(),key:"TOTALBW",meter:0,data:0,ratecounter:true,url:"/newdash?dash_key=retrousage"},
-     {title:"Total Packets",guid:GUID.GUID_CG_AGGREGATE(),key:"TOTALBW",meter:1,data:0,ratecounter:true,url:"/newdash?dash_key=retrousage"},
+     {title:"Total Bytes",guid:GUID.GUID_CG_AGGREGATE(),key:"TOTALBW",meter:0,data:0,chart_data:[],ratecounter:true,url:"/newdash?dash_key=retrousage"},
+     {title:"Total Packets",guid:GUID.GUID_CG_AGGREGATE(),key:"TOTALBW",meter:1,data:0,chart_data:[],ratecounter:true,url:"/newdash?dash_key=retrousage"},
     ];
     this.metrics = [
      // Alerts
@@ -118,7 +119,7 @@ function load_totals(mod,opts)
 {
   var kMod=mod;
   //load toppers for every 5mins
-  _.each( kMod.totals, function (k) {
+  _.each( kMod.totals, function (k,i) {
     var kUp= k;
     k.bucket_size = kMod.get_bucketsize(k.guid);
     var req = mk_trp_request(TRP.Message.Command.COUNTER_ITEM_REQUEST,
@@ -131,12 +132,22 @@ function load_totals(mod,opts)
     prom=prom.then ( function(f){
       return get_response(req,function(resp){
         kMod.status_updater(kUp.title);
-        var multiplier = kUp.ratecounter ? kUp.bucket_size:1; // per second counter 
+        var multiplier = kUp.ratecounter ? kUp.bucket_size:1; // per second counter
+        
+
         var total=_.chain(resp.stats)
                    .reduce( function(memo,ai) { return memo + multiplier*ai.values[kUp.meter].toNumber();}, 0 )
                    .value();
         kUp.data += total;
-        update_totals(kMod,kUp);  
+        update_totals(kMod,kUp);
+        if(_.has(kUp,"chart_data")){
+          kUp.chart_data = _.chain(resp.stats)
+                           .collect(function(ai){
+                            return {x:new Date(ai.ts_tv_sec.toNumber()*1000),y:ai.values[kUp.meter]*8}
+                           })
+                          .value();
+          update_chart(kMod,kUp,i)
+        } 
       });
     });
   });
@@ -181,7 +192,9 @@ function update_duration(mod,opts)
   var t = $("<span>",{class:"text-"+cls}).text(kMod.time_duration.duration + " Starting from " + fmt_ts(kMod.time_duration.from_ts));
   pt.find('.panel-body').append(header);
   pt.find('.panel-body').append(t);
-  $('#overall_totals').append(pt);
+  $('#badge_data').append(pt);
+
+
 
 }
 
@@ -206,7 +219,7 @@ function update_totals(mod,k)
   }
   pt.find('.panel-body').append(header);
   pt.find('.panel-body').append(t);
-  $('#overall_totals').append(pt);
+  $('#badge_data').append(pt);
 }
 
 // for updater status
@@ -225,6 +238,116 @@ function mkstatusupdater(mod,opts)
     $('#statusline').text("Please wait. Building totals. Step: " + msg + " " + Math.floor(cnt/max*100) + "%");
   }
 
+}
+
+function update_chart(mod,k,i){ 
+  var kMod = mod;
+  var kUp = k;
+  var pt = $(CHART_TEMPLATE);
+  pt.find('.panel').addClass('panel-default');
+  $('#chart_data').append(pt);
+
+
+
+  var chart_width = pt.width() - 20 ;
+  var aspect_ratio = 3;
+  var chart_height = parseInt(chart_width/aspect_ratio);
+  chart_width = parseInt(chart_width);
+  var canvas = $("<canvas>",{width:chart_width,height:chart_height,id:'canvas_'+i});
+
+  pt.find('.panel-body').append(canvas)
+
+  var zoom = {
+    // Boolean to enable zooming
+    enabled: true,
+
+    // Enable drag-to-zoom behavior
+    drag: true,
+
+    // Zooming directions. Remove the appropriate direction to disable 
+    // Eg. 'y' would only allow zooming in the y direction
+    mode: 'x',
+    limits: {
+      max: 10,
+      min: 0.5
+    }
+  }
+
+
+  var c10 = d3.schemeCategory10;
+  
+  var chart_datasets = [];
+  //collecting the data
+  
+  chart_datasets.push({
+    label:kUp.title,
+    borderWidth: 1 ,
+    fill:false,
+    backgroundColor:c10[i],
+    borderColor:c10[i],
+    data:kUp.chart_data,
+    steppedLine: true
+  });
+    
+  
+  var ctx = document.getElementById('canvas_'+i);
+  var label_string = "";
+  if(i==0){
+    label_string = "bps"
+  }else{
+    label_string = "pps"
+  }
+
+  window.pcap_totals_canvas =  new Chart(ctx, {
+    type:'line',
+    data:{
+      datasets:chart_datasets,
+    },
+    options: {
+      responsive:false,
+
+      scales: {
+        xAxes: [{
+          type: 'time',
+          time: {
+            displayFormats: {
+              'day': 'MMM DD',
+              'hour': 'hA MMM DD'
+            }
+          },
+          
+        }],
+        yAxes: [{
+          display:true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Units '+label_string
+            },
+            ticks: {
+            autoSkip: true,
+            maxTicksLimit: 8,
+            callback: function(value, index, values) {
+              return h_fmtbw(value);
+            },
+          }
+        }]
+      },
+      tooltips: {
+        callbacks: {
+        label: function (tooltipItem, data) {
+          return [names[tooltipItem.datasetIndex]+" : "+h_fmtbw(tooltipItem.yLabel)];
+          }
+        }
+      },
+      animation:false,
+      elements: { point: { radius: 0 } },
+      zoom:zoom,
+      // Container for zoom options
+     
+    }
+    
+  });
+  
 }
 
 //called from trp js base
