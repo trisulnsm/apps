@@ -1,0 +1,20 @@
+name:  PCAP Totals
+
+version: 0.0.5
+
+author: trisul
+
+
+description: 
+   short: Shows total  summary of pcap file .
+   long:  |
+      Shows duraion,total bandwidth,packets and flows
+      Shows total No.of Resources(http,dns,ssl) and FTS( dns,ssl,http headers)
+      Shows total No.of alerts for all alerts group(IDS,Blacklist,Flow Tracking,Threshold crossing)
+      Shows No.of keys in each counter group
+
+apptype: dashboard_js
+
+appresources: pcap_totals.js
+
+dependencies: 
