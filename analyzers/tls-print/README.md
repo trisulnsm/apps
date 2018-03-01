@@ -36,7 +36,7 @@ If you have a different JSON database you can put it in the share directory at t
 
 ![Retro Counters > JA3 ](https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/tls-print/ja3_topk.png?raw=true) 
 
-![Retro Counters > JA3 > Click on Print > View Edge ](https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/tls-print/ja3_edge.png?raw=true) 
+![Retro Counters > JA3 > Click on Print > View Edge ](https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/tls-print/ja3_graph.png?raw=true) 
 
 
 
