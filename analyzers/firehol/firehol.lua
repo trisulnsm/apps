@@ -84,7 +84,7 @@ TrisulPlugin = {
     -- Firehol 1: required - load into iprangemap struct 
     T.fhole_1 = TrisulPlugin.check_reload( T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level1) 
     if T.fhole_1 == nil then 
-      T.logerror("Sorry cant find firehol_level1 intel file")
+      T.logerror("Sorry cant find firehol_level1 intel file. Follow instructions in README to download the file")
       return false
     end 
 
