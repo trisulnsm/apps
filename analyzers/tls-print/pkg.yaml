@@ -1,13 +1,13 @@
 name: TLS Fingerprinter
 
-version: 0.0.3
+version: 0.0.4
 
 author: trisul
 
 description: 
    short: Generates and tracks TLS Fingerprint indicators 
    long:  |
-      TLS Fingerprinting technique can be used to identify TLS/SSL applications. This app generates and tracks these.
+      TLS Fingerprinting can be used to identify TLS/SSL client applications including Malware. This app generates and tracks them.
 
 apptype: lua
 

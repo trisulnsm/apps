@@ -1,8 +1,8 @@
 # TLS Fingerprinter
 
-This Trisul APP adds TLS Fingerprinting capability to Trisul NSM. 
+This Trisul APP adds TLS Fingerprinting capability to TrisulNSM. 
 
-TLS fingerprinting is a network analysis technique to intelligently guess the client being used for a given SSL/TLS connection.  You can use this method to detect rogue clients, build a profile of known clients, apply any intel you may come across for known Malware fingerprints. It is just a very good extra insight you can get into your network , particularly when more than 70% of typical enterprise traffic  these days are using SSL/TLS. 
+TLS fingerprinting is a network analytics technique to intelligently guess a SSL/TLS client.  Use this to detect rogue clients, build a profile of known clients.  It is just a very good extra piece of info  when more than 70% of enterprise traffic these days are using SSL/TLS. 
 
 
 Links:
@@ -13,24 +13,25 @@ Links:
 
 ## Installing 
 
-1. To install this APP logon as admin, then select APP from _Web Admin > Manage > Apps._
+1. To install the "TLS Print" APP. Logon as admin, then select APP from _Web Admin > Manage > Apps._
 2. Then restart the Trisul Probes to turn the app live.
-
-
 
 ### 1. The TLS Fingerprint database 
 
-The App uses a stock TLS Fingerprint JSON database located at 
+The App uses a stock TLS Fingerprint JSON database located at  the following location
 
 ````
-/usr/local/var/lib/trisul-probe/domain0/probe0/context0/lua/repo/tls-fingerprints.json 
+# stock database 
+/usr/local/var/lib/trisul-config/domain0/context0/profile0/lua/github.com_trisulnsm_apps
 ````
 
-If you have a different database you can put it in the share directory at. If a fingerprint file is found at this location it is loaded instead. 
+If you have a different JSON database you can put it in the share directory at the following location. 
 
 ````
+# custom database, this is loaded if present first 
 /usr/local/share/trisul-probe/plugins/tls-fingerprints.json 
 ````
+
 
 ## Using 
 
@@ -44,6 +45,9 @@ UPDATES
 =======
 
 ````
+0.0.4		Mar 01 2018			* Updated with 50+new prints
+                                * Adds Flow Tags with first 6 chars of JA3 Hash
+								* Handle very long descriptions 
 0.0.3		Jan 08 2018			Updated with 150+ newprints 
                                 Adds a new Edge to Graph Analytics when no SNI hostname is present.
 								Adds  Bottom-K JA3 prints in addition to Top-K to the streaming analytics 
