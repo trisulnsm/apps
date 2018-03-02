@@ -13,6 +13,8 @@
 --              in both directions. 
 -- 
 
+-- local dbg=require'debugger'
+
 local FH = require'iprangemap'
 
 
@@ -20,9 +22,6 @@ function file_exists(name)
   local f=io.open(name,"r")
   if f~=nil then io.close(f) return true else return false end
 end
-
-
-local dbg=require'debugger'
 
 -- --------------------------------------------
 -- override by trisul_apps_save_exe.config.lua 
@@ -160,6 +159,7 @@ TrisulPlugin = {
 
   -- Uses T.intel_file_hashes to reload intel file if hash changes on disk 
   check_reload = function(firehol_intel_file )
+    if not file_exists(firehol_intel_file) then return nil end 
     local h = io.popen("md5sum   "..firehol_intel_file)
     local md5=  h:read("*a"):match('%w+') 
     if T.intel_file_hashes[ firehol_intel_file ]  ~= md5 then
