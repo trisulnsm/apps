@@ -1,0 +1,19 @@
+name:  Daily Key Report
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: Shows daily usage report for key
+   long:  |
+      Shows Min,Max,average and Total for a key in tabel format
+      User can select any period of time .
+      
+
+apptype: dashboard_js
+
+appresources: daily_key_report.js
+
+dependencies: 
