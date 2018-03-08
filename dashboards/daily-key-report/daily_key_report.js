@@ -41,7 +41,6 @@ var DailyKeyUsage = $.klass({
   get_data:function(){
 
     if(this.dates.length  == 0){
-      new ExportToCSV({table_id:"mma_data_table",filename_prefix:"min_max_js"});
       return true;
     }
     this.status_updater("");
@@ -136,4 +135,3 @@ function run(opts) {
  new DailyKeyUsage(opts); 
 }
 
-//# sourceURL=min_max_avg.js
