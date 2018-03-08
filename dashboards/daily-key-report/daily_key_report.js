@@ -6,6 +6,10 @@ var DailyKeyUsage = $.klass({
 
   //reset the ui
   reset_ui:function(){
+    if(this.trp_form.key == "" || this.trp_form.key == undefined){
+      alert("Key filed can't be blank");
+      return true;
+    }
     $(this.trp_form.domid).find('#mma_data_widget').remove();
     var widget =get_widget_shell();
     widget.attr("id","mma_data_widget");
