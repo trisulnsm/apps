@@ -9,7 +9,7 @@ This app provides three metrics
 
 1. A new Counter Group called "SNI" 
     1. meter 0 : bandwidth  per hostname
-	2. meter 1 : flows/hits per hostname
+    2. meter 1 : flows/hits per hostname
 
 2. A new Resource Group called "SNI" contains IP->SNI hostname mapping 
 
@@ -19,6 +19,9 @@ This app provides three metrics
 Versions:
 =========
 
-0.0.6  	Oct 25 2017  		Updated - flowkey() 
-0.0.5  	Oct 11 2017  		Add Edges from TLS SNI to flow vertices 
+````
+0.0.7   Mar 10 2018         New add_flow_attribute() allows other scripts to pick up, example URLCategory 
+0.0.6   Oct 25 2017         Updated - flowkey() 
+0.0.5   Oct 11 2017         Add Edges from TLS SNI to flow vertices 
+````
 
