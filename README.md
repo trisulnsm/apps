@@ -18,4 +18,21 @@ To install these tools
 4. For each App click on the README link for additional instructions
 
 
+## LUA analyzer
+
+| APP Name  | Description |
+| ------------- | ------------- |
+| FireHOL checker  |Alerts if activity seen from FireHOL blacklist  |
+| Passive DNS Extractor|Extracts IP to Domain map|
+| PingMON | Large scale PING reachability and latency monitor| 
+|Prune Encrypted PCAP|Prunes high volume encrypted Netflix/YouTube from PCAP storage|
+|Prune TLS from PCAP storage|Dont store TLS traffic|
+|SNI TLS Metrics|Traffic metrics from TLS Server Name Indication|
+|SNMP Poller|SNMP Poller for Interface Usage|
+|SSH Events|SSH Login and Tunnel|
+|Save Binaries|Extract binary files, PDF, Flash from traffic|
+|Suricata via EVE UnixSocket|Suricata alerts via EVE Unix Socket|
+|TCP Analyzer|Identify hosts experiencing TCP performance|
+|TLS Fingerprinter|Generates and tracks TLS Fingerprint indicators|
+
 
