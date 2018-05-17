@@ -36,3 +36,21 @@ To install these tools
 |TLS Fingerprinter|Generates and tracks TLS Fingerprint indicators|
 
 
+## JS Dashboards
+|APP Name | Description
+|---------|----------|
+|Daily Key Report| Shows daily usage report for key|
+|Key Space Explorer| Search all active key space and get total usage|
+|PCAP Totals|Shows total summary of pcap file |
+|Security Overview - Internal Hosts| Shows IDS and Badfellas alerts count for internal hosts| 
+|Super search host|earch all hosts by domain name and print total usage of each.|
+|Usage Activity Heatmap|Shows key activity usage in d3 heatmap visualization Day/Hour|
+
+## Package Dashboard
+
+|APP Name | Description
+|---------|----------|
+|DNS monitoring|DNS Custom Metrics and dashboards|
+|Probe Performance|System performance of Trisul Probes|
+|Save Binaries Monitoring|Dashboards for the Save Binaries App|
+|TCP Analysis|TCP analyzer dashboards|
