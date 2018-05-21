@@ -175,7 +175,7 @@ FlowImporter.process_flow=function(engine, flowtbl)
       engine:new_flow_record( tkey.flow,  0, flowtbl.bytes, 0,flowtbl.packets);
     end 
 
-    engine:set_flow_duration( tkey.flow, (flowtbl.last_timestamp - flowtbl.first_timestamp)/100);
+    engine:set_flow_duration( tkey.flow, flowtbl.last_timestamp - flowtbl.first_timestamp);
 
     local COUNTER_GUIDS = {
       flowgen  = '{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}',
