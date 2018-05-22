@@ -103,19 +103,20 @@ TrisulPlugin = {
 
 		local val = TrisulPlugin.lookup_prefix(T.ldb_iterator, "CTRY:",ip)
 		if val then 
-			local key,label = val:match("(%s+)%s*(.*)")
+			local key,label = val:match("(%S+)%s*(.*)")
+		print("Coutr "..val.." key"..key) 
 			TrisulPlugin.update_metrics(engine, flow, "{F962527D-985D-42FD-91D5-DA39F4D2A222}",  key, label) 
 		end
 
 		local val = TrisulPlugin.lookup_prefix(T.ldb_iterator, "CITY:",ip)
 		if val then 
-			local key,label = val:match("(%s+)%s*(.*)")
+			local key,label = val:match("(%S+)%s*(.*)")
 			TrisulPlugin.update_metrics(engine, flow, "{E85FEB77-942C-411D-DF12-5DFCFCF2B932}",  key, label) 
 		end
 
 		local val = TrisulPlugin.lookup_prefix(T.ldb_iterator, "PROXY:",ip)
 		if val then 
-			local key,label = val:match("(%s+)%s*(.*)")
+			local key,label = val:match("(%S+)%s*(.*)")
 			TrisulPlugin.update_metrics(engine, flow, "{2DCA13EB-0EB3-46F6-CAA2-9989EA904051}",  key, label) 
 		end
 
