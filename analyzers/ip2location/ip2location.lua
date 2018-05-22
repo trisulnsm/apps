@@ -47,7 +47,7 @@ TrisulPlugin = {
   lookup_prefix = function(iter,prefix,key)
 	local k0,v0= T.ldb:upper(T.ldb_iterator, prefix..key)
 	if k0 then 
-		local k1,k2 = k0:match("%u+:([%x%.]+)-([%x%.]+)")
+		local k1,k2 = k0:match("%u:+([%x%.]+)-([%x%.]+)")
 		if key < k1 and key > k2 then
 			return v0
 		end
@@ -90,6 +90,8 @@ TrisulPlugin = {
 		local ip=flow:flow():ipz_readable()
 		if T.host:is_homenet(ip) then 
 			ip=flow:flow():ipa()
+		else 
+			ip=flow:flow():ipz()
 	 	end 	
 
 

@@ -116,7 +116,7 @@ end
 
 if #arg ~= 2 then
 	print("Usage : compile_ip2loc leveldbpath  directory_where_the_IP2LOCATION_files_are_kept")
-	exit() 
+	return  
 end
 
 
