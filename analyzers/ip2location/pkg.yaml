@@ -8,7 +8,7 @@ description:
    short: Country, ASN, City, and Proxy metrics based on the IP2Location databases 
    long:  |
       This app uses the free IP2Location LITE databases https://lite.ip2location.com/ to 
-	  measure and label based on IP addresses. Uses LevelDB as an intermediate format 
+    measure and label based on IP addresses. Uses LevelDB as an intermediate format 
 
 apptype: lua
 
