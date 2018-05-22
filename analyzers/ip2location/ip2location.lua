@@ -19,7 +19,7 @@ TrisulPlugin = {
   onload = function() 
 
     -- required 
-    T.ldb_root = T.env.get_config("App>DataDirectory") .. "/plugins/"
+    T.ldb_root = T.env.get_config("App>DataDirectory") .. "/plugins"
   	T.ldb_loadtm=0
   	T.ldb_iterator=nil
   	T.ldb=nil 
@@ -62,7 +62,7 @@ TrisulPlugin = {
 	-- reload if levelDB has a new modificationtime 
 	-- 
     onbeginflush = function(engine)
-		T.ldb_path = T.ldb_root .. "/trisul-ip2loc.level_"..engine:id()
+		T.ldb_path = T.ldb_root.."/trisul-ip2loc-"..engine:id()..".level"
 
 		if T.ldb then 
 			local mtime = tonumber(T.ldb:getval("last_updated_tm"))

@@ -88,7 +88,7 @@ UPDATES
 =======
 
 ````
-0.0.1		May 22 2018			Initial release 
+0.0.2		May 22 2018			Initial release 
 ````
 
 
