@@ -6,7 +6,7 @@ TrisulPlugin = {
 
   -- the ID block, you can skip the fields marked 'optional '
   -- 
-  id =  { name = "IP2Loc ASN", },
+  id =  { name = "IP2Loc ASN", description ="ASN metrics"},
 
 
   -- countergroup block
@@ -16,6 +16,7 @@ TrisulPlugin = {
     control = {
       guid = "{EF44F11F-B90B-4B24-A9F5-86482C51D125}",
       name = "IP2Loc ASN",
+	  description = "Meters ASN",
       bucketsize = 60,
     },
 

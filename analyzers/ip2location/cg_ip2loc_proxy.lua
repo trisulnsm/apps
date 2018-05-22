@@ -6,7 +6,7 @@ TrisulPlugin = {
 
   -- the ID block, you can skip the fields marked 'optional '
   -- 
-  id =  { name = "IP2Loc Proxy", },
+  id =  { name = "IP2Loc Proxy", description="Proxy Metrics"},
 
 
   -- countergroup block
@@ -16,6 +16,7 @@ TrisulPlugin = {
     control = {
       guid = "{2DCA13EB-0EB3-46F6-CAA2-9989EA904051}",
       name = "IP2Loc Proxy",
+	  description = "Meters Proxy",
       bucketsize = 60,
     },
 

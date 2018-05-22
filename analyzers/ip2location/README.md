@@ -28,6 +28,9 @@ From https://lite.ip2location.com/ download the following databases into  `/usr/
 
 ````
 
+Then `unzip` them 
+
+
 
 ### 2. Compile the lists  
 
@@ -37,10 +40,21 @@ Then run the following command to compile the databases. We are compiling twice 
 uses pipelines. Pipe0 will work with the 0.level and Pipe1 with 1.level. This increases performance and
 concurrency 
 
+
+Download the two lua files (`compile_ip2loc.lua and tris_leveldb.lua`) used to compile this  into a LevelDB database
+
+
+The session would look somethign like this 
+
 ````bash
 
-luajit /usr/local/share/trisul-probe/plugins /usr/local/share/trisul-probe/plugins/trisul-ip2loc-0.level
-luajit /usr/local/share/trisul-probe/plugins /usr/local/share/trisul-probe/plugins/trisul-ip2loc-1.level
+cd /usr/local/share/trisul-probe/plugins 
+
+wget https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2location/compile_ip2loc.lua
+wget https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2location/tris_leveldb.lua
+
+luajit compile_ip2loc.lua /usr/local/share/trisul-probe/plugins /usr/local/share/trisul-probe/plugins/trisul-ip2loc-0.level
+luajit compile_ip2loc.lua /usr/local/share/trisul-probe/plugins /usr/local/share/trisul-probe/plugins/trisul-ip2loc-1.level
 
 ````
 

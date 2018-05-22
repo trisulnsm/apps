@@ -6,7 +6,7 @@ TrisulPlugin = {
 
   -- the ID block, you can skip the fields marked 'optional '
   -- 
-  id =  { name = "IP2Loc Country", },
+  id =  { name = "IP2Loc Country", description="Country Metrics"},
 
 
   -- countergroup block
@@ -16,6 +16,7 @@ TrisulPlugin = {
     control = {
       guid = "{F962527D-985D-42FD-91D5-DA39F4D2A222}",
       name = "IP2Loc Country",
+	  description = "Meters Country",
       bucketsize = 60,
     },
 
