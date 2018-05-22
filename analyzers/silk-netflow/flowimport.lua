@@ -63,16 +63,17 @@ end
 
 FlowImporter.toflow_format=function( dir, tkey)
   if dir=='AZ' then 
-      return string.format("%sC:%s:%s_%s:%s_%s_%04X_%04X", 
+      return string.format("%sC:%s:%s_%s:%s_%s_%08X_%08X", 
               tkey.protocol,   tkey.source_ip,   tkey.source_port,   
               tkey.destination_ip,   tkey.destination_port, 
               tkey.router_ip,   tkey.input_interface_number,   tkey.output_interface_number ) 
   else
-      return string.format("%sC:%s:%s_%s:%s_%s_%04X_%04X", 
+      return string.format("%sC:%s:%s_%s:%s_%s_%08X_%08X", 
               tkey.protocol,   tkey.destination_ip,   tkey.destination_port, 
               tkey.source_ip,   tkey.source_port,   
               tkey.router_ip,   tkey.output_interface_number,   tkey.input_interface_number ) 
   end
+
 end
 
 FlowImporter.process_flow=function(engine, flowtbl)
@@ -86,11 +87,11 @@ FlowImporter.process_flow=function(engine, flowtbl)
          source_port = FlowImporter.toport_format(  flowtbl.source_port),
          destination_ip = FlowImporter.toip_format(  flowtbl.destination_ip),
          destination_port = FlowImporter.toport_format(  flowtbl.destination_port),
-         input_interface_number = flowtbl.input_interface,
-         output_interface_number = flowtbl.output_interface
+         input_interface_number = tonumber(flowtbl.input_interface),
+         output_interface_number = tonumber(flowtbl.output_interface)
     }
-    tkey.input_interface = tkey.router_ip..'_'..string.format("%04X",tonumber(flowtbl.input_interface))
-    tkey.output_interface = tkey.router_ip..'_'..string.format("%04X",tonumber(flowtbl.output_interface))
+    tkey.input_interface = tkey.router_ip..'_'..string.format("%08X",tonumber(flowtbl.input_interface))
+    tkey.output_interface = tkey.router_ip..'_'..string.format("%08X",tonumber(flowtbl.output_interface))
 
 
     -- home network perspective 
