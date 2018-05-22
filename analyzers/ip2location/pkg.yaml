@@ -1,0 +1,17 @@
+name: Geo based on IP2Location db
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Country, ASN, City, and Proxy metrics based on the IP2Location databases 
+   long:  |
+      This app uses the free IP2Location LITE databases https://lite.ip2location.com/ to 
+	  measure and label based on IP addresses. Uses LevelDB as an intermediate format 
+
+apptype: lua
+
+appresources: cg_ip2loc_asn.lua cg_ip2loc_cc.lua cg_ip2loc_proxy.lua cg_ip2loc_region.lua compile_ip2loc.lua ip2location.lua tris_leveldb.lua README.md 
+
+dependencies:  
