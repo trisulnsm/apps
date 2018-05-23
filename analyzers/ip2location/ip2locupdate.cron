@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd /usr/local/share/trisul-probe/plugins 
+
+
+# modify this to download the lists 
+# wget ..
+# unzip ..
+
+luajit compile_ip2loc.lua /usr/local/share/trisul-probe/plugins /usr/local/share/trisul-probe/plugins/trisul-ip2loc-0.level
+luajit compile_ip2loc.lua /usr/local/share/trisul-probe/plugins /usr/local/share/trisul-probe/plugins/trisul-ip2loc-1.level
+
+

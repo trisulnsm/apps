@@ -20,23 +20,25 @@ Post install run the following 3 steps to keep the FireHOL list updated.
 ### 1. Download the latest IP2 Location Databases
 
 From https://lite.ip2location.com/ download the following databases into  `/usr/local/share/trisul-probe/plugins`
+Then `unzip` them.
+
+
 
 ````bash
--rw-rw-r-- 1 guru guru  9082502 May 17 15:14 IP2LOCATION-LITE-ASN.CSV.ZIP
--rw-rw-r-- 1 guru guru 37129729 May 17 15:14 IP2LOCATION-LITE-DB3.CSV.ZIP
--rw-rw-r-- 1 guru guru  1000038 May 17 15:15 IP2PROXY-LITE-PX2.CSV.ZIP
+$ ls -l /usr/local/share/trisul-probe/plugins 
+-rw-rw-r-- 1 guru guru  9082502 May 17 15:14 IP2LOCATION-LITE-ASN.CSV
+-rw-rw-r-- 1 guru guru 37129729 May 17 15:14 IP2LOCATION-LITE-DB3.CSV
+-rw-rw-r-- 1 guru guru  1000038 May 17 15:15 IP2PROXY-LITE-PX2.CSV
 
 ````
-
-Then `unzip` them 
 
 
 
 ### 2. Compile the CSV lists  
 
-For this you have to install LuaJIT on the probe.  For Ubuntu it is `sudo apt install luajit` 
 
-Then run the following command to compile the databases. 
+
+Make sure you have `luajit` on your probe. If not run `apt install luajit`.  Then run the following command to compile the databases. 
 
 1. Download the two lua files (`compile_ip2loc.lua and tris_leveldb.lua`) used to compile this  into a LevelDB database
 2. Run the compiler and generate the two databases 
@@ -55,8 +57,6 @@ luajit compile_ip2loc.lua /usr/local/share/trisul-probe/plugins /usr/local/share
 
 ````
 
-This app automatically refereshes the list every hour. 
-
 
 ### 3.  How updates are picked up
 
@@ -72,6 +72,22 @@ Login as admin , go to Context : default > Admin Tasks > Start/Stop Tasks. Resta
 
 This app creates four new counter groups. Go to Retro > Counter to start your analysis.
 
+## Cron updates
+
+
+Use the script `ip2locupdate-cron.sh` to update the list every week.  You have to supply the URL and the registration code 
+
+
+````sh
+
+crontab -e -u trisul
+
+# then add this line 
+0 0 * * * /usr/local/share/trisul-probe/plugins/ip2locupdate-cron.sh 
+
+````
+
+The updates are automatically picked up.  
 
 ## Notices
 
@@ -85,6 +101,7 @@ UPDATES
 =======
 
 ````
+0.0.3		May 23 2018			Added cron script to DL and compile 
 0.0.2		May 22 2018			Initial release 
 ````
 

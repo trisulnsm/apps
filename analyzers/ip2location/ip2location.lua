@@ -24,6 +24,7 @@ TrisulPlugin = {
   	T.ldb_iterator=nil
   	T.ldb=nil 
 	T.permanent_failure=false 
+	T.key_labels_added = { } 
   end,
 
   onunload=function()
@@ -59,24 +60,17 @@ TrisulPlugin = {
   -- sg_monitor block
   sg_monitor  = {
 
-	-- reload if levelDB has a new modificationtime 
+	-- load only during the flush interval 
 	-- 
     onbeginflush = function(engine)
 		T.ldb_path = T.ldb_root.."/trisul-ip2loc-"..engine:id()..".level"
-
-		if T.ldb then 
-			local mtime = tonumber(T.ldb:getval("last_updated_tm"))
-			if mtime > T.ldb_loadtm then
-				TrisulPlugin.reload()
-				T.ldb_loadtm=mtime
-			end
-		else 
-			TrisulPlugin.reload()
-			T.ldb_loadtm=tonumber(T.ldb:getval("last_updated_tm"))
-		end 
-
-		T.key_labels_added = { } 
+		TrisulPlugin.reload() 
 	end,
+
+	onendflush = function()
+		TrisulPlugin.onunload() 
+	end, 
+
 
 	-- do the metering for IP endpoints  
 	--
