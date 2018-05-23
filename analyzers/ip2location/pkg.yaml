@@ -12,6 +12,6 @@ description:
 
 apptype: lua
 
-appresources: cg_ip2loc_asn.lua cg_ip2loc_cc.lua cg_ip2loc_proxy.lua cg_ip2loc_region.lua compile_ip2loc.lua ip2location.lua tris_leveldb.lua README.md 
+appresources: cg_ip2loc_asn.lua cg_ip2loc_cc.lua cg_ip2loc_proxy.lua cg_ip2loc_region.lua compile_ip2loc.lua ip2location.lua ipprefixdb.lua tris_leveldb.lua README.md 
 
 dependencies:  
