@@ -8,29 +8,26 @@
 -- Raw DB of Country/Region is > 300MB. Why levelDB? we love it!  and two threads
 -- can share a handle. 
 -- 
-local leveldb=require'tris_leveldb' 
-local bit=require'bit'
+local IPPrefixDB=require'ipprefixdb'
 
--- ip number to trisulkey format
-function ipnum_tokey(ipnum)
-	return string.format("%02X.%02X.%02X.%02X", 
-		bit.rshift(ipnum,24), bit.band(bit.rshift(ipnum,16),0xff), bit.band(bit.rshift(ipnum,8),0xff), bit.band(bit.rshift(ipnum,0),0xff))
-end
+
+local bit=require'bit'
 
 -- 
 -- All databases are compiled into a single LevelDB 
 -- 
 function do_compile(csv_file_path, leveldb_path )
 
-	local ldb = leveldb.new()
+	local ldb = IPPrefixDB.new()
 	ldb:open(leveldb_path);
 
 	-- ASN is a prefix 
+	ldb:set_databasename("ASN");
 	process_csv_file(ldb, csv_file_path.. "/IP2LOCATION-LITE-ASN.CSV",
 					 function(ldb, linearr)
-						local k1 = ipnum_tokey(linearr[1])
-						local k2 = ipnum_tokey(linearr[2])
-						ldb:put("ASN:"..k2.."-"..k1, linearr[4]..' '..linearr[5])
+						local k1 = linearr[1]
+						local k2 = linearr[2]
+						ldb:put_ipnum(k1,k2,linearr[4]..' '..linearr[5])
 				 end)
 
 	-- IPR (Ip region  ) 
@@ -38,23 +35,27 @@ function do_compile(csv_file_path, leveldb_path )
 	-- IPC (Ip city )
 	process_csv_file(ldb, csv_file_path.. "/IP2LOCATION-LITE-DB3.CSV",
 					 function(ldb, linearr)
-						local k1 = ipnum_tokey(linearr[1])
-						local k2 = ipnum_tokey(linearr[2])
-						ldb:put("CTRY:"..k2.."-"..k1, linearr[3]..' '..linearr[4])
-						ldb:put("STAT:"..k2.."-"..k1, linearr[3]..'_'..linearr[5])
-						ldb:put("CITY:"..k2.."-"..k1, linearr[3]..'_'..linearr[6])
+						local k1 = linearr[1]
+						local k2 = linearr[2]
+						ldb:set_databasename("CTRY");
+						ldb:put_ipnum(k1,k2,linearr[3]..' '..linearr[4])
+						ldb:set_databasename("STATE");
+						ldb:put_ipnum(k1,k2,linearr[3]..'_'..linearr[5])
+						ldb:set_databasename("CITY");
+						ldb:put_ipnum(k1,k2,linearr[3]..'_'..linearr[6])
 				 end)
 
 
 	-- PRXY (Proxy-Type-CC) 
 	process_csv_file(ldb, csv_file_path.. "/IP2PROXY-LITE-PX2.CSV",
 					 function(ldb, linearr)
-						local k1 = ipnum_tokey(linearr[1])
-						local k2 = ipnum_tokey(linearr[2])
-						ldb:put("PRXY:"..k2.."-"..k1, linearr[3]..' '..linearr[4])
+						local k1 = linearr[1]
+						local k2 = linearr[2]
+						ldb:set_databasename("PROXY");
+						ldb:put_ipnum(k1,k2,linearr[3]..' '..linearr[4])
 				 end)
 
-	ldb:put("last_updated_tm",tostring(os.time()))
+	ldb:putraw("last_updated_tm",tostring(os.time()))
 	ldb:close() 
 
 
@@ -70,7 +71,7 @@ process_csv_file=function( ldb, csv_file, cbfunc)
 	-- check if we already compiled 
 	local h_csv = io.popen("md5sum   "..csv_file)
 	local md5=  h_csv:read("*a"):match('%w+')
-	local _,md5_db = ldb:get(csv_file)
+	local _,md5_db = ldb:getraw(csv_file)
 
 	if md5_db == md5  then 
 		print("Skipping. No change detected in "..csv_file)
@@ -78,7 +79,7 @@ process_csv_file=function( ldb, csv_file, cbfunc)
 	end
 
 	-- update  hash
-	ldb:put(csv_file,"in progress")
+	ldb:putraw(csv_file,"in progress")
 
 	print("Processing ".. csv_file)
 	local f,err = io.open(csv_file)
@@ -110,7 +111,7 @@ process_csv_file=function( ldb, csv_file, cbfunc)
 	print(csv_file.. ":Loaded ".. nitems.." subnets in "..(endts-startts).." seconds. Mem usage = "..(aftermem-beforemem).." KB") 
 
 	-- update  hash
-	ldb:put(csv_file,md5)
+	ldb:putraw(csv_file,md5)
 end
 
 
@@ -123,3 +124,6 @@ end
 print("compile_ip2loc:  Compiling IP2LOCATION files in "..arg[1].." into the LevebDB dir"..arg[2])
 do_compile(arg[1], arg[2])
 
+	local ldb = IPPrefixDB.new()
+	ldb:open(arg[2]);
+	ldb:dump() 
