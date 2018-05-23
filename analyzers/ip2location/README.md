@@ -32,19 +32,16 @@ Then `unzip` them
 
 
 
-### 2. Compile the lists  
+### 2. Compile the CSV lists  
 
 For this you have to install LuaJIT on the probe.  For Ubuntu it is `sudo apt install luajit` 
 
-Then run the following command to compile the databases. We are compiling twice because of the way Trisul
-uses pipelines. Pipe0 will work with the 0.level and Pipe1 with 1.level. This increases performance and
-concurrency 
+Then run the following command to compile the databases. 
 
+1. Download the two lua files (`compile_ip2loc.lua and tris_leveldb.lua`) used to compile this  into a LevelDB database
+2. Run the compiler and generate the two databases 
 
-Download the two lua files (`compile_ip2loc.lua and tris_leveldb.lua`) used to compile this  into a LevelDB database
-
-
-The session would look somethign like this 
+The commands would look like this 
 
 ````bash
 
