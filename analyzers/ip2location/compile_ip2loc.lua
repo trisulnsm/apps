@@ -20,7 +20,7 @@ end
 -- 
 -- All databases are compiled into a single LevelDB 
 -- 
-function do_compile(leveldb_path, csv_file_path)
+function do_compile(csv_file_path, leveldb_path )
 
 	local ldb = leveldb.new()
 	ldb:open(leveldb_path);
@@ -115,11 +115,11 @@ end
 
 
 if #arg ~= 2 then
-	print("Usage : compile_ip2loc leveldbpath  directory_where_the_IP2LOCATION_files_are_kept")
+	print("Usage : compile_ip2loc directory-with-IP2LOC-databases  output-leveldb-database")
 	return  
 end
 
 
-print("compile_ip2loc:  Compiling IP2LOCATION files in "..arg[2].." into the LevebDB dir"..arg[1])
+print("compile_ip2loc:  Compiling IP2LOCATION files in "..arg[1].." into the LevebDB dir"..arg[2])
 do_compile(arg[1], arg[2])
 
