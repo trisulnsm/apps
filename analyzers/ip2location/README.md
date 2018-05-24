@@ -37,7 +37,6 @@ $ ls -l /usr/local/share/trisul-probe/plugins
 ### 2. Compile the CSV lists  
 
 
-
 Make sure you have `luajit` on your probe. If not run `apt install luajit`.  Then run the following command to compile the databases. 
 
 1. Download the two lua files (`compile_ip2loc.lua and tris_leveldb.lua`) used to compile this  into a LevelDB database
@@ -56,6 +55,12 @@ wget https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2locati
 luajit compile_ip2loc.lua /usr/local/share/trisul-probe/plugins /usr/local/share/trisul-probe/plugins/trisul-ip2loc-0.level
 luajit compile_ip2loc.lua /usr/local/share/trisul-probe/plugins /usr/local/share/trisul-probe/plugins/trisul-ip2loc-1.level
 
+````
+
+Make sure the databases are readable by the `trisul` user
+
+````bash
+chown -R trisul.trisul /usr/local/share/trisul-probe/plugins/trisul-ip2loc-*.level
 ````
 
 
