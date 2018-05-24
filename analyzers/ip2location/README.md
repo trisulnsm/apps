@@ -43,7 +43,7 @@ Make sure you have `luajit` on your probe. If not run `apt install luajit`.  The
 1. Download the two lua files (`compile_ip2loc.lua and tris_leveldb.lua`) used to compile this  into a LevelDB database
 2. Run the compiler and generate the two databases 
 
-The commands would look like this 
+The commands would look like this, the compilation process can take 3-4 minutes  
 
 ````bash
 
@@ -51,6 +51,7 @@ cd /usr/local/share/trisul-probe/plugins
 
 wget https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2location/compile_ip2loc.lua
 wget https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2location/tris_leveldb.lua
+wget https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2location/ipprefixdb.lua
 
 luajit compile_ip2loc.lua /usr/local/share/trisul-probe/plugins /usr/local/share/trisul-probe/plugins/trisul-ip2loc-0.level
 luajit compile_ip2loc.lua /usr/local/share/trisul-probe/plugins /usr/local/share/trisul-probe/plugins/trisul-ip2loc-1.level
