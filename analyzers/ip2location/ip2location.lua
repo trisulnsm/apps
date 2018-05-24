@@ -7,7 +7,6 @@
 -- 
 local ipprefixdb=require'ipprefixdb' 
 local bit=require'bit'
-local dbg=require'debugger'
 
 TrisulPlugin = { 
 
@@ -25,7 +24,10 @@ TrisulPlugin = {
   end,
 
   onunload=function()
-  	if T.ldb then T.ldb:close()  end 
+  	if T.ldb then 
+		T.ldb:close()  
+		T.ldb=nil
+	end 
   end,
 
   reload=function()
@@ -34,9 +36,8 @@ TrisulPlugin = {
 	T.ldb = ipprefixdb.new()
 	local f,err=T.ldb:open(T.ldb_path, true)
 	if not f then 
-		print("Unable to find source LevelDB database "..T.ldb_path)
+		print("Error opening IPPrefix database "..T.ldb_path)
 		T.ldb=nil
-		return 
 	end
   end,
 
@@ -53,8 +54,9 @@ TrisulPlugin = {
 	end,
 
 	onendflush = function()
-		TrisulPlugin.onunload() 
-	end, 
+		if T.ldb then T.ldb:close()  end 
+		T.ldb=nil
+	end,
 
 
 	-- do the metering for IP endpoints  
@@ -72,6 +74,9 @@ TrisulPlugin = {
 		else 
 			ip=flow:flow():ipz()
 	 	end 	
+
+		-- filter out multicast and broadcast
+		if ip > "E0" then return end
 
 
 		
@@ -97,7 +102,7 @@ TrisulPlugin = {
 		end
 
 		T.ldb:set_databasename("PROXY")
-		local val = TrisulPlugin.lookup_prefix(ip)
+		local val = T.ldb:lookup_prefix(ip)
 		if val then 
 			local key,label = val:match("(%S+)%s*(.*)")
 			TrisulPlugin.update_metrics(engine, flow, "{2DCA13EB-0EB3-46F6-CAA2-9989EA904051}",  key, label) 

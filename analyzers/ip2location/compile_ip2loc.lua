@@ -124,6 +124,3 @@ end
 print("compile_ip2loc:  Compiling IP2LOCATION files in "..arg[1].." into the LevebDB dir"..arg[2])
 do_compile(arg[1], arg[2])
 
-	local ldb = IPPrefixDB.new()
-	ldb:open(arg[2]);
-	ldb:dump() 
