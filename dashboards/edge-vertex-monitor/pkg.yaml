@@ -1,0 +1,20 @@
+name: Edge vertex Montitor
+
+version: 0.0.1
+
+author: trisul
+
+
+description:
+   short: Show usage report for selected guid,meters and keys
+   long:  |
+      Shows the usge report for keys for selected meters in table format
+      You can choose any number of meters
+      You can enter any number of keys with comma(,) seperated
+
+apptype: dashboard_js
+
+appresources: edge_vertex_monitor.js
+
+dependencies:
+
