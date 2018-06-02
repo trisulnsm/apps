@@ -105,7 +105,7 @@ var EdgeVertexMonitor= $.klass({
     var anchor = '<a href="/newdash/index?dash_key=key&guid={{cgguid}}">'
     
     var meters = this.cg_meter_json[this.cgguid];
-    var ths = "<th>Readable</th><th>Lable</th>";
+    var ths = "<th>Readable</th><th>Label</th>";
     this.mustache_tmpl = "<td><a href='/newdash/index?dash_key=key&guid={{cgguid}}&key={{key}}' target='_blank'>{{readable}}</a></td>"+
                          "<td><a href='/newdash/index?dash_key=key&guid={{cgguid}}&key={{key}}' target='_blank'>{{label}}</a></td>"
     _.each(meters[1],function(meter){
