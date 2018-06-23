@@ -52,6 +52,7 @@ UPDATES
 =======
 
 ````
+0.0.5   Jun 23 2018     FFI tries 2 libcrypto versions to run on CentOS7/Ubuntu16
 0.0.4   Mar 01 2018     Updated with 50+new prints
                         Adds Flow Tags with first 6 chars of JA3 Hash
                         Handle very long descriptions 

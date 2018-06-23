@@ -14,7 +14,7 @@ local ffi=require('ffi')
 local status,C
 for _,lib in ipairs( {'libcrypto.so.1.0.2k', 'libcrypto.so.1.0.0'} )
 do
-	status, C = pcall(function() return  ffi.load('libcrypto.so.1.0.2k') end)
+	status, C = pcall(function() return  ffi.load(lib) end)
 	if status then break end 
 end
 if not status then error "Cant load FFI libcrypto version " end
