@@ -68,7 +68,7 @@ TrisulPlugin = {
 
       local enabled = T.env.get_config("Reassembly>FileExtraction>Enabled")
       if  enabled:lower() ~= "true" then
-          T.logerror("Save Binaries : needs the Reassembly>FileExtraction>Enabled config setting to be TRUE. Cant proceed. ");
+          T.logwarning("Save Binaries : needs the Reassembly>FileExtraction>Enabled config setting to be TRUE. Cant proceed. ");
           return false
       end
 
