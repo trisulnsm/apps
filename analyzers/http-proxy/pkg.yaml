@@ -1,0 +1,16 @@
+name: HTTP Proxy 
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Extracts metrics in HTTP Proxy env
+   long:  |
+      Interprets the HTTP and CONNECT methods to give you total visibility in Proxy environments such as squid.
+
+apptype: lua
+
+appresources: http-proxy.lua README.md 
+
+dependencies:  
