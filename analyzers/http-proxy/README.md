@@ -22,10 +22,32 @@ Restart Trisul-Probe and you're done.
 2. Flows > Search by @tag=mail.google.com@ to search for flows to target hosts 
 3. From any point you can click on  "View Edges" to see related items. Example - which internal host connected to "Malware.site.com"
 
+## Configuration parameters
+
+If you want to over ride the default parameters, copy this chunk of code into a file called `trisulnsm_http_connect.lua` in 
+the probe config directory `/usr/local/var/lib/trisul-probe/dX/pX/contextX/config`
+
+The two parameters are used to control how very long HTTP hostnames are dealt with
+
+````lua
+
+DEFAULT_CONFIG = {
+
+  -- number of dots in hostname to track 
+  -- skks.mail.yahoo.com = 3 dots 
+  NumDots=3,
+  
+  -- max hostname len 
+  MaxHostnameLen=25,
+}
+
+````
+
 
 UPDATES
 =======
 
+0.0.2		Jun 27 2018			Added config options to control very long proxy external host names 
 0.0.1		Jun 26 2018			Initial release 
 
 

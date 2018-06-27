@@ -5,6 +5,27 @@
 -- PURPOSE:     Hook into Trisul's TCP reassembly engine 
 -- DESCRIPTION: Marks the CONNECT protocol to account for Proxy Destination hosts and protocols 
 -- 
+
+function file_exists(name)
+  local f=io.open(name,"r")
+  if f~=nil then io.close(f) return true else return false end
+end
+
+-- --------------------------------------------
+-- override by trisulnsm_http_connect.lua 
+-- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
+--
+DEFAULT_CONFIG = {
+
+  -- number of dots in hostname to track 
+  -- skks.mail.yahoo.com = 3 dots 
+  NumDots=3,
+  
+  -- max hostname len 
+  MaxHostnameLen=25,
+}
+-- --------------------------------------------
+
 TrisulPlugin = { 
 
 
@@ -19,6 +40,21 @@ TrisulPlugin = {
 
   	T.re2_http_request = T.re2("(GET|POST|HEAD|OPTIONS|CONNECT)\\s(\\S+)\\sHTTP/\\d\\.\\d")
 	T.re2_connect=T.re2("CONNECT\\s(\\S+):(\\d+)")
+
+    -- load custom config if present 
+    T.active_config = DEFAULT_CONFIG
+    local custom_config_file = T.env.get_config("App>DBRoot").."/config/trisulnsm_http_connect.lua"
+
+    if file_exists(custom_config_file) then 
+      local newsettings = dofile(custom_config_file) 
+      T.log("Loading custom settings from ".. custom_config_file)
+      for k,v in pairs(newsettings) do 
+        T.active_config[k]=v
+        T.log("Loaded new setting "..k.."="..v)
+      end
+    else 
+      T.log("Loaded default settings")
+    end
 
   end,
 
@@ -53,6 +89,30 @@ TrisulPlugin = {
 			external_host=host
 		end 
 
+
+		-- gotta massage the external host name from HTTP CONNECT 
+		-- can be huge like -civaszsc6z7ws-bgljqcbnz6z5e5jx-611747-i1-v6exp3-v4.metric.gstatic.com
+
+		-- restrict hostname to Max dots  for max utility  
+		local t = {}                   
+		local i = 0
+		while true do
+		  i = string.find(s, '.', i+1, true)    
+		  if i == nil then break end
+		  table.insert(t, i)
+		end
+
+		if #t > T.active_config.NumDots then 
+			 external_host= string.sub(external_host,t[#t-T.active_config.NumDots]+1)
+		end 
+
+		-- now dont allow huge lengths (again trackers do this) 
+		if #external_host > T.active_config.MaxHostnameLen then
+			external_host=string.sub(external_host,#external_host-T.active_config.MaxHostnameLen,-1)
+		end
+
+
+		-- Tag flow - so you can search by it 
 		engine:tag_flow(flowkey:id(), external_host)
 
 		-- for XMIT 

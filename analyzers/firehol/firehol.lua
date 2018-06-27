@@ -24,7 +24,7 @@ function file_exists(name)
 end
 
 -- --------------------------------------------
--- override by trisul_apps_save_exe.config.lua 
+-- override by trisulnsm_firehol.lua 
 -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
 --
 DEFAULT_CONFIG = {
