@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: http-proxy.lua README.md 
+appresources: http_connect.lua README.md 
 
 dependencies:  
