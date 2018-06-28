@@ -89,6 +89,11 @@ TrisulPlugin = {
 			external_host=host
 		end 
 
+		if external_host == nil then
+			T.logwarning("No hostname found in either CONNECT or HTTP Verbs: "..buffstr:sub(1,20));
+			return
+		end
+
 
 		-- gotta massage the external host name from HTTP CONNECT 
 		-- can be huge like -civaszsc6z7ws-bgljqcbnz6z5e5jx-611747-i1-v6exp3-v4.metric.gstatic.com
@@ -97,7 +102,7 @@ TrisulPlugin = {
 		local t = {}                   
 		local i = 0
 		while true do
-		  i = string.find(s, '.', i+1, true)    
+		  i = string.find(external_host , '.', i+1, true)    
 		  if i == nil then break end
 		  table.insert(t, i)
 		end
