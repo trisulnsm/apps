@@ -52,6 +52,8 @@ UPDATES
 =======
 
 ````
+0.0.6   Jun 28 2018     Dont log all hashes, instead update_key info if user wants to see JA3 string 
+                        for a given JA3 hash 
 0.0.5   Jun 23 2018     FFI tries 2 libcrypto versions to run on CentOS7/Ubuntu16
 0.0.4   Mar 01 2018     Updated with 50+new prints
                         Adds Flow Tags with first 6 chars of JA3 Hash

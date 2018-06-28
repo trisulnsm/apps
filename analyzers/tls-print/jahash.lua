@@ -247,7 +247,7 @@ TrisulPlugin = {
         local ja3_hash = md5sum(ja3_str)
 
         -- log this useful to create ja3_ database 
-        print(" flow=".. flowkey:to_s().." hash ".. ja3_hash.. " string="..ja3_str)
+        -- print(" flow=".. flowkey:to_s().." hash ".. ja3_hash.. " string="..ja3_str)
 
         -- counters and edges 
         engine:update_counter('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 0, 1)
@@ -258,7 +258,7 @@ TrisulPlugin = {
         -- see if this is a known hash 
         local client_desc = T.print_tbl[ja3_hash]
         if client_desc then
-          engine:update_key_info('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, client_desc)
+          engine:update_key_info('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, client_desc, ja3_str)
           engine:add_edge('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 
                       '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', client_desc)
         end
