@@ -90,7 +90,7 @@ TrisulPlugin = {
 		end 
 
 		if external_host == nil then
-			T.logwarning("No hostname found in either CONNECT or HTTP Verbs: "..buffstr:sub(1,20));
+			T.loginfo("No hostname found in either CONNECT or HTTP Verbs: "..buffstr:sub(1,20));
 			return
 		end
 
