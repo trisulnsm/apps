@@ -200,6 +200,9 @@ TrisulPlugin = {
 
         payload:skip(payload:next_u8())     -- over compression 
 
+        -- if there are no extensions (it can happen) we're done - no JA3 
+        if not payload:has_more() then return end
+
         -- extensions, we pick out SNI as well if 
         payload:push_fence(payload:next_u16())
 

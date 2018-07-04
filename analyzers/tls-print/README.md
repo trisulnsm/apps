@@ -52,6 +52,7 @@ UPDATES
 =======
 
 ````
+0.0.7   Jul 3  2018     Minor error when no extensions are present. We cant do FP for that.
 0.0.6   Jun 28 2018     Dont log all hashes, instead update_key info if user wants to see JA3 string 
                         for a given JA3 hash 
 0.0.5   Jun 23 2018     FFI tries 2 libcrypto versions to run on CentOS7/Ubuntu16
