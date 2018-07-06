@@ -13,6 +13,21 @@
 -- 
 local leveldb=require'tris_leveldb' 
 
+function file_exists(name)
+  local f=io.open(name,"r")
+  if f~=nil then io.close(f) return true else return false end
+end
+
+-- --------------------------------------------
+-- override by /usr/local/var/lib/trisul-probe/dX/pX/contextX/config/trisulnsm_skip_youtube.lua 
+--
+DEFAULT_CONFIG = {
+
+  DNS_Regex_To_Skip ="(youtube|googlevideo|twitter|ytimg|twimg|netflix|nflxvideo|nflximg|nflxext|acorn.tv|tubitv|atv-ext.amazon.com|atv-ps.amazon.com|hulu)"
+
+}
+-- --------------------------------------------
+
 TrisulPlugin = { 
 
   id =  {
@@ -22,21 +37,38 @@ TrisulPlugin = {
 
   -- pre-Compile the regex 
   onload = function()
-	T.re2x = T.re2("(youtube|googlevideo|twitter|ytimg|twimg|netflix|nflxvideo|nflximg|nflxext|acorn.tv|tubitv|atv-ext.amazon.com|atv-ps.amazon.com|hulu)")
-    T.LevelReader = nil 
+
+    -- load custom config if present 
+    T.active_config = DEFAULT_CONFIG
+    local custom_config_file = T.env.get_config("App>DBRoot").."/config/trisulnsm_skip_youtube.lua"
+    if file_exists(custom_config_file) then 
+      local newsettings = dofile(custom_config_file) 
+      T.log("Loading custom settings from ".. custom_config_file)
+      for k,v in pairs(newsettings) do 
+        T.active_config[k]=v
+        T.log("Loaded new setting "..k.."="..v)
+      end
+    else 
+      T.log("Loaded default settings")
+    end
+
+    T.re2x = T.re2( T.active_config.DNS_Regex_To_Skip) 
+    T.LevelDB = nil 
   end,
 
-
-  -- we listen to onmessage for a pDNS attach event
-  -- this requires passive_dns.lua script 
+  -- we listen to onmessage for a pDNS attach event (from the PassiveDNS app )
   message_subscriptions = { '{4349BFA4-536C-4310-C25E-E7C997B92244}' },
+
+  -- get a levelDB handle 
   onmessage=function(msgid, msg)
+    if msgid=='{4349BFA4-536C-4310-C25E-E7C997B92244}' then
+      if not T.LevelDB then 
     local dbaddr = msg:match("newleveldb=(%S+)")
-    _,T.LevelReader = leveldb.from_addr(dbaddr);
-
-    print(T.contextid.. "  Got Broadcast from ".. msg)
+        T.LevelDB = leveldb.new() 
+        T.LevelDB:fromaddr(dbaddr);
+      end
+    end
   end,
-
 
   -- packet_storage block
   -- lookup IPZ (usually the outside IP) -> domain name
@@ -44,19 +76,17 @@ TrisulPlugin = {
   packet_storage   = {
 
     filter = function( engine, timestamp, flow ) 
-
-        if T.LevelReader then 
-
-            local name =  T.LevelReader( flow:ipz_readable());
-            if name then 
-                local ok, category = T.re2x:partial_match_c1( name)
-                if ok then 
-                    print( T.contextid .. " skip flow=" .. flow:to_s() .. "   map=" .. category) 
-                    return 0
-                end 
-            end
+      if T.LevelDB then 
+        local name =  T.LevelDB( flow:ipz_readable());
+        if name then 
+          local ok, category = T.re2x:partial_match_c1( name)
+          if ok then 
+            print( T.contextid .. " skip flow=" .. flow:to_s() .. "   map=" .. category) 
+            return 0
+          end 
         end
-        return -1 
+      end
+      return -1 
     end
 
   },

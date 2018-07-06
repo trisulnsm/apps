@@ -1,5 +1,7 @@
 # Prune PCAP storage 
 
+> *New*  Metrics to measure how many flows were excluded from PCAP for each category 
+
 ### Calling NSM Practitioners  !! 
 
 Don't waste precious Disk Space and Write IOPs storing encrypted packets from
@@ -14,12 +16,34 @@ with this Trisul Network Analytics plugin.
 
 ## Traffic not saved:  Netflix, Youtube
 
-By default this app skips the following Regex  -- see the skip_youtube.lua file in this package 
+By default this app skips the following Regex  
 
-````
+````lua 
 T.re2x = T.re2("(youtube|googlevideo|twitter|ytimg|twimg|netflix|nflxvideo|nflximg|nflxext|acorn.tv|tubitv|atv-ext.amazon.com|atv-ps.amazon.com|hulu)")
 ````
 
+## How to add your own "Exclude PCAP" sites.
+
+Say you want to exclude `twitch` flows from PCAP, you can override the default regex. 
+
+
+Save the following snippet and put it in the Probe context config directory in the following file 
+`/usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/trisulnsm_skip_youtube.lua`
+
+
+````lua 
+-- --------------------------------------------
+-- override by /usr/local/var/lib/trisul-probe/dX/pX/contextX/config/trisulnsm_skip_youtube.lua 
+--
+DEFAULT_CONFIG = {
+
+  DNS_Regex_To_Skip ="(twitch|youtube|googlevideo|twitter|ytimg|twimg|netflix|nflxvideo|nflximg|nflxext|acorn.tv|tubitv|atv-ext.amazon.com|atv-ps.amazon.com|hulu)"
+
+  }
+  -- --------------------------------------------
+````
+
+> You need to use the [Google RE2 regex format](https://github.com/google/re2) 
 
 ## Installing
 
@@ -33,6 +57,8 @@ UPDATES
 =======
 
 ````
+0.0.6		Jul  6 2018			New leveldb lib, customization of regex, metrics with new
+                                counter group. 
 0.0.4		Jan  8 2017			Added acorn.tv,Amazon Prime, Hulu TV packets to be excluded 
 0.0.1		Oct 30 2017			Initial release 
 ````
