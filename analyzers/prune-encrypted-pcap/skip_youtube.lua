@@ -63,7 +63,7 @@ TrisulPlugin = {
   onmessage=function(msgid, msg)
     if msgid=='{4349BFA4-536C-4310-C25E-E7C997B92244}' then
       if not T.LevelDB then 
-    local dbaddr = msg:match("newleveldb=(%S+)")
+        local dbaddr = msg:match("newleveldb=(%S+)")
         T.LevelDB = leveldb.new() 
         T.LevelDB:fromaddr(dbaddr);
       end
@@ -77,11 +77,12 @@ TrisulPlugin = {
 
     filter = function( engine, timestamp, flow ) 
       if T.LevelDB then 
-        local name =  T.LevelDB:get( flow:ipz_readable());
+        local name =  T.LevelDB:getval( flow:ipz_readable());
         if name then 
           local ok, category = T.re2x:partial_match_c1( name)
           if ok then 
-            print( T.contextid .. " skip flow=" .. flow:to_s() .. "   map=" .. category) 
+		  	engine:update_counter("{1E92FD61-5129-499D-0A12-883E9FC1C00C}", category, 0, 1)
+            -- print( T.contextid .. " skip flow=" .. flow:to_s() .. "   map=" .. category) 
             return 0
           end 
         end

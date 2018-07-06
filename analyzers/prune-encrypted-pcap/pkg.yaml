@@ -14,6 +14,6 @@ description:
 
 apptype: lua
 
-appresources: skip_youtube.lua  tris_leveldb.lua 
+appresources: skip_youtube.lua  tris_leveldb.lua  new_counters.lua 
 
 dependencies:  passive-dns-creator  
