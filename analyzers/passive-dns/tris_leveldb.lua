@@ -159,10 +159,9 @@ local sleveldb = {
 
   -- close 
   close=function(tbl)
-  	if not tbl.owner then
-		  error("Cannot close() leveldb database when  you are not an owner. Did you use fromaddr() to create it ?")
+  	if tbl.owner then
+		L.leveldb_close(tbl._db)
     end
-    L.leveldb_close(tbl._db)
     tbl._db=nil 
   end, 
 

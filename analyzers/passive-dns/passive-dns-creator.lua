@@ -12,8 +12,6 @@
 --        2. resource_monitor - listens to DNS and updates the leveldb  CNAME/A -> domain
 -- 
 
-package.path = package.path .. ';helpers/?.lua'
-
 local leveldb=require'tris_leveldb'
 
 TrisulPlugin = { 
@@ -28,9 +26,10 @@ TrisulPlugin = {
   onmessage=function(msgid, msg)
     if msgid=='{4349BFA4-536C-4310-C25E-E7C997B92244}' then
       local dbaddr = msg:match("newleveldb=(%S+)")
-	  if not T.LevelDB then 
-		  T.LevelDB = leveldb.fromaddr(dbaddr);
-	  end
+      if not T.LevelDB then 
+        T.LevelDB = leveldb.new() 
+        T.LevelDB:fromaddr(dbaddr);
+      end
     end
   end,
 
@@ -41,8 +40,10 @@ TrisulPlugin = {
 
   -- close 
   onunload = function()
-      T.loginfo("Closing Leveldb from owner")
+    T.loginfo("Closing Leveldb from owner")
+    if T.LevelDB then 
       T.LevelDB:close()
+    end 
   end, 
 
   -- resource_monitor  block 
@@ -54,19 +55,20 @@ TrisulPlugin = {
 
     --  we will each each DNS resource from Trisul into this method
     --  Engine-0 owns the LevelDB , others share the handle through a broadcast
-	--  mechanism. Luckily LevelDB supports N reader/writer per process 
+    --  mechanism. Luckily LevelDB supports N reader/writer per process 
     onnewresource  = function(engine, resource )
 
       if T.LevelDB == nil then
-	  	if engine:instanceid()=="0" then 
+        if engine:instanceid()=="0" then 
           local dbfile = T.env.get_config("App>DBRoot").."/config/PassiveDNSDB.level";
-          T.LevelDB = leveldb.open(dbfile); 
+          T.LevelDB = leveldb.new()
+          T.LevelDB:open(dbfile); 
           engine:post_message_backend( '{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.LevelDB:toaddr() ) 
           engine:post_message_frontend('{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.LevelDB:toaddr() ) 
-		else
-		  -- other backend engines have to wait .. 
-		  return 
-	    end
+        else
+          -- other backend engines have to wait for LevelDB Handle from post_message_xx 
+          return 
+        end
       end
 
       for ip in  resource:label():gmatch("A%s+([%d%.]+)") do
