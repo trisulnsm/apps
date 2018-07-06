@@ -77,7 +77,7 @@ TrisulPlugin = {
 
     filter = function( engine, timestamp, flow ) 
       if T.LevelDB then 
-        local name =  T.LevelDB( flow:ipz_readable());
+        local name =  T.LevelDB:get( flow:ipz_readable());
         if name then 
           local ok, category = T.re2x:partial_match_c1( name)
           if ok then 
