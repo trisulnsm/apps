@@ -11,6 +11,8 @@
 --        1. leveldb          - uses LUAJIT FFI to build a LEVELDB backend 
 --        2. resource_monitor - listens to DNS and updates the leveldb  CNAME/A -> domain
 -- 
+package.path = package.path .. ';helpers/?.lua'
+
 local leveldb=require'tris_leveldb'
 
 TrisulPlugin = { 
@@ -20,28 +22,27 @@ TrisulPlugin = {
     description = "Listens to DNS traffic and builds a IP->Name DNS database", 
   },
 
+  -- All those interested in plugging into PDNS listen tothis message and
+  -- get a handle to the LevelDB database.  The owner of handle skips it  
   onmessage=function(msgid, msg)
     if msgid=='{4349BFA4-536C-4310-C25E-E7C997B92244}' then
       local dbaddr = msg:match("newleveldb=(%S+)")
-      T.LevelWriter,_,T.LevelCloser = leveldb.from_addr(dbaddr);
+	  if not T.LevelDB then 
+		  T.LevelDB = leveldb.fromaddr(dbaddr);
+	  end
     end
   end,
 
-
   -- open the LevelDB database  & create the reader/writer 
   onload = function() 
-    T.pending,T.owner=false,false
+    T.LevelDB=nil 
   end,
-
 
   -- close 
   onunload = function()
-    if T.owner then 
-      T.log("Closing Leveldb from owner")
-      T.LevelCloser()
-    end 
+      T.loginfo("Closing Leveldb from owner")
+      T.LevelDB:close()
   end, 
-
 
   -- resource_monitor  block 
   --
@@ -51,31 +52,26 @@ TrisulPlugin = {
     resource_guid = '{D1E27FF0-6D66-4E57-BB91-99F76BB2143E}',
 
     --  we will each each DNS resource from Trisul into this method
-    --  since levelDB is 1:writer-N:reader - we lazily open the DB and
-    --  transmit the handle to other instances. Once that is setup 
-    --  we just store the mapping into the DB 
+    --  Engine-0 owns the LevelDB , others share the handle through a broadcast
+	--  mechanism. Luckily LevelDB supports N reader/writer per process 
     onnewresource  = function(engine, resource )
 
-
-      if T.LevelWriter == nil then 
-        if engine:instanceid() == "0" and not T.pending then
+      if T.LevelDB == nil then
+	  	if engine:instanceid()=="0" then 
           local dbfile = T.env.get_config("App>DBRoot").."/config/PassiveDNSDB.level";
-          T.dbaddr = leveldb.open(dbfile); -- dont use local to prevent GC 
-          T.pending = true
-          T.owner=true
-          engine:post_message_backend('{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.dbaddr) 
-          engine:post_message_frontend('{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.dbaddr) 
-        end
-        return
+          T.LevelDB = leveldb.open(dbfile); 
+          engine:post_message_backend( '{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.LevelDB:toaddr() ) 
+          engine:post_message_frontend('{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.LevelDB:toaddr() ) 
+		else
+		  -- other backend engines have to wait .. 
+		  return 
+	    end
       end
 
       for ip in  resource:label():gmatch("A%s+([%d%.]+)") do
-        T.LevelWriter(ip,resource:uri())
+        T.LevelDB:put(ip,resource:uri())
       end
-
-
     end,
-
   }
-
 }
+
