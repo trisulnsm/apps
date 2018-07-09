@@ -32,7 +32,7 @@ TrisulPlugin = {
 		resource:uri());
 
 	  -- A records 
-      for ip in  resource:label():gmatch("A%s+([%d%.]+)") do
+      for ip in  resource:label():gmatch("%sA%s+([%d%.]+)") do
         -- print(ip) 
 		engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
 			resource:flow():id(),
@@ -41,7 +41,7 @@ TrisulPlugin = {
       end
 
 	  -- AAAA records 
-      for ip in  resource:label():gmatch("AAAA%s+([%x%:]+)") do
+      for ip in  resource:label():gmatch("%sAAAA%s+([%x%:]+)") do
         -- print(ip) 
 		engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
 			resource:flow():id(),
@@ -60,6 +60,4 @@ TrisulPlugin = {
 	  end 
     end,
   },
-
-
 }
