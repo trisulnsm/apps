@@ -22,7 +22,7 @@ TrisulPlugin = {
 		local text = fts:text()
 
 		-- CN
-  		local _,_,cn= text:find("CN=([%w%.-]+)")
+  		local _,_,cn= text:find("CN=(.*)\r\n")
 	    engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
 			fts:flow():id(),
 			"INDICATOR:SSLCN", 
