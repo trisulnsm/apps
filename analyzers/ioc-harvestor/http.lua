@@ -1,4 +1,3 @@
---
 -- fts_monitor.lua skeleton
 -- Extracts URL and HTTP-Host and HTTP-Referer for INTEL 
 -- 
@@ -23,14 +22,23 @@ TrisulPlugin = {
 
 		local _,_,uri = text:find("%s([^%s?]+)")
 
-		local _,_,host = text:find("Host:%s(%S+)")
-	    engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
-			fts:flow():id(),
-			"INDICATOR:HTTPURL", 
-			host..uri) 
+		local _,_,host = text:find("Host%s*:%s*(%S+)")
+		if not host then
+			T.logwarn("No Host header found for url: ".. uri) 
+		else
+			engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
+				fts:flow():id(),
+				"INDICATOR:HTTPURL", 
+				host..uri) 
+		end
 
+		local _,_,referer = text:find("Referer%s*:%s*(%S+)")
+		if referer then
+			engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
+				fts:flow():id(),
+				"INDICATOR:HTTPREFERER", 
+				referer) 
+		end
     end,
-
-
   },
 }

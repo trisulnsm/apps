@@ -15,8 +15,9 @@ Currenly harvested :
 9. SSL SHA1 Hashes 
 10. HTTP URLs
 11. HTTP Host names
-12. JA3 TLS Fingerprints 
-13. File Hashes 
+12. HTTP Referer 
+13. JA3 TLS Fingerprints 
+14. File Hashes 
 
 
 All these are now available in a single Resource Stream called *Intel Harvest* with GUID *"{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}"*
