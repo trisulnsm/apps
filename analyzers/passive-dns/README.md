@@ -17,8 +17,7 @@ lookup of IP to Domain.  This is more of a building block app for other richer a
 LevelDB is found in the EPEL repo
 
 ````
-wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm
-rpm -ivh epel-release-7-9.noarch.rpm
+yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 yum install leveldb
 ````
 
