@@ -35,7 +35,8 @@ UPDATES
 =======
 
 ````
-0.0.1		Jul 09 2018			Initial release 
+0.0.2		Jul 10 2018			For perf reason now used AC pattern match to get HTTP intel 
+0.0.1		Jul 07 2018			Initial release 
 ````
 
 
