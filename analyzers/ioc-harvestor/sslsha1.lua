@@ -1,36 +1,35 @@
 --
--- ssl certificate SHA1 intel 
--- Extracts SHA1 sign of certificates 
+-- resource_monitor.lua skeleton
+-- 	harvests SSL Certificates SHA1 
 -- 
 TrisulPlugin = { 
 
   -- id block
-  -- 
+  --
   id =  {
-    name = "Cert SHA1 Harvestor",
-    description = "harvest SHA1 cert prints ",
+    name = "SSL Cert SHA1",
+    description = "Harvest SHA1 prints", 
   },
 
-  fts_monitor  = {
+  -- resource_monitor block 
+  --
+  resource_monitor  = {
 
-    fts_guid = '{5AEE3F0B-9304-44BE-BBD0-0467052CF468}', 
+    resource_guid = '{5AEE3F0B-9304-44BE-BBD0-0467052CF468}', 
 
-    onflush = function(engine, fts) 
+    -- Pull out DOMAINs and IP (from CNAME A AAAA records)  
+    onflush = function(engine, resource) 
 
-		local text = fts:text()
+	  local _,_,sha1 = resource:uri():find("SHA1:(%x+)%s")
 
-		if not text:find("GET",1,true)  then return end 
-
-		local _,_,uri = text:find("%s([^%s?]+)")
-
-		local _,_,host = text:find("Host:%s(%S+)")
-	    engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
-			flow:id(),
-			"INDICATOR:HTTPURL", 
-			host..uri) 
+	  -- URI 
+	  engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
+		resource:flow():id(),
+		"INDICATOR:CERTSHA1", 
+		sha1)
 
     end,
-
-
   },
+
+
 }

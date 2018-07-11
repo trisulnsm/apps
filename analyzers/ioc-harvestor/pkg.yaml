@@ -11,6 +11,7 @@ description:
 
 apptype: lua
 
-appresources: dns.lua hosts.lua http.lua intel_resource.lua intel_tester.lua ja3.lua sni.lua sshsha1.lua ssl.lua sslsha1.lua 
+appresources: binaries.lua dns.lua hosts.lua hostsv6.lua http.lua intel_resource.lua intel_tester.lua ja3.lua mkconfig.lua sni.lua  ssl.lua sslsha1.lua
+
 
 dependencies:  
