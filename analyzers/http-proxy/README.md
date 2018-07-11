@@ -1,14 +1,17 @@
 # HTTP Proxy
 
-If you have an environment where Web Traffic goes through a Proxy Server and you are only able to capture data on the "inside side", this plugin is for you. We have put Trisul in such customer environments to find that the Destination IP of all flows is the IP of the proxy server. This plugin provides you the following.
+If you are in  an environment where Web Traffic goes through a Proxy Server and you are only able to capture data on the "inside" -  this plugin is for you.  Without this APP, all destination addresses will appear to be to the proxy server IP. 
+
+
+What this app gives you :
+
 
 1. handles HTTP CONNECT and straight through HTTP proxies (Squid and most other commonly available UTMs)
 2. adds a new Traffic Counter Group "External Hosts Proxy" to measure the actual Destination rather than the Proxy server IP
-3. labels all flows with the actual destination host. So you can search by server name "Show me mail.google.com flows" 
+3. labels all flows with the actual destination host. 
 4. adds EDGE for graph analytics 
 
 ## Installation
-
 
 Login as admin, then Web Admin > Apps and click on "HTTP Proxy". 
 
@@ -16,7 +19,6 @@ Restart Trisul-Probe and you're done.
 
 
 ## Viewing
-
 
 1. Retro Counters > Proxy External Hosts to see upload / download traffic by actual hostname
 2. Flows > Search by @tag=mail.google.com@ to search for flows to target hosts 
@@ -43,12 +45,14 @@ DEFAULT_CONFIG = {
 
 ````
 
-
 UPDATES
 =======
 
+````
+
 0.0.2		Jun 27 2018			Added config options to control very long proxy external host names 
 0.0.1		Jun 26 2018			Initial release 
+````
 
 
 
