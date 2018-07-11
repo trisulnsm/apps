@@ -27,7 +27,6 @@ TrisulPlugin = {
     },  
   },
 
-
   sg_monitor  = {
 
     onflush = function(engine, newflow)
@@ -46,7 +45,6 @@ TrisulPlugin = {
 
       -- timout : did not terminate with RST/FIN 
       if bit.band(newflow:state(),0x0100) ~= 0 then
-         print("BAND "..bit.band(newflow:state(),0x0100))
          engine:update_counter("{E45623ED-744C-4053-1401-84C72EE49D3B}", flowkey:ipa() , 7, 1)
          engine:update_counter("{E45623ED-744C-4053-1401-84C72EE49D3B}", flowkey:ipz() , 7, 1)
          newflow:add_tag("BADQUALITY")
@@ -73,8 +71,6 @@ TrisulPlugin = {
       end
 
     end,
-
   },
-
-
 }
+
