@@ -1,8 +1,8 @@
 # IOC Harvestor
 
-This APP creates a new Trisul Resource Group stream containing INTEL items harvested from various other streams.
+This APP creates a single new Trisul Resource Group stream containing INTEL items harvested from various other streams.
 
-Currently harvesting these  :
+Currenly harvesting 14 items 
 
 1. IPv4
 2. IPv6
@@ -21,11 +21,11 @@ Currently harvesting these  :
 14. File Hashes 
 
 
-All these are now available in a single Resource Stream called *Intel Harvest* with GUID *"{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}"*
+This apps creates a new Resource Stream called *Intel Harvest* with GUID *"{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}"*. You can just listen to the resorces on this stream and write code to do something with them. See `intel_print.lua` which just prints them to the terminal. 
 
 ## What is the use of this Harvestor ?
 
-> This APP is a building block app, upon which you can build INTEL checking applications which can compare these with Threat databases  in real time. 
+> This is a building block APP. This gives you all Intel items in a single stream, you can plug this into any Intel checking code. 
 
 ## Installing 
 
@@ -43,6 +43,8 @@ return {
 
 ## Sample output 
 
+
+````
 ..
 INDICATOR:DNSIP = 173.194.38.153
 INDICATOR:DNSCNAME = pagead46.l.doubleclick.net
