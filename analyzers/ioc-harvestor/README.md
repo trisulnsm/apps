@@ -2,7 +2,7 @@
 
 This APP creates a new Trisul Resource Group stream containing INTEL items harvested from various other streams.
 
-Currenly harvested :
+Currently harvesting these  :
 
 1. IPv4
 2. IPv6
