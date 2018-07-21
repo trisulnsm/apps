@@ -2,7 +2,7 @@
 
 This APP creates a single new Trisul Resource Group stream containing INTEL items harvested from various other streams.
 
-Currenly harvesting 14 items 
+Currently harvesting 14 items 
 
 1. IPv4
 2. IPv6
@@ -11,7 +11,7 @@ Currenly harvesting 14 items
 4. DNS A IPv4
 5. DNS AAAA IPv6
 6. SSL SNI
-7. SSL Certificate CN
+7. SSL Certificate CN (Common name)
 8. SSL Certifcate  SAN (Subject Alternative Names)
 9. SSL SHA1 Hashes 
 10. HTTP URLs
