@@ -4,12 +4,16 @@ Passive DNS extractor builds a live database of IP to latest seen domain name.
 
 ## Purpose of this App
 
-To construct a live IP -> Domain database that can be used by other Trisul Apps that need a real time
-lookup of IP to Domain.  This is more of a building block app for other richer applications. 
+*This is a "building block app" upon which you can construct other apps.*
 
-## How to run
+Installing this app gives you two capabilities :
 
-> **Note** This app requires the `libleveldb` library. See below for install instructions  
+1. the ability in real time to lookup an IP to a domain name.  
+2. constructs a live IP -> Domain database 
+
+## Dependency on LevelDB  
+
+This app requires the `libleveldb` library. See below for install instructions  
 
 
 ### 1. Installing LevelDB On CentOS 7 probe 

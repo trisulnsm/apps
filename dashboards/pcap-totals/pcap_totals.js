@@ -125,7 +125,7 @@ function load_totals(mod,opts)
     var req = mk_trp_request(TRP.Message.Command.COUNTER_ITEM_REQUEST,
     {
       counter_group: k.guid,
-      key: new TRP.KeyT({key:k.key}),
+      key: TRP.KeyT.create({key:k.key}),
       time_interval:kMod.active_interval()
     });
     
