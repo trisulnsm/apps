@@ -33,7 +33,9 @@ var DailyKeyUsage = $.klass({
   //get dates between to dates
   load_tint_array:function(){
    this.dates = get_dates(new Date(this.trp_form.from_date),new Date(this.trp_form.to_date));
-   this.status_updater = this.mkstatusupdater();
+   this.tris_pg_bar = new TrisProgressBar({max:this.dates.length,
+                                            divid:'sq_content',
+                                            slim: true});
    this.get_data();
   },
 
@@ -43,7 +45,6 @@ var DailyKeyUsage = $.klass({
     if(this.dates.length  == 0){
       return true;
     }
-    this.status_updater("");
     var t = this.dates.shift();
 
     t = [t.getTime()/1000,(t.getTime()/1000)+86400];
@@ -51,7 +52,7 @@ var DailyKeyUsage = $.klass({
     var meter = parseInt(this.trp_form.meters.split(",")[0]);
 
     var data = {counter_group:this.trp_form.counter_group,
-                key:new TRP.KeyT({label:this.trp_form.key}),
+                key:TRP.KeyT.create({label:this.trp_form.key}),
                 time_interval:mk_time_interval(t)}
 
     var req = mk_trp_request(TRP.Message.Command.COUNTER_ITEM_REQUEST,data);
@@ -110,24 +111,11 @@ var DailyKeyUsage = $.klass({
     td = td + "<td>"+h_fmtvol(total)+meter_type.units.slice(0,1)+"</td>"
  
     $('#mma_data').find("tbody").append("<tr>"+td+"</tr>");
+    this.tris_pg_bar.update_progress_bar();
 
   },
 
-  //show status updater to show processing
-  mkstatusupdater:function(){
-    
-    var max = this.dates.length;
-    var cnt=0;
-    $('#show_processing').show();
-    return function( msg) {
-      ++cnt;
-      if(Math.floor(cnt/max*100) >= 100){
-        $('#show_processing').html('');
-      }
-      $('#show_processing').text("Please wait. Building daily key report. Step: " + msg + " " + Math.floor(cnt/max*100) + "%");
-    }
-
-  }
+  
 
 });
 
@@ -135,3 +123,4 @@ function run(opts) {
  new DailyKeyUsage(opts); 
 }
 
+//# sourceURL=daily_key_report.js
