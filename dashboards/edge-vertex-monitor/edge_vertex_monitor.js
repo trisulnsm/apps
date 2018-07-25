@@ -27,7 +27,7 @@ var EdgeVertexMonitor= $.klass({
   },
   //add the form to the dom
   add_form:function(){
-    this.form=$("<form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select class='cg_id' id='cgguid' name='cgguid'></select> </div> </div> <div class='form-group'> <label class='control-label col-xs-4'>Keys</label> <div class='col-xs-8'> <textarea id='keys' name='keys'></textarea> <span class='help-block'>comma seperated</span> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Meter</label> <div class='col-xs-8'> <select class='meter_id' id='meters' multiple name='meter'></select> </div> </div> <div class='form-group'> <div id='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='form-group'> <div class='col-xs-10 col-md-offset-4'> <input id='from_date' name='from_date' type='hidden'> <input id='to_date' name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Get Usage'>:</input> </div> </div> </div> </form>");
+    this.form=$("<form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select class='cg_id' id='cgguid' name='cgguid'></select> </div> </div> <div class='form-group'> <label class='control-label col-xs-4'>Keys</label> <div class='col-xs-8'> <textarea id='keys' name='keys'></textarea> <span class='help-block'>comma seperated</span> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Meter</label> <div class='col-xs-8'> <select class='meter_id' id='meters' multiple name='meter'></select> </div> </div> <div class='form-group'> <div id='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='form-group'> <div class='col-xs-10 col-md-offset-4'> <input id='from_date' name='from_date' type='hidden'> <input id='to_date' name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Get Usage'></input> </div> </div> </div> </form>");
     $(this.domid).append(this.form);
 
     //defaults from local storage
@@ -142,9 +142,9 @@ var EdgeVertexMonitor= $.klass({
     var cthis = this;
     var date = {from_date:this.form.find('#from_date').val(),to_date:this.form.find('#to_date').val()}
     _.each(this.keys.split(","),$.proxy(function(key){
-      var keyt= new TRP.KeyT({label:key});
+      var keyt= TRP.KeyT.create({label:key});
       if(localStorage.getItem("/trisul/edge_vertex/monitor/valid_input")==1){
-        keyt =  new TRP.KeyT({key:key})
+        keyt =  TRP.KeyT.create({key:key})
       }
       var req=  mk_trp_request(TRP.Message.Command.COUNTER_ITEM_REQUEST,
       {
@@ -256,11 +256,9 @@ function run(opts){
       .col-xs-10.col-md-offset-4
         %input{type:"hidden",name:"from_date",id:"from_date"}
         %input{type:"hidden",name:"to_date",id:"to_date"}
-        %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Get Usage"} 
-  
+        %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Get Usage"}
 
-
-       
+     
 */
 
 //# sourceURL=edge_vertex_monitor.js
