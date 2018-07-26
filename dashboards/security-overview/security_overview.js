@@ -8,7 +8,7 @@ SecurityOverview = $.klass({
     this.home_networks_arr = this.convert_iparr_to_intergerarr(opts["home_networks"]);
 
     //build trp time interval
-    this.tmint = new TRP.TimeInterval();
+    this.tmint = TRP.TimeInterval.create();
     var recentsecs = 86400;
     this.topcount = 100;
 
@@ -21,8 +21,8 @@ SecurityOverview = $.klass({
     if(dash_json.topcount > 0 ){
       this.topcount = parseInt(dash_json.topcount);
     }
-    this.tmint.from= new TRP.Timestamp({tv_sec:this.available_time.window_tots - recentsecs});
-    this.tmint.to= new TRP.Timestamp({tv_sec:this.available_time.window_tots});
+    this.tmint.from= TRP.Timestamp.create({tv_sec:this.available_time.window_tots - recentsecs});
+    this.tmint.to= TRP.Timestamp.create({tv_sec:this.available_time.window_tots});
     
     // all the UI data will be stored
     this.alerts_data = {};
@@ -81,7 +81,7 @@ SecurityOverview = $.klass({
     var req = mk_trp_request(TRP.Message.Command.QUERY_ALERTS_REQUEST,
       {
         alert_group: guid,
-        priority: new TRP.KeyT({key:priority.toString()}),
+        priority: TRP.KeyT.create({key:priority.toString()}),
         time_interval:this.tmint,
         maxitems:1000
       });

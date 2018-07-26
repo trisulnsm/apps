@@ -96,9 +96,9 @@ var KeyActivityUsage = $.klass({
     }
     var tint = this.tint_arr.shift();
     var group_by_hour = {}
-    var time_interval = new TRP.TimeInterval();
-    time_interval.from= new TRP.Timestamp({tv_sec:tint[0]/1000});
-    time_interval.to= new TRP.Timestamp({tv_sec:tint[1]/1000});
+    var time_interval = TRP.TimeInterval.create();
+    time_interval.from= TRP.Timestamp.create({tv_sec:tint[0]/1000});
+    time_interval.to= TRP.Timestamp.create({tv_sec:tint[1]/1000});
     var date  = new Date(tint[0])
     var day = date.getDay();
     // d3 heat map example day  always start from monday 
@@ -107,7 +107,7 @@ var KeyActivityUsage = $.klass({
     var req = mk_trp_request(TRP.Message.Command.COUNTER_ITEM_REQUEST,
               {
                 counter_group: this.guid,
-                key:  new TRP.KeyT({label:this.key}),
+                key:  TRP.KeyT.create({label:this.key}),
                 time_interval:time_interval
               });
     $('#hm_status_bar_text').html('Updating '+(this.no_of_days - this.tint_arr.length)+"/"+(this.no_of_days));
