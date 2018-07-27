@@ -120,9 +120,9 @@ var InKeysMagicMap   =  $.klass({
     var inkeys = $('#in_keys').val().trim();
     var spaces = _.collect(inkeys.split("\n"),function(inkey){
       inkey = inkey.split("~");
-      return new TRP.KeySpaceRequest.KeySpace({
-        from_key :new TRP.KeyT({label:inkey[0]}),
-        to_key : new TRP.KeyT({label:inkey[1]})
+      return TRP.KeySpaceRequest.KeySpace.create({
+        from_key :TRP.KeyT.create({label:inkey[0]}),
+        to_key : TRP.KeyT.create({label:inkey[1]})
       });
     });
 
@@ -186,7 +186,7 @@ var InKeysMagicMap   =  $.klass({
     var req = mk_trp_request(TRP.Message.Command.COUNTER_ITEM_REQUEST,
     {
         counter_group: this.cgguid,
-        key:  new TRP.KeyT({key:k.key}),
+        key:  TRP.KeyT.create({key:k.key}),
         time_interval:mk_time_interval($.extend({recentsecs:this.recentsecs},this.available_time))
     });
     return  get_response(req,function(resp){

@@ -61,7 +61,7 @@ var HostTotal   =  $.klass({
         var req = mk_trp_request(TRP.Message.Command.COUNTER_ITEM_REQUEST,
           {
             counter_group: GUID.GUID_CG_HOSTS(),
-            key:  new TRP.KeyT({key:k.key}),
+            key:  TRP.KeyT.create({key:k.key}),
             time_interval:mk_time_interval($.extend({recentsecs:86400},this.available_time))
           });
         return  get_response(req,function(resp){
