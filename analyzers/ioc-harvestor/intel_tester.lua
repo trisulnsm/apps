@@ -39,7 +39,7 @@ TrisulPlugin = {
 	-- do you want to save these Harvested resources on the Hub
 	-- 
     flushfilter = function(engine, resource) 
-	  print(resource:uri().. ' = ' .. resource:label() ) 
+	  -- print(resource:uri().. ' = ' .. resource:label() ) 
 	  return T.active_config.SaveHarvestedItems 
     end,
 

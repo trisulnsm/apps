@@ -14,7 +14,7 @@ function  make_config( custom_config_file, default_config_table)
       T.loginfo("Loading custom settings from ".. custom_config_file)
       for k,v in pairs(newsettings) do 
         active_config[k]=v
-        T.loginfo("Loaded new setting "..k.."="..v)
+        T.loginfo("Loaded new setting "..k.."="..tostring(v))
       end
     else 
       T.loginfo("Loaded default settings")
