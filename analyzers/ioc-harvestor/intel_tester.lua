@@ -25,7 +25,7 @@ TrisulPlugin = {
 						  -- Save these to backend DB (can take up significant disk space) 
 						  -- in production override this to false  in 
 						  -- /usr/local/var/lib/trisul-probe/d0/p0/cX/config/trisulnsm_ioc-harvestor.lua config file 
-						  SaveHarvestedItems=true,
+						  SaveHarvestedItems=false,
 						} )
 
   end,
