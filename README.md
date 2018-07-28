@@ -22,9 +22,12 @@ To install these tools
 
 | APP Name  | Description |
 | ------------- | ------------- |
-| FireHOL checker  |Alerts if activity seen from FireHOL blacklist  |
-| Passive DNS Extractor|Extracts IP to Domain map|
-| PingMON | Large scale PING reachability and latency monitor| 
+|FireHOL checker  |Alerts if activity seen from FireHOL blacklist  |
+|Geo based on IP2Location db|Geo based metering to Trisul using the IP2Location LITE databases|
+|HTTP Proxy|Extracts metrics in HTTP Proxy|
+|IOC Harvestor|Harvests intel items into a single resource stream from different places in Trisul pipeline|
+|Passive DNS Extractor|Extracts IP to Domain map|
+|PingMON | Large scale PING reachability and latency monitor| 
 |Prune Encrypted PCAP|Prunes high volume encrypted Netflix/YouTube from PCAP storage|
 |Prune TLS from PCAP storage|Dont store TLS traffic|
 |SNI TLS Metrics|Traffic metrics from TLS Server Name Indication|
@@ -40,6 +43,7 @@ To install these tools
 |APP Name | Description
 |---------|----------|
 |Daily Key Report| Shows daily usage report for key|
+|Edge vertex Monitor|Show usage report for selected guid,meters and keys|
 |Key Space Explorer| Search all active key space and get total usage|
 |PCAP Totals|Shows total summary of pcap file |
 |Security Overview - Internal Hosts| Shows IDS and Badfellas alerts count for internal hosts| 
