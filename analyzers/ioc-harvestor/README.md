@@ -65,6 +65,7 @@ UPDATES
 =======
 
 ````
+0.0.4		Jul 25 2018			By Default IOC-Harvestor wont save the Intel items (save disk)
 0.0.3		Jul 11 2018			IPv6 and also a config option to prevent saving to DB 
 0.0.2		Jul 10 2018			For perf reason now used AC pattern match to get HTTP intel 
 0.0.1		Jul 07 2018			Initial release 

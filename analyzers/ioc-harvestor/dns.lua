@@ -24,40 +24,39 @@ TrisulPlugin = {
     -- Pull out DOMAINs and IP (from CNAME A AAAA records)  
     onflush = function(engine, resource) 
 
-	  -- URI 
-	  -- print(resource:uri())
-	  engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
-		resource:flow():id(),
-		"INDICATOR:NAME", 
-		resource:uri());
+      -- URI 
+      -- print(resource:uri())
+      engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
+        resource:flow():id(),
+        "INDICATOR:NAME", 
+        resource:uri());
 
-	  -- A records 
+      -- A records 
       for ip in  resource:label():gmatch("%sA%s+([%d%.]+)") do
         -- print(ip) 
-		engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
-			resource:flow():id(),
-			"INDICATOR:DNSIP", 
-			ip);
+        engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
+            resource:flow():id(),
+            "INDICATOR:DNSIP", 
+            ip);
       end
 
-	  -- AAAA records 
+      -- AAAA records 
       for ip in  resource:label():gmatch("%sAAAA%s+([%x%:]+)") do
         -- print(ip) 
-		engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
-			resource:flow():id(),
-			"INDICATOR:DNSIP6", 
-			ip);
+        engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
+            resource:flow():id(),
+            "INDICATOR:DNSIP6", 
+            ip);
 
       end
 
-	  -- CNAME  records 
+      -- CNAME  records 
       for cname in  resource:label():gmatch("CNAME%s+([%w%.%-]+)") do
-        -- print(cname) 
-		engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
-			resource:flow():id(),
-			"INDICATOR:DNSCNAME", 
-			cname);
-	  end 
+        engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
+            resource:flow():id(),
+            "INDICATOR:DNSCNAME", 
+            cname);
+      end 
     end,
   },
 }

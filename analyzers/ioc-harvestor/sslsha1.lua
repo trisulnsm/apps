@@ -19,14 +19,13 @@ TrisulPlugin = {
 
     -- Pull out DOMAINs and IP (from CNAME A AAAA records)  
     onflush = function(engine, resource) 
+  	  local _,_,sha1 = resource:uri():find("SHA1:(%x+)%s")
 
-	  local _,_,sha1 = resource:uri():find("SHA1:(%x+)%s")
-
-	  -- URI 
-	  engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
-		resource:flow():id(),
-		"INDICATOR:CERTSHA1", 
-		sha1)
+  	  -- URI 
+  	  engine:add_resource('{EE1C9F46-0542-4A7E-4C6A-55E2C4689419}',
+          		resource:flow():id(),
+          		"INDICATOR:CERTSHA1", 
+          		sha1)
 
     end,
   },

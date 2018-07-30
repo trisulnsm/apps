@@ -7,7 +7,7 @@ end
 function  make_config( custom_config_file, default_config_table)
 
     -- load custom config if present 
-	local active_config = default_config_table
+  local active_config = default_config_table
 
     if file_exists(custom_config_file) then 
       local newsettings = dofile(custom_config_file) 
@@ -20,7 +20,7 @@ function  make_config( custom_config_file, default_config_table)
       T.loginfo("Loaded default settings")
     end
 
-	return active_config
+  return active_config
 
 end 
 
