@@ -4,10 +4,9 @@
 -- TYPE:        BACKEND SCRIPT
 -- PURPOSE:     Creates a real time MULTIPURPOSE PASSIVE DNS database 
 -- DESCRIPTION: A passive DNS database observes DNS traffic and builds a IP->name
---        and name->IP lookup over time. For NSM purposes an IP->Name mapping is 
---        a crucial capability for real time streaming analytics. 
+--            and name->IP lookup over time. 
 --
---        This script does the following
+-- This script does the following
 --        1. leveldb          - uses LUAJIT FFI to build a LEVELDB backend 
 --        2. resource_monitor - listens to DNS and updates the leveldb  CNAME/A -> domain
 -- 
@@ -50,7 +49,7 @@ TrisulPlugin = {
   --
   resource_monitor   = {
 
-    -- DNS RESOURCE 
+    -- watch the DNS RESOURCE STREAM 
     resource_guid = '{D1E27FF0-6D66-4E57-BB91-99F76BB2143E}',
 
     --  we will each each DNS resource from Trisul into this method
@@ -58,6 +57,9 @@ TrisulPlugin = {
     --  mechanism. Luckily LevelDB supports N reader/writer per process 
     onnewresource  = function(engine, resource )
 
+    -- TODO : explain whats going on here. 
+    -- basically openign the sharing the levelDB handle with all other Trisul LUA 
+    -- levelDB is multithread 
       if T.LevelDB == nil then
         if engine:instanceid()=="0" then 
           local dbfile = T.env.get_config("App>DBRoot").."/config/PassiveDNSDB.level";
@@ -71,9 +73,27 @@ TrisulPlugin = {
         end
       end
 
+      -- the actual storage is straight forward 
+      -- push all the A  IPv4 
+      local ts = tostring(os.time())
       for ip in  resource:label():gmatch("A%s+([%d%.]+)") do
         T.LevelDB:put(ip,resource:uri())
+        -- use a sentinel and push ip/A/name
+        T.LevelDB:put(ip.."/A/"..resource:uri(), ts)
+        -- use a sentinel and push name/A/ip
+        T.LevelDB:put(resource:uri().."/A/"..ip, ts)
       end
+
+      -- push all the AAAA IPv6
+      for ip6 in  resource:label():gmatch("AAAA%s+([%x%:]+)") do
+        T.LevelDB:put(ip6,resource:uri())
+        -- use a sentinel and push ipv6/6A/name
+        -- notice trick because /A will match /AAAA as levelDB sentinel 
+        T.LevelDB:put(ip6.."/6A/"..resource:uri(), ts)
+        -- use a sentinel and push name/6A/ipv6
+        T.LevelDB:put(resource:uri().."/6A/"..ip6, ts) 
+      end
+
     end,
   }
 }

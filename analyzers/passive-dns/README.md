@@ -1,15 +1,26 @@
-# Passive DNS Extractor
+# Passive DNS Creator
 
-Passive DNS extractor builds a live database of IP to latest seen domain name. 
+Builds a real time passive DNS database. 
+
+> ### What is a Passive DNS Database? ** 
+> A passive DNS DB is a historical record of which domains resolved to which IPs and its inverse - 
+> IPs to domains.  A Real-Time Passive DNS database is designed to be used in 
+> streaming analytics platforms like Trisul where you need this intelligence in the Fast
+> path to make decisions.  An alternative to a Real Time database would be a Log or SQL 
+> database. 
+
 
 ## Purpose of this App
 
-*This is a "building block app" upon which you can construct other apps.*
-
-Installing this app gives you two capabilities :
+Installing this app gives you several capabilities :
 
 1. the ability in real time to lookup an IP to a domain name.  
-2. constructs a live IP -> Domain database 
+2. the ability to lookup a domain name to IP. 
+3. detect "first seen" IP and "first seen" domain
+4. detect "not seen in 1 month" and other variants thereof 
+5. iterate over all IPs used by a domain historically with timestamp
+6. iterate over all domains used by an IP historically 
+7. just a solid record of all DNS mappings in a proven and fast LevelDB database 
 
 ## Dependency on LevelDB  
 
@@ -52,11 +63,12 @@ UPDATES
 =======
 
 ````
-0.0.7		Jul 08 2018			Upgraded to the new tris_levelDB library helper
-0.0.3		Jan 08 2018			Now uses `resource_monitor` instead of `fts_monitor` to build the 
+0.0.8       Aug 01 2018         Lookup domain to IP history , IP to domain history 
+0.0.7       Jul 08 2018         Upgraded to the new tris_levelDB library helper
+0.0.3       Jan 08 2018         Now uses `resource_monitor` instead of `fts_monitor` to build the 
                                 DNS database. Must faster. 
 
-0.0.1		Oct 10 2017			Initial release 
+0.0.1       Oct 10 2017         Initial release 
 ````
 
 
