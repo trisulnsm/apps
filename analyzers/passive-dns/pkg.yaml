@@ -14,6 +14,6 @@ description:
 
 apptype: lua
 
-appresources: passive-dns-creator.lua   tris_leveldb.lua 
+appresources: passive-dns-creator.lua   tris_leveldb.lua  dump.lua
 
 dependencies:  LevelDB 

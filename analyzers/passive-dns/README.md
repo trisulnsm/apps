@@ -59,6 +59,25 @@ the probe  config directory `PassiveDNSDB.level`. The probe config
 directory for each context is at `/usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/`
 
 
+## Working with the LevelDB
+
+You can use the [tris_leveldb.lua library](https://github.com/trisulnsm/trisul-scripts/tree/master/lua/libs/leveldb)  to work with the database. 
+
+For example if you want to dump the database - put this file in the passiveDNS app directory and run `luajit dump.lua` 
+
+````lua
+
+local LevelDB=require'tris_leveldb' 
+db1=LevelDB.new()
+
+db1:open("/usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/PassiveDNSDB.level")
+db1:dump()
+db1:close() 
+
+
+````
+
+
 UPDATES
 =======
 
