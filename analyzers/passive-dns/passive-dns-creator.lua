@@ -86,7 +86,7 @@ TrisulPlugin = {
         -- use a sentinel and push name/A/ip
         T.LevelDB:put(resource:uri().."/A/"..ip, ts)
         -- use a sentinel and push reversed_name/A/ip
-        T.LevelDB:put(fqdn_reverse.."/A/"..ip, ts)
+        T.LevelDB:put(rev_fqdn.."/A/"..ip, ts)
       end
 
       -- push all the AAAA IPv6
@@ -98,7 +98,7 @@ TrisulPlugin = {
         -- use a sentinel and push name/6A/ipv6
         T.LevelDB:put(resource:uri().."/6A/"..ip6, ts) 
         -- use a sentinel and push reversed_name/A/ip
-        T.LevelDB:put(fqdn_reverse.."/6A/"..ip6, ts)
+        T.LevelDB:put(rev_fqdn.."/6A/"..ip6, ts)
       end
 
     end,
