@@ -61,7 +61,9 @@ The level DB database will be built from live network traffic and stored in the 
 
 The catch here is you cannot read the LevelDB database `PassiveDNSDB.level` from outside while it is in LIVE use by Trisul. However, the file api.lua provides a simple interface for the outside world to query the database.  The interface is available on the Unix Socket `$run/leveldbapi.sock.0` , the run directory is located at `/usr/local/var/lib/trisul-probe/domain0/probe0/context0/run` can be switched by the [trisbashrc](https://www.trisul.org/docs/ref/trisbashrc.html)  helper macro `cd.run` 
 
-There are two API commands
+To use the  API is you just send the command string to the Unix Socket and print the response. The following  examples use netcat `nc`. 
+
+#### Commands supported
 1. `dump` : dumps the entire database 
 1. `listprefix<space>prefix` : dump all the matching prefixes
 
