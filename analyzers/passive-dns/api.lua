@@ -187,7 +187,8 @@ TrisulPlugin = {
       iter:seek_to(args[2])
       while iter:valid() do
         local k,v = iter:key_value()
-	if k:match(args[2]) ~= 0  then 
+print("k="..k)
+	if k:find(args[2],1,true) ~= 1  then 
 		break
 	end 
         local outstr=k.."="..v.."\n"

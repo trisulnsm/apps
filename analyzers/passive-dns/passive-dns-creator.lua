@@ -73,6 +73,9 @@ TrisulPlugin = {
         end
       end
 
+	  -- reverse 
+	  local rev_fqdn = fqdn_reverse(resource:uri())
+
       -- the actual storage is straight forward 
       -- push all the A  IPv4 
       local ts = tostring(os.time())
@@ -82,6 +85,8 @@ TrisulPlugin = {
         T.LevelDB:put(ip.."/A/"..resource:uri(), ts)
         -- use a sentinel and push name/A/ip
         T.LevelDB:put(resource:uri().."/A/"..ip, ts)
+        -- use a sentinel and push reversed_name/A/ip
+        T.LevelDB:put(fqdn_reverse.."/A/"..ip, ts)
       end
 
       -- push all the AAAA IPv6
@@ -92,9 +97,27 @@ TrisulPlugin = {
         T.LevelDB:put(ip6.."/6A/"..resource:uri(), ts)
         -- use a sentinel and push name/6A/ipv6
         T.LevelDB:put(resource:uri().."/6A/"..ip6, ts) 
+        -- use a sentinel and push reversed_name/A/ip
+        T.LevelDB:put(fqdn_reverse.."/6A/"..ip6, ts)
       end
 
     end,
   }
 }
+
+-- utility function
+-- fqdn_reverse('ocsp.ws.symantec.com') => 'com.symantec.ws.ocsp' 
+--
+fqdn_reverse=function(fqdn)
+	parts={}
+	for k in fqdn:gmatch("[^%.]+") do
+		table.insert(parts,k)
+	end
+
+	revparts={}
+	for i = table.getn(parts),1,-1 do
+	    table.insert(revparts,parts[i])
+	end
+	return table.concat(revparts,'.')
+end
 
