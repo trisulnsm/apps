@@ -1,19 +1,17 @@
 -- api.lua 
 -- 
--- allows you to query the live LevelDB database  (for testing and offline purposes) 
+-- allows you to query a live LevelDB database  
+-- use case right now is PassiveDNS - see onmessage
 -- 
 -- 2 commands  supported 
 --     listprefix<space>prefix
---     dumpall 
-
-
+--     dump
 local ffi=require'ffi'
 local API_SOCKETFILE_NAME='leveldbapi.sock'
 local leveldb=require'tris_leveldb'
+local bit=require'bit'
 
--- need to do this mapping .. :-(
--- takes time to get used to LuaJIT FFI but quite easy once you get the 
--- hang of it 
+-- FFI it 
 ffi.cdef[[
 
 typedef int   ssize_t;
@@ -52,7 +50,6 @@ int unlink(char * pathname);
 int close(int fd);
 ]] 
 
-
 strerror = function()
   return ffi.string(ffi.C.strerror( ffi.errno() ))
 end
@@ -68,6 +65,7 @@ TrisulPlugin = {
 
   -- All those interested in plugging into PDNS listen tothis message and
   -- get a handle to the LevelDB database.  The owner of handle skips it  
+  -- the MessageGUID is the advertisement from the PassiveDNS app that it has opened a database 
   onmessage=function(msgid, msg)
     if msgid=='{4349BFA4-536C-4310-C25E-E7C997B92244}' then
       local dbaddr = msg:match("newleveldb=(%S+)")
@@ -78,13 +76,9 @@ TrisulPlugin = {
     end
   end,
 
-
-  -- returning false from onload will effectively stop the script itself
-  -- 
   onload = function()
     T.socket = nil 
   end,
-
 
   -- opens a unix socket 
   open_api_socket = function(socket_path ) 
@@ -92,7 +86,7 @@ TrisulPlugin = {
     T.log(T.K.loglevel.INFO, "API Socket setting up the socket : ".. socket_path)
 
     -- socket 
-    local socket = ffi.C.socket( K.AF_UNIX, K.SOCK_STREAM, 0 );
+    local socket = ffi.C.socket( K.AF_UNIX, bit.bor(K.SOCK_STREAM,K.SOCK_NONBLOCK), 0 );
     if  socket == -1 then 
       T.logerror("Error socket() " .. strerror())
       return  false 
@@ -159,10 +153,12 @@ TrisulPlugin = {
         if ffi.errno() ~=  K.EAGAIN then 
           T.logerror("Error ffi.recv " .. strerror())
         end 
+        ffi.C.close(sock)
         return
       end
 
       local cmd_string  = ffi.string(T.rbuf, ret)
+      T.loginfo("About to dispatch API command "..cmd_string)
       TrisulPlugin.dispatch_cmd( sock, timestamp, cmd_string)
       ffi.C.close(sock)
 
@@ -171,14 +167,13 @@ TrisulPlugin = {
   },
 
   -- cmd string - split by new line 
+  -- process the API commands, query the levelDB
   dispatch_cmd = function(wsock, timestamp, cmd_string)
 
     local args = {}
     for token in cmd_string:gmatch("[^%s]+") do
        args[#args+1]=token
     end
-
-    print(cmd_string)
 
     if args[1] =="listprefix" then 
 
@@ -187,10 +182,9 @@ TrisulPlugin = {
       iter:seek_to(args[2])
       while iter:valid() do
         local k,v = iter:key_value()
-print("k="..k)
-	if k:find(args[2],1,true) ~= 1  then 
-		break
-	end 
+        if k:find(args[2],1,true) ~= 1  then 
+          break
+        end 
         local outstr=k.."="..v.."\n"
         ffi.C.send(wsock,outstr,#outstr,0)
         iter:iter_next()
@@ -215,7 +209,7 @@ print("k="..k)
       end
       iter:destroy()
     else
-      local ret = ffi.C.send(wsock, "unsupported",10,0)
+      local ret = ffi.C.send(wsock, "unsupported",11,0)
     end
 
   end,
