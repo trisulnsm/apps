@@ -14,6 +14,8 @@ with this Trisul Network Analytics plugin.
 4. These packets are almost useless -- YouTube is moving to QUIC (UDP) others uses PFS encryption.
 5. Trisul still processes the metrics,flows,SSL certs so you dont lose visibility
 
+> This App requires the [Passive DNS Extractor](https://github.com/trisulnsm/apps/tree/master/analyzers/passive-dns)  app to be installed first.
+
 ## Traffic not saved:  Netflix, Youtube
 
 By default this app skips the following Regex  
