@@ -82,6 +82,7 @@ UPDATES
 =======
 
 ````
+0.0.9       Aug 02 2018         API.lua allows you to query the online (live) database from outside
 0.0.8       Aug 01 2018         Lookup domain to IP history , IP to domain history 
 0.0.7       Jul 08 2018         Upgraded to the new tris_levelDB library helper
 0.0.3       Jan 08 2018         Now uses `resource_monitor` instead of `fts_monitor` to build the 
