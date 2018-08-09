@@ -1,6 +1,6 @@
 name: TLS Fingerprinter
 
-version: 0.0.7
+version: 0.0.8
 
 author: trisul
 
@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: jahash.lua tls-fingerprints.json sweepbuf.lua 
+appresources: jahash.lua tls-fingerprints.json sweepbuf.lua  mkconfig.lua
 
 dependencies:  

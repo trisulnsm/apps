@@ -14,13 +14,14 @@ local ffi=require('ffi')
 local status,C
 for _,lib in ipairs( {'libcrypto.so.1.0.2k', 'libcrypto.so.1.0.0'} )
 do
-	status, C = pcall(function() return  ffi.load(lib) end)
-	if status then break end 
+  status, C = pcall(function() return  ffi.load(lib) end)
+  if status then break end 
 end
 if not status then error "Cant load FFI libcrypto version " end
 
 local SWP = require'sweepbuf' 
 local JSON = require'JSON' 
+require 'mkconfig'
 
 -- local dbg=require'debugger'
 ffi.cdef[[
@@ -82,7 +83,6 @@ TrisulPlugin = {
     description = "a client_hello hash ",
   },
 
-
   -- read the JSON 
   -- 
   onload = function()
@@ -93,6 +93,17 @@ TrisulPlugin = {
       T.logerror("TLS PRINT: needs the Reassembly>TCPReassembly>Applications>EnableSSLRecordExtraction be TRUE. Cant proceed. ");
       return false
     end
+
+
+  -- do you want to log every JA3 hash - default OFF to save disk space 
+  T.active_config = make_config(
+          T.env.get_config("App>DBRoot").."/config/trisulnsm_tls-fingerprint.lua",
+          {
+            -- logs for each TLS flow the FlowID, JA3-Hash, JA3-String
+            -- default is false, override if you want to debug or harvest strings in  the following file
+            -- /usr/local/var/lib/trisul-probe/d0/p0/cX/config/trisulnsm_tls-fingerprint.lua  config file 
+            LogHashes=false,
+          } )
 
     -- search these paths for fingerprint database 
     local PrintFiles = { 
@@ -150,7 +161,9 @@ TrisulPlugin = {
     },
 
     meters = {
-      {0, T.K.vartype.COUNTER, 20, 40, "Hits", "hits",    "hits" },
+      {0, T.K.vartype.COUNTER, 20, 40, "Hits",        "hits",        "hits" },
+      {1, T.K.vartype.COUNTER, 20, 40, "Client Hits", "clt-hits",    "hits" },
+      {2, T.K.vartype.COUNTER, 20, 40, "Server Hits", "svr-hits",    "hits" },
     },  
   },
  
@@ -162,6 +175,7 @@ TrisulPlugin = {
     -- 
     onattribute = function(engine, timestamp, flowkey, attr_name, attr_value) 
 
+
       if attr_name == "User-Agent" then
         engine:add_flow_edges(flowkey:id(), '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', attr_value:sub(10))
         return
@@ -171,7 +185,12 @@ TrisulPlugin = {
       local payload = SWP.new(attr_value)
 
       -- Only interested in TLS handshake (type = 22) + client_hello only
-      if payload:next_u8() == 22 and payload:skip(4) and payload:next_u8() == 1 then
+      if payload:next_u8() == 22 and payload:skip(4) then
+
+      local hstype = payload:next_u8()
+    
+    -- only client_hello and server_hello beyond this point 
+      if hstype ~=1 and hstype ~= 2 then return end 
 
         payload:reset()
         payload:inc(5)
@@ -196,16 +215,28 @@ TrisulPlugin = {
         payload:skip(32)                    -- over client_random
         payload:skip(payload:next_u8())     -- over SessionID if present 
 
-        ja3f.Cipher = payload:next_u16_arr( payload:next_u16()/2) 
+    -- Ciphers
+    if hstype == 1 then 
+      ja3f.Cipher = payload:next_u16_arr( payload:next_u16()/2) 
+    elseif hstype == 2 then
+      ja3f.Cipher = { payload:next_u16() } 
+    end
 
-        payload:skip(payload:next_u8())     -- over compression 
+    
+    -- Compression
+    if hstype == 1 then 
+      payload:skip(payload:next_u8())     -- over compression 
+    elseif hstype==2 then
+      payload:skip(1)             -- over compression 
+    end
 
         -- if there are no extensions (it can happen) we're done - no JA3 
         if not payload:has_more() then return end
 
-        -- extensions, we pick out SNI as well if 
+    -- extensions length
         payload:push_fence(payload:next_u16())
 
+    -- we need the SNI to add Trisul EDGE graph vertices from the JA3 
         local snihostname  = nil 
 
         while payload:has_more() do
@@ -215,7 +246,7 @@ TrisulPlugin = {
             ja3f.EllipticCurve  = payload:next_u16_arr( payload:next_u16()/2)
           elseif ext_type == 11 then
              ja3f.EllipticCurvePointFormat = payload:next_u8_arr( payload:next_u8())
-          elseif ext_type ==  0 then 
+          elseif ext_type ==  0  and ext_len > 0 then 
             payload:push_fence(payload:next_u16())
             while payload:has_more() do
               payload:skip(1)
@@ -242,18 +273,29 @@ TrisulPlugin = {
           end
         end 
 
-        local ja3_str = ja3f.SSLVersion .. "," ..
+        local ja3_str = ""
+
+    if hstype==1 then 
+          ja3_str = ja3f.SSLVersion .. "," ..
                  table.concat(ja3f.Cipher,"-")..","..
                  table.concat(ja3f.SSLExtension,"-")..","..
                  table.concat(ja3f.EllipticCurve,"-")..","..
                  table.concat(ja3f.EllipticCurvePointFormat,"-")
+    elseif hstype==2 then
+          ja3_str = ja3f.SSLVersion .. "," ..
+                 table.concat(ja3f.Cipher,"-")..","..
+                 table.concat(ja3f.SSLExtension,"-")
+    end
         local ja3_hash = md5sum(ja3_str)
 
         -- log this useful to create ja3_ database 
-        -- print(" flow=".. flowkey:to_s().." hash ".. ja3_hash.. " string="..ja3_str)
+    if T.active_config.LogHashes then 
+      print(" flow=".. flowkey:to_s().." hash ".. ja3_hash.. " string="..ja3_str)
+    end
 
         -- counters and edges 
         engine:update_counter('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 0, 1)
+        engine:update_counter('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, hstype , 1)
 
         -- flow tag 6 chars only 
         engine:tag_flow(flowkey:id(), ja3_hash:sub(1,6))
