@@ -4,6 +4,7 @@
 -- 
 local leveldb=require'tris_leveldb' 
 local bit=require'bit'
+local IP6=require'ip6'
 
 -- ip number to trisulkey format
 function ipnum_tokey(ipnum)
@@ -13,6 +14,12 @@ end
 function key_toipnum(key)
   local pmatch,_, b1,b2,b3,b4= key:find("(%x+)%.(%x+)%.(%x+)%.(%x+)")
   return  tonumber(b1,16)*16777216+tonumber(b2,16)*65536+tonumber(b3,16)*256+tonumber(b4,16) 
+end
+function ip6_tokey(num)
+
+end
+function key_toip6(ip6key)
+
 end
 
 local ipprefixdb   = {
@@ -34,6 +41,13 @@ local ipprefixdb   = {
     end
 	tbl.put(tbl, num_start, num_end, val) 
   end, 
+
+  put_ipv6_cidr = function( tbl, ipv6, val )
+    local _,_,ip ,cidr = ipv6:find("([%x:]*)/(%d*)")
+	local f,l = IP6.ip6_cidr(ip,cidr)
+	tbl.ldb:put(tbl.ldb_keyprefix.."FWD/".. f.."-"..l.."/"..cidr, tostring(val))
+	tbl.ldb:put(tbl.ldb_keyprefix.."REV/".. l.."-"..f.."/"..cidr, tostring(val))
+  end,
 
   put_ipnum = function( tbl, ipnum_from, ipnum_to, val )
   	tbl.put(tbl,ipnum_from, ipnum_to, val)
@@ -57,7 +71,7 @@ local ipprefixdb   = {
 
   range_match=function(dbkey, keyin)
 	local dir,k1,k2,range = dbkey:match("|(%w+)/([%x%.]+)-([%x%.]+)/(%d+)")
-	local key=string.sub(keyin,5)
+	local key=keyin:match("/(.*)$")
 	if dir=="REV" and key <= k1 and key >= k2 then
 		return true
 	elseif dir=="FWD" and key >=k1 and key <=k2 then
@@ -68,7 +82,9 @@ local ipprefixdb   = {
   end, 
 
   lookup_prefix_fwd = function(tbl,key)
-    local k0,v0= tbl.ldb:upper(tbl.ldb_iterator, tbl.ldb_keyprefix.."FWD/"..key,tbl.range_match)
+  	local iter = tbl.ldb:create_iterator()
+    local k0,v0= tbl.ldb:upper(iter, tbl.ldb_keyprefix.."FWD/"..key,tbl.range_match)
+	iter:destroy()
     if k0 then
         local k1,k2,range = k0:match("FWD/([%x%.]+)-([%x%.]+)/(%d+)")
         if key <= k2 and key >= k1 then
@@ -79,7 +95,9 @@ local ipprefixdb   = {
 
 
   lookup_prefix_rev = function(tbl,key)
-    local k0,v0= tbl.ldb:lower(tbl.ldb_iterator, tbl.ldb_keyprefix.."REV/"..key, tbl.range_match )
+  	local iter = tbl.ldb:create_iterator()
+    local k0,v0= tbl.ldb:lower(iter, tbl.ldb_keyprefix.."REV/"..key, tbl.range_match )
+	iter:destroy()
     if k0 then
         local k1,k2,range = k0:match("REV/([%x%.]+)-([%x%.]+)/(%d+)")
         if key <= k1 and key >= k2 then
@@ -130,10 +148,9 @@ local ipprefixdb   = {
 	if not f then
 		return f, err 
 	end
-
 	tbl.ldb_iterator=tbl.ldb:create_iterator()
+
 	tbl.set_databasename(tbl,"0")
-	return true,"success"
   end,
 
   -- set databasename 
