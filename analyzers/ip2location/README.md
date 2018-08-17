@@ -51,7 +51,9 @@ Login as admin , go to Context : default > Admin Tasks > Start/Stop Tasks. Resta
 
 ## Viewing data 
 
-This app creates four new counter groups. Go to Retro > Counter to start your analysis.
+This app creates four new counter groups starting with "IP2LOC-Country/ASN/City/Proxy". Go to Retro > Counter to start your analysis.
+
+![IP2 Location images](ip2loc-asn.png)
 
 ## Cron updates
 
@@ -69,10 +71,14 @@ The updates are automatically picked up.
 
 ## Notices
 
+from IP2Location website 
+
+````
 All sites, advertising materials and documentation mentioning features or use of this database must display the following acknowledgment:
 
 "This site or product includes IP2Proxy LITE data available from https://www.ip2location.com/proxy-database."
-"This site or product includes IP2Proxy LITE data available from https://www.ip2location.com/asn-database."
+"This site or product includes IP2Proxy ASN  data available from https://www.ip2location.com/asn-database."
+````
 
 
 UPDATES
