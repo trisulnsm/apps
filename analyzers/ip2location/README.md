@@ -79,7 +79,8 @@ UPDATES
 =======
 
 ````
-0.0.5		Aug 17 2018			Added a helper script ip2locompile.sh to prepare the lists 
+0.0.5		Aug 17 2018			Added a helper script ip2locompile.sh to prepare the lists and
+                                flow per ASN,Country,City,Proxy
 0.0.3		May 23 2018			Added cron script to DL and compile 
 0.0.2		May 22 2018			Initial release 
 ````
