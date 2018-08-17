@@ -36,7 +36,7 @@ TrisulPlugin = {
 	T.ldb = ipprefixdb.new()
 	local f,err=T.ldb:open(T.ldb_path, true)
 	if not f then 
-		print("Error opening IPPrefix database "..T.ldb_path)
+		print("Error opening IPPrefix database err="..err.." path="..T.ldb_path)
 		T.ldb=nil
 	end
   end,
@@ -120,6 +120,8 @@ TrisulPlugin = {
 		if T.host:is_homenet(flow:flow():ipz_readable()) then 
 			dir=1
 		end 
+
+		engine:update_counter ( guid ,  key, 3, 1)
 
 		engine:update_counter( guid,  key, 0, flow:az_bytes()+flow:za_bytes());
 		if dir==0 then 

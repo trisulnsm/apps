@@ -149,8 +149,8 @@ local ipprefixdb   = {
 		return f, err 
 	end
 	tbl.ldb_iterator=tbl.ldb:create_iterator()
-
 	tbl.set_databasename(tbl,"0")
+	return true
   end,
 
   -- set databasename 
