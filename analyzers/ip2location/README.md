@@ -1,9 +1,8 @@
 # IP2Location LITE Geo Metrics  
 
+This app adds Geo based metering to Trisul using the [IP2Location LITE databases](https://lite.ip2location.com/)
 
-This app adds Geo based metering to Trisul using the IP2Location LITE databases. 
-
-The following CSV databases are processed. The databases can be found at https://lite.ip2location.com/
+The following CSV databases are processed by this app.
 
 1. ASN-LITE - for Autonomous System Number metrics 
 2. DB3-LITE - for Country and City 
@@ -14,15 +13,14 @@ The following CSV databases are processed. The databases can be found at https:/
 
 To install this APP logon as admin, then select APP from _Web Admin > Manage > Apps._
 
-Post install run the following 3 steps to keep the FireHOL list updated. 
-
 
 ### 1. Download the latest IP2 Location Databases
 
 From https://lite.ip2location.com/ download the following databases into  `/usr/local/share/trisul-probe/plugins`
-Then `unzip` them.
+Then `unzip` them. *You may need to sign up at the IP2Location website and download manually* 
 
 
+The directory contents ought to look like the following with the three CSV files. 
 
 ````bash
 $ ls -l /usr/local/share/trisul-probe/plugins 
@@ -33,16 +31,14 @@ $ ls -l /usr/local/share/trisul-probe/plugins
 ````
 
 
-
 ### 2. Compile the CSV lists  
-
 
 Make sure you have `luajit` on your probe. If not run `apt install luajit`.  Then run the following command to compile the databases. 
 
 1. Download the two lua files (`compile_ip2loc.lua and tris_leveldb.lua`) used to compile this  into a LevelDB database
 2. Run the compiler and generate the two databases 
 
-The commands would look like this, the compilation process can take 3-4 minutes  
+You can cut-past the following to generated the compiled databases
 
 ````bash
 
