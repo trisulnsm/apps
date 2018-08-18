@@ -12,7 +12,7 @@ curl -o /usr/local/share/trisul-probe/plugins/firehol_level1.netset   https://ip
 curl -o /usr/local/share/trisul-probe/plugins/firehol_level3.netset   https://iplists.firehol.org/files/firehol_level3.netset
 
 OWNERGROUP=$(stat -c '%U.%G' /usr/local/share/trisul-probe/plugins)
-echo "Changing permission of feed to $OWNERGROUP"
+echo "  + Changing permission of feed to $OWNERGROUP"
 chown $OWNERGROUP  /usr/local/share/trisul-probe/plugins/firehol_level1.netset
 chown $OWNERGROUP  /usr/local/share/trisul-probe/plugins/firehol_level3.netset
 
