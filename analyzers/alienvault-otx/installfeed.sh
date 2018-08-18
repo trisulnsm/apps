@@ -22,7 +22,7 @@ echo "Using OTX API KEY    : $API_KEY"
 
 
 if ! ldconfig -p | grep -q libleveldb ;  then
-  echo 'Error: libleveldb is not installed. Use apt install libleveldbv15 or yum install libleveldbv15 ' >&2
+  echo 'Error: libleveldb is not installed. Use apt install libleveldb1v5 or yum install libleveldb1v5 ' >&2
   exit 1
 fi 
 
