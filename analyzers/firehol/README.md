@@ -22,8 +22,8 @@ Run the `installfeed.sh` script in this folder  to install the FireHOL feeds and
 Cut paste the below
 
 ````
-wget https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/firehol/installfeed.sh
-sh ./installfeed.sh 
+curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/firehol/installfeed.sh
+bash ./installfeed.sh 
 ````
 
 
