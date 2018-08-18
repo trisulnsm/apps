@@ -8,6 +8,12 @@ if [[ $# -eq 0 ]] ; then
     exit 1
 fi
 
+
+if ! [[ -x "$(command -v luajit)" ]]; then
+  echo 'Error: luajit is not installed. Use apt install luajit or yum install luajit to install' >&2
+  exit 1
+fi
+
 DOWNLOAD_TOKEN=$1
 
 echo "Using download token : $DOWNLOAD_TOKEN"
