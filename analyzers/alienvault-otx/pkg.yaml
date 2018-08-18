@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: otx.lua  README.md   installfeed.sh  
+appresources: check-leveldb.lua  README.md   
 
 dependencies: ioc-harvestor 
