@@ -41,7 +41,6 @@ echo "  + Installing GEM faraday"
 gem install faraday 
 fi 
 
-
 curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/alienvault-otx/otx2leveldb.rb
 ruby ./otx2leveldb.rb $API_KEY   trisul-intel.level
 
@@ -54,4 +53,5 @@ cp -r trisul-intel.level /usr/local/share/trisul-probe/plugins/trisul-intel.leve
 cp -r trisul-intel.level /usr/local/share/trisul-probe/plugins/trisul-intel.level.1
 chown -R $OWNERGROUP  /usr/local/share/trisul-probe/plugins/trisul-intel.level.*
 
+echo "  + Successfully installed OTX feed"
 
