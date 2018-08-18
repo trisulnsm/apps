@@ -19,7 +19,7 @@ chown $OWNERGROUP  /usr/local/share/trisul-probe/plugins/firehol_level3.netset
 TMPFILE=$(mktemp)
 crontab -l >  $TMPFILE
 
-if [[ grep -q firehol $TMPFILE]]; then 
+if  grep -q firehol $TMPFILE ; then 
 	cat << ENDCMD  >> $TMPFILE
 	0 * * * * curl -o /usr/local/share/trisul-probe/plugins/firehol_level1.netset   https://iplists.firehol.org/files/firehol_level1.netset
 	0 * * * * curl -o /usr/local/share/trisul-probe/plugins/firehol_level3.netset   https://iplists.firehol.org/files/firehol_level3.netset
