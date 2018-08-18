@@ -19,10 +19,12 @@ Post install ,  run the `installfeed.sh` script to keep the FireHOL list updated
 
 Run the `installfeed.sh` script in this folder  to install the FireHOL feeds and update the CRON to download every hour 
 
-````
-$ ./installfeed.sh 
-````
+Cut paste the below
 
+````
+wget https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/firehol/installfeed.sh
+sh ./installfeed.sh 
+````
 
 
 ### 2. Restart probe
