@@ -16,20 +16,20 @@ To install this APP logon as admin, then select APP from _Web Admin > Manage > A
 
 To proceed further you need to obtain a `DOWNLOAD_TOKEN` from the IP2Location website.
 
-Download the helper script found in this directory `ip2locompile.lua` to download and compile the databases. 
+Download the helper script found in this directory `installfeeds.sh` to download and compile the databases. 
 
 ````
-curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2location/ip2locompile.sh
+curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2location/installfeeds.sh
 ````
 
-Run the `ip2locompile.sh` helper script with the DOWNLOAD_TOKEN to get and compile the database. Usage `./ip2locompile.sh DOWNLOAD_TOKEN`  
+Run the `installfeeds.sh` helper script with the DOWNLOAD_TOKEN to get and compile the database. Usage `./installfeeds.sh DOWNLOAD_TOKEN`  
 
 #### Example run 
 
 > Note: This can take about 5 minutes
 
 ````bash
-root@unpl:~# ./ip2locompile.sh xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+root@unpl:~# ./installfeeds.sh xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 Using download token :  xxxxxxxxxxxxxxx
 Using proxy          :  http://192.168.2.11:3128
 Archive:  DB3LITE.ZIP
@@ -58,13 +58,13 @@ This app creates four new counter groups starting with "IP2LOC-Country/ASN/City/
 ## Cron updates
 
 
-Use the script `ip2locompile.sh` to update the list every week.  You have to supply the DOWNLOAD_TOKEN
+Use the script `installfeeds.sh` to update the list every week.  You have to supply the DOWNLOAD_TOKEN
 
 ````sh
 crontab -e -u trisul
 
 # then add this line 
-0 0 * * * /usr/local/share/trisul-probe/plugins/ip2locompile.sh 
+0 0 * * * /usr/local/share/trisul-probe/plugins/installfeeds.sh 
 ````
 
 The updates are automatically picked up.  
@@ -85,7 +85,7 @@ UPDATES
 =======
 
 ````
-0.0.5		Aug 17 2018			Added a helper script ip2locompile.sh to prepare the lists and
+0.0.5		Aug 17 2018			Added a helper script installfeeds.sh to prepare the lists and
                                 flow per ASN,Country,City,Proxy
 0.0.3		May 23 2018			Added cron script to DL and compile 
 0.0.2		May 22 2018			Initial release 
