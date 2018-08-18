@@ -23,9 +23,9 @@ wget    "http://www.ip2location.com/download/?token=$DOWNLOAD_TOKEN&file=DB3LITE
 wget    "http://www.ip2location.com/download/?token=$DOWNLOAD_TOKEN&file=DBASNLITE" -O DBASNLITE.ZIP 
 wget    "http://www.ip2location.com/download/?token=$DOWNLOAD_TOKEN&file=PX2LITE" -O PX2LITE.ZIP 
 
-unzip -f DB3LITE.ZIP	IP2LOCATION-LITE-DB3.CSV
-unzip -f DBASNLITE.ZIP  IP2LOCATION-LITE-ASN.CSV
-unzip -f PX2LITE.ZIP  	IP2PROXY-LITE-PX2.CSV
+unzip DB3LITE.ZIP	-f IP2LOCATION-LITE-DB3.CSV
+unzip DBASNLITE.ZIP -f IP2LOCATION-LITE-ASN.CSV
+unzip PX2LITE.ZIP  	-f IP2PROXY-LITE-PX2.CSV
 
 curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2location/compile_ip2loc.lua
 curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2location/tris_leveldb.lua
