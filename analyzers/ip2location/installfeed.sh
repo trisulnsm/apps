@@ -4,7 +4,7 @@
 
 if [[ $# -eq 0 ]] ; then
     echo "Error: Need Download Token as first argument"
-    echo "Usage: ip2locompile <download-token>"
+    echo "Usage: ./installfeed.sh <download-token>"
     exit 1
 fi
 
@@ -38,7 +38,10 @@ cp -r trisul-ip2loc-0.level/ trisul-ip2loc-1.level/
 cp -r trisul-ip2loc-0.level/ /usr/local/share/trisul-probe/plugins/
 cp -r trisul-ip2loc-1.level/ /usr/local/share/trisul-probe/plugins/
 
-chown -R trisul.trisul /usr/local/share/trisul-probe/plugins/trisul-ip2loc*
+OWNERGROUP=$(stat -c '%U.%G' /usr/local/share/trisul-probe/plugins)
+echo "Changing ownership to to Trisul Probe user $OWNERGROUP"
+chown -R $OWNERGROUP  /usr/local/share/trisul-probe/plugins/trisul-ip2loc*
+
 
 echo "Finished"
 

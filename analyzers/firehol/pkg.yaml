@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: firehol.lua  iprangemap.lua README.md  
+appresources: firehol.lua  iprangemap.lua README.md   installfeed.sh  mkconfig.lua
 
 dependencies:  

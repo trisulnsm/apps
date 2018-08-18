@@ -2,69 +2,38 @@
 
 Check all your traffic against the excellent FireHOL Level1 blacklist. The FireHOL list has a reputation for a very low false positive rate.  **If you see a FireHOL alert in Trisul, you MUST investigate further.**  To help the analyst further, this app elevates the alert priority to 1 when bi-directional data transfer above a threshold occurs with a blacklisted host. 
 
-> **Update 15-Feb-2018** Added support for FireHOL Level-3 due to user demand
+> **Update 18-Aug-2018** Script to automate installation of feed in one step 
 
 1. FireHOL Level1 is a must block list of IPs , this app detects activity and creates a HIGH Priority Alert if it finds a hit
-2. Optionally if you have the FireHOL Level3 Intel file, this app will scan that as well and create a LOW Priority Alert, if there is significant data transfer in both directors it will escalate the priority to HIGH.
+2. FireHOL Level3 is a also a list of malicious IPs, this app will scan that as well and create a LOW Priority Alert. If there is significant data transfer in both directors it will escalate the priority to HIGH.
 
 
 ## Installing 
 
 To install this APP logon as admin, then select APP from _Web Admin > Manage > Apps._
 
-Post install run the following 3 steps to keep the FireHOL list updated. 
+Post install ,  run the `installfeed.sh` script to keep the FireHOL list updated. 
 
 
-### 1. Download the latest FireHOL intel file 
+### 1. Installing the feed 
 
-````
-curl -o /usr/local/share/trisul-probe/plugins/firehol_level1.netset   https://iplists.firehol.org/files/firehol_level1.netset
-curl -o /usr/local/share/trisul-probe/plugins/firehol_level3.netset   https://iplists.firehol.org/files/firehol_level3.netset
+Run the `installfeed.sh` script in this folder  to install the FireHOL feeds and update the CRON to download every hour 
 
 ````
-the level3.netset file is optional.
-
-
-Or if  your probe uses a proxy to get outside.  In the following example the proxy is at 192.168.2.11  port 3128
-````
-curl -x https://192.168.2.11:3128 -o /usr/local/share/trisul-probe/plugins/firehol_level1.netset   https://iplists.firehol.org/files/firehol_level1.netset
+$ ./installfeed.sh 
 ````
 
 
-### 2.  Keep the list updated every hour
 
-
-````
-
-crontab -e 
-
-# add this line
-0 * * * * curl -o /usr/local/share/trisul-probe/plugins/firehol_level1.netset   https://iplists.firehol.org/files/firehol_level1.netset
-0 * * * * curl -o /usr/local/share/trisul-probe/plugins/firehol_level3.netset   https://iplists.firehol.org/files/firehol_level3.netset
-
-````
-
-This app automatically refereshes the list every hour. 
-
-
-### 3.  How updates are picked up
-
-This APP checks the MD5 of the two Intel files before every stream window (approx 1 minute). If they change , they are refreshed immediately.
-
-
-### 4. Restart probe
+### 2. Restart probe
 
 Login as admin , go to Context : default > Admin Tasks > Start/Stop Tasks. Restart the probe
-
+This APP checks the MD5 of the two Intel files before every stream window (approx 1 minute). If they change , they are refreshed immediately.
 
 Config Parameters
 ==============
 
-Some of the knobs you can adjust on a per-probe basis.
-
-
-From the filehol.lua script these are the settings you can customize. 
-
+The config settings you can customize on a per Probe basis
 
 ````lua
 
@@ -94,13 +63,12 @@ To supply your own custom settings,
 
 ````lua 
 
+# in file /usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/trisulnsm_filehol.lua 
+
 return  {
 
-	-- How much should blacklisted IP Recv for Priority elevation to MAJOR (1)
-	Vol_Sev1_Alert_Recv=50000,
-
-	-- How much should blacklisted IP Transmit for Priority elevation to MAJOR (1)
-	Vol_Sev1_Alert_Xmit=50000,
+  -- How much should blacklisted IP Recv for Priority elevation to MAJOR (1)
+  Vol_Sev1_Alert_Recv=50000,
 }
 
 ````
@@ -113,16 +81,17 @@ The FireHOL alerts show up in Trisul as User-Alerts.
 2. View older alerts. Select Alerts > Show All > click on User Alerts
 
 
-![Alerts > View All> Real Time Alerts](https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/firehol/screenshot-demo.trisul.org-3000-2017-11-02-13-43-01-686.png?raw=true) 
+![Alerts > View All> Real Time Alerts](screenshot-demo.trisul.org-3000-2017-11-02-13-43-01-686.png) 
 
 
 UPDATES
 =======
 
 ````
-0.0.3		Feb 15 2018			Added FireHOL-Level3 support 
-0.0.2		Nov 2 2017			Custom options 
-0.0.1		Oct 30 2017			Initial release 
+0.0.5   Aug 18 2018     installfeed.sh to automate Feed download and Cron
+0.0.3   Feb 15 2018     Added FireHOL-Level3 support 
+0.0.2   Nov 2 2017      Custom options 
+0.0.1   Oct 30 2017     Initial release 
 ````
 
 

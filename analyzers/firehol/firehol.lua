@@ -16,34 +16,7 @@
 -- local dbg=require'debugger'
 
 local FH = require'iprangemap'
-
-
-function file_exists(name)
-  local f=io.open(name,"r")
-  if f~=nil then io.close(f) return true else return false end
-end
-
--- --------------------------------------------
--- override by trisulnsm_firehol.lua 
--- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
---
-DEFAULT_CONFIG = {
-
-  -- filename of FireHOL level1 Feed  - will trigger Sev-1 alert 
-  Firehol_Filename_Level1 ="firehol_level1.netset",
-
-  -- optional level3 - will create Sev-3 alert 
-  Firehol_Filename_Level3 ="firehol_level3.netset",
-
-  -- How much should blacklisted IP Recv for Priority elevation to MAJOR (1)
-  Vol_Sev1_Alert_Recv=10000,
-
-  -- How much should blacklisted IP Transmit for Priority elevation to MAJOR (1)
-  Vol_Sev1_Alert_Xmit=20000,
-}
--- --------------------------------------------
-
-
+require'mkconfig'
 
 -- converts key in trisul format to readable 
 function readable_ip(key)
@@ -63,20 +36,25 @@ TrisulPlugin = {
   -- load the list 
   onload = function()
 
-    -- load custom config if present 
-    T.active_config = DEFAULT_CONFIG
-    local custom_config_file = T.env.get_config("App>DBRoot").."/config/trisulnsm_firehol.lua"
+  -- --------------------------------------------
+  -- override by trisulnsm_firehol.lua 
+  -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
+  --
+    T.active_config = make_config(
+            T.env.get_config("App>DBRoot").."/config/trisulnsm_firehol.lua",
+            {
+                -- filename of FireHOL level1 Feed  - will trigger Sev-1 alert 
+                Firehol_Filename_Level1 ="firehol_level1.netset",
 
-    if file_exists(custom_config_file) then 
-      local newsettings = dofile(custom_config_file) 
-      T.log("Loading custom settings from ".. custom_config_file)
-      for k,v in pairs(newsettings) do 
-        T.active_config[k]=v
-        T.log("Loaded new setting "..k.."="..v)
-      end
-    else 
-      T.log("Loaded default settings")
-    end
+                -- optional level3 - will create Sev-3 alert 
+                Firehol_Filename_Level3 ="firehol_level3.netset",
+
+                -- How much should blacklisted IP Recv for Priority elevation to MAJOR (1)
+                Vol_Sev1_Alert_Recv=10000,
+
+                -- How much should blacklisted IP Transmit for Priority elevation to MAJOR (1)
+                Vol_Sev1_Alert_Xmit=20000,
+            })
 
     T.intel_file_hashes = {} 
   
