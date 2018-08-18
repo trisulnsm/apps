@@ -4,6 +4,7 @@
 #
 
 echo "Using http proxy     : $http_proxy"
+echo "Using https proxy    : $https_proxy"
 
 echo "Downloading FireHOL sets into /usr/local/share/trisul-probe/plugins"
 
@@ -11,8 +12,9 @@ curl -o /usr/local/share/trisul-probe/plugins/firehol_level1.netset   https://ip
 curl -o /usr/local/share/trisul-probe/plugins/firehol_level3.netset   https://iplists.firehol.org/files/firehol_level3.netset
 
 OWNERGROUP=$(stat -c '%U.%G' /usr/local/share/trisul-probe/plugins)
+echo "Changing permission of feed to $OWNERGROUP"
 chown $OWNERGROUP  /usr/local/share/trisul-probe/plugins/firehol_level1.netset
-chown $OWNERGROUP  /usr/local/share/trisul-probe/plugins/firehol_level2.netset
+chown $OWNERGROUP  /usr/local/share/trisul-probe/plugins/firehol_level3.netset
 
 TMPFILE=$(mktemp)
 crontab -l >  $TMPFILE
@@ -26,9 +28,5 @@ crontab $TMPFILE
 rm $TMPFILE
 
 echo "Successfully installed FireHOL sets and added to CRONTAB for daily refresh"
-
-
-
-
 
 
