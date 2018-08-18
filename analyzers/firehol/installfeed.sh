@@ -19,14 +19,20 @@ chown $OWNERGROUP  /usr/local/share/trisul-probe/plugins/firehol_level3.netset
 TMPFILE=$(mktemp)
 crontab -l >  $TMPFILE
 
-cat << ENDCMD  >> $TMPFILE
-0 * * * * curl -o /usr/local/share/trisul-probe/plugins/firehol_level1.netset   https://iplists.firehol.org/files/firehol_level1.netset
-0 * * * * curl -o /usr/local/share/trisul-probe/plugins/firehol_level3.netset   https://iplists.firehol.org/files/firehol_level3.netset
-ENDCMD
+if [[ grep -q firehol $TMPFILE]]; then 
+	cat << ENDCMD  >> $TMPFILE
+	0 * * * * curl -o /usr/local/share/trisul-probe/plugins/firehol_level1.netset   https://iplists.firehol.org/files/firehol_level1.netset
+	0 * * * * curl -o /usr/local/share/trisul-probe/plugins/firehol_level3.netset   https://iplists.firehol.org/files/firehol_level3.netset
+	ENDCMD
 
-crontab $TMPFILE
+	crontab $TMPFILE
+	echo "Added FireHOL sets to crontab for daily refresh"
+else
+	echo "Crontab entry for FireHOL already exists, skipping" 
+fi
+
 rm $TMPFILE
 
-echo "Successfully installed FireHOL sets and added to CRONTAB for daily refresh"
+echo "Successfully installed FireHOL sets. Restart Trisul-Probe "
 
 
