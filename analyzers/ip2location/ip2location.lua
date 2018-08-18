@@ -31,12 +31,11 @@ TrisulPlugin = {
   end,
 
   reload=function()
-	print("LevelDB directory modification detected, reloading from "..T.ldb_path)
   	TrisulPlugin.onunload() 
 	T.ldb = ipprefixdb.new()
 	local f,err=T.ldb:open(T.ldb_path, true)
 	if not f then 
-		print("Error opening IPPrefix database err="..err.." path="..T.ldb_path)
+		T.logerror("Error opening IPPrefix database err="..err.." path="..T.ldb_path)
 		T.ldb=nil
 	end
   end,
