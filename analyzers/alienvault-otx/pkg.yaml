@@ -1,0 +1,16 @@
+name: Alienvault OTX 
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Integrates AlienVault OTX Intel 
+   long:  |
+      Scan your traffic against AlienVault OTX intel. Need the IOC-Harvestor app and Alien OTX Key.
+
+apptype: lua
+
+appresources: otx.lua  README.md   installfeed.sh  
+
+dependencies: ioc-harvestor 
