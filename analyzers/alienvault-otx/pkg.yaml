@@ -7,7 +7,7 @@ author: trisul
 description: 
    short: Integrates AlienVault OTX Intel 
    long:  |
-      Scan your traffic against AlienVault OTX intel. Need the IOC-Harvestor app and Alien OTX Key.
+      Scan your traffic against AlienVault OTX intel needs the IOC-Harvestor app and Alien OTX Key.
 
 apptype: lua
 
