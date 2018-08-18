@@ -5,12 +5,12 @@ version: 0.0.1
 author: trisul
 
 description: 
-   short: Integrates AlienVault OTX Intel 
+   short: Scans your traffic against AlienVault OTX Intel, needs IOC-Harvestor APP
    long:  |
       Scan your traffic against AlienVault OTX intel needs the IOC-Harvestor app and Alien OTX Key.
 
 apptype: lua
 
-appresources: check-leveldb.lua  README.md   
+appresources: check-leveldb.lua  README.md    tris_leveldb.lua
 
 dependencies: ioc-harvestor 
