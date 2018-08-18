@@ -16,8 +16,8 @@ fi
 
 DOWNLOAD_TOKEN=$1
 
-echo "Using download token : $DOWNLOAD_TOKEN"
-echo "Using http proxy     : $http_proxy"
+echo "  + Using download token : $DOWNLOAD_TOKEN"
+echo "  + Using http proxy     : $http_proxy"
 
 wget    "http://www.ip2location.com/download/?token=$DOWNLOAD_TOKEN&file=DB3LITE" -O DB3LITE.ZIP 
 wget    "http://www.ip2location.com/download/?token=$DOWNLOAD_TOKEN&file=DBASNLITE" -O DBASNLITE.ZIP 
@@ -39,9 +39,7 @@ cp -r trisul-ip2loc-0.level/ /usr/local/share/trisul-probe/plugins/
 cp -r trisul-ip2loc-1.level/ /usr/local/share/trisul-probe/plugins/
 
 OWNERGROUP=$(stat -c '%U.%G' /usr/local/share/trisul-probe/plugins)
-echo "Changing ownership to to Trisul Probe user $OWNERGROUP"
+echo "  + Changing ownership to to Trisul Probe user $OWNERGROUP"
 chown -R $OWNERGROUP  /usr/local/share/trisul-probe/plugins/trisul-ip2loc*
 
-
-echo "Finished"
-
+echo "  + Finished"

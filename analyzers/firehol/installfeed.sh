@@ -28,7 +28,7 @@ ENDCMD
 	crontab $TMPFILE
 	echo "  + Added FireHOL sets to crontab for daily refresh"
 else
-	echo "  + Crontab entry for FireHOL already exists, skipping" 
+	echo "  - Crontab entry for FireHOL already exists, skipping" 
 fi
 
 rm $TMPFILE
