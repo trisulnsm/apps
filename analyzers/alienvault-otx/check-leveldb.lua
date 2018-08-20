@@ -25,7 +25,7 @@ TrisulPlugin = {
 
     onbeginflush=function(engine) 
       T.leveldb = LDB.new()
-      local ok,errmsg=T.leveldb:open("/usr/local/share/trisul-probe/plugins/trisul-intel.leveldb."..engine:instanceid())
+      local ok,errmsg=T.leveldb:open("/usr/local/share/trisul-probe/plugins/trisul-intel.level."..engine:instanceid())
       if not ok then
         T.logerror("Unable to open the leveldb file e="..errmsg)
         T.leveldb=nil

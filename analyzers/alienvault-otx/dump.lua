@@ -3,7 +3,7 @@
 
 local LevelDB=require'tris_leveldb'
 db1=LevelDB.new()
-db1:open("/usr/local/share/trisul-probe/plugins/trisul-intel.leveldb.0") 
+db1:open("/usr/local/share/trisul-probe/plugins/trisul-intel.level.0") 
 db1:dump()
 db1:close()
 

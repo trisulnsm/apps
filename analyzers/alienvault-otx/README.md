@@ -35,7 +35,6 @@ in the User-Alerts group as shown below
 ![User Alerts from AlienVault OTX](avhit.png) 
 
 
-
 UPDATES
 =======
 

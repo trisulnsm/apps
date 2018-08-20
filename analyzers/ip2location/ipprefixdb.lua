@@ -100,7 +100,7 @@ local ipprefixdb   = {
 	iter:destroy()
     if k0 then
         local k1,k2,range = k0:match("REV/([%x%.]+)-([%x%.]+)/(%d+)")
-        if key <= k1 and key >= k2 then
+        if range and key <= k1 and key >= k2 then
             return v0,tonumber(range)
         end
     end
@@ -149,8 +149,8 @@ local ipprefixdb   = {
 		return f, err 
 	end
 	tbl.ldb_iterator=tbl.ldb:create_iterator()
+
 	tbl.set_databasename(tbl,"0")
-	return true
   end,
 
   -- set databasename 
