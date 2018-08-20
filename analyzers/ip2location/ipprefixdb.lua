@@ -21,6 +21,10 @@ end
 function key_toip6(ip6key)
 
 end
+function ipstr_tokey(ipstr)
+  local pmatch,_, b1,b2,b3,b4= ipstr:find("(%d+)%.(%d+)%.(%d+)%.(%d+)")
+  return  string.format("%02X.%02X.%02X.%02X", b1,b2,b3,b4)
+end
 
 local ipprefixdb   = {
 
@@ -149,8 +153,8 @@ local ipprefixdb   = {
 		return f, err 
 	end
 	tbl.ldb_iterator=tbl.ldb:create_iterator()
-
 	tbl.set_databasename(tbl,"0")
+	return true
   end,
 
   -- set databasename 

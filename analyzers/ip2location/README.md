@@ -50,6 +50,21 @@ Processing ./IP2LOCATION-LITE-DB3.CSV
 
 Login as admin , go to Context : default > Admin Tasks > Start/Stop Tasks. Restart the probe
 
+## Manual lookup using the checkip tool
+
+The app includes the `checkip.lua` tool , you can run this manually to look up ANY ip from the command line
+
+````
+root@ubuntu16prod# luajit checkip.lua 193.77.148.62
+
+IP2Location Report for IP 193.77.148.62
+Key  :C1.4D.94.3E
+ASN  :5603 Formerly SiOL Internet d.o.o.
+CTRY :SI Slovenia
+CITY :SI_Metlika
+
+````
+
 ## Viewing data 
 
 This app creates four new counter groups starting with "IP2LOC-Country/ASN/City/Proxy". Go to Retro > Counter to start your analysis.
