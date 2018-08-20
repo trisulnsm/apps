@@ -44,13 +44,11 @@ fi
 curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/alienvault-otx/otx2leveldb.rb
 ruby ./otx2leveldb.rb $API_KEY   trisul-intel.level
 
-cp -r trisul-intel.level /usr/local/share/trisul-probe/plugins/trisul-intel.level.0
-cp -r trisul-intel.level /usr/local/share/trisul-probe/plugins/trisul-intel.level.1
+cp -rf trisul-intel.level /usr/local/share/trisul-probe/plugins/trisul-intel.level.0
+cp -rf trisul-intel.level /usr/local/share/trisul-probe/plugins/trisul-intel.level.1
 
 OWNERGROUP=$(stat -c '%U.%G' /usr/local/share/trisul-probe/plugins)
 echo "  + Changing permission of feed to $OWNERGROUP"
-cp -r trisul-intel.level /usr/local/share/trisul-probe/plugins/trisul-intel.level.0
-cp -r trisul-intel.level /usr/local/share/trisul-probe/plugins/trisul-intel.level.1
 chown -R $OWNERGROUP  /usr/local/share/trisul-probe/plugins/trisul-intel.level.*
 
 echo "  + Successfully installed OTX feed"

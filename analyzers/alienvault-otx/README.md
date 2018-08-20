@@ -16,14 +16,12 @@ The first thing you need to do is to get an [AlienVault OTX API Key](https://otx
 
 
 > *Prerequisties*   The installation process needs Ruby and LevelDB installed
-> apt install build-essential
-> apt install ruby
-> apt install libleveldb1v5 
+> apt install build-essential ruby libleveldb1v5 
 > gem install rake faraday leveldb 
 
 ````lua
 curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/alienvault-otx/installfeed.sh
-bash ./installfeed.sh 
+bash ./installfeed.sh  ALIENVAULT_API_KEY 
 
 ````
 
