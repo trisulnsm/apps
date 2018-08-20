@@ -14,6 +14,17 @@ if ! [[ -x "$(command -v luajit)" ]]; then
   exit 1
 fi
 
+if ! [[ -x "$(command -v wget)" ]]; then
+  echo 'Error: wget is not installed. Use apt install wget or yum install wget to install' >&2
+  exit 1
+fi
+
+if ! [[ -x "$(command -v unzip)" ]]; then
+  echo 'Error: unzip is not installed. Use apt install unzip or yum install unzip to install' >&2
+  exit 1
+fi
+
+
 DOWNLOAD_TOKEN=$1
 
 echo "  + Using download token : $DOWNLOAD_TOKEN"

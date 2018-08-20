@@ -23,28 +23,7 @@ curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2lo
 bash installfeed.sh DOWNLOAD_TOKEN
 ````
 
-Run the `installfeed.sh` helper script with the DOWNLOAD_TOKEN to get and compile the database. Usage `./installfeed.sh DOWNLOAD_TOKEN`  
-
-#### Example run 
-
-> Note: This can take about 5 minutes
-
-````bash
-root@unpl:~# ./installfeed.sh xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-Using download token :  xxxxxxxxxxxxxxx
-Using proxy          :  http://192.168.2.11:3128
-Archive:  DB3LITE.ZIP
-Archive:  DBASNLITE.ZIP
-Archive:  PX2LITE.ZIP
-compile_ip2loc:  Compiling IP2LOCATION files in . into the LevebDB dirtrisul-ip2loc-0.level
-Processing ./IP2LOCATION-LITE-ASN.CSV
-100k...
-600k...
-./IP2LOCATION-LITE-ASN.CSV:Loaded 634445 subnets in 9 seconds. Mem usage = -19.7119140625 KB
-Processing ./IP2LOCATION-LITE-DB3.CSV
-100k...
-200k...
-````
+> *5 minutes* The compilation can take up to 5 minutes. Please be patient. 
 
 ### 2. Restart probe
 
@@ -101,10 +80,10 @@ UPDATES
 =======
 
 ````
-0.0.5		Aug 17 2018			Added a helper script installfeed.sh to prepare the lists and
+0.0.5       Aug 17 2018         Added a helper script installfeed.sh to prepare the lists and
                                 flow per ASN,Country,City,Proxy
-0.0.3		May 23 2018			Added cron script to DL and compile 
-0.0.2		May 22 2018			Initial release 
+0.0.3       May 23 2018         Added cron script to DL and compile 
+0.0.2       May 22 2018         Initial release 
 ````
 
 
