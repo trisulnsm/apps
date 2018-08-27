@@ -1,0 +1,17 @@
+name: Umbrella Top-1M
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Tracks DNS queries outside the Top-1-Million 
+   long:  |
+      Uses the Cisco Umbrella Top-1M to mark and measure DNS hits outside of
+      Cisco Umbrella Top-1Million domains. A new counter group is created. 
+
+apptype: lua
+
+appresources: compile-top1m.lua dns-resource.lua installfeed.sh
+
+dependencies:  
