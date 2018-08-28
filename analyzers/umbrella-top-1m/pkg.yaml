@@ -1,6 +1,6 @@
 name: Umbrella Top-1M
 
-version: 0.0.1
+version: 0.0.2
 
 author: trisul
 
@@ -12,6 +12,6 @@ description:
 
 apptype: lua
 
-appresources: compile-top1m.lua dns-resource.lua installfeed.sh
+appresources: compile-top1m.lua dns-resource.lua installfeed.sh tris_leveldb.lua 
 
 dependencies:  
