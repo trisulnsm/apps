@@ -47,7 +47,7 @@ TrisulPlugin = {
     onflush = function(engine, resource) 
       if T.ldb==nil then return end 
       local v=T.ldb:getval(resource:uri())
-      if v  then
+      if v == nil   then
         engine:update_counter("{3317EEB3-CE83-4C8F-E321-79E7194BD974}",
                     resource:uri(),
                     0,
