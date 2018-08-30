@@ -28,10 +28,10 @@ echo "  + Downloading Top-1M list from umbrella-static"
 curl -O  http://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip
 
 echo "  + Unzipping" 
-unzip http://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip
+unzip top-1m.csv.zip
 
 echo "  + Downloading compiler script"
-curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/cisco-umbrella-top1m/compile-top1m.lua
+curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/umbrella-top-1m/compile-top1m.lua
 
 echo "  + Compiling the list into a LevelDB database for use by Trisul"
 luajit compile-top1m.lua  top-1m.csv  
