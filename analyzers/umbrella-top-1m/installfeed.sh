@@ -39,8 +39,10 @@ luajit compile-top1m.lua  top-1m.csv   umbrella.level
 
 OWNERGROUP=$(stat -c '%U.%G' /usr/local/share/trisul-probe/plugins)
 echo "  + Changing permission of feed to $OWNERGROUP"
-cp -r umbrella.level /usr/local/share/trisul-probe/plugins/umbrella.level.0
-cp -r umbrella.level /usr/local/share/trisul-probe/plugins/umbrella.level.1
+mkdir -p /usr/local/share/trisul-probe/plugins/umbrella.level.0
+mkdir -p /usr/local/share/trisul-probe/plugins/umbrella.level.1
+cp -r umbrella.level/* /usr/local/share/trisul-probe/plugins/umbrella.level.0
+cp -r umbrella.level/* /usr/local/share/trisul-probe/plugins/umbrella.level.1
 chown -R $OWNERGROUP  /usr/local/share/trisul-probe/plugins/umbrella.level.*
 
 echo "  + Success" 
