@@ -28,13 +28,13 @@ echo "  + Downloading Top-1M list from umbrella-static"
 curl -O  http://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip
 
 echo "  + Unzipping" 
-unzip top-1m.csv.zip
+unzip -f top-1m.csv.zip
 
 echo "  + Downloading compiler script"
 curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/umbrella-top-1m/compile-top1m.lua
 
-echo "  + Compiling the list into a LevelDB database for use by Trisul"
-luajit compile-top1m.lua  top-1m.csv  
+echo "  + Compiling the list into a LevelDB database umbrella.level "
+luajit compile-top1m.lua  top-1m.csv   umbrella.level
 
 
 OWNERGROUP=$(stat -c '%U.%G' /usr/local/share/trisul-probe/plugins)
