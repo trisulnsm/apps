@@ -21,9 +21,9 @@ if not status then
     return false;
 end
 
--- push each  into leveldb 
+-- push each  into leveldb  - regex 
 for l in f:lines() do 
-	local h = l:match("%d+,(%S+)")
+	local h = l:match("%d+[,%s]+(%S+)")
 	ldb:put(h,"1")
 end 
 

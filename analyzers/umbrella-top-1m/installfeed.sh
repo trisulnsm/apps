@@ -31,10 +31,10 @@ echo "  + Downloading Quantcast-Top1M"
 curl -O  https://ak.quantcast.com/quantcast-top-sites.zip
 
 echo "  + Unzipping Cisco Umbrella" 
-unzip -f top-1m.csv.zip
+unzip -o top-1m.csv.zip
 
 echo "  + Unzipping Quantcast" 
-unzip -f quantcast-top-sites.zip
+unzip -o quantcast-top-sites.zip
 
 echo "  + Downloading compiler script"
 curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/umbrella-top-1m/compile-top1m.lua
