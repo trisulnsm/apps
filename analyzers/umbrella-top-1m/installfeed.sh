@@ -27,15 +27,24 @@ done
 echo "  + Downloading Top-1M list from umbrella-static"
 curl -O  http://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip
 
-echo "  + Unzipping" 
+echo "  + Downloading Quantcast-Top1M" 
+curl -O  https://ak.quantcast.com/quantcast-top-sites.zip
+
+echo "  + Unzipping Cisco Umbrella" 
 unzip -f top-1m.csv.zip
+
+echo "  + Unzipping Quantcast" 
+unzip -f quantcast-top-sites.zip
 
 echo "  + Downloading compiler script"
 curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/umbrella-top-1m/compile-top1m.lua
+curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/umbrella-top-1m/tris_leveldb.lua
 
-echo "  + Compiling the list into a LevelDB database umbrella.level "
+echo "  1 Umbrella  : Compiling the list into a LevelDB database umbrella.level "
 luajit compile-top1m.lua  top-1m.csv   umbrella.level
 
+echo "  2 Quantcast : Compiling the list into a LevelDB database umbrella.level "
+luajit compile-top1m.lua  Quantcast-Top-Million.txt  umbrella.level
 
 OWNERGROUP=$(stat -c '%U.%G' /usr/local/share/trisul-probe/plugins)
 echo "  + Changing permission of feed to $OWNERGROUP"

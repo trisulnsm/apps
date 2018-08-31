@@ -10,6 +10,9 @@ Some of the uses can be to
 3. Iterative - you can add whitelisted based on your enterprise and fine tune this list 
 
 
+> Added Quantcast-Top-1M to this as well. So any domain that is not in either of the lists
+> can be truly said to be outside Top-1M 
+
 ## Installing 
 
 To install this APP logon as admin, then select APP from _Web Admin > Manage > Apps._
