@@ -1,0 +1,19 @@
+name: Protocol Tree Viewer 
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: View metrics in a Protocol Tree 
+   long:  |
+      If you installed the Protocol Tree Lua Plugin you will get 
+      a breakup of protocls by ip/udp/tcp in a tree format. 
+      This plugin is a visualization of that. 
+
+apptype: dashboard_js
+
+appresources: new-prototree.js
+
+dependencies: 

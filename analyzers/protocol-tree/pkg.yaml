@@ -1,0 +1,16 @@
+name: Protocol Tree Metrics
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Generates metrics in a protocol tree 
+   long:  |
+      Break up of traffic by protocol, not just the final protocol but by IP/IPv6/TCP/UDP
+
+apptype: lua
+
+appresources: cg_protocol_tree.lua  ptree_ethernet.lua  sweepbuf.lua
+
+dependencies: 
