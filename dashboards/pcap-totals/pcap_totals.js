@@ -213,9 +213,11 @@ function update_totals(mod,k)
   var data = h_fmtvol(k.data)
   if(_.has(k,"url")){
     var t = $("<a>",{class:"label label-"+cls,style:"font-size:130%",href:k.url,target:"_blank"}).text(data);
+	t.attr('title',k.data);
   }
   else{
     var t = $("<span>",{class:"label label-"+cls,style:"font-size:130%"}).text(fmt_number(data));
+	t.attr('title',k.data);
   }
   pt.find('.panel-body').append(header);
   pt.find('.panel-body').append(t);
