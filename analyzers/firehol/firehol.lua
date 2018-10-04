@@ -140,6 +140,7 @@ TrisulPlugin = {
     if not file_exists(firehol_intel_file) then return nil end 
     local h = io.popen("md5sum   "..firehol_intel_file)
     local md5=  h:read("*a"):match('%w+') 
+	h:close() 
     if T.intel_file_hashes[ firehol_intel_file ]  ~= md5 then
       T.log("Reloading FireHOL list , change detected")
       T.intel_file_hashes[ firehol_intel_file ] = md5
