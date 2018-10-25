@@ -19,6 +19,14 @@ To install this APP logon as admin, then select APP from _Web Admin > Manage > A
 
 Post install ,  run the `installfeed.sh` script to keep the FireHOL list updated as shown below 
 
+### Prerequisites
+
+This app needs the following packages installed
+
+* luajit  - `apt install luajit`
+* unzip - `apt install unzip`
+* libleveldb  - `apt install libleveldb1v5` for CentOS see [leveldb for CentOS](https://github.com/trisulnsm/apps/tree/master/analyzers/passive-dns#dependency-on-leveldb)
+
 
 ### 1. Installing the feed 
 

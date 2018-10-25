@@ -11,7 +11,7 @@ pushd  /tmp
 programs=(luajit wget unzip)
 for p in ${programs[@]}; do
 	if ! [[ -x "$(command -v $p)" ]]; then
-	  echo 'Error: $p is not installed. Try apt install $p or yum install $p' >&2
+	  echo "Error: $p is not installed. Try apt install $p or yum install $p" >&2
 	  exit 1
 	fi
 done 
@@ -19,7 +19,7 @@ done
 libs=(libleveldb)
 for p in ${libs[@]}; do
 	if ! ldconfig -p | grep -q $p ;  then
-	  echo 'Error: $p is not installed. ' >&2
+	  echo "Error: $p is not installed. " >&2
 	  exit 1
 	fi 
 done
