@@ -9,7 +9,7 @@ This APP requires you to first install the [IOC-Harvestor Trisul APP](https://gi
 
 ## Getting the AlienVault OTX into a LevelDB database
 
-First, go on OTX and get an [AlienVault OTX API Key](https://otx.alienvault.com/). Next,  on OTX subscribe to any number of *Pulses* . Pulses are collections of IOCs from various sources.  Compile the IOCs from OTX into a LevelDB database using the `installfeed.sh` script as shown below.
+First, go on OTX and get an [AlienVault OTX API Key](https://otx.alienvault.com/). Next,  on OTX subscribe to any number of *Pulses* . Pulses are collections of IOCs from various sources.  
 
 ### Pre-requisites Ruby and LevelDB 
 
@@ -31,11 +31,20 @@ gem install rake faraday leveldb
 
 ## Installing the AlienVault OTX Feed 
 
+Compile the IOCs from OTX into a LevelDB database using the `installfeed.sh` script as shown below.
+
 ````lua
 curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/alienvault-otx/installfeed.sh
 bash ./installfeed.sh  ALIENVAULT_API_KEY 
 
 ````
+
+### Where to find the API KEY
+
+Login to your AlienVault OTX account and copy paste the API key. You can find it here
+
+![API Key](whereisapikey.png)
+
 
 
 ## Viewing the alerts

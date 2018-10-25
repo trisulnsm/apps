@@ -21,7 +21,9 @@ Post install ,  run the `installfeed.sh` script to keep the FireHOL list updated
 
 ### Prerequisites
 
-This app needs the following packages installed
+This app needs the following packages installed.
+
+> Ubuntu 18.04 note : add the `universe` repository using `sudo add-apt-repository universe`
 
 * luajit  - `apt install luajit`
 * unzip - `apt install unzip`
