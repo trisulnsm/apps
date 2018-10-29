@@ -1,0 +1,20 @@
+name: Simple executive
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: Top Inbound , Outbound Apps and risky traffics
+   long:  |
+      This dashboard shows top Inbound source,destinations
+      top outbound source,destinations,Top Apps
+      top sources,destinations 
+
+
+apptype: dashboard_share
+
+appresources: dash_live.json dash_retro.json
+
+dependencies : 

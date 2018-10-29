@@ -1,0 +1,202 @@
+{
+  "WebtrisulDashboard": [
+    [
+      {
+        "id": 10002,
+        "webtrisul_addon_package_id": 1,
+        "trisul_web_user_id": 2,
+         "key": "simpleexecutivel",
+        "name": "Simple Executive",
+        "description": "Executive dashboard contains top inbound,outbound sources,destinations,apps",
+        "moduri": "/webtrisul_module/getmod",
+        "axupdateuri": "/newdash/traffic_axsavepos",
+        "collapsedmods": null,
+        "undecoratedmods": null,
+        "pos_head": null,
+        "pos_left": null,
+        "pos_right": null,
+        "pos_foot": null,
+        "pos_top1": "",
+        "pos_top2": "10012,10016,10013,10019,10014,10022,10024|133,10017,10018,10020,10021,10023,10025",
+        "pos_mid3": "||",
+        "pos_bot2": "|",
+        "pos_bot1": "",
+        "pos_mid4": "|||",
+        "pos_reserved1": null,
+        "pos_reserved2": null,
+        "pos_reserved3": null,
+        "dashboard_type": "LIVE"
+      }
+    ],
+    [
+      {
+        "id": 10012,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 34,
+        "name": "Outbound Traffic",
+        "description": "outbound traffic relative to your home network",
+        "options": "{\"recentsecs\":21600,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"AREA\",\"title\":\"Outbound\",\"models\":\"[[\\r\\n    \\\"{393B5EBC-AB41-4387-8F31-8077DB917336}\\\",\\r\\n    \\\"DIR_OUTOFHOME\\\",\\r\\n    0,\\r\\n    \\\"Outbound\\\"\\r\\n  ]\\r\\n]\"}",
+        "stretch_to_fit": 0,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 0
+      },
+      {
+        "id": 10016,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": " Outbound Destinations",
+        "description": "In the latest 5 minutes (the default topper time interval) these are the Top outbound destinations traffic.&lt;br/&gt;&lt;br/&gt; &lt;strong&gt;Internal Hosts&lt;/strong&gt; are those hosts that are in your Home Network IP range.  Login as admin and specify your home network IP ranges for most accuracy .",
+        "options": "{\"name\":\"Internal Hosts\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{00AA77BB-0063-11A5-8380-FEBDBABBDBEA}\",\"statid\":1,\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10013,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 34,
+        "name": "Inbound Traffic",
+        "description": "Inbound traffic relative to your home network",
+        "options": "{\"recentsecs\":21600,\"width\":350,\"bucketsize\":\"0\",\"height\":300,\"surface\":\"AREA\",\"title\":\"Inbound\",\"models\":\"[\\r\\n  [\\r\\n    \\\"{393B5EBC-AB41-4387-8F31-8077DB917336}\\\",\\r\\n    \\\"DIR_INTOHOME\\\",\\r\\n    0,\\r\\n    \\\"Inbound\\\"\\r\\n  ]\\r\\n]\"}",
+        "stretch_to_fit": 0,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 0
+      },
+      {
+        "id": 10019,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Inbound Sources",
+        "description": "In the latest 5 minutes (the default topper time interval) these are the Top inbound sources traffic.&lt;br/&gt;&lt;br/&gt; &lt;strong&gt;Internal Hosts&lt;/strong&gt; are those hosts that are in your Home Network IP range.  Login as admin and specify your home network IP ranges for most accuracy .",
+        "options": "{\"name\":\"External Hosts\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{00AA77BB-0063-11A5-8380-FEBDBABBDBEA}\",\"statid\":2,\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10014,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 4,
+        "name": " Topper Chart Apps",
+        "description": "Top Apps in selected interval",
+        "options": "{\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"topcount\":10,\"statid\":\"0\",\"recentsecs\":900,\"units\":\"B\",\"width\":400,\"height\":300,\"surface\":\"PIE\"}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10022,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Top  Sources",
+        "description": "In the latest 5 minutes (the default topper time interval) these are the Top  sources.",
+        "options": "{\"name\":\"Apps\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}\",\"statid\":2,\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10024,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Base Domains",
+        "description": "In the latest 5 minutes (the default topper time interval) these are the Top  base domains.",
+        "options": "{\"name\":\"Apps\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{74FE9532-EDEB-421E-BD92-B5C62E7F2346}\",\"statid\":\"0\",\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 133,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Outbound Sources",
+        "description": "In the latest 5 minutes (the default topper time interval) these are the Top outbound sources traffic.&lt;br/&gt;&lt;br/&gt; &lt;strong&gt;Internal Hosts&lt;/strong&gt; are those hosts that are in your Home Network IP range.  Login as admin and specify your home network IP ranges for most accuracy .",
+        "options": "{\"name\":\"Internal Hosts\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{889900CC-0063-11A5-8380-FEBDBABBDBEA}\",\"statid\":2,\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10017,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": " Outbound Apps",
+        "description": "In the latest 5 minutes (the default topper time interval) these are the Top outbound apps traffic.&lt;br/&gt;&lt;br/&gt; &lt;strong&gt;Internal Hosts&lt;/strong&gt; are those hosts that are in your Home Network IP range.  Login as admin and specify your home network IP ranges for most accuracy .",
+        "options": "{\"name\":\"Internal Hosts\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"statid\":3,\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10018,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Inbound Destinations",
+        "description": "In the latest 5 minutes (the default topper time interval) these are the Top inbound destinations traffic.&lt;br/&gt;&lt;br/&gt; &lt;strong&gt;Internal Hosts&lt;/strong&gt; are those hosts that are in your Home Network IP range.  Login as admin and specify your home network IP ranges for most accuracy .",
+        "options": "{\"name\":\"Internal Hosts\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{889900CC-0063-11A5-8380-FEBDBABBDBEA}\",\"statid\":1,\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10020,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Inbound Apps",
+        "description": "In the latest 5 minutes (the default topper time interval) these are the Top Inbound apps traffic.&lt;br/&gt;&lt;br/&gt; &lt;strong&gt;Internal Hosts&lt;/strong&gt; are those hosts that are in your Home Network IP range.  Login as admin and specify your home network IP ranges for most accuracy .",
+        "options": "{\"name\":\"Apps\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"statid\":2,\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10021,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Top Apps",
+        "description": "In the latest 5 minutes (the default topper time interval) these are the Top  apps traffic.&lt;br/&gt;&lt;br/&gt; &lt;strong&gt;Internal Hosts&lt;/strong&gt; are those hosts that are in your Home Network IP range.  Login as admin and specify your home network IP ranges for most accuracy .",
+        "options": "{\"name\":\"Apps\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"statid\":\"0\",\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10023,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Top  Destinations",
+        "description": "In the latest 5 minutes (the default topper time interval) these are the Top  Destinations.",
+        "options": "{\"name\":\"Apps\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}\",\"statid\":1,\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10025,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Risky traffic",
+        "description": "In the latest 5 minutes ",
+        "options": "{\"name\":\"Apps\",\"topcount\":10,\"autotooltips\":true,\"cgguid\":\"{A0FA9464-B496-4A20-A9AB-4D2D09AFF902}\",\"statid\":\"0\",\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      }
+    ]
+  ]
+}
