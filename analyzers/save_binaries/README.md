@@ -1,5 +1,7 @@
 # Save EXE, PE, DLL, FLASH, PDF, ISO 
 
+![logo](thumbnail.png)
+
 Install this app and immediately start dumping potentially malicious binaries 
 transferred via HTTP to `/tmp/savedfiles`
 
