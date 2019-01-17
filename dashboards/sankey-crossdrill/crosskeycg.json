@@ -1,0 +1,36 @@
+{
+  "TrisulCounterGroupCrosskey": [
+    [
+      {
+        "id": 1,
+        "CounterGUID": "{66B3EC45-F8AC-6CF3-CB1B-498A5A6D1ED4}",
+        "ParentCounterGUID": "{889900CC-0063-11A5-8380-FEBDBABBDBEA}",
+        "CrosskeyCounterGUID": "{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}",
+        "CrosskeyThirdCounterGUID": "{00AA77BB-0063-11A5-8380-FEBDBABBDBEA}",
+        "KeyLength1": null,
+        "KeyLength2": null,
+        "KeyLength3": null
+      }
+    ],
+    [
+      {
+        "id": 50,
+        "CounterGUID": "{66B3EC45-F8AC-6CF3-CB1B-498A5A6D1ED4}",
+        "Name": "Flowapp",
+        "Description": "flowapp",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 60000,
+        "TrackHiWater": 10000,
+        "TrackLoWater": 1000,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Active",
+        "CardinalityEstimateBits": null,
+        "TopperTrafficOnly": "False",
+        "EnableSliceKeys": null,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1547450461
+      }
+    ]
+  ]
+}
