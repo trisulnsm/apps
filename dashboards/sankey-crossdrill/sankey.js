@@ -133,7 +133,9 @@ class SankeyCrossDrill  {
     var cgtoppers_bytes = $.merge([], this.cgtoppers_bytes.keys);
     //remove n.of toppers for slider
     if(this.remove_topper_count  > 0){
-      cgtoppers_bytes = cgtoppers_bytes.slice(this.remove_topper_count,cgtoppers_bytes.length);
+      var sysgroup = cgtoppers_bytes[0];
+      cgtoppers_bytes = cgtoppers_bytes.slice(this.remove_topper_count+1,cgtoppers_bytes.length);
+      cgtoppers_bytes.unshift(sysgroup)
     }
 
     let keylookup = {};
