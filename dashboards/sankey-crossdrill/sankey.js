@@ -26,8 +26,7 @@ class SankeyCrossDrill  {
      this.form.find("input[name*='fltr_crs_items']").attr("id","fltr_crs_"+this.rand_id);
 
     $('#'+this.divid).append(this.form);
-    this.chart_div_id = 'sankey_chart_'+this.rand_id;
-    $('#'+this.divid).append($("<div>",{id:this.chart_div_id}));
+    
 
     //time selector
     var update_ids = "#from_date_"+this.rand_id+","+"#to_date_"+this.rand_id;
@@ -87,6 +86,7 @@ class SankeyCrossDrill  {
   }
   //bind the form values to get toppers
   submitform(){
+    this.reset();
     var selected_fromdate = $('#from_date_'+this.rand_id).val();
     var selected_todate = $('#to_date_'+this.rand_id).val();
     var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
@@ -97,6 +97,12 @@ class SankeyCrossDrill  {
     this.filter_text=$('#fltr_crs_'+this.rand_id).val();
     this.run();
     return false;
+  }
+  reset(){
+    $('#'+this.divid).find(".panel").remove();
+    $('#'+this.divid).append("<div class='panel panel-info'> <div class='panel-body'> <h4> <i class='fa fa-spinner fa-spin'></i> Pleae wait ....  </h4> </div> </div>");
+    this.chart_div_id = 'sankey_chart_'+this.rand_id;
+    $('#'+this.divid).find(".panel-body").append($("<div>",{id:this.chart_div_id}));
   }
 
 
@@ -123,7 +129,7 @@ class SankeyCrossDrill  {
     //find statid type 
     var meter_types = this.cg_meters.all_meters_type[this.cgguid];
     if(_.size(meter_types) == 0 ){
-       meter_types = this.cg_meters.all_meters_type[crosskey_cgguids[0]];
+      meter_types = this.cg_meters.all_meters_type[crosskey_cgguids[0]];
     }
     //multiply by bucket_size if type = "Bps" or 4
     if(meter_types[this.meter].type!=4){
@@ -131,11 +137,12 @@ class SankeyCrossDrill  {
     }
     this.links  = { source : [], target : [], value : [] };
     var cgtoppers_bytes = $.merge([], this.cgtoppers_bytes.keys);
+    cgtoppers_bytes = _.reject(cgtoppers_bytes, function(ai){
+      return ai.key=="SYS:GROUP_TOTALS";
+    });
     //remove n.of toppers for slider
     if(this.remove_topper_count  > 0){
-      var sysgroup = cgtoppers_bytes[0];
       cgtoppers_bytes = cgtoppers_bytes.slice(this.remove_topper_count+1,cgtoppers_bytes.length);
-      cgtoppers_bytes.unshift(sysgroup)
     }
 
     let keylookup = {};
@@ -180,27 +187,25 @@ class SankeyCrossDrill  {
         if (parts[2]) {
           parts[2]=resolved_keys[2][parts[2]];
         }
-        //no resolve for SYS:GROUP_TOTALS
-        if (k.match(/SYS:/)) continue;
         cgtoppers_bytes[i].label=parts.join("_");
     }
     if(this.filter_text){
       var reg_exp = new RegExp(this.filter_text,"i")
       cgtoppers_bytes = _.select(cgtoppers_bytes,function(item){
         let k=item.label;
-        return k.match(reg_exp) || k.match(/SYS:/)
+        return k.match(reg_exp)
       });
     }
 
     //always show top 25 
-    cgtoppers_bytes = cgtoppers_bytes.slice(0,25)
+    cgtoppers_bytes = cgtoppers_bytes.slice(0,30)
     
     for (let i =0 ; i < cgtoppers_bytes.length; i++)
     { 
         //convert label to resolved lable
         let k=cgtoppers_bytes[i].label;
         let parts=k.split("_");
-        keylookup[parts[0]] = keylookup[parts[0]] || idx++;
+        keylookup[parts[0]] = keylookup[parts[0]]==undefined ? idx++ : keylookup[parts[0]];
         keylookup[parts[1]] = keylookup[parts[1]] || idx++;
         if (parts[2]) {
           keylookup[parts[2]] = keylookup[parts[2]] || idx++;
@@ -212,7 +217,6 @@ class SankeyCrossDrill  {
     {
         let item=cgtoppers_bytes[i];
         let k=item.label;
-        if (k.match(/SYS:/)) continue;
         let parts=k.split("_");
         if (parts[2]) {
           this.links.source.push(keylookup[parts[0]])
@@ -229,12 +233,13 @@ class SankeyCrossDrill  {
         }
 
     }
-    this.labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0]).value();
+    this.labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0]).value()
     // convert this into this.
     this.repaint();
   }
 
   repaint() {
+    $('#'+this.divid).find(".panel-body h4").remove();
     Plotly.purge(this.chart_div_id);
     var data = {
       type: "sankey",
@@ -252,14 +257,21 @@ class SankeyCrossDrill  {
       link: this.links
     }
 
-
+    //width of div widht
+    var width = $('#'+this.divid).width();
+    width = parseInt(width)-50;
+    var height = this.labels.length *50;
+    if(height < 500){
+      height =500;
+    }
     var layout = {
       title: this.cg_meters.all_cg_meters[this.cgguid][0],
+      width:width,
+      height:height,
       font: {
         size: 10
       },
-      autosize:false,
-      height:1000
+      
     }
 
     var data = [data]
@@ -324,4 +336,13 @@ function run(opts)
       %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Show Chart"}
 
   
+*/
+
+/*
+.panel.panel-info
+  .panel-body
+    %h4
+      %i.fa.fa-spinner.fa-spin
+      Pleae wait ....
+
 */
