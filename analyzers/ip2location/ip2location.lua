@@ -100,6 +100,14 @@ TrisulPlugin = {
 			TrisulPlugin.update_metrics(engine, flow, "{E85FEB77-942C-411D-DF12-5DFCFCF2B932}",  key, label) 
 		end
 
+
+		T.ldb:set_databasename("STATE")
+		local val = T.ldb:lookup_prefix(ip)
+		if val then 
+			local key,label = val:match("(%S+)%s*(.*)")
+			TrisulPlugin.update_metrics(engine, flow, "{5C28445E-19E3-499E-E14D-E4CC7128B62B}",  key, label) 
+		end
+
 		T.ldb:set_databasename("PROXY")
 		local val = T.ldb:lookup_prefix(ip)
 		if val then 

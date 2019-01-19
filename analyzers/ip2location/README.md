@@ -14,9 +14,9 @@ To install this APP logon as admin, then select APP from _Web Admin > Manage > A
 
 ### 1. Install the IP2LOCATION databases 
 
-To proceed further you need to obtain a `DOWNLOAD_TOKEN` from the IP2Location website.
+> To proceed further you need to obtain a `DOWNLOAD_TOKEN` from the [IP2Location website](https://lite.ip2location.com/) 
 
-Download the helper script found in this directory `installfeed.sh` to download and compile the databases. 
+Get the installer script `installfeed.sh` to download and compile the databases as shown below.
 
 ````
 curl -O  https://raw.githubusercontent.com/trisulnsm/apps/master/analyzers/ip2location/installfeed.sh
@@ -80,6 +80,7 @@ UPDATES
 =======
 
 ````
+0.0.6       Jan 19 2019         Added STATE within country wise 
 0.0.5       Aug 17 2018         Added a helper script installfeed.sh to prepare the lists and
                                 flow per ASN,Country,City,Proxy
 0.0.3       May 23 2018         Added cron script to DL and compile 
