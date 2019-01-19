@@ -98,7 +98,7 @@ process_csv_file=function( ldb, csv_file, cbfunc)
 	  if validline  then 
 		local linearr={}
 		for k in l:gmatch('".-"')  do
-			linearr[#linearr+1] = k:gsub('"','')
+			linearr[#linearr+1] = k:gsub('["%s]','')
 		end 
 		cbfunc( ldb, linearr) 
 		nitems = nitems + 1

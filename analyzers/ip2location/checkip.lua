@@ -35,6 +35,14 @@ else
 	print("CTRY not found ")
 end 
 
+ldb:set_databasename("STATE")
+local val = ldb:lookup_prefix(ip)
+if val then 
+	print("STATE:"..val)
+else
+	print("STATE not found ")
+end 
+
 ldb:set_databasename("CITY")
 local val = ldb:lookup_prefix(ip)
 if val then 
