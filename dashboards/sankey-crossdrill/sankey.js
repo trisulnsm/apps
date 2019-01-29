@@ -173,7 +173,7 @@ class SankeyCrossDrill  {
       }
       var resp=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,req_opts);
       _.each(resp.keys,function(keyt){
-        resolved_keys[i][keyt.key] = keyt.label.replace("_","-");
+        resolved_keys[i][keyt.key] = keyt.label.replace(/_/g,"-");
       });
     }
       
