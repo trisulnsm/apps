@@ -183,10 +183,11 @@ class SankeyCrossDrill  {
         //convert label to resolved lable
         let k=cgtoppers_bytes[i].label;
         let parts=k.split("_");
-        parts=[resolved_keys[0][parts[0]],resolved_keys[1][parts[1]],parts[2]]
+        parts=[resolved_keys[0][parts[0]],resolved_keys[1][parts[1]]]
         if (parts[2]) {
           parts[2]=resolved_keys[2][parts[2]];
         }
+        parts = _.map(parts,function(a,i){return a+":"+i })
         cgtoppers_bytes[i].label=parts.join("_");
     }
     if(this.filter_text){
@@ -233,7 +234,7 @@ class SankeyCrossDrill  {
         }
 
     }
-    this.labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0]).value()
+    this.labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2/g,"")).value()
     // convert this into this.
     this.repaint();
   }
