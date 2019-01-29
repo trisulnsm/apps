@@ -183,10 +183,15 @@ class SankeyCrossDrill  {
         //convert label to resolved lable
         let k=cgtoppers_bytes[i].label;
         let parts=k.split("_");
-        parts=[resolved_keys[0][parts[0]],resolved_keys[1][parts[1]]]
-        if (parts[2]) {
+        parts=[resolved_keys[0][parts[0]],resolved_keys[1][parts[1]],parts[2]]
+        if (parts[2]!=undefined) {
           parts[2]=resolved_keys[2][parts[2]];
+        }else{
+          parts = parts.slice(0,2)
         }
+        //adding some extra key if  link source and target is same
+        // for example hosts and http host resolved key is same
+        //It will lead a error
         parts = _.map(parts,function(a,i){return a+":"+i })
         cgtoppers_bytes[i].label=parts.join("_");
     }
