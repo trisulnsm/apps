@@ -17,7 +17,7 @@ class SankeyCrossDrill  {
 
     this.rand_id=parseInt(Math.random()*100000);
     this.form = $("<form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select name='cgguid'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Meter</label> <div class='col-xs-8'> <select name='meter'></select> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Remove Toppers</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider'> <div class='ui-slider-handle' id='custom-handle'></div> </div> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Filter Item</label> <div class='col-xs-8'> <input name='fltr_crs_items' type='text'> <div class='span help-block text-left'>Type text to filter crosskey items</div> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Show Chart'> </div> </div> </form>");
-    //all are random id only
+    //all are randomid only
     this.form.find("select[name*='cgguid']").attr("id","cg_id_"+this.rand_id);
     this.form.find("select[name*='meter']").attr("id","meter_id_"+this.rand_id);
     this.form.find(".new_time_selector").attr("id","new_time_selector_"+this.rand_id);
@@ -127,18 +127,18 @@ class SankeyCrossDrill  {
     }
 
     //find statid type 
-    var meter_types = this.cg_meters.all_meters_type[this.cgguid];
-    if(_.size(meter_types) == 0 ){
-      meter_types = this.cg_meters.all_meters_type[crosskey_cgguids[0]];
+    this.meter_types = this.cg_meters.all_meters_type[this.cgguid];
+    if(_.size(this.meter_types) == 0 ){
+     this.meter_types = this.cg_meters.all_meters_type[crosskey_cgguids[0]];
     }
     //multiply by bucket_size if type = "Bps" or 4
-    if(meter_types[this.meter].type!=4){
+    if(this.meter_types[this.meter].type!=4 && this.meter_types[this.meter].units=="Bps"){
       bucket_size=1;
     }
     this.links  = { source : [], target : [], value : [] };
     var cgtoppers_bytes = $.merge([], this.cgtoppers_bytes.keys);
     cgtoppers_bytes = _.reject(cgtoppers_bytes, function(ai){
-      return ai.key=="SYS:GROUP_TOTALS";
+      return ai.key=="SYS:GROUP_TOTALS" || ai.key.includes("_XX");
     });
     //remove n.of toppers for slider
     if(this.remove_topper_count  > 0){
@@ -173,7 +173,7 @@ class SankeyCrossDrill  {
       }
       var resp=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,req_opts);
       _.each(resp.keys,function(keyt){
-        resolved_keys[i][keyt.key] = keyt.label;
+        resolved_keys[i][keyt.key] = keyt.label.replace("_","-");
       });
     }
       
@@ -244,6 +244,7 @@ class SankeyCrossDrill  {
     var data = {
       type: "sankey",
       orientation: "h",
+      valuesuffix: this.meter_types[this.meter].units.replace("ps",""),
       node: {
         pad: 15,
         thickness: 30,
