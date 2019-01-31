@@ -148,53 +148,7 @@ class SankeyCrossDrill  {
     let keylookup = {};
     let idx=0;
     
-    //resolve keys  to show name
-    //get all itmes to resolve
-    //unresolved_keys=[["C0.A8.01.01"...],["p-0050"...],["34.AF.34.4F"..]]
-    //resolved_keys=[{C0.A8.01.01:localmcahine}]
-    var unresolved_keys = [[],[],[]];
-    var resolved_keys = [{},{},{}];
-    for (let i =0 ; i < cgtoppers_bytes.length; i++) 
-    {  
-        let k=cgtoppers_bytes[i].label;
-
-        let parts=k.split("_");
-        unresolved_keys[0].push(parts[0]);
-        unresolved_keys[1].push(parts[1]);
-        if (parts[2]) {
-         unresolved_keys[2].push(parts[2]);
-        }
-    }
     
-    for(let i =0; i < unresolved_keys.length ; i++){
-      var req_opts = {
-        counter_group:crosskey_cgguids[i],
-        keys:_.uniq(unresolved_keys[i])
-      }
-      var resp=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,req_opts);
-      _.each(resp.keys,function(keyt){
-        resolved_keys[i][keyt.key] = keyt.label.replace(/_/g,"-");
-      });
-    }
-      
-    //cgtopers convert to label to resolved item
-    for (let i =0 ; i < cgtoppers_bytes.length; i++)
-    { 
-        //convert label to resolved lable
-        let k=cgtoppers_bytes[i].label;
-        let parts=k.split("_");
-        parts=[resolved_keys[0][parts[0]],resolved_keys[1][parts[1]],parts[2]]
-        if (parts[2]!=undefined) {
-          parts[2]=resolved_keys[2][parts[2]];
-        }else{
-          parts = parts.slice(0,2)
-        }
-        //adding some extra key if  link source and target is same
-        // for example hosts and http host resolved key is same
-        //It will lead a error
-        parts = _.map(parts,function(a,i){return a+":"+i })
-        cgtoppers_bytes[i].label=parts.join("_");
-    }
     if(this.filter_text){
       var reg_exp = new RegExp(this.filter_text,"i")
       cgtoppers_bytes = _.select(cgtoppers_bytes,function(item){
@@ -203,14 +157,19 @@ class SankeyCrossDrill  {
       });
     }
 
-    //always show top 25 
+    //always show top 30 
     cgtoppers_bytes = cgtoppers_bytes.slice(0,30)
     
     for (let i =0 ; i < cgtoppers_bytes.length; i++)
-    { 
-        //convert label to resolved lable
+    {   
+        //change label to :0,:1,:2
+        //http host and host has same lable 
         let k=cgtoppers_bytes[i].label;
-        let parts=k.split("_");
+        let parts=k.split("/");
+        parts = _.map(parts,function(ai,ind){
+          return ai+":"+ind
+        });
+        cgtoppers_bytes[i].label=parts.join("/")
         keylookup[parts[0]] = keylookup[parts[0]]==undefined ? idx++ : keylookup[parts[0]];
         keylookup[parts[1]] = keylookup[parts[1]] || idx++;
         if (parts[2]) {
@@ -223,7 +182,7 @@ class SankeyCrossDrill  {
     {
         let item=cgtoppers_bytes[i];
         let k=item.label;
-        let parts=k.split("_");
+        let parts=k.split("/");
         if (parts[2]) {
           this.links.source.push(keylookup[parts[0]])
           this.links.target.push(keylookup[parts[1]])
