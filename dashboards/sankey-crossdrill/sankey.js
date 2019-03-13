@@ -138,7 +138,7 @@ class SankeyCrossDrill  {
     this.links  = { source : [], target : [], value : [] };
     var cgtoppers_bytes = $.merge([], this.cgtoppers_bytes.keys);
     cgtoppers_bytes = _.reject(cgtoppers_bytes, function(ai){
-      return ai.key=="SYS:GROUP_TOTALS" || ai.key.includes("_XX");
+      return ai.key=="SYS:GROUP_TOTALS" || ai.key.includes("XX");
     });
     //remove n.of toppers for slider
     if(this.remove_topper_count  > 0){
@@ -165,11 +165,11 @@ class SankeyCrossDrill  {
         //change label to :0,:1,:2
         //http host and host has same lable 
         let k=cgtoppers_bytes[i].label;
-        let parts=k.split("/");
+        let parts=k.split("\\");
         parts = _.map(parts,function(ai,ind){
           return ai.replace(/:0|:1|:2/g,"")+":"+ind;
         });
-        cgtoppers_bytes[i].label=parts.join("/")
+        cgtoppers_bytes[i].label=parts.join("\\")
         keylookup[parts[0]] = keylookup[parts[0]]==undefined ? idx++ : keylookup[parts[0]];
         keylookup[parts[1]] = keylookup[parts[1]] || idx++;
         if (parts[2]) {
@@ -182,7 +182,7 @@ class SankeyCrossDrill  {
     {
         let item=cgtoppers_bytes[i];
         let k=item.label;
-        let parts=k.split("/");
+        let parts=k.split("\\");
         if (parts[2]) {
           this.links.source.push(keylookup[parts[0]])
           this.links.target.push(keylookup[parts[1]])
