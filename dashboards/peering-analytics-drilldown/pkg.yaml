@@ -1,6 +1,6 @@
-name: Peering Analytics
+name: Peering Analytics Drilldown
 
-version: 0.0.2
+version: 0.0.1
 
 author: trisul
 
@@ -13,6 +13,6 @@ description:
 
 apptype: dashboard_js
 
-appresources: peering_analytics.js app.css 
+appresources: peering_analytics_drilldown.js app.css 
 
 dependencies: 

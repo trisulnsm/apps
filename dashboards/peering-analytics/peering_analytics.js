@@ -224,8 +224,8 @@ class ISPOverviewMapping{
     }
 
     this.draw_table();
-    this.draw_chart();
-    this.draw_sankey_chart();
+    await this.draw_chart();
+    await this.draw_sankey_chart();
   }
 
   draw_table(){
@@ -347,7 +347,7 @@ class ISPOverviewMapping{
         to_date:this.form.find("#to_date_"+this.rand_id).val(),
         valid_input:1
     };
-    await $.ajax({
+    $.ajax({
       url:"/trpjs/generate_chart",
       data:model_data,
       context:this,
@@ -482,7 +482,7 @@ class ISPOverviewMapping{
                         key: tr.data("key"),
                         statid:tr.data("statid"),
                         label:tr.data("label").replace(/\\/g,"\\\\"),
-                        readable:tr.data("readable").replace(/\\/g,"\\\\"),                        
+                        readable:`${tr.data("readable")}`.replace(/\\/g,"\\\\"),                        
                         cgguid:this.filter_cgguid,
                         ck_cgguid:this.crosskey_cgguid,
                         filter_cgname:this.filter_cgname,
