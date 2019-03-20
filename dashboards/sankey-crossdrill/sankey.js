@@ -65,7 +65,7 @@ class SankeyCrossDrill  {
                             }).each(function(a,b){
                               //if meter is empty get if from parent counter group
                             if(a[1].length==0){
-                             var parent_cgguid = cthis.cg_meters.crosskey[b][0];
+                             var parent_cgguid = cthis.cg_meters.crosskey[b][1];
                              a[1] = cthis.cg_meters.all_cg_meters[parent_cgguid][1];
                             }
                           })
@@ -129,7 +129,7 @@ class SankeyCrossDrill  {
     //find statid type 
     this.meter_types = this.cg_meters.all_meters_type[this.cgguid];
     if(_.size(this.meter_types) == 0 ){
-     this.meter_types = this.cg_meters.all_meters_type[crosskey_cgguids[0]];
+     this.meter_types = this.cg_meters.all_meters_type[crosskey_cgguids[1]];
     }
     //multiply by bucket_size if type = "Bps" or 4
     if(this.meter_types[this.meter].type!=4 && this.meter_types[this.meter].units=="Bps"){
