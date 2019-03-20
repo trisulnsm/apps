@@ -291,7 +291,7 @@ class ISPOverviewMapping{
     });
   }
 
-  draw_chart(){
+  async draw_chart(){
     this.dount_div_id = `dount_chart_${this.meter}_${this.rand_id}`;
     this.data_dom.find(`#isp_overview_${this.meter}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
     this.trfchart_div_id = `traffic_chart_${this.meter}_${this.rand_id}`;
@@ -347,7 +347,7 @@ class ISPOverviewMapping{
         to_date:this.form.find("#to_date_"+this.rand_id).val(),
         valid_input:1
     };
-    $.ajax({
+    await $.ajax({
       url:"/trpjs/generate_chart",
       data:model_data,
       context:this,
