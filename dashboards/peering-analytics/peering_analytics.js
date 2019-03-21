@@ -481,7 +481,7 @@ class ISPOverviewMapping{
                     $.param({
                         key: tr.data("key"),
                         statid:tr.data("statid"),
-                        label:tr.data("label").replace(/\\/g,"\\\\"),
+                        label:`${tr.data("label")}`.replace(/\\/g,"\\\\"),
                         readable:`${tr.data("readable")}`.replace(/\\/g,"\\\\"),                        
                         cgguid:this.filter_cgguid,
                         ck_cgguid:this.crosskey_cgguid,
