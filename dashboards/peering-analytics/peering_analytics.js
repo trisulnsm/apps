@@ -488,7 +488,7 @@ class ISPOverviewMapping{
                         filter_cgname:this.filter_cgname,
                         window_fromts:this.tmint.from.tv_sec,
                         window_tots:this.tmint.to.tv_sec,
-                        "dash_key":"ispdrilldown"
+                        "dash_key_regex":"gitPeeringAnalyticsDrilldown"
                     }));
         break;
       case 1:

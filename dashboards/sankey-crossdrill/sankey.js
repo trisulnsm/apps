@@ -172,8 +172,10 @@ class SankeyCrossDrill  {
         cgtoppers_bytes[i].label=parts.join("\\")
         keylookup[parts[0]] = keylookup[parts[0]]==undefined ? idx++ : keylookup[parts[0]];
         keylookup[parts[1]] = keylookup[parts[1]] || idx++;
-        if (parts[2]) {
-          keylookup[parts[2]] = keylookup[parts[2]] || idx++;
+        for(let i=2 ; i < parts.length;i++){
+          if (parts[i]) {
+            keylookup[parts[i]] = keylookup[parts[i]] || idx++;
+          }
         }
         
     }
@@ -183,17 +185,9 @@ class SankeyCrossDrill  {
         let item=cgtoppers_bytes[i];
         let k=item.label;
         let parts=k.split("\\");
-        if (parts[2]) {
-          this.links.source.push(keylookup[parts[0]])
-          this.links.target.push(keylookup[parts[1]])
-          this.links.value.push(parseInt(item.metric*bucket_size))
-          this.links.source.push(keylookup[parts[1]])
-          this.links.target.push(keylookup[parts[2]])
-          this.links.value.push(parseInt(item.metric*bucket_size))
-
-        } else {
-          this.links.source.push(keylookup[parts[0]])
-          this.links.target.push(keylookup[parts[1]])
+         for(let j=1;j < parts.length; j++){
+          this.links.source.push(keylookup[parts[j-1]]);
+          this.links.target.push(keylookup[parts[j]]);
           this.links.value.push(parseInt(item.metric*bucket_size))
         }
 

@@ -1,6 +1,11 @@
 class ISPDrilldownMapping{
   constructor(opts) {
-    $('head').append('<link rel="stylesheet" type="text/css" href="/plugins/app.css">');
+    let js_file =opts.jsfile;
+    let file_path = js_file.split("/")
+    file_path.pop()
+    file_path = file_path.join("/");
+    let css_file = `/plugins/${file_path}/app.css`;
+    $('head').append(`<link rel="stylesheet" type="text/css" href="${css_file}">`);
     this.dash_params = opts.dash_params;
     this.dom = $(opts.divid);
     this.time_selector = opts.new_time_selector;
