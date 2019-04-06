@@ -1,0 +1,18 @@
+name: Search Keys
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: Search keys to check any usage activity in your network
+   long:  |
+      For example : If you want to list of MAC address in your network
+      Select Mac from counter group and enter list of keys.
+
+apptype: dashboard_js
+
+appresources: search_keys.js
+
+dependencies: 
