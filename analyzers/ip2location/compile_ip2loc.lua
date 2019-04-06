@@ -30,6 +30,16 @@ function do_compile(csv_file_path, leveldb_path )
 						ldb:put_ipnum(k1,k2,linearr[4]..' '..linearr[5])
 				 end)
 
+	-- IPC (Ip country )
+	process_csv_file(ldb, csv_file_path.. "/IP2LOCATION-LITE-DB1.CSV",
+					 function(ldb, linearr)
+						local k1 = linearr[1]
+						local k2 = linearr[2]
+						ldb:set_databasename("CTRY");
+						ldb:put_ipnum(k1,k2,linearr[3]..' '..linearr[4])
+				 end)
+
+
 	-- IPR (Ip region  ) 
 	-- IPC (Ip countr  )
 	-- IPC (Ip city )

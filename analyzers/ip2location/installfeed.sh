@@ -10,9 +10,7 @@ fi
 
 
 if ! [[ -x "$(command -v luajit)" ]]; then
-  echo 'Error: luajit is not installed' >&2
-  echo '  Ubuntu:  apt install luajit' >&2
-  echo '  CentOS:  yum install epel-release and then yum install luajit ' >&2
+  echo 'Error: luajit is not installed. Use apt install luajit or yum install luajit to install' >&2
   exit 1
 fi
 
@@ -26,6 +24,15 @@ if ! [[ -x "$(command -v unzip)" ]]; then
   exit 1
 fi
 
+HASLEVEL=$(/sbin/ldconfig -p | grep libleveldb)
+if ! [[ -z  "$HASLEVEL" ]]; then
+  echo Found level db library : $HASLEVEL
+else
+  echo Error: leveldb not found
+  echo    Ubuntu:  apt install libleveldb1v5
+  echo    CentOS:  yum install leveldb
+  exit 1
+fi
 
 DOWNLOAD_TOKEN=$1
 
