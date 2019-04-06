@@ -21,9 +21,10 @@ TrisulPlugin = {
     },
 
     meters = {
-        {  0, T.K.vartype.RATE_COUNTER,      40, 40, "Total",          "Total",    "Bps" },
-        {  1, T.K.vartype.RATE_COUNTER,      40, 40, "Upload To",      "Upload To",   "Bps" },
+        {  0, T.K.vartype.RATE_COUNTER,      40, 40, "Total",          "Total",         "Bps" },
+        {  1, T.K.vartype.RATE_COUNTER,      40, 40, "Upload To",      "Upload To",     "Bps" },
         {  2, T.K.vartype.RATE_COUNTER,      40, 40, "Download From",  "Download From", "Bps" },
+        {  3, T.K.vartype.COUNTER,      	 40, 40, "Flows",  		   "Flows",         "flows" },
     },  
 
   },
