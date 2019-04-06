@@ -10,7 +10,9 @@ fi
 
 
 if ! [[ -x "$(command -v luajit)" ]]; then
-  echo 'Error: luajit is not installed. Use apt install luajit or yum install luajit to install' >&2
+  echo 'Error: luajit is not installed' >&2
+  echo '  Ubuntu:  apt install luajit' >&2
+  echo '  CentOS:  yum install epel-release and then yum install luajit ' >&2
   exit 1
 fi
 
