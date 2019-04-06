@@ -80,6 +80,7 @@ UPDATES
 =======
 
 ````
+0.0.7       Apr 6  2019         Supports DB1 (Country Only) mode and better install experience 
 0.0.6       Jan 19 2019         Added STATE within country wise 
 0.0.5       Aug 17 2018         Added a helper script installfeed.sh to prepare the lists and
                                 flow per ASN,Country,City,Proxy
