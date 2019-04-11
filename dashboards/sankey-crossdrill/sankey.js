@@ -54,10 +54,6 @@ class SankeyCrossDrill  {
     //loadonly crosskey counter groups
     this.cg_meters={};
     await get_counters_and_meters_json(this.cg_meters);
-    if(_.size(this.cg_meters.crosskey)  ==0 ){
-      $('#'+this.divid).html("<div class='alert alert-info'>No crosskey counter groups found</div>");
-      return true;
-    }
     
     for (var key in this.cg_meters.all_cg_meters) {
       let v = this.cg_meters.all_cg_meters[key];
@@ -105,9 +101,9 @@ class SankeyCrossDrill  {
     this.cgtoppers_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
       counter_group: this.cgguid,
       time_interval: this.tmint ,
-      meter:this.meter,
-      maxitems:1000
-    });
+      meter:parseInt(this.meter),
+      maxitems:10000
+    }); 
     this.prase_toppers();
   }
 
@@ -126,11 +122,12 @@ class SankeyCrossDrill  {
      this.meter_types = this.cg_meters.all_meters_type[crosskey_cgguids[1]];
     }
     //multiply by bucket_size if type = "Bps" or 4
-    if(this.meter_types[this.meter].type!=4 && this.meter_types[this.meter].units=="Bps"){
+    if(this.meter_types[this.meter].type!=4 && this.meter_types[this.meter].units!="Bps"){
       bucket_size=1;
     }
     this.links  = { source : [], target : [], value : [] };
     var cgtoppers_bytes = $.merge([], this.cgtoppers_bytes.keys);
+    cgtoppers_bytes = _.sortBy(cgtoppers_bytes,function(ck){return -ck.metric.toNumber()})
     cgtoppers_bytes = _.reject(cgtoppers_bytes, function(ai){
       return ai.key=="SYS:GROUP_TOTALS" || ai.key.includes("XX");
     });
@@ -192,7 +189,6 @@ class SankeyCrossDrill  {
   }
 
   repaint() {
-    console.log(this.labels)
     $('#'+this.divid).find(".panel-body h4").remove();
     Plotly.purge(this.chart_div_id);
     var data = {
