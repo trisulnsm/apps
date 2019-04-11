@@ -161,7 +161,7 @@ class SankeyCrossDrill  {
         let k=cgtoppers_bytes[i].label;
         let parts=k.split("\\");
         parts = _.map(parts,function(ai,ind){
-          return ai.replace(/:0|:1|:2/g,"")+":"+ind;
+          return ai.replace(/:0|:1|:2|:3|:4|:5|:6/g,"")+":"+ind;
         });
         cgtoppers_bytes[i].label=parts.join("\\")
         keylookup[parts[0]] = keylookup[parts[0]]==undefined ? idx++ : keylookup[parts[0]];
@@ -186,7 +186,7 @@ class SankeyCrossDrill  {
         }
 
     }
-    this.labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2/g,"")).value()
+    this.labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2|:3|:4|:5|:6/g,"")).value()
     // convert this into this.
     this.repaint();
   }
