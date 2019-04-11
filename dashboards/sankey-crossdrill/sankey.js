@@ -58,21 +58,15 @@ class SankeyCrossDrill  {
       $('#'+this.divid).html("<div class='alert alert-info'>No crosskey counter groups found</div>");
       return true;
     }
-    var crosskey_meters = _.chain(this.cg_meters.all_cg_meters)
-                            .pick(function(a,b){
-                              //select only crosskey countet group
-                              return _.keys(cthis.cg_meters.crosskey).includes(b)
-                            }).each(function(a,b){
-                              //if meter is empty get if from parent counter group
-                            if(a[1].length==0){
-                             var parent_cgguid = cthis.cg_meters.crosskey[b][1];
-                             a[1] = cthis.cg_meters.all_cg_meters[parent_cgguid][1];
-                            }
-                          })
-                          .value();
-
-
-    var js_params = {meter_details:crosskey_meters,
+    
+    for (var key in this.cg_meters.all_cg_meters) {
+      let v = this.cg_meters.all_cg_meters[key];
+      if(v[1].length==0 &&  this.cg_meters.crosskey[key]){
+        var parent_cgguid = this.cg_meters.crosskey[key][1];
+        v[1] = cthis.cg_meters.all_cg_meters[parent_cgguid][1];
+      }
+    }
+    var js_params = {meter_details:this.cg_meters.all_cg_meters,
       selected_cg : "",
       selected_st : "0",
       update_dom_cg :"cg_id_"+this.rand_id,
@@ -198,6 +192,7 @@ class SankeyCrossDrill  {
   }
 
   repaint() {
+    console.log(this.labels)
     $('#'+this.divid).find(".panel-body h4").remove();
     Plotly.purge(this.chart_div_id);
     var data = {
