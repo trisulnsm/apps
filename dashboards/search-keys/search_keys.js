@@ -15,7 +15,7 @@ class KeySpaceExplorer{
 
   }
   async add_form(){
-    this.form = $("<div class='row ui_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select name='countergroup'></select> </div> </div> </div> </div> <div class='row'> <div class='col-xs-12'> <div class='from-group'> <label class='control-label col-xs-2'>Keys</label> <div class='col-xs-10'> <textarea name='searchkey' rows='10'></textarea> <span class='help-block text-left'>Please enter comma(,) seperated keys or one key per line.</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Search'> </div> </div> </form> </div> </div>");
+    this.form = $("<div class='row ui_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select name='countergroup'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='col-xs-12'> <div class='from-group'> <label class='control-label col-xs-2'>Keys</label> <div class='col-xs-10'> <textarea name='searchkey' rows='10'></textarea> <span class='help-block text-left'>Please enter comma(,) seperated keys or one key per line.You can also use range . Ex 192.168.1.10~192.168.1.20</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Search'> </div> </div> </form> </div> </div>");
     this.form.find("select[name*='countergroup']").attr("id","cg_"+this.rand_id);
     this.form.find("textarea[name*='searchkey']").attr("id","keys_"+this.rand_id);
     this.form.find(".new_time_selector").attr("id","new_time_selector_"+this.rand_id);
@@ -75,10 +75,16 @@ class KeySpaceExplorer{
     keys = keys.split(/\n|,/);
     let keyspaces = [];
     for(let i =0 ; i< keys.length; i++){
+      let fk = keys[i];
+      let tk = keys[i];
+      if(fk.match(/~/)){
+        fk  = fk.split("~")[0];
+        tk  = tk.split("~")[1];
+      }
       let from_keyt = TRP.KeyT.create();
-      from_keyt.label = keys[i];
+      from_keyt.label = fk;
       let to_keyt = TRP.KeyT.create();
-      to_keyt.label=keys[i];
+      to_keyt.label=tk;
       let key_space = TRP.KeySpaceRequest.KeySpace.create();
       key_space.from_key = from_keyt;
       key_space.to_key = to_keyt;
@@ -128,21 +134,22 @@ function run(opts){
   .col-xs-12
     %form.form-horizontal
       .row
-        .col-xs-6
-          .form-group
-            .new_time_selector
         .col-xs-6 
           .form-group 
             %label.control-label.col-xs-4 Counter Group         
             .col-xs-8 
               %select{name:'countergroup'} 
+        .col-xs-6
+          .form-group
+            .new_time_selector
+        
       .row
         .col-xs-12
           .from-group
             %label.control-label.col-xs-2 Keys
             .col-xs-10
               %textarea{name:"searchkey",rows:10}
-              %span.help-block.text-left Please enter comma(,) seperated keys or one key per line.
+              %span.help-block.text-left Please enter comma(,) seperated keys or one key per line.You can also use range . Ex 192.168.1.10~192.168.1.20
       .row
         .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
           %input{type:"hidden",name:"from_date"}
