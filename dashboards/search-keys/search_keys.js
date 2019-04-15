@@ -26,7 +26,8 @@ class KeySpaceExplorer{
     let  update_ids = "#from_date_"+this.rand_id+","+"#to_date_"+this.rand_id;
     new ShowNewTimeSelector({divid:"#new_time_selector_"+this.rand_id,
                               update_input_ids:update_ids,
-                              default_ts:this.default_selected_time
+                              default_ts:this.default_selected_time,
+                              add_class:"pull-right"
                             });
     this.form.submit($.proxy(this.submit_form,this));
     this.cg_meters = {};
@@ -113,7 +114,11 @@ class KeySpaceExplorer{
       if(readable != keyt.label && keyt.label.length > 0){
         readable = `${readable}(${keyt.label})`
       }
-      let params =$.param({dash_key:"key",guid:$('#cg_'+this.rand_id).val(),key:keyt.key,statid:0});
+      let params =$.param({dash_key:"retrotools",guid:$('#cg_'+this.rand_id).val(),
+                          key:keyt.key,statid:0,
+                          window_fromts:tint[0].from.tv_sec,
+                          window_tots:tint[0].to.tv_sec
+                          });
       ul.append(`<li><a href="/newdash/index?${params}" target="_blank">${readable}<a></li>`);
     }
     let td = $("<td>").append(ul);
