@@ -13,10 +13,8 @@ class ISPDrilldownMapping{
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
     this.meter = this.dash_params.statid;
     this.maxitems=10;
+    this.probe_id = opts.probe_id;
     this.load_meters();
-
-
-
   }
   
   async load_meters(){
@@ -27,9 +25,10 @@ class ISPDrilldownMapping{
     this.tmint = mk_time_interval([fromTS,toTS]);
     this.reset_ui();
 
+
   }
   async reset_ui(){
-    this.data_dom=$("<div class='drilldown_data'> <h1 class='drilldown_title'></h1> <div class='row'> <div class='col-xs-12'> <div class='drill_traffic_chart_div traffic_chart_div'> <h2> <i class='fa fa-line-chart'></i> Traffic Chart </h2> <div class='drill_traffic_chart'></div> </div> </div> </div> <div class='row'> <div class='col-xs-12 routers_drilldown'> <div class='col-xs-7 toppers_table_div'> <h2> <i class='fa fa-table'></i> Routers Toppers </h2> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-5 donut_chart_div'> <h2> <i class='fa fa-pie-chart'></i> Toppers Chart </h2> <div class='donut_chart'></div> </div> <div class='col-xs-12 routers_traffic_div traffic_chart_div'> <h2> <i class='fa fa-area-chart'></i> Routers Traffic Chart </h2> <div class='routers_traffic_chart'></div> </div> <div class='col-xs-12 routers_sankey_div sankey_chart_div'> <h2> <i class='fa fa-random'></i> Routers Sankey Chart </h2> <div class='routers_sankey_chart'></div> </div> </div> <div class='col-xs-12 interfaces_drilldown'> <div class='col-xs-6 toppers_table_div'> <h2> <i class='fa fa-table'></i> Interface Toppers </h2> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-6 donut_chart_div'> <h2> Toppers Chart </h2> <div class='donut_chart'></div> </div> <div class='col-xs-12 interface_traffic_div traffic_chart_div'> <h2> <i class='fa fa-area-chart'></i> Interfaces Traffic Chart </h2> <div class='interfaces_traffic_chart'></div> </div> <div class='col-xs-12 interfaces_sankey_div sankey_chart_div'> <h2> <i class='fa fa-random'></i> Interfaces Sankey Chart </h2> <div class='interfaces_sankey_chart'></div> </div> </div> </div> </div>");
+    this.data_dom=$("<div class='drilldown_data'> <h2 class='drilldown_title'></h2> <div class='row'> <div class='col-xs-12'> <div class='drill_traffic_chart_div traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Overall Usage Traffic Chart </h3> <div class='drill_traffic_chart'></div> </div> </div> </div> <div class='row'> <div class='col-xs-12 routers_drilldown'> <div class='col-xs-7 toppers_table_div'> <h3> <i class='fa fa-table'></i> Routers Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-5 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> <div class='col-xs-12 routers_traffic_div traffic_chart_div'> <h3> <i class='fa fa-area-chart'></i> Traffic chart for Routers </h3> <div class='routers_traffic_chart'></div> </div> <div class='col-xs-12 routers_sankey_div sankey_chart_div'> <h3> <i class='fa fa-random'></i> Routers Sankey Chart </h3> <div class='routers_sankey_chart'></div> </div> </div> <div class='col-xs-12 interfaces_drilldown'> <div class='col-xs-6 toppers_table_div'> <h3> <i class='fa fa-table'></i> Interface Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-6 donut_chart_div'> <h3> Toppers Chart </h3> <div class='donut_chart'></div> </div> <div class='col-xs-12 interface_traffic_div traffic_chart_div'> <h3> <i class='fa fa-area-chart'></i> Traffic chart for interfaces </h3> <div class='interfaces_traffic_chart'></div> </div> <div class='col-xs-12 interfaces_sankey_div sankey_chart_div'> <h3> <i class='fa fa-random'></i> Interfaces Sankey Chart </h3> <div class='interfaces_sankey_chart'></div> </div> <div class='col-xs-6 toppers_table_div'> <h3>Top Internal Hosts</h3> <div class='aggregated_int_flows'> <table> <thead> <tr> <th>Item</th> <th>Label</th> <th>FLows</th> <th sort='volume'>Volume</th> </tr> </thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-6 toppers_table_div'> <h3>Top External Hosts</h3> <div class='aggregated_ext_flows'> <table> <thead> <tr> <th>Item</th> <th>Label</th> <th>Flows</th> <th sort='volume'>Volume</th> </tr> </thead> <tbody></tbody> </table> </div> </div> </div> </div> </div>");
     this.dom.find(".drilldown_data").html('');
     this.dom.append(this.data_dom);
     this.dom.find(".drill_traffic_chart").attr("id","drill_traffic_chart_"+this.rand_id);
@@ -38,8 +37,13 @@ class ISPDrilldownMapping{
 
     this.draw_drill_chart();
     this.filter_text = this.dash_params.key;
+    this.agg_flows = [];
     await this.get_toppers("Routers")
     await this.get_toppers("Interfaces")
+    await this.get_aggregated_flows("in");
+    await this.get_aggregated_flows("out");
+    this.draw_aggregate_table('aggregated_int_flows');
+    this.draw_aggregate_table('aggregated_ext_flows')
   }
 
   draw_drill_chart(){
@@ -103,6 +107,19 @@ class ISPDrilldownMapping{
     await this.draw_sankey_chart(filter_cgbase);
 
   }
+  async get_aggregated_flows(intf){
+    let readable = this.dash_params.readable.split("\\");
+    
+    let opts = {flowtag:this.dash_params.key,time_interval:this.tmint,probe_id:this.probe_id};
+    if(readable.length > 1){
+      let interfaces = readable[1].split("_");
+      opts["nf_routerid"] = TRP.KeyT.create({label:interfaces[0]});
+      opts[`nf_ifindex_${intf}`]= TRP.KeyT.create({label:interfaces[1]});
+    }
+    this.agg_flows.push(await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts));
+    
+  }
+
   draw_table(filter_cgbase){
     let cgbasename = filter_cgbase.toLocaleLowerCase();
     var table = this.data_dom.find(`.${cgbasename}_drilldown`).find(".toppers_table").find("table");
@@ -131,6 +148,45 @@ class ISPDrilldownMapping{
     add_barspark(table);
     table.tablesorter();
     
+  }
+
+  draw_aggregate_table(cls){
+    var table = this.data_dom.find(`.${cls}`).find("table");
+    table.addClass('table table-hover table-sysdata');
+    let toppers = [];
+    if(cls=="aggregated_int_flows"){
+      toppers.push(this.agg_flows[0].internal_ip);
+      toppers.push(this.agg_flows[1].internal_ip);
+    }else{
+      toppers.push(this.agg_flows[0].external_ip);
+      toppers.push(this.agg_flows[1].external_ip);
+    }
+    toppers =_.flatten(toppers);
+    let toppers_obj = {};
+    for(let i=0 ; i < toppers.length; i++){
+      let t = toppers[i];
+      let k = t.key.key
+      if(toppers_obj[k]){
+        let  v = toppers_obj[k];
+        v.count = parseInt(v.count) + parseInt(t.count) ;
+        console.log(t.metric.toNumber());
+        v.metric = v.metric.toNumber() + t.metric.toNumber() ;
+      }else{
+        toppers_obj[k] = t
+      }
+    }
+    toppers = _.sortBy(_.values(toppers_obj),function(k){return -k.metric;});
+    for(let i=0; i< toppers.length;i++){
+      var t = toppers[i];
+
+      table.find("tbody").append(`<tr>
+                                  <td>${t.key.readable}</td>
+                                  <td>${t.key.label}</td>
+                                  <td>${t.count}</td>
+                                  <td>${h_fmtvol(t.metric)}</td>
+                                  </tr>`);
+    }
+
   }
   async draw_dount_chart(filter_cgbase){
     let cgbasename = filter_cgbase.toLocaleLowerCase();
@@ -220,7 +276,6 @@ class ISPDrilldownMapping{
 
     let cgbasename = filter_cgbase.toLocaleLowerCase();
     this.sankey_div_id = `${cgbasename}_sankey_chart_${this.rand_id}`;
-    console.log(this.sankey_div_id)
     this.data_dom.find(`.${cgbasename}_sankey_chart`).append($("<div>",{id:this.sankey_div_id}));
 
     // Get Bytes Toppers
@@ -346,18 +401,18 @@ function run(opts) {
 // HAML
 /*
 .drilldown_data
-  %h1.drilldown_title
+  %h2.drilldown_title
   .row
     .col-xs-12
       .drill_traffic_chart_div.traffic_chart_div
-        %h2
+        %h3
           %i.fa.fa-line-chart 
-          Traffic Chart
+          Overall Usage Traffic Chart 
         .drill_traffic_chart
   .row
     .col-xs-12.routers_drilldown
       .col-xs-7.toppers_table_div
-        %h2
+        %h3
           %i.fa.fa-table 
           Routers Toppers
         .toppers_table
@@ -365,24 +420,24 @@ function run(opts) {
             %thead
             %tbody
       .col-xs-5.donut_chart_div
-        %h2
+        %h3
           %i.fa.fa-pie-chart 
           Toppers Chart
         .donut_chart
       .col-xs-12.routers_traffic_div.traffic_chart_div
-        %h2
+        %h3
           %i.fa.fa-area-chart 
-          Routers Traffic Chart
+          Traffic chart for Routers
         .routers_traffic_chart
       .col-xs-12.routers_sankey_div.sankey_chart_div
-        %h2
+        %h3
           %i.fa.fa-random 
           Routers Sankey Chart
         .routers_sankey_chart
 
     .col-xs-12.interfaces_drilldown
       .col-xs-6.toppers_table_div
-        %h2
+        %h3
           %i.fa.fa-table 
           Interface Toppers
         .toppers_table
@@ -390,20 +445,44 @@ function run(opts) {
             %thead
             %tbody
       .col-xs-6.donut_chart_div
-        %h2 
+        %h3 
           Toppers Chart
         .donut_chart
 
       .col-xs-12.interface_traffic_div.traffic_chart_div
-        %h2
+        %h3
           %i.fa.fa-area-chart 
-          Interfaces Traffic Chart
+          Traffic chart for interfaces
         .interfaces_traffic_chart
       .col-xs-12.interfaces_sankey_div.sankey_chart_div
-        %h2 
+        %h3 
           %i.fa.fa-random
           Interfaces Sankey Chart
         .interfaces_sankey_chart
+      
+      .col-xs-6.toppers_table_div
+        %h3 Top Internal Hosts
+        .aggregated_int_flows
+          %table
+            %thead
+              %tr
+                %th Item
+                %th Label
+                %th FLows
+                %th{sort:"volume"} Volume
+            %tbody
+      .col-xs-6.toppers_table_div
+        %h3 Top External Hosts
+        .aggregated_ext_flows
+          %table
+            %thead
+              %tr
+                %th Item
+                %th Label
+                %th Flows
+                %th{sort:"volume"} Volume
+            %tbody
+
 
 
 
