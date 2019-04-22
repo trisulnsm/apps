@@ -345,7 +345,8 @@ class ISPOverviewMapping{
         key:keys.join(","),
         from_date:this.form.find("#from_date_"+this.rand_id).val(),
         to_date:this.form.find("#to_date_"+this.rand_id).val(),
-        valid_input:1
+        valid_input:1,
+        surface:"STACKEDAREA"
     };
     $.ajax({
       url:"/trpjs/generate_chart",
