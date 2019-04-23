@@ -11,6 +11,10 @@ class ASNPathAnalytics{
     this.rand_id=parseInt(Math.random()*100000);
     this.default_selected_time = opts.new_time_selector;
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
+    this.cgguid = "{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}";
+    if(opts.jsparams){
+      this.cgguid = opts.jsparams.crosskey_guid || "{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}";
+    }
     this.add_form();
   }
   //add form 
