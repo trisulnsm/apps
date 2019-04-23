@@ -61,9 +61,8 @@ class ASNPathAnalytics{
     return false;
   }
   async get_data(){
-    this.cgguid = "{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}";
     if(this.cg_meters.all_cg_meters[this.cgguid]==undefined){
-      this.data_dom.html("<div class='alert alert-info'>ASN Path Analytics lua is not installed</div>")
+      this.data_dom.html("<div class='alert alert-info'>ASN Path crossKey Counter Group Not found.</div>")
       return true;
     }
     //upload toppers
