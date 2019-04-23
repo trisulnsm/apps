@@ -33,7 +33,29 @@ class ASNPathAnalytics{
                             });
     
     this.cg_meters = {};
+    this.mk_time_interval();
     await get_counters_and_meters_json(this.cg_meters);
+    let router_keys=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
+      counter_group: GUID.GUID_CG_FLOWGENS(),
+      time_interval: this.tmint,
+      maxitems:100,
+      meter:0
+    });
+    $("#routers_"+this.rand_id)
+         .append($("<option></option>")
+                    .attr("value",0)
+                    .text("Please select")); 
+
+    for(let i=0 ; i < router_keys.keys.length; i++){
+      let keyt =   router_keys.keys[i];
+      if(keyt.key=="SYS:GROUP_TOTALS"){
+        continue;
+      }
+      $("#routers_"+this.rand_id)
+         .append($("<option></option>")
+                    .attr("value",keyt.key)
+                    .text(keyt.label)); 
+    };
     this.form.submit($.proxy(this.submit_form,this));
   }
   //time intetval
@@ -65,20 +87,23 @@ class ASNPathAnalytics{
       this.data_dom.html("<div class='alert alert-info'>ASN Path crossKey Counter Group Not found.</div>")
       return true;
     }
+    let req_opts = {
+      counter_group: this.cgguid,
+      time_interval: this.tmint,
+      maxitems:1000,
+    }
+    let selected_router = $('#routers_'+this.rand_id).val();
+    //for please select option don't add key filter
+    if(selected_router != 0)
+    {
+      req_opts["key_filter"]= selected_router;
+    }
     //upload toppers
-    let upload_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: this.cgguid,
-      time_interval: this.tmint,
-      maxitems:1000,
-      meter:0
-    });
-
-    let download_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: this.cgguid,
-      time_interval: this.tmint,
-      maxitems:1000,
-      meter:1
-    });
+    
+    req_opts["meter"] = 0;
+    let upload_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts );
+    req_opts["meter"] = 1;
+    let download_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts);
 
     this.bucket_size = this.cg_meters.all_cg_bucketsize[this.cgguid].top_bucket_size;
     let unresolved_keys = [];
@@ -104,11 +129,12 @@ class ASNPathAnalytics{
     this.change_keys_label(download_bytes,resolved_keymap);
     
     //convert data to table
-    var table_data = {}
+    let table_data = {}
+
     for(let i=0;i<upload_bytes.keys.length;i++){
       let keyt = upload_bytes.keys[i];
       let label = keyt.label;
-      if (label=="SYS:GROUP_TOTALS"){
+      if (label=="SYS:GROUP_TOTALS" ){
         continue;
       }
       if(table_data[label]==undefined){
@@ -135,7 +161,7 @@ class ASNPathAnalytics{
   }
 
   get_unresolved_keys(data){
-    let arrays = []
+    let arrays = [];
     for(let i=0;i<data.keys.length;i++){
       let key = data.keys[i].key;
       if (key=="SYS:GROUP_TOTALS"){

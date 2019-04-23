@@ -15,10 +15,17 @@ class ISPOverviewMapping{
     this.default_selected_time = opts.new_time_selector;
     //we need it for time zone conversion
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
-    this.filter_cgguid = "{03E016FC-46AA-4340-90FC-0E278B93C677}"
+    this.filter_cgguid = "{03E016FC-46AA-4340-90FC-0E278B93C677}";
+    this.crosskey_router = null;
+    this.crosskey_interface=null;
+    this.meter_details_in = {upload:0,download:1}
+    //filter by router and interface crosskey
     if(opts.jsparams){
-      this.filter_cgguid = opts.jsparams.filter_cgguid || "{03E016FC-46AA-4340-90FC-0E278B93C677}"
+      this.crosskey_router = opts.jsparams.crosskey_router;
+      this.crosskey_interface = opts.jsparams.crosskey_interface;
+      this.meter_details_in = opts.jsparams.meters || {upload:0,download:1};
     }
+
     this.add_form();
   }
   async add_form(){
@@ -38,7 +45,7 @@ class ISPOverviewMapping{
                                default_ts:this.default_selected_time
                             });
     this.mk_time_interval();
-    //get interface toppers for drowdown
+    //get router toppers for drowdown in form
     var top_routers=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
       counter_group: "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
       time_interval: this.tmint ,
@@ -52,7 +59,7 @@ class ISPOverviewMapping{
       }
       router_key_map[top_routers.keys[i].key] = top_routers.keys[i].label
     }
-
+    //get interface toppers for dropdown in form
     var top_intfs=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
       counter_group: "{C0B04CA7-95FA-44EF-8475-3835F3314761}",
       time_interval: this.tmint ,
@@ -84,12 +91,17 @@ class ISPOverviewMapping{
       selected_cg : "",
       selected_st : "0",
       update_dom_cg : "routers_"+this.rand_id,
-      update_dom_st : "interfaces_"+this.rand_id    
+      update_dom_st : "interfaces_"+this.rand_id,
+      chosen:true
     }
     //Load meter combo for routers and interfaces
     new CGMeterCombo(JSON.stringify(js_params));
     this.cg_meters = {};
     await get_counters_and_meters_json(this.cg_meters);
+    //find crosskeyguid is present automatically find base counter group
+    if(this.crosskey_interface && this.cg_meters.crosskey[this.crosskey_interface]){
+      this.filter_cgguid = this.cg_meters.crosskey[this.crosskey_interface][1];
+    }
     this.form.submit($.proxy(this.submit_form,this));
   }
   //make time interval to get toppers.
@@ -107,15 +119,17 @@ class ISPOverviewMapping{
     return false;
   }
   async get_data_all_meters_data(){
-    for(let i=0 ;i <=1 ; i++){
-      this.meter=i;
+    let keys = Object.keys(this.meter_details_in);
+    for (const [i, key] of keys.entries()) {
+      this.meter_index = i;
+      this.meter = this.meter_details_in[key];
       await this.get_data();
-    }
+    };
   }
   //Reset UI for every submit
   reset_ui(){
     this.dom.find(".ui_data").html('');
-    this.data_dom = $("<div class='ui_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <ul class='nav nav-tabs' id='isp_overview_tabs'> <li class='active'> <a data-toggle='tab' href='#isp_overview_0' role='tab'> <i class='fa fa-upload'></i> Upload </a> </li> <li> <a data-toggle='tab' href='#isp_overview_1' role='tab'> <i class='fa fa-download'></i> Download </a> </li> </ul> <div class='tab-content'> <div class='tab-pane active' data-use-width='1' id='isp_overview_0'> <div class='row'> <div class='col-xs-12 toppers_table_div'> <h2> <i class='fa fa-table'></i> Toppers </h2> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> </div> <div class='row'> <div class='col-xs-12 traffic_chart_div'> <h2> <i class='fa fa-line-chart'></i> Traffic Chart </h2> <div class='traffic_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 donut_chart_div'> <h2> <i class='fa fa-pie-chart'></i> Toppers Chart </h2> <div class='donut_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 sankey_chart_div'> <h2> <i class='fa fa-random'></i> Sankey Chart </h2> <div class='sankey_chart'></div> </div> </div> </div> <div class='tab-pane' data-use-width='1' id='isp_overview_1'> <div class='row'> <div class='col-xs-12 toppers_table_div'> <h2> <i class='fa fa-table'></i> Toppers </h2> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> </div> <div class='row'> <div class='col-xs-12 traffic_chart_div'> <h2> <i class='fa fa-line-chart'></i> Traffic Chart </h2> <div class='traffic_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 donut_chart_div'> <h2> <i class='fa fa-pie-chart'></i> Toppers Chart </h2> <div class='donut_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 sankey_chart_div'> <h2> <i class='fa fa-random'></i> Sankey Chart </h2> <div class='sankey_chart'></div> </div> </div> </div> </div> </div> </div> </div> </div> </div>");
+    this.data_dom = $("<div class='ui_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <ul class='nav nav-tabs' id='isp_overview_tabs'> <li class='active'> <a data-toggle='tab' href='#isp_overview_0' role='tab'> <i class='fa fa-upload'></i> Upload </a> </li> <li> <a data-toggle='tab' href='#isp_overview_1' role='tab'> <i class='fa fa-download'></i> Download </a> </li> </ul> <div class='tab-content'> <div class='tab-pane active' data-use-width='1' id='isp_overview_0'> <div class='row'> <div class='col-xs-12 overall_traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Overall Traffic Chart </h3> <div class='overall_traffic_chart'></div> </div> <div class='col-xs-12 toppers_table_div'> <h3> <i class='fa fa-table'></i> Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> </div> <div class='row'> <div class='col-xs-12 traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Traffic Chart </h3> <div class='traffic_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 sankey_chart_div'> <h3> <i class='fa fa-random'></i> Sankey Chart </h3> <div class='sankey_chart'></div> </div> </div> </div> <div class='tab-pane' data-use-width='1' id='isp_overview_1'> <div class='row'> <div class='col-xs-12 overall_traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Overall Traffic Chart </h3> <div class='overall_traffic_chart'></div> </div> <div class='col-xs-12 toppers_table_div'> <h3> <i class='fa fa-table'></i> Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> </div> <div class='row'> <div class='col-xs-12 traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Traffic Chart </h3> <div class='traffic_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 sankey_chart_div'> <h3> <i class='fa fa-random'></i> Sankey Chart </h3> <div class='sankey_chart'></div> </div> </div> </div> </div> </div> </div> </div> </div> </div>");
     this.dom.append(this.data_dom);
     this.maxitems=10;
     this.cgguid = null;
@@ -143,46 +157,23 @@ class ISPOverviewMapping{
     if(Object.keys(this.cg_meters.crosskey).length == 0){
       this.crosskey_cgguid = null;
     }
-    //we need cgguid for toppers and crosskey guid for sankey
-    this.filter_cgname = "ASN"
-    switch(this.filter_cgguid){
-      case GUID.GUID_CG_ASN():
-        this.filter_cgname ="ASN"
-        break;
-      case GUID.GUID_CG_COUNTRY():
-        this.filter_cgname ="Country"
-        break
-      case GUID.GUID_CG_CITY():
-        this.filter_cgname ="City"
-        break
-      case GUID.GUID_CG_PREFIX():
-        this.filter_cgname ="Prefix"
-        break
-    }
     this.update_headings();
     if( selected_interface !="0"){
-      this.filter_crosskeycg = "interfaces"
+      this.cgguid = this.crosskey_interface;
       this.filter_text = selected_interface;
     }
-    else if(selected_router == "0"){
-      this.filter_crosskeycg = "Routers"
-      this.cgguid = this.filter_cgguid;
+    else if(selected_router != "0"){
+      this.cgguid = this.crosskey_router;
+      this.filter_text = selected_interface;
     }
     else if(selected_router){
-      this.filter_crosskeycg = "Routers"
-      this.filter_text = selected_router;
-      
+      this.cgguid = this.filter_cgguid
     }
-    this.selected_crosskey=_.pick(this.cg_meters.crosskey,function(a,b){
-      let reg_exp = new RegExp(`Auto_${this.filter_crosskeycg}_${this.filter_cgname}`,"i")
-      return a[0].match(reg_exp);
-    },this);
-    this.crosskey_cgguid =  Object.keys(this.selected_crosskey)[0];
-    //if you want all the data comes from crosskeycg
-    this.cgguid = this.cgguid || this.crosskey_cgguid;
+    
+    this.crosskey_cgguid =  this.cgguid;
     //find bucket size
     if(this.cg_meters.all_cg_bucketsize[this.cgguid]==undefined){
-      this.data_dom.html('<div class="alert alert-info">No data found</div>');
+      this.data_dom.html('<div class="alert alert-info">Crosskey counter groups not created. Need crosskey counter groups to work with this app</div>');
       return
     }
     this.top_bucket_size = this.cg_meters.all_cg_bucketsize[this.cgguid].top_bucket_size;
@@ -200,7 +191,7 @@ class ISPOverviewMapping{
       this.ck_top_bucket_size=this.cg_meters.all_cg_bucketsize[this.crosskey_cgguid].top_bucket_size;
       this.meter_types = this.cg_meters.all_meters_type[this.crosskey_cgguid];
       if(_.size(this.meter_types) == 0 ){
-        let parent_cgguid = this.selected_crosskey[this.crosskey_cgguid][1];
+        let parent_cgguid = this.cg_meters.crosskey[this.crosskey_cgguid][1];
         this.meter_types = this.cg_meters.all_meters_type[parent_cgguid];
       }
     }
@@ -211,6 +202,7 @@ class ISPOverviewMapping{
       meter:this.meter,
       maxitems:100000
     });
+
     this.cgtoppers_resp.keys = this.sort_hash(this.cgtoppers_resp,"metric");
     //reject sysgrup and xx
     this.cgtoppers_resp.keys = _.reject(this.cgtoppers_resp.keys,function(topper){
@@ -222,19 +214,62 @@ class ISPOverviewMapping{
         return topper.key.match(this.filter_text)
       },this);
     }
-
-    this.draw_table();
+    
+    await this.draw_table();
     await this.draw_chart();
+    await this.draw_traffic_chart();
     await this.draw_sankey_chart();
   }
+  //draw a in and out traffic chart for selected interfaces 
+  //if no interface selected draw chart for aggregates
+  async draw_traffic_chart(){
+    let key_arr = ["DIR_OUTOFHOME","DIR_INTOHOME"];
+    let meter_arr = [2,1]
+    let cgguid = this.cgguid;
+    let key = this.filter_text;
+    let meter = this.meter;
+    //if none of router or interfaces selectd show total bandwidth
 
-  draw_table(){
+    if(this.filter_text==null || this.filter_text == undefined){
+      cgguid = GUID.GUID_CG_AGGREGATE();
+      key = key_arr[this.meter];
+      meter=0;
+    }else if(this.filter_text.match(/_/)){
+      cgguid = GUID.GUID_CG_FLOWINTERFACE();
+      meter = meter_arr[this.meter_index];
+    }else{
+      //no in and out meterid for routers only total
+      this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".overall_traffic_chart_div").remove();
+      return true;
+    }
+    var model_data = {cgguid:cgguid,
+        meter:meter,
+        key:key,
+        from_date:this.form.find("#from_date_"+this.rand_id).val(),
+        to_date:this.form.find("#to_date_"+this.rand_id).val(),
+        valid_input:1,
+        surface:"AREA"
+    };
+
+    await $.ajax({
+      url:"/trpjs/generate_chart",
+      data:model_data,
+      context:this,
+      success:function(resp){
+        let div =this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".overall_traffic_chart")
+        div.html(resp);
+      }
+    });
+
+  }
+
+  async draw_table(){
     let rows = [];
-    var table = this.data_dom.find(`#isp_overview_${this.meter}`).find(".toppers_table").find("table");
+    var table = this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".toppers_table").find("table");
     this.table_id = `table_${this.meter}_${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
-    table.find("thead").append(`<tr><th>${this.filter_cgname}</th><th>Label</th><th sort='volume' barspark='auto'>Volume </th><th sort='volume'>Bandwidth</th><th class='nosort'></th></tr>`);
+    table.find("thead").append(`<tr><th>Key</th><th>Label</th><th sort='volume' barspark='auto'>Volume </th><th sort='volume'>Bandwidth</th><th class='nosort'></th></tr>`);
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,100);
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
@@ -248,11 +283,12 @@ class ISPOverviewMapping{
       dropdown.append(dropdown_menu);
 
       let key = topper.key.split("\\").shift();
+      let full_key= topper.key;
       let readable = topper.readable.split("\\").shift();
       let label = topper.label.split("\\").shift();
       let avg_bw = (topper.metric*this.top_bucket_size)/(this.tmint.to.tv_sec-this.tmint.from.tv_sec);
       avg_bw = avg_bw*this.multiplier;
-      rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" data-readable="${topper.readable}">
+      rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" data-readable="${topper.readable}" data-full_key="${full_key}">
                                 <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
                                 <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
                                 <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
@@ -292,10 +328,10 @@ class ISPOverviewMapping{
   }
 
   async draw_chart(){
-    this.dount_div_id = `dount_chart_${this.meter}_${this.rand_id}`;
-    this.data_dom.find(`#isp_overview_${this.meter}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
-    this.trfchart_div_id = `traffic_chart_${this.meter}_${this.rand_id}`;
-    this.data_dom.find(`#isp_overview_${this.meter}`).find(".traffic_chart").append($("<div>",{id:this.trfchart_div_id}));
+    this.dount_div_id = `dount_chart_${this.meter_index}_${this.rand_id}`;
+    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
+    this.trfchart_div_id = `traffic_chart_${this.meter_index}_${this.rand_id}`;
+    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".traffic_chart").append($("<div>",{id:this.trfchart_div_id}));
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,this.maxitems);
     var values = [];
     var labels = [];
@@ -348,7 +384,7 @@ class ISPOverviewMapping{
         valid_input:1,
         surface:"STACKEDAREA"
     };
-    $.ajax({
+    await $.ajax({
       url:"/trpjs/generate_chart",
       data:model_data,
       context:this,
@@ -360,10 +396,10 @@ class ISPOverviewMapping{
 
   }
   async draw_sankey_chart(){
-    this.sankey_div_id = `sankey_chart_${this.meter}_${this.rand_id}`;
-    this.data_dom.find(`#isp_overview_${this.meter}`).find(".sankey_chart").append($("<div>",{id:this.sankey_div_id}));
-    if(this.crosskey_cgguid == null){
-      $('#'+this.sankey_div_id).html("<div class='alert alert-info'>No data found.</div>");
+    this.sankey_div_id = `sankey_chart_${this.meter_index}_${this.rand_id}`;
+    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".sankey_chart").append($("<div>",{id:this.sankey_div_id}));
+    if(this.crosskey_cgguid == this.filter_cgguid){
+      $('#'+this.sankey_div_id).html('<div class="alert alert-info">Crosskey counter groups not created. Need crosskey counter groups to work with this app</div>');
       return;
     }
 
@@ -495,7 +531,7 @@ class ISPOverviewMapping{
       case 1:
         let link_params =$.param({dash_key:"key",
                          guid:this.cgguid,
-                         key:tr.data("key"),
+                         key:tr.data("full_key"),
                          statid:tr.data("statid")
                         });
         window.open("/newdash/index?"+link_params);
@@ -564,7 +600,7 @@ class TablePagination {
   }
 };
 
-//# sourceURL=ips_overview_mappings.js
+//# sourceURL=peering_analytics.js
 
 
 //HAML PART
@@ -613,8 +649,13 @@ class TablePagination {
           .tab-content
             .tab-pane.active#isp_overview_0{"data-use-width":1}
               .row
+                .col-xs-12.overall_traffic_chart_div
+                  %h3
+                    %i.fa.fa-line-chart 
+                    Upload Traffic Chart
+                  .overall_traffic_chart
                 .col-xs-12.toppers_table_div
-                  %h2 
+                  %h3 
                     %i.fa.fa-table
                     Toppers
                   .toppers_table
@@ -623,26 +664,31 @@ class TablePagination {
                       %tbody
               .row
                 .col-xs-12.traffic_chart_div
-                  %h2
+                  %h3
                     %i.fa.fa-line-chart 
                     Traffic Chart
                   .traffic_chart
               .row
                 .col-xs-12.donut_chart_div
-                  %h2
+                  %h3
                     %i.fa.fa-pie-chart 
                     Toppers Chart
                   .donut_chart
               .row
                 .col-xs-12.sankey_chart_div
-                  %h2 
+                  %h3 
                     %i.fa.fa-random 
                     Sankey Chart
                   .sankey_chart
             .tab-pane#isp_overview_1{"data-use-width":1}
               .row
+                .col-xs-12.overall_traffic_chart_div
+                  %h3
+                    %i.fa.fa-line-chart 
+                    Download Traffic Chart
+                  .overall_traffic_chart
                 .col-xs-12.toppers_table_div
-                  %h2
+                  %h3
                     %i.fa.fa-table
                     Toppers
                   .toppers_table
@@ -652,19 +698,19 @@ class TablePagination {
                 
               .row
                 .col-xs-12.traffic_chart_div
-                  %h2
+                  %h3
                     %i.fa.fa-line-chart 
                     Traffic Chart
                   .traffic_chart
               .row
                 .col-xs-12.donut_chart_div
-                  %h2
+                  %h3
                     %i.fa.fa-pie-chart
                     Toppers Chart
                   .donut_chart
               .row
                 .col-xs-12.sankey_chart_div
-                  %h2 
+                  %h3 
                     %i.fa.fa-random
                     Sankey Chart
                   .sankey_chart
