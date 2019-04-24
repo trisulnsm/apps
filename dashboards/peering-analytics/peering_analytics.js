@@ -25,7 +25,6 @@ class ISPOverviewMapping{
       this.crosskey_interface = opts.jsparams.crosskey_interface;
       this.meter_details_in = opts.jsparams.meters || {upload:0,download:1};
     }
-
     this.add_form();
   }
   async add_form(){
@@ -129,7 +128,7 @@ class ISPOverviewMapping{
   //Reset UI for every submit
   reset_ui(){
     this.dom.find(".ui_data").html('');
-    this.data_dom = $("<div class='ui_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <ul class='nav nav-tabs' id='isp_overview_tabs'> <li class='active'> <a data-toggle='tab' href='#isp_overview_0' role='tab'> <i class='fa fa-upload'></i> Upload </a> </li> <li> <a data-toggle='tab' href='#isp_overview_1' role='tab'> <i class='fa fa-download'></i> Download </a> </li> </ul> <div class='tab-content'> <div class='tab-pane active' data-use-width='1' id='isp_overview_0'> <div class='row'> <div class='col-xs-12 overall_traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Overall Traffic Chart </h3> <div class='overall_traffic_chart'></div> </div> <div class='col-xs-12 toppers_table_div'> <h3> <i class='fa fa-table'></i> Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> </div> <div class='row'> <div class='col-xs-12 traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Traffic Chart </h3> <div class='traffic_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 sankey_chart_div'> <h3> <i class='fa fa-random'></i> Sankey Chart </h3> <div class='sankey_chart'></div> </div> </div> </div> <div class='tab-pane' data-use-width='1' id='isp_overview_1'> <div class='row'> <div class='col-xs-12 overall_traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Overall Traffic Chart </h3> <div class='overall_traffic_chart'></div> </div> <div class='col-xs-12 toppers_table_div'> <h3> <i class='fa fa-table'></i> Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> </div> <div class='row'> <div class='col-xs-12 traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Traffic Chart </h3> <div class='traffic_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 sankey_chart_div'> <h3> <i class='fa fa-random'></i> Sankey Chart </h3> <div class='sankey_chart'></div> </div> </div> </div> </div> </div> </div> </div> </div> </div>");
+    this.data_dom = $("<div class='ui_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <ul class='nav nav-tabs' id='isp_overview_tabs'> <li class='active'> <a data-toggle='tab' href='#isp_overview_0' role='tab'> <i class='fa fa-upload'></i> Upload </a> </li> <li> <a data-toggle='tab' href='#isp_overview_1' role='tab'> <i class='fa fa-download'></i> Download </a> </li> </ul> <div class='tab-content'> <div class='tab-pane active' data-use-width='1' id='isp_overview_0'> <div class='row'> <div class='col-xs-12 overall_traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Upload Traffic Chart </h3> <div class='overall_traffic_chart'></div> </div> <div class='col-xs-12 toppers_table_div'> <h3> <i class='fa fa-table'></i> Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> </div> <div class='row'> <div class='col-xs-12 traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Traffic Chart </h3> <div class='traffic_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 sankey_chart_div'> <h3> <i class='fa fa-random'></i> Sankey Chart </h3> <div class='sankey_chart'></div> </div> </div> </div> <div class='tab-pane' data-use-width='1' id='isp_overview_1'> <div class='row'> <div class='col-xs-12 overall_traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Download Traffic Chart </h3> <div class='overall_traffic_chart'></div> </div> <div class='col-xs-12 toppers_table_div'> <h3> <i class='fa fa-table'></i> Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> </div> <div class='row'> <div class='col-xs-12 traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Traffic Chart </h3> <div class='traffic_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 sankey_chart_div'> <h3> <i class='fa fa-random'></i> Sankey Chart </h3> <div class='sankey_chart'></div> </div> </div> </div> </div> </div> </div> </div> </div> </div>");
     this.dom.append(this.data_dom);
     this.maxitems=10;
     this.cgguid = null;
@@ -196,24 +195,22 @@ class ISPOverviewMapping{
       }
     }
     //load_toppers
-    this.cgtoppers_resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
+    let req_opts = {
       counter_group: this.cgguid,
       time_interval: this.tmint ,
       meter:this.meter,
-      maxitems:100000
-    });
+      maxitems:1000
+    }
+    if(this.filter_text){
+      req_opts["key_filter"]=this.filter_text
+    }
+    this.cgtoppers_resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, req_opts);
 
     this.cgtoppers_resp.keys = this.sort_hash(this.cgtoppers_resp,"metric");
     //reject sysgrup and xx
     this.cgtoppers_resp.keys = _.reject(this.cgtoppers_resp.keys,function(topper){
       return topper.key=="SYS:GROUP_TOTALS" || topper.key.includes("XX");
     });
-
-    if(this.filter_text){
-      this.cgtoppers_resp.keys = _.select(this.cgtoppers_resp.keys,function(topper){
-        return topper.key.match(this.filter_text)
-      },this);
-    }
     
     await this.draw_table();
     await this.draw_chart();
