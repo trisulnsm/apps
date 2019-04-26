@@ -138,6 +138,7 @@ class ISPOverviewMapping{
       e.preventDefault()
       $(this).tab('show')
     });
+    this.data_dom.find('.toppers_table_div').append("<span class='notify'><i class='fa fa-spinner fa-spin'></i>Please wait...</span>");
     //title part
 
   }
@@ -262,6 +263,7 @@ class ISPOverviewMapping{
 
   async draw_table(){
     let rows = [];
+    this.data_dom.find(`#isp_overview_${this.meter_index}`).find('.notify').remove();
     var table = this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".toppers_table").find("table");
     this.table_id = `table_${this.meter}_${this.rand_id}`;
     table.attr("id",this.table_id)

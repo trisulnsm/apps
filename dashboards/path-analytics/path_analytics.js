@@ -90,7 +90,7 @@ class ASNPathAnalytics{
     let req_opts = {
       counter_group: this.cgguid,
       time_interval: this.tmint,
-      maxitems:1000,
+      maxitems:100,
     }
     let selected_router = $('#routers_'+this.rand_id).val();
     //for please select option don't add key filter
@@ -106,24 +106,31 @@ class ASNPathAnalytics{
     let download_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts);
 
     this.bucket_size = this.cg_meters.all_cg_bucketsize[this.cgguid].top_bucket_size;
-    let unresolved_keys = [];
-    unresolved_keys.push(this.get_unresolved_keys(upload_bytes));
-    unresolved_keys.push(this.get_unresolved_keys(download_bytes));
-    //changed to single array
-    let keys = [].concat.apply([], unresolved_keys);
-    //remove duplicates
-    keys = Array.from(new Set(keys));
+    this.unresolved_asn_keys = [];
+    this.unresolved_router_keys=[];
+    this.get_unresolved_keys(upload_bytes);
+    this.get_unresolved_keys(download_bytes);
 
     //get name for keys
-    let resolved_keyts=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST, {
+    let resolved_keyts = {}
+    resolved_keyts["asn"]=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST, {
       counter_group: GUID.GUID_CG_ASN(),
-      keys:keys
+      keys:this.unresolved_asn_keys
     });
-    let resolved_keymap = {}
-    for(let i=0;i<resolved_keyts.keys.length;i++){
-      let keyt = resolved_keyts.keys[i]
-      resolved_keymap[keyt.key] = keyt.label
-    }
+    resolved_keyts["router"]=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST, {
+      counter_group: GUID.GUID_CG_FLOWGENS(),
+      keys:this.unresolved_router_keys
+    });
+
+    
+    let resolved_keymap = {asn:{},router:{}};
+    for (let [key, item] of Object.entries(resolved_keyts)) {
+      for(let i=0;i< item.keys.length;i++){
+        let keyt = item.keys[i];
+        resolved_keymap[key][keyt.key] = keyt.label
+      }
+    };
+    console.log(resolved_keymap)
     //change label to resolved labels
     this.change_keys_label(upload_bytes,resolved_keymap);
     this.change_keys_label(download_bytes,resolved_keymap);
@@ -134,7 +141,7 @@ class ASNPathAnalytics{
     for(let i=0;i<upload_bytes.keys.length;i++){
       let keyt = upload_bytes.keys[i];
       let label = keyt.label;
-      if (label=="SYS:GROUP_TOTALS" ){
+      if (keyt.key=="SYS:GROUP_TOTALS" ){
         continue;
       }
       if(table_data[label]==undefined){
@@ -143,10 +150,11 @@ class ASNPathAnalytics{
       table_data[label][3]=table_data[label][3] + (keyt.metric.toNumber()*this.bucket_size)
     }
 
+
     for(let i=0;i<download_bytes.keys.length;i++){
       let keyt = download_bytes.keys[i];
       let label = keyt.label;
-      if (label=="SYS:GROUP_TOTALS"){
+      if (keyt.key=="SYS:GROUP_TOTALS"){
         continue;
       }
       if(table_data[label]==undefined){
@@ -167,9 +175,19 @@ class ASNPathAnalytics{
       if (key=="SYS:GROUP_TOTALS"){
         continue;
       }
-      arrays.push(key.split("/"))
+      arrays = key.split(/\/|\\/);
+      let router = arrays.shift();
+      if(! this.unresolved_router_keys.includes(router)){
+        this.unresolved_router_keys.push(router);
+      }
+      
+      arrays.forEach(function(asn){
+        if(! this.unresolved_asn_keys.includes(asn)){
+          this.unresolved_asn_keys.push(asn);
+        }
+      },this);
     }
-    return [].concat.apply([], arrays);
+    
   }
 
   change_keys_label(data,keymap){
@@ -179,10 +197,12 @@ class ASNPathAnalytics{
       if (key=="SYS:GROUP_TOTALS"){
         continue;
       }
-      key = Array.from(new Set(key.split("/")));
+      key = Array.from(new Set(key.split(/\/|\\/)));
       var labels=[];
+      var router = key.shift();
+      labels.push(keymap["router"][router] || router)
       for(let j=0; j<key.length ; j++){
-        labels.push(keymap[key[j]] || key[j])
+        labels.push(keymap["asn"][key[j]] || key[j])
       }
       data.keys[i].readable = key.join("\\");
       data.keys[i].label = labels.join("\\");
@@ -227,7 +247,7 @@ class ASNPathAnalytics{
       let k=cgtoppers_bytes[i].label;
       let parts=k.split("\\");
       parts = _.map(parts,function(ai,ind){
-        return ai.replace(/:0|:1|:2/g,"")+":"+ind;
+        return ai.replace(/:0|:1|:2|:3|:4|:5|:6|:7|:8|:9/g,"")+":"+ind;
       });
       cgtoppers_bytes[i].label=parts.join("\\")
       keylookup[parts[0]] = keylookup[parts[0]]==undefined ? idx++ : keylookup[parts[0]];
@@ -252,7 +272,7 @@ class ASNPathAnalytics{
       }
 
     }
-    let labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2/g,"")).value()
+    let labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2|:3|:4|:5|:6|:7|:8|:9/g,"")).value()
   
     Plotly.purge(this.sankey_div_id);
     var data = {
