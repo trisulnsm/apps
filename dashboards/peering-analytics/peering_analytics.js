@@ -20,13 +20,34 @@ class ISPOverviewMapping{
     this.crosskey_interface=null;
     this.meter_details_in = {upload:0,download:1}
     //filter by router and interface crosskey
-    if(opts.jsparams){
+
+    if(opts.jsparams &&  _.size(opts.jsparams)>0){
       this.crosskey_router = opts.jsparams.crosskey_router;
       this.crosskey_interface = opts.jsparams.crosskey_interface;
       this.meter_details_in = opts.jsparams.meters || {upload:0,download:1};
-    }
+    } 
+
     this.add_form();
   }
+
+  async compute_cg_by_name() {
+
+    console.log("Checking for Auto_ ASN _ Router _Interface cross key groups");
+
+    let cginfo= await fetch_trp(TRP.Message.Command.COUNTER_GROUP_INFO_REQUEST);
+    let opts = {}
+
+    try {
+      opts= { 
+          crosskey_router :  cginfo.group_details.find( (item) => item.name=="Auto_Routers_ASN").guid ,
+          crosskey_interface: cginfo.group_details.find( (item) => item.name=="Auto_Interfaces_ASN").guid
+      }
+    } catch(err) {
+      console.log("Unable to find counter group Auto_Routers_ASN needed for this app");
+    }
+    return opts;
+  }
+
   async add_form(){
     //assign randid to form fields
     this.form = $("<div class='row ui_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Routers</label> <div class='col-xs-8'> <select name='routers'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Interfaces</label> <div class='col-xs-8'> <select name='interfaces'></select> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Submit'> </div> </div> </form> </div> </div>");
@@ -37,6 +58,13 @@ class ISPOverviewMapping{
     this.form.find("input[name*='to_date']").attr("id","to_date_"+this.rand_id);
     this.dom.append(this.form);
     var update_ids = "#from_date_"+this.rand_id+","+"#to_date_"+this.rand_id;
+
+    if (! _.isString(this.crosskey_router)) {
+      let opts = await this.compute_cg_by_name();
+      this.crosskey_router=opts.crosskey_router;
+      this.crosskey_interface=opts.crosskey_interface;
+      debugger;
+    }
 
     //new time selector 
     new ShowNewTimeSelector({divid:"#new_time_selector_"+this.rand_id,
