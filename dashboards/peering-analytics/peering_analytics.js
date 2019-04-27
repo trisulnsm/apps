@@ -268,7 +268,7 @@ class ISPOverviewMapping{
     this.table_id = `table_${this.meter}_${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
-    table.find("thead").append(`<tr><th>Key</th><th>Label</th><th sort='volume' barspark='auto'>Volume </th><th sort='volume'>Bandwidth</th><th class='nosort'></th></tr>`);
+    table.find("thead").append(`<tr><th>Key</th><th>Label</th><th sort='volume' barspark='auto'>Volume </th><th sort='volume'>Avg Bandwidth</th><th class='nosort'></th></tr>`);
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,100);
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
@@ -276,6 +276,7 @@ class ISPOverviewMapping{
       let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;;'><small>Options<i class='fa fa-caret-down fa-fw'></i></small></a></span>");
       let dropdown_menu = $("<ul class='dropdown-menu  pull-right'></ul>");
       dropdown_menu.append("<li><a href='javascript:;;'>Drilldown</a></li>");
+      dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
 
 
@@ -291,7 +292,7 @@ class ISPOverviewMapping{
                                 <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
                                 <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
                                 <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
-                                <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("ps","")}</td>
+                                <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
 
                                 <td>${dropdown[0].outerHTML}</td>
                                 </tr>`);
@@ -528,6 +529,17 @@ class ISPOverviewMapping{
                     }));
         break;
       case 1:
+        let params = {
+          key: tr.data("full_key").replace(/\\/g,"\\\\"),
+          statids:tr.data("statid"),
+          cgguid:this.cgguid,
+          window_fromts:this.tmint.from.tv_sec,
+          window_tots:this.tmint.to.tv_sec,
+        }
+        let url = "/trpjs/generate_chart_lb?"+$.param(params);
+        load_modal(url);
+        break;
+      case 2:
         let link_params =$.param({dash_key:"key",
                          guid:this.cgguid,
                          key:tr.data("full_key"),
