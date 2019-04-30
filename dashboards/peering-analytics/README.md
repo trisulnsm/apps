@@ -1,6 +1,5 @@
 # Peering Analytics
 
-
 This app adds Router/Interface/AS analytics to Trisul. 
 
 You can analyze
@@ -14,10 +13,9 @@ For each of these you have to specify the cross key
 
 ## For AS Analytics
 
+Two Crosskey Counter groups are required.  Named Auto_Routers_ASN and Auto_Interfaces_ASN  
 
-Two Crosskey Counter groups are required.   Router X AS and Interface X AS 
-
-After installing , add these GUIDs to module params. 
+If you have different names, you can edit the module params to specify them.
 
 
 ````
