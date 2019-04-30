@@ -1,64 +1,94 @@
 //ASN Path analytics
 class ASNPathAnalytics{
   constructor(opts){
-    let js_file =opts.jsfile;
-    let file_path = js_file.split("/")
-    file_path.pop()
-    file_path = file_path.join("/");
-    let css_file = `/plugins/${file_path}/app.css`;
-    $('head').append(`<link rel="stylesheet" type="text/css" href="${css_file}">`);
     this.dom = $(opts.divid);
     this.rand_id=parseInt(Math.random()*100000);
     this.default_selected_time = opts.new_time_selector;
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
     this.cgguid = "{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}";
     if(opts.jsparams){
-      this.cgguid = opts.jsparams.crosskey_guid || "{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}";
+      this.cgguid = opts.jsparams.crosskey_interface || "{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}";
     }
     this.add_form();
   }
-  //add form 
+
   async add_form(){
-    this.form = $("<div class='row path_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Routers</label> <div class='col-xs-8'> <select name='routers'></select> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Submit'> </div> </div> </form> </div> </div>");
+    this.form=$("<div class='row pathanalytics_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Routers</label> <div class='col-xs-8'> <select name='routers'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Interfaces</label> <div class='col-xs-8'> <select name='interfaces'></select> </div> </div> </div> <div class='col-xs-6'> <div class='from-group'> <label class='control-label col-xs-4'>Filter ASN</label> <div class='col-xs-8'> <input class='filter_asn' type='text'> <span class='help-block text-left'>Please enter AS Number to filter the result</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Submit'> </div> </div> </form> </div> </div>");
+    //we are updating router and meter based on id.
     this.form.find("select[name*='routers']").attr("id","routers_"+this.rand_id);
-    this.form.find(".new_time_selector").attr("id","new_time_selector_"+this.rand_id);
+    this.form.find("select[name*='interfaces']").attr("id","interfaces_"+this.rand_id);
     this.form.find("input[name*='from_date']").attr("id","from_date_"+this.rand_id);
     this.form.find("input[name*='to_date']").attr("id","to_date_"+this.rand_id);
+    this.form.find(".new_time_selector").attr("id","new_time_selector_"+this.rand_id);
     this.dom.append(this.form);
-    var update_ids = "#from_date_"+this.rand_id+","+"#to_date_"+this.rand_id;
     //new time selector 
+    let update_ids = "#from_date_"+this.rand_id+","+"#to_date_"+this.rand_id;
     new ShowNewTimeSelector({divid:"#new_time_selector_"+this.rand_id,
                                update_input_ids:update_ids,
                                default_ts:this.default_selected_time
                             });
-    
-    this.cg_meters = {};
-    this.mk_time_interval();
-    await get_counters_and_meters_json(this.cg_meters);
-    let router_keys=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: GUID.GUID_CG_FLOWGENS(),
-      time_interval: this.tmint,
-      maxitems:100,
-      meter:0
-    });
-    $("#routers_"+this.rand_id)
-         .append($("<option></option>")
-                    .attr("value",0)
-                    .text("Please select")); 
 
-    for(let i=0 ; i < router_keys.keys.length; i++){
-      let keyt =   router_keys.keys[i];
-      if(keyt.key=="SYS:GROUP_TOTALS"){
-        continue;
-      }
-      $("#routers_"+this.rand_id)
-         .append($("<option></option>")
-                    .attr("value",keyt.key)
-                    .text(keyt.label)); 
-    };
+    //loading router and interface in dropdown
+    //get interface search key request
+    this.mk_time_interval();
+    await this.load_routers_interfaces();
+    await this.get_cgmeters();
     this.form.submit($.proxy(this.submit_form,this));
   }
-  //time intetval
+  async load_routers_interfaces(){
+    //get routers from keyspace request
+    let top_routers=await fetch_trp(TRP.Message.Command.KEYSPACE_REQUEST, {
+      counter_group: GUID.GUID_CG_FLOWGENS(),
+      time_interval:this.tmint,
+      maxitems:1000
+    });
+
+    this.router_keymap ={}
+    _.each(top_routers.hits,function(keyt){
+      this.router_keymap[keyt.key] = keyt.label || keyt.readable;
+    },this);
+
+
+    let top_intfs=await fetch_trp(TRP.Message.Command.KEYSPACE_REQUEST, {
+      counter_group: GUID.GUID_CG_FLOWINTERFACE(),
+      time_interval:this.tmint,
+      maxitems:1000
+    });
+
+    this.intf_keymap ={}
+    _.each(top_intfs.hits,function(keyt){
+      this.intf_keymap[keyt.key] = keyt.label || keyt.readable;
+    },this);
+
+    let drop_down_items = {"0":["Please select",[["0","Please select"]]]};
+
+    let interface_keys = _.sortBy(top_intfs.hits,function(keyt) { return keyt.key })
+    for(let i=0;i<interface_keys.length; i++){
+      let intf_keyt = interface_keys[i];
+      let router_key=intf_keyt.key.split("_")[0];
+      let router_label = this.router_keymap[router_key];
+      let intf_dropdown = [];
+      if(_.has(drop_down_items,router_key)){
+        intf_dropdown= drop_down_items[router_key];
+      }else{
+        drop_down_items[router_key]=[router_label,[["0","Please Select"]]];
+        intf_dropdown = drop_down_items[router_key];
+      }
+      intf_dropdown[1].push([intf_keyt.key,this.intf_keymap[intf_keyt.key]]);
+    }
+    var js_params = {meter_details:drop_down_items,
+      selected_cg : "",
+      selected_st : "0",
+      update_dom_cg : "routers_"+this.rand_id,
+      update_dom_st : "interfaces_"+this.rand_id,
+      chosen:true
+    }
+    new CGMeterCombo(JSON.stringify(js_params));
+  }
+  async get_cgmeters(){
+    this.cg_meters={};
+    await get_counters_and_meters_json(this.cg_meters);
+  }
   mk_time_interval(){
     var selected_fromdate = $('#from_date_'+this.rand_id).val();
     var selected_todate = $('#to_date_'+this.rand_id).val();
@@ -67,146 +97,109 @@ class ASNPathAnalytics{
     this.tmint = mk_time_interval([fromTS,toTS]);
   }
 
-  reset_ui(){
-    this.dom.find(".path_data").html('');
-    this.data_dom = $("<div class='path_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <div class='col-xs-12 toppers_table_div'> <h2> <i class='fa fa-table'></i> Busiest Routes <small> Shows the top used AS PATHS </small> </h2> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-12 sankey_asn_upload sankey_chart'> <h2> <i class='fa fa-random'></i> Route Per Hop Analytics - Transmit <small> Usage of busiest route segments </small> </h2> <div class='sankey_chart_upload'></div> </div> <div class='col-xs-12 sankey_asn_download sankey_chart'> <h2> <i class='fa fa-random'></i> Route Per Hop Analytics - Receive <small> Usage of busiest route segments - Download </small> </h2> <div class='sankey_chart_download'></div> </div> </div> </div> </div> </div> </div>");
-    this.dom.append(this.data_dom);
-    this.data_dom.find('.toppers_table_div').attr("id","toppers_table_"+this.rand_id)
-    this.data_dom.find(".sankey_chart_upload").attr("id","sankey_chart_upload_"+this.rand_id);
-    this.data_dom.find(".sankey_chart_download").attr("id","sankey_chart_download_"+this.rand_id)
-  }
-
   submit_form(){
     this.reset_ui();
     this.mk_time_interval();
     this.get_data();
     return false;
   }
+ 
+  reset_ui(){
+    this.dom.find(".path_data").html('');
+    this.data_dom = $("<div class='path_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <div class='col-xs-12 toppers_table_div'> <h2> <i class='fa fa-table'></i> Busiest Routes <small> Shows the top used AS PATHS </small> </h2> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-12 sankey_asn_upload sankey_chart'> <h2> <i class='fa fa-random'></i> Route Per Hop Analytics - Transmit <small> Usage of busiest route segments </small> </h2> <div class='sankey_chart_upload'></div> </div> <div class='col-xs-12 sankey_asn_download sankey_chart'> <h2> <i class='fa fa-random'></i> Route Per Hop Analytics - Receive <small> Usage of busiest route segments - Download </small> </h2> <div class='sankey_chart_download'></div> </div> </div> </div> </div> </div> </div>");
+    this.dom.append(this.data_dom);
+    this.data_dom.find('.toppers_table_div').attr("id","toppers_table_"+this.rand_id);
+    this.data_dom.find(".sankey_chart_upload").attr("id","sankey_chart_upload_"+this.rand_id);
+    this.data_dom.find(".sankey_chart_download").attr("id","sankey_chart_download_"+this.rand_id);
+  }
   async get_data(){
-    if(this.cg_meters.all_cg_meters[this.cgguid]==undefined){
-      this.data_dom.html("<div class='alert alert-info'>ASN Path crossKey Counter Group Not found.</div>")
-      return true;
-    }
+    this.data ={};
+    this.bucket_size = this.cg_meters.all_cg_bucketsize[this.cgguid].top_bucket_size;
+
     let req_opts = {
       counter_group: this.cgguid,
       time_interval: this.tmint,
       maxitems:100,
     }
-    let selected_router = $('#routers_'+this.rand_id).val();
-    //for please select option don't add key filter
-    if(selected_router != 0)
+    let selected_interface = $('#interfaces_'+this.rand_id).val();
+    let selected_router = $('#interfaces_'+this.rand_id).val();
+    let filter_asn = this.form.find(".filter_asn").val();
+
+    if(selected_interface != 0)
     {
+      req_opts["key_filter"]= selected_interface;
+    }else if(selected_router !=0){
       req_opts["key_filter"]= selected_router;
     }
-    //upload toppers
-    
-    req_opts["meter"] = 0;
-    let upload_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts );
-    req_opts["meter"] = 1;
-    let download_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts);
-
-    this.bucket_size = this.cg_meters.all_cg_bucketsize[this.cgguid].top_bucket_size;
-    this.unresolved_asn_keys = [];
-    this.unresolved_router_keys=[];
-    this.get_unresolved_keys(upload_bytes);
-    this.get_unresolved_keys(download_bytes);
-
-    //get name for keys
-    let resolved_keyts = {}
-    resolved_keyts["asn"]=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST, {
-      counter_group: GUID.GUID_CG_ASN(),
-      keys:this.unresolved_asn_keys
-    });
-    resolved_keyts["router"]=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST, {
-      counter_group: GUID.GUID_CG_FLOWGENS(),
-      keys:this.unresolved_router_keys
-    });
-
-    
-    let resolved_keymap = {asn:{},router:{}};
-    for (let [key, item] of Object.entries(resolved_keyts)) {
-      for(let i=0;i< item.keys.length;i++){
-        let keyt = item.keys[i];
-        resolved_keymap[key][keyt.key] = keyt.label
-      }
-    };
-    console.log(resolved_keymap)
-    //change label to resolved labels
-    this.change_keys_label(upload_bytes,resolved_keymap);
-    this.change_keys_label(download_bytes,resolved_keymap);
-    
-    //convert data to table
-    let table_data = {}
-
-    for(let i=0;i<upload_bytes.keys.length;i++){
-      let keyt = upload_bytes.keys[i];
-      let label = keyt.label;
-      if (keyt.key=="SYS:GROUP_TOTALS" ){
-        continue;
-      }
-      if(table_data[label]==undefined){
-        table_data[label] = [keyt.key,keyt.readable,label,0,0]
-      }
-      table_data[label][3]=table_data[label][3] + (keyt.metric.toNumber()*this.bucket_size)
+    if(filter_asn.length > 0){
+      req_opts["key_filter"] = filter_asn;
     }
+    req_opts["meter"] = 0;
+    this.data[0]=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts );
+    req_opts["meter"] = 1;
+    this.data[1]=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts);
+    //key_filter in trp support one like 
+    //we can't combine router with asn to make key filter
+    //so support added via code.
+    console.log(this.data)
+    let filter_value = ".*";
+    if(selected_router && filter_asn){
+      filter_value = selected_router;
+    }else if(selected_interface && filter_asn){
+      filter_value = selected_interface
+    }
+    //resove asn path to label
+    let asn_keys=await fetch_trp(TRP.Message.Command.KEYSPACE_REQUEST, {
+      counter_group: GUID.GUID_CG_ASN(),
+      time_interval:this.tmint,
+      maxitems:10000
+    });
 
+    let asn_keymap = {}
+    _.each(asn_keys.hits,function(keyt){
+      asn_keymap[keyt.key] = keyt.label || keyt.readable;
+    },this);
 
-    for(let i=0;i<download_bytes.keys.length;i++){
-      let keyt = download_bytes.keys[i];
-      let label = keyt.label;
-      if (keyt.key=="SYS:GROUP_TOTALS"){
-        continue;
+    for(let meterid in this.data){
+      this.data[meterid].keys = _.chain(this.data[meterid].keys)
+                                .select(function(topper){
+                                  return topper.key.match(filter_value)
+                                })
+                                .reject(function(topper){
+                                  return topper.key=="SYS:GROUP_TOTALS"
+                                })
+                                .each(function(keyt){
+                                  //remove repated asn in single path
+                                  let readable = keyt.readable.split(/\/|\\/);
+                                  let intf = _.last(readable);
+                                  if(intf.match(/^[0-9]*$/)){
+                                    intf=readable.shift();
+                                  }else{
+                                    intf=readable.pop();
+                                  }
+                                  let asn_path = _.unique(readable);
+                                  let asn_resolved = asn_path.map(x=> asn_keymap[x] || x).join("\\")
+                                  keyt.label=[intf,asn_resolved].join("\\");
+                                  keyt.readable=[intf,asn_path.join("\\")].join("\\");
+                                },this)
+                              .value();
+    }
+    let table_data = {}
+    for(let meterid in this.data){
+       meterid = parseInt(meterid);
+      for(let i=0;i<this.data[meterid].keys.length;i++){
+        let keyt = this.data[meterid].keys[i];
+        let label = keyt.label;
+        if(table_data[label]==undefined){
+          table_data[label] = [keyt.key,keyt.readable,label,0,0]
+        }
+        table_data[label][meterid+3]=table_data[label][meterid+3] + (keyt.metric.toNumber()*this.bucket_size)
       }
-      if(table_data[label]==undefined){
-        table_data[label] = [keyt.key,keyt.readable,label,0,0]
-      }
-      table_data[label][4]=table_data[label][4] + (keyt.metric.toNumber()*this.bucket_size)
     }
     this.draw_table(table_data);
-    this.draw_sankey_chart(upload_bytes,"upload")
-    this.draw_sankey_chart(download_bytes,"download")
-
-  }
-
-  get_unresolved_keys(data){
-    let arrays = [];
-    for(let i=0;i<data.keys.length;i++){
-      let key = data.keys[i].key;
-      if (key=="SYS:GROUP_TOTALS"){
-        continue;
-      }
-      arrays = key.split(/\/|\\/);
-      let router = arrays.shift();
-      if(! this.unresolved_router_keys.includes(router)){
-        this.unresolved_router_keys.push(router);
-      }
-      
-      arrays.forEach(function(asn){
-        if(! this.unresolved_asn_keys.includes(asn)){
-          this.unresolved_asn_keys.push(asn);
-        }
-      },this);
-    }
+    this.draw_sankey_chart(this.data[0],"upload")
+    this.draw_sankey_chart(this.data[1],"download")
     
-  }
-
-  change_keys_label(data,keymap){
-    for(let i=0;i<data.keys.length;i++){
-      let key = data.keys[i].key;
-
-      if (key=="SYS:GROUP_TOTALS"){
-        continue;
-      }
-      key = Array.from(new Set(key.split(/\/|\\/)));
-      var labels=[];
-      var router = key.shift();
-      labels.push(keymap["router"][router] || router)
-      for(let j=0; j<key.length ; j++){
-        labels.push(keymap["asn"][key[j]] || key[j])
-      }
-      data.keys[i].readable = key.join("\\");
-      data.keys[i].label = labels.join("\\");
-    }
   }
 
   draw_table(table_data){
@@ -235,7 +228,7 @@ class ASNPathAnalytics{
 
   draw_sankey_chart(toppers,id){
     this.sankey_div_id = `sankey_chart_${id}_${this.rand_id}`;
-    let cgtoppers_bytes = toppers.keys.slice(1,30);
+    let cgtoppers_bytes = toppers.keys.slice(0,30);
     let keylookup = {};
     let idx=0;
     let links  = { source : [], target : [], value : [] };
@@ -246,6 +239,8 @@ class ASNPathAnalytics{
       //http host and host has same lable 
       let k=cgtoppers_bytes[i].label;
       let parts=k.split("\\");
+
+      
       parts = _.map(parts,function(ai,ind){
         return ai.replace(/:0|:1|:2|:3|:4|:5|:6|:7|:8|:9/g,"")+":"+ind;
       });
@@ -260,6 +255,7 @@ class ASNPathAnalytics{
         
     }
 
+
     for (let i =0 ; i < cgtoppers_bytes.length; i++)
     {
       let item=cgtoppers_bytes[i];
@@ -273,7 +269,6 @@ class ASNPathAnalytics{
 
     }
     let labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2|:3|:4|:5|:6|:7|:8|:9/g,"")).value()
-  
     Plotly.purge(this.sankey_div_id);
     var data = {
       type: "sankey",
@@ -319,28 +314,41 @@ class ASNPathAnalytics{
   }
 
 }
-
-function run(opts){
+ 
+ function run(opts){
   new ASNPathAnalytics(opts)
-}
+ }
 
 //# sourceURL=path_analytics.js
 
 
 // HAML for from
 /*
-.row.path_form
+.row.pathanalytics_form
   .col-xs-12
     %form.form-horizontal
       .row
+        .col-xs-6 
+          .form-group 
+            %label.control-label.col-xs-4 Routers          
+            .col-xs-8 
+              %select{name:'routers'} 
         .col-xs-6
           .form-group
             .new_time_selector
-        .col-xs-6 
+        
+      .row
+        .col-xs-6
           .form-group 
-            %label.control-label.col-xs-4 Routers         
+            %label.control-label.col-xs-4 Interfaces          
             .col-xs-8 
-              %select{name:'routers'} 
+              %select{name:'interfaces'} 
+        .col-xs-6
+          .from-group
+            %label.control-label.col-xs-4 Filter ASN
+            .col-xs-8
+              %input{type:"text",class:"filter_asn"}
+              %span.help-block.text-left Please enter AS Number to filter the result
       .row
         .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
           %input{type:"hidden",name:"from_date"}

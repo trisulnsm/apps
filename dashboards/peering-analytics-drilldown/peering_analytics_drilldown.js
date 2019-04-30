@@ -28,7 +28,7 @@ class ISPDrilldownMapping{
 
   }
   async reset_ui(){
-    this.data_dom=$("<div class='drilldown_data'> <h2 class='drilldown_title'></h2> <div class='row'> <div class='col-xs-12'> <div class='drill_traffic_chart_div traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Overall Usage Traffic Chart </h3> <div class='drill_traffic_chart'></div> </div> </div> </div> <div class='row'> <div class='col-xs-12 routers_drilldown'> <div class='col-xs-7 toppers_table_div'> <h3> <i class='fa fa-table'></i> Routers Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-5 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> <div class='col-xs-12 routers_traffic_div traffic_chart_div'> <h3> <i class='fa fa-area-chart'></i> Traffic chart for Routers </h3> <div class='routers_traffic_chart'></div> </div> <div class='col-xs-12 routers_sankey_div sankey_chart_div'> <h3> <i class='fa fa-random'></i> Routers Sankey Chart </h3> <div class='routers_sankey_chart'></div> </div> </div> <div class='col-xs-12 interfaces_drilldown'> <div class='col-xs-6 toppers_table_div'> <h3> <i class='fa fa-table'></i> Interface Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-6 donut_chart_div'> <h3> Toppers Chart </h3> <div class='donut_chart'></div> </div> <div class='col-xs-12 interface_traffic_div traffic_chart_div'> <h3> <i class='fa fa-area-chart'></i> Traffic chart for interfaces </h3> <div class='interfaces_traffic_chart'></div> </div> <div class='col-xs-12 interfaces_sankey_div sankey_chart_div'> <h3> <i class='fa fa-random'></i> Interfaces Sankey Chart </h3> <div class='interfaces_sankey_chart'></div> </div> <div class='col-xs-6 toppers_table_div'> <h3>Top Internal Hosts</h3> <div class='aggregated_int_flows'> <table> <thead> <tr> <th>Item</th> <th>Label</th> <th>FLows</th> <th sort='volume'>Volume</th> </tr> </thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-6 toppers_table_div'> <h3>Top External Hosts</h3> <div class='aggregated_ext_flows'> <table> <thead> <tr> <th>Item</th> <th>Label</th> <th>Flows</th> <th sort='volume'>Volume</th> </tr> </thead> <tbody></tbody> </table> </div> </div> </div> </div> </div>");
+    this.data_dom=$("<div class='drilldown_data'> <h2 class='drilldown_title'></h2> <div class='row'> <div class='col-xs-12'> <div class='drill_traffic_chart_div traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Overall Usage Traffic Chart </h3> <div class='drill_traffic_chart'></div> </div> </div> </div> <div class='row'> <div class='col-xs-12 routers_drilldown'> <div class='col-xs-7 toppers_table_div'> <h3> <i class='fa fa-table'></i> Routers Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-5 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> <div class='col-xs-12 routers_traffic_div traffic_chart_div'> <h3> <i class='fa fa-area-chart'></i> Traffic chart for Routers </h3> <div class='routers_traffic_chart'></div> </div> <div class='col-xs-12 routers_sankey_div sankey_chart_div'> <h3> <i class='fa fa-random'></i> Routers Sankey Chart </h3> <div class='routers_sankey_chart'></div> </div> </div> <div class='col-xs-12 interfaces_drilldown'> <div class='col-xs-6 toppers_table_div'> <h3> <i class='fa fa-table'></i> Interface Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-6 donut_chart_div'> <h3> Toppers Chart </h3> <div class='donut_chart'></div> </div> <div class='col-xs-12 interface_traffic_div traffic_chart_div'> <h3> <i class='fa fa-area-chart'></i> Traffic chart for interfaces </h3> <div class='interfaces_traffic_chart'></div> </div> <div class='col-xs-12 interfaces_sankey_div sankey_chart_div'> <h3> <i class='fa fa-random'></i> Interfaces Sankey Chart </h3> <div class='interfaces_sankey_chart'></div> </div> <div class='col-xs-6 toppers_table_div'> <h3>Top Internal Hosts</h3> <div class='internal_ip'> <table> <thead> <tr> <th>Item</th> <th>Label</th> <th>FLows</th> <th sort='volume'>Volume</th> </tr> </thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-6 toppers_table_div'> <h3>Top External Hosts</h3> <div class='external_ip'> <table> <thead> <tr> <th>Item</th> <th>Label</th> <th>Flows</th> <th sort='volume'>Volume</th> </tr> </thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-6 toppers_table_div'> <h3>Top ASNumber</h3> <div class='tag_asnumber'> <table> <thead> <tr> <th>Item</th> <th>Label</th> <th>Flows</th> <th sort='volume'>Volume</th> </tr> </thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-6 toppers_table_div'> <h3>Top Prefixes</h3> <div class='tag_prefixes'> <table> <thead> <tr> <th>Item</th> <th>Label</th> <th>Flows</th> <th sort='volume'>Volume</th> </tr> </thead> <tbody></tbody> </table> </div> </div> </div> </div> </div>");
     this.dom.find(".drilldown_data").html('');
     this.dom.append(this.data_dom);
     this.dom.find(".drill_traffic_chart").attr("id","drill_traffic_chart_"+this.rand_id);
@@ -42,8 +42,10 @@ class ISPDrilldownMapping{
     await this.get_toppers("Interfaces")
     await this.get_aggregated_flows("in");
     await this.get_aggregated_flows("out");
-    this.draw_aggregate_table('aggregated_int_flows');
-    this.draw_aggregate_table('aggregated_ext_flows')
+    this.draw_aggregate_table('internal_ip');
+    this.draw_aggregate_table('external_ip');
+    this.draw_aggregate_table('tag_asnumber');
+    this.draw_aggregate_table('tag_prefixes');
   }
 
   draw_drill_chart(){
@@ -110,11 +112,13 @@ class ISPDrilldownMapping{
   async get_aggregated_flows(intf){
     let readable = this.dash_params.readable.split("\\");
     
-    let opts = {flowtag:this.dash_params.key,time_interval:this.tmint,probe_id:this.probe_id};
+    let opts = {flowtag:`[asn]${this.dash_params.key}${this.dash_params.key}`,time_interval:this.tmint,probe_id:this.probe_id};
     if(readable.length > 1){
       let interfaces = readable[1].split("_");
       opts["nf_routerid"] = TRP.KeyT.create({label:interfaces[0]});
-      opts[`nf_ifindex_${intf}`]= TRP.KeyT.create({label:interfaces[1]});
+      if(interfaces[1]){
+        opts[`nf_ifindex_${intf}`]= TRP.KeyT.create({label:interfaces[1]});
+      }
     }
     this.agg_flows.push(await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts));
     
@@ -150,18 +154,28 @@ class ISPDrilldownMapping{
     
   }
 
-  draw_aggregate_table(cls){
-    var table = this.data_dom.find(`.${cls}`).find("table");
+  draw_aggregate_table(group){
+    var table = this.data_dom.find(`.${group}`).find("table");
     table.addClass('table table-hover table-sysdata');
     let toppers = [];
-    if(cls=="aggregated_int_flows"){
-      toppers.push(this.agg_flows[0].internal_ip);
-      toppers.push(this.agg_flows[1].internal_ip);
-    }else{
-      toppers.push(this.agg_flows[0].external_ip);
-      toppers.push(this.agg_flows[1].external_ip);
+    if(group=="internal_ip" || group == "external_ip"){
+      toppers.push(this.agg_flows[0][group]);
+      toppers.push(this.agg_flows[1][group]);
+    }else if(group=="tag_asnumber"){
+      if(! this.agg_flows[0].tag_group.find(x=>x.group_name=="asn")){
+        return true
+      }
+     toppers.push(this.agg_flows[0].tag_group.find(x=>x.group_name=="asn").tag_metrics)
+     toppers.push(this.agg_flows[1].tag_group.find(x=>x.group_name=="asn").tag_metrics)
     }
-    toppers =_.flatten(toppers);
+    else if(group=="tag_prefixes"){
+      if(! this.agg_flows[0].tag_group.find(x=>x.group_name=="prf")){
+        return true
+      }
+      toppers.push(this.agg_flows[0].tag_group.find(x=>x.group_name=="prf").tag_metrics)
+      toppers.push(this.agg_flows[1].tag_group.find(x=>x.group_name=="prf").tag_metrics)
+    }
+    toppers =_.flatten(toppers).slice(0,50);
     let toppers_obj = {};
     for(let i=0 ; i < toppers.length; i++){
       let t = toppers[i];
@@ -169,7 +183,6 @@ class ISPDrilldownMapping{
       if(toppers_obj[k]){
         let  v = toppers_obj[k];
         v.count = parseInt(v.count) + parseInt(t.count) ;
-        console.log(t.metric.toNumber());
         v.metric = v.metric.toNumber() + t.metric.toNumber() ;
       }else{
         toppers_obj[k] = t
@@ -180,7 +193,7 @@ class ISPDrilldownMapping{
       var t = toppers[i];
 
       table.find("tbody").append(`<tr>
-                                  <td>${t.key.readable}</td>
+                                  <td>${t.key.readable||t.key.key}</td>
                                   <td>${t.key.label}</td>
                                   <td>${t.count}</td>
                                   <td>${h_fmtvol(t.metric)}</td>
@@ -462,7 +475,7 @@ function run(opts) {
       
       .col-xs-6.toppers_table_div
         %h3 Top Internal Hosts
-        .aggregated_int_flows
+        .internal_ip
           %table
             %thead
               %tr
@@ -473,7 +486,29 @@ function run(opts) {
             %tbody
       .col-xs-6.toppers_table_div
         %h3 Top External Hosts
-        .aggregated_ext_flows
+        .external_ip
+          %table
+            %thead
+              %tr
+                %th Item
+                %th Label
+                %th Flows
+                %th{sort:"volume"} Volume
+            %tbody
+      .col-xs-6.toppers_table_div
+        %h3 Top ASNumber
+        .tag_asnumber
+          %table
+            %thead
+              %tr
+                %th Item
+                %th Label
+                %th Flows
+                %th{sort:"volume"} Volume
+            %tbody
+      f.col-xs-6.toppers_table_div
+        %h3 Top Prefixes
+        .tag_prefixes
           %table
             %thead
               %tr
