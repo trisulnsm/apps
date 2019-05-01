@@ -112,7 +112,7 @@ class ISPDrilldownMapping{
   async get_aggregated_flows(intf){
     let readable = this.dash_params.readable.split("\\");
     
-    let opts = {flowtag:`[asn]${this.dash_params.key}${this.dash_params.key}`,time_interval:this.tmint,probe_id:this.probe_id};
+    let opts = {flowtag:`[asn]${this.dash_params.key}`,time_interval:this.tmint,probe_id:this.probe_id};
     if(readable.length > 1){
       let interfaces = readable[1].split("_");
       opts["nf_routerid"] = TRP.KeyT.create({label:interfaces[0]});
