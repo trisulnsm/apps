@@ -1,0 +1,37 @@
+{
+  "TrisulCounterGroupCrosskey": [
+    [
+      {
+        "id": 2,
+        "CounterGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
+        "ParentCounterGUID": "{03E016FC-46AA-4340-90FC-0E278B93C677}",
+        "CrosskeyCounterGUID": "{C0B04CA7-95FA-44EF-8475-3835F3314761}",
+        "CrosskeyThirdCounterGUID": null,
+        "KeyLength1": null,
+        "KeyLength2": null,
+        "KeyLength3": null
+      }
+    ],
+    [
+      {
+        "id": 49,
+        "CounterGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
+        "Name": "Auto_Interfaces_ASN",
+        "Description": "auto asn router",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 60000,
+        "TrackHiWater": 50000,
+        "TrackLoWater": 25000,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Active",
+        "CardinalityEstimateBits": "",
+        "TopperTrafficOnly": "False",
+        "EnableSliceKeys": 0,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1555927434,
+        "ResolverCounterGUID": null
+      }
+    ]
+  ]
+}

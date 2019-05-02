@@ -1,0 +1,18 @@
+{
+  "TrisulSessTaggerPolicie": [
+    [
+      {
+        "id": 5,
+        "SessionGroupID": "{99A78737-4B41-4387-8F31-8077DB917336}",
+        "TaggerName": "auto prefix",
+        "TaggerRule": "{2BE2A3B6-613D-4216-0737-3684E824EA33}=*",
+        "TaggerTag": "AUTO:PREFIX",
+        "CheckContent": null,
+        "RowStatus": "Active",
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1556701907,
+        "TaggerGroup": "prf"
+      }
+    ]
+  ]
+}

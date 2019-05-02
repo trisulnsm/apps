@@ -106,7 +106,7 @@ class ASNPathAnalytics{
  
   reset_ui(){
     this.dom.find(".path_data").html('');
-    this.data_dom = $("<div class='path_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <div class='col-xs-12 toppers_table_div'> <h2> <i class='fa fa-table'></i> Busiest Routes <small> Shows the top used AS PATHS </small> </h2> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-12 sankey_asn_upload sankey_chart'> <h2> <i class='fa fa-random'></i> Route Per Hop Analytics - Transmit <small> Usage of busiest route segments </small> </h2> <div class='sankey_chart_upload'></div> </div> <div class='col-xs-12 sankey_asn_download sankey_chart'> <h2> <i class='fa fa-random'></i> Route Per Hop Analytics - Receive <small> Usage of busiest route segments - Download </small> </h2> <div class='sankey_chart_download'></div> </div> </div> </div> </div> </div> </div>");
+    this.data_dom = $("<div class='path_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <div class='col-xs-12 toppers_table_div'> <h3 class='noitify'> <i class='fa fa-spinner fa-spin'></i> Please wait .... Getting data .....  </h3> <h2> <i class='fa fa-table'></i> Busiest Routes <small> Shows the top used AS PATHS </small> </h2> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-12 sankey_asn_upload sankey_chart'> <h2> <i class='fa fa-random'></i> Route Per Hop Analytics - Transmit <small> Usage of busiest route segments </small> </h2> <div class='sankey_chart_upload'></div> </div> <div class='col-xs-12 sankey_asn_download sankey_chart'> <h2> <i class='fa fa-random'></i> Route Per Hop Analytics - Receive <small> Usage of busiest route segments - Download </small> </h2> <div class='sankey_chart_download'></div> </div> </div> </div> </div> </div> </div>");
     this.dom.append(this.data_dom);
     this.data_dom.find('.toppers_table_div').attr("id","toppers_table_"+this.rand_id);
     this.data_dom.find(".sankey_chart_upload").attr("id","sankey_chart_upload_"+this.rand_id);
@@ -141,7 +141,6 @@ class ASNPathAnalytics{
     //key_filter in trp support one like 
     //we can't combine router with asn to make key filter
     //so support added via code.
-    console.log(this.data)
     let filter_value = ".*";
     if(selected_router && filter_asn){
       filter_value = selected_router;
@@ -203,6 +202,7 @@ class ASNPathAnalytics{
   }
 
   draw_table(table_data){
+    this.dom.find('.noitify').remove();
     let rows = [];
     var table = this.data_dom.find(`#toppers_table_${this.rand_id}`).find(".toppers_table").find("table");
     this.table_id = `table_${this.rand_id}`;
@@ -363,6 +363,9 @@ class ASNPathAnalytics{
       .panel.panel-info
         .panel-body
           .col-xs-12.toppers_table_div
+            %h3.noitify
+              %i.fa.fa-spinner.fa-spin
+              Please wait .... Getting data .....
             %h2 
               %i.fa.fa-table
               Busiest Routes

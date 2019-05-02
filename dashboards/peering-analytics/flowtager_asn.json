@@ -1,0 +1,18 @@
+{
+  "TrisulSessTaggerPolicie": [
+    [
+      {
+        "id": 4,
+        "SessionGroupID": "{99A78737-4B41-4387-8F31-8077DB917336}",
+        "TaggerName": "Auto asn",
+        "TaggerRule": "{03E016FC-46AA-4340-90FC-0E278B93C677}=*",
+        "TaggerTag": "AUTO:ASN",
+        "CheckContent": null,
+        "RowStatus": "Active",
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1556701874,
+        "TaggerGroup": "asn"
+      }
+    ]
+  ]
+}
