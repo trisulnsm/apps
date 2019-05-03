@@ -63,7 +63,6 @@ class ISPOverviewMapping{
       let opts = await this.compute_cg_by_name();
       this.crosskey_router=opts.crosskey_router;
       this.crosskey_interface=opts.crosskey_interface;
-      debugger;
     }
 
     //new time selector 
@@ -237,9 +236,16 @@ class ISPOverviewMapping{
 
     this.cgtoppers_resp.keys = this.sort_hash(this.cgtoppers_resp,"metric");
     //reject sysgrup and xx
+
+    let sys_totals = _.select(this.cgtoppers_resp.keys,function(topper){
+      return topper.key=="SYS:GROUP_TOTALS"
+    });
+    this.sys_group_totals = sys_totals[0].metric.toNumber()*this.top_bucket_size;
+
     this.cgtoppers_resp.keys = _.reject(this.cgtoppers_resp.keys,function(topper){
       return topper.key=="SYS:GROUP_TOTALS" || topper.key.includes("XX");
     });
+   
     
     await this.draw_table();
     await this.draw_chart();
@@ -327,16 +333,27 @@ class ISPOverviewMapping{
 
 
     }
-    new TablePagination(this.table_id,{no_of_rows:10,rows:rows});
-    table.find('.dropdown-menu').find('a').bind('click',$.proxy(function(event){
+    new TrisTablePagination(this.table_id,{no_of_rows:10,rows:rows,
+                            sys_group_totals:this.sys_group_totals,
+                            callback:$.proxy(function(){this.pagination_callback()},this)});
+      table.find('.dropdown-menu').find('a').bind('click',$.proxy(function(event){
       this.dropdown_click(event);
     },this));
     table.find('.linkdrill').find('a').bind('click',$.proxy(function(event){
       this.dropdown_click(event);
     },this));
-
-    add_barspark(table);
     table.tablesorter();
+  }
+
+  pagination_callback(){
+    console.log(this.table_id)
+    this.data_dom.find("table").find('.dropdown-menu').find('a').bind('click',$.proxy(function(event){
+      this.dropdown_click(event);
+    },this));
+    this.data_dom.find("table").find('.linkdrill').find('a').bind('click',$.proxy(function(event){
+      this.dropdown_click(event);
+    },this));
+
   }
 
   sort_hash(data,key){
@@ -585,59 +602,7 @@ function run(opts) {
   new ISPOverviewMapping(opts);
 }
 
-//paginate the table
-class TablePagination {
-  constructor(table_id,opts) {
-    this.table_id   = table_id;
-    this.no_of_rows = opts.no_of_rows || 10; //number of row per pagination
-    this.rows = opts.rows;
-    this.total_rows = this.rows.length;
-    this.rand_id=parseInt(Math.random()*100000);
-    this.add_pagination();
-  }
-  add_pagination(){
-    let ul = $("<ul>",{class:"pagination",id:"pagination_"+this.rand_id});
-    let no_of_pagination = Math.ceil(this.total_rows / this.no_of_rows);
-    for(let i=1 ; i<=no_of_pagination; i++){
-      let li = $(`<li><a href='javascript:;' data-pagination-no=${i}>${i}</a></li>`);
-      if(i==1){
-        li.addClass('active');;
-      }
-      ul.append(li);
-    }
-    $('#'+this.table_id).parent().append(ul);
-    ul.find('a').bind('click',$.proxy(function(event){
-      this.pagination_click(event);
-    },this));
-    this.clicked_pagination=1;
-    this.change_rows();
-    if(this.total_rows <= this.no_of_rows){
-      ul.hide();
-    }
-  }
-  pagination_click(event){
-     var target = $(event.target);
-     $(`#pagination_${this.rand_id}`).find("li").removeClass('active');
-     target.parent().addClass('active');
-     this.clicked_pagination = target.data("pagination-no");
-     this.change_rows();
-  }
-  change_rows(){
-   // $(`#pagination_${this.rand_id}`).find(`*[data-pagination-no=${this.clicked_pagination}]`);
-    let start_row  = 0;
-    let end_row = this.no_of_rows-1;
-    let table = $('#'+this.table_id);
-    if(this.clicked_pagination > 1){
-      start_row = ((this.clicked_pagination-1)  * this.no_of_rows) ;
-      end_row = start_row + this.no_of_rows;
-    }
-    table.find("tbody").html("");
-    for(let i=start_row ; i<=end_row ; i++){
-      table.find("tbody").append(this.rows[i])
-    }
-    add_barspark(table);
-  }
-};
+
 
 //# sourceURL=peering_analytics.js
 

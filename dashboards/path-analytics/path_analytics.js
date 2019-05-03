@@ -9,11 +9,14 @@ class ASNPathAnalytics{
     if(opts.jsparams){
       this.cgguid = opts.jsparams.crosskey_interface || "{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}";
     }
+    load_css_file(opts);
+    this.remove_topper_count=0;
+    this.max_crosskey_nodes=30;
     this.add_form();
   }
 
   async add_form(){
-    this.form=$("<div class='row pathanalytics_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Routers</label> <div class='col-xs-8'> <select name='routers'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Interfaces</label> <div class='col-xs-8'> <select name='interfaces'></select> </div> </div> </div> <div class='col-xs-6'> <div class='from-group'> <label class='control-label col-xs-4'>Filter ASN</label> <div class='col-xs-8'> <input class='filter_asn' type='text'> <span class='help-block text-left'>Please enter AS Number to filter the result</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Submit'> </div> </div> </form> </div> </div>");
+    this.form=$("<div class='row pathanalytics_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Routers</label> <div class='col-xs-8'> <select name='routers'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Interfaces</label> <div class='col-xs-8'> <select name='interfaces'></select> </div> </div> </div> <div class='col-xs-6'> <div class='from-group'> <label class='control-label col-xs-4'>Filter ASN</label> <div class='col-xs-8'> <input class='filter_asn' type='text'> <span class='help-block text-left'>Please enter AS Number to filter the result</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Remove Toppers</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider-remove-topn'> <div class='ui-slider-handle' id='remove-top-n'></div> </div> <span class='help-block text-left'>Remove the top N flows from view to reveal the smaller flows</span> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Show max nodes</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider-max-nodes'> <div class='ui-slider-handle' id='max-nodes'></div> </div> <span class='help-block text-left'>Show approximately these many nodes on the sankey (default 30)</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Submit'> </div> </div> </form> </div> </div>");
     //we are updating router and meter based on id.
     this.form.find("select[name*='routers']").attr("id","routers_"+this.rand_id);
     this.form.find("select[name*='interfaces']").attr("id","interfaces_"+this.rand_id);
@@ -33,6 +36,34 @@ class ASNPathAnalytics{
     this.mk_time_interval();
     await this.load_routers_interfaces();
     await this.get_cgmeters();
+
+    let cthis = this;
+    $( "#slider-remove-topn" ).slider({
+      min: 0, max: 10, value:0, step:1,
+      create: function() {
+         $( "#remove-top-n" ).text( $( this ).slider( "value" ) );
+      },
+      slide: function( event, ui ) {
+         $( "#remove-top-n" ).text( ui.value );
+        cthis.remove_topper_count=ui.value;
+        cthis.draw_sankey_chart(cthis.data[0],"upload");
+        cthis.draw_sankey_chart(cthis.data[1],"download");
+      }
+    });
+
+   
+    $( "#slider-max-nodes" ).slider({
+      min: 20, max: 100, value:30, step:10,
+      create: function() {
+        $( "#max-nodes" ).text( $( this ).slider( "value" ) );
+      },
+      slide: function( event, ui ) {
+        $( "#max-nodes" ).text( ui.value );
+        cthis.max_crosskey_nodes=ui.value;
+        cthis.draw_sankey_chart(cthis.data[0],"upload");
+        cthis.draw_sankey_chart(cthis.data[1],"download");
+      }
+    });
     this.form.submit($.proxy(this.submit_form,this));
   }
   async load_routers_interfaces(){
@@ -183,6 +214,15 @@ class ASNPathAnalytics{
                                 },this)
                               .value();
     }
+    
+    this.draw_table();
+    this.draw_sankey_chart(this.data[0],"upload")
+    this.draw_sankey_chart(this.data[1],"download")
+    
+  }
+
+
+  draw_table(){
     let table_data = {}
     for(let meterid in this.data){
        meterid = parseInt(meterid);
@@ -195,13 +235,6 @@ class ASNPathAnalytics{
         table_data[label][meterid+3]=table_data[label][meterid+3] + (keyt.metric.toNumber()*this.bucket_size)
       }
     }
-    this.draw_table(table_data);
-    this.draw_sankey_chart(this.data[0],"upload")
-    this.draw_sankey_chart(this.data[1],"download")
-    
-  }
-
-  draw_table(table_data){
     this.dom.find('.noitify').remove();
     let rows = [];
     var table = this.data_dom.find(`#toppers_table_${this.rand_id}`).find(".toppers_table").find("table");
@@ -228,7 +261,7 @@ class ASNPathAnalytics{
 
   draw_sankey_chart(toppers,id){
     this.sankey_div_id = `sankey_chart_${id}_${this.rand_id}`;
-    let cgtoppers_bytes = toppers.keys.slice(0,30);
+    let cgtoppers_bytes = toppers.keys.slice(this.remove_topper_count,this.max_crosskey_nodes);
     let keylookup = {};
     let idx=0;
     let links  = { source : [], target : [], value : [] };
@@ -336,7 +369,8 @@ class ASNPathAnalytics{
         .col-xs-6
           .form-group
             .new_time_selector
-        
+       
+          
       .row
         .col-xs-6
           .form-group 
@@ -349,6 +383,22 @@ class ASNPathAnalytics{
             .col-xs-8
               %input{type:"text",class:"filter_asn"}
               %span.help-block.text-left Please enter AS Number to filter the result
+      .row
+        .col-xs-6
+          .form-group
+            %label.control-label.col-xs-4 Remove Toppers
+            .col-xs-8{style:"padding-top:10px"}
+              #slider-remove-topn
+                %div#remove-top-n.ui-slider-handle
+              %span.help-block.text-left Remove the top N flows from view to reveal the smaller flows
+        .col-xs-6
+          .form-group
+            %label.control-label.col-xs-4 Show max nodes
+            .col-xs-8{style:"padding-top:10px"}
+              #slider-max-nodes
+                %div#max-nodes.ui-slider-handle
+              %span.help-block.text-left Show approximately these many nodes on the sankey (default 30)
+
       .row
         .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
           %input{type:"hidden",name:"from_date"}
