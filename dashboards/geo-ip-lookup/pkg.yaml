@@ -1,0 +1,16 @@
+name: Geo IP Lookup
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short:   Shows the ip look up
+   long:  |
+      Show ASNumber , ASNumber path,Country etc ..
+
+apptype: dashboard_js
+
+appresources: geo_ip_lookup.js
+
