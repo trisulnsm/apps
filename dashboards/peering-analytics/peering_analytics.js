@@ -235,16 +235,17 @@ class ISPOverviewMapping{
     this.cgtoppers_resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, req_opts);
 
     this.cgtoppers_resp.keys = this.sort_hash(this.cgtoppers_resp,"metric");
+    
     //reject sysgrup and xx
-
-    let sys_totals = _.select(this.cgtoppers_resp.keys,function(topper){
-      return topper.key=="SYS:GROUP_TOTALS"
-    });
-    this.sys_group_totals = sys_totals[0].metric.toNumber()*this.top_bucket_size;
-
     this.cgtoppers_resp.keys = _.reject(this.cgtoppers_resp.keys,function(topper){
       return topper.key=="SYS:GROUP_TOTALS" || topper.key.includes("XX");
     });
+    
+    this.sys_group_totals = 1;
+    _.each(this.cgtoppers_resp.keys,function(topper){
+      this.sys_group_totals = this.sys_group_totals + topper.metric.toNumber(); 
+    },this);
+    this.sys_group_totals = this.sys_group_totals*this.top_bucket_size;
    
     
     await this.draw_table();
@@ -312,6 +313,7 @@ class ISPOverviewMapping{
       dropdown_menu.append("<li><a href='javascript:;;'>Drilldown</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
+      dropdown_menu.append("<li><a href='javascript:;;'>ASN Path</a></li>");
 
 
       dropdown.append(dropdown_menu);
@@ -563,8 +565,8 @@ class ISPOverviewMapping{
                     $.param({
                         key: tr.data("key"),
                         statid:tr.data("statid"),
-                        label:`${tr.data("label")}`.replace(/\\/g,"\\\\"),
-                        readable:`${tr.data("readable")}`.replace(/\\/g,"\\\\"),                        
+                        label:`${tr.data("label")}`.toString().replace(/\\/g,"\\\\"),
+                        readable:`${tr.data("readable")}`.toString().replace(/\\/g,"\\\\"),                        
                         cgguid:this.filter_cgguid,
                         ck_cgguid:this.crosskey_cgguid,
                         filter_cgname:this.filter_cgname,
@@ -575,7 +577,7 @@ class ISPOverviewMapping{
         break;
       case 1:
         let params = {
-          key: tr.data("full_key").replace(/\\/g,"\\\\"),
+          key: tr.data("full_key").toString().replace(/\\/g,"\\\\"),
           statids:tr.data("statid"),
           cgguid:this.cgguid,
           window_fromts:this.tmint.from.tv_sec,
@@ -591,6 +593,15 @@ class ISPOverviewMapping{
                          statid:tr.data("statid")
                         });
         window.open("/newdash/index?"+link_params);
+        break;
+      case 3:
+        let lp=$.param({dash_key_regex:"gitPathAnalytics",
+                         key:tr.data("full_key").toString().replace(/\\/g,"\\\\"),
+                         valid_input:1,
+                         window_fromts:this.tmint.from.tv_sec,
+                         window_tots:this.tmint.to.tv_sec,
+                        });
+        window.open("/newdash/index?"+lp);
         break;
 
     } 

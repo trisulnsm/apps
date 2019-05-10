@@ -13,6 +13,8 @@ class ASNPathAnalytics{
     this.remove_topper_count=0;
     this.max_crosskey_nodes=30;
     this.add_form();
+    this.dash_params = opts.dash_params;
+    
   }
 
   async add_form(){
@@ -65,6 +67,9 @@ class ASNPathAnalytics{
       }
     });
     this.form.submit($.proxy(this.submit_form,this));
+    if(this.dash_params.valid_input == "1" || this.dash_params.valid_input==1){
+      this.form.submit();
+    }
   }
   async load_routers_interfaces(){
     //get routers from keyspace request
@@ -107,9 +112,26 @@ class ASNPathAnalytics{
       }
       intf_dropdown[1].push([intf_keyt.key,this.intf_keymap[intf_keyt.key]]);
     }
+    let incoming_key = this.dash_params.key || ""
+    incoming_key = incoming_key.split(/\\/);
+    let selected_cg = "";
+    let selected_st = "0";
+    if(incoming_key.length == 2){
+      this.form.find(".filter_asn").val(incoming_key[0]);
+      let rout_intf = incoming_key[1].split("_");
+      if(rout_intf.length == 2){
+        selected_cg = rout_intf[0];
+        selected_st = incoming_key[1];
+      }else{
+        selected_cg  = rout_intf[0];
+      }
+    }
+    else if (incoming_key.length == 1){
+      this.form.find(".filter_asn").val(incoming_key[0]);
+    }
     var js_params = {meter_details:drop_down_items,
-      selected_cg : "",
-      selected_st : "0",
+      selected_cg : selected_cg,
+      selected_st : selected_st,
       update_dom_cg : "routers_"+this.rand_id,
       update_dom_st : "interfaces_"+this.rand_id,
       chosen:true
