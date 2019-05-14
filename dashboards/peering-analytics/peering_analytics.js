@@ -4,14 +4,8 @@
 class ISPOverviewMapping{
   constructor(opts) {
 
-    let js_file =opts.jsfile;
-    let file_path = js_file.split("/")
-    file_path.pop()
-    file_path = file_path.join("/");
-    let css_file = `/plugins/${file_path}/app.css`;
-    $('head').append(`<link rel="stylesheet" type="text/css" href="${css_file}">`);
     this.dom = $(opts.divid);
-    this.rand_id=parseInt(Math.random()*100000);
+    this.rand_id="";
     this.default_selected_time = opts.new_time_selector;
     //we need it for time zone conversion
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
@@ -27,8 +21,21 @@ class ISPOverviewMapping{
       this.meter_details_in = opts.jsparams.meters || {upload:0,download:1};
     } 
 
-    this.add_form();
+    this.add_form(opts);
   }
+
+
+  // load the frame 
+  async load_assets(opts)
+  {
+    // load app.css file
+    load_css_file(opts);
+
+    // load template.haml file 
+    let html_str = await get_html_from_hamltemplate(opts);
+    this.haml_dom =$(html_str)
+  }
+
 
   async compute_cg_by_name() {
 
@@ -48,16 +55,14 @@ class ISPOverviewMapping{
     return opts;
   }
 
-  async add_form(){
+  async add_form(opts){
+
+
+    await this.load_assets(opts);
+    
     //assign randid to form fields
-    this.form = $("<div class='row ui_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Routers</label> <div class='col-xs-8'> <select name='routers'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Interfaces</label> <div class='col-xs-8'> <select name='interfaces'></select> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Submit'> </div> </div> </form> </div> </div>");
-    this.form.find("select[name*='routers']").attr("id","routers_"+this.rand_id);
-    this.form.find("select[name*='interfaces']").attr("id","interfaces_"+this.rand_id);
-    this.form.find(".new_time_selector").attr("id","new_time_selector_"+this.rand_id);
-    this.form.find("input[name*='from_date']").attr("id","from_date_"+this.rand_id);
-    this.form.find("input[name*='to_date']").attr("id","to_date_"+this.rand_id);
+    this.form = $(this.haml_dom[0]);
     this.dom.append(this.form);
-    var update_ids = "#from_date_"+this.rand_id+","+"#to_date_"+this.rand_id;
 
     if (! _.isString(this.crosskey_router)) {
       let opts = await this.compute_cg_by_name();
@@ -66,8 +71,8 @@ class ISPOverviewMapping{
     }
 
     //new time selector 
-    new ShowNewTimeSelector({divid:"#new_time_selector_"+this.rand_id,
-                               update_input_ids:update_ids,
+    new ShowNewTimeSelector({divid:"#new_time_selector"+this.rand_id,
+                               update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
                             });
     this.mk_time_interval();
@@ -116,8 +121,8 @@ class ISPOverviewMapping{
     var js_params = {meter_details:all_dropdown,
       selected_cg : "",
       selected_st : "0",
-      update_dom_cg : "routers_"+this.rand_id,
-      update_dom_st : "interfaces_"+this.rand_id,
+      update_dom_cg : "routers"+this.rand_id,
+      update_dom_st : "interfaces"+this.rand_id,
       chosen:true
     }
     //Load meter combo for routers and interfaces
@@ -132,8 +137,8 @@ class ISPOverviewMapping{
   }
   //make time interval to get toppers.
   mk_time_interval(){
-    var selected_fromdate = $('#from_date_'+this.rand_id).val();
-    var selected_todate = $('#to_date_'+this.rand_id).val();
+    var selected_fromdate = $('#from_date'+this.rand_id).val();
+    var selected_todate = $('#to_date'+this.rand_id).val();
     var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
     var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
     this.tmint = mk_time_interval([fromTS,toTS]);
@@ -154,8 +159,8 @@ class ISPOverviewMapping{
   }
   //Reset UI for every submit
   reset_ui(){
-    this.dom.find(".ui_data").html('');
-    this.data_dom = $("<div class='ui_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <ul class='nav nav-tabs' id='isp_overview_tabs'> <li class='active'> <a data-toggle='tab' href='#isp_overview_0' role='tab'> <i class='fa fa-upload'></i> Upload </a> </li> <li> <a data-toggle='tab' href='#isp_overview_1' role='tab'> <i class='fa fa-download'></i> Download </a> </li> </ul> <div class='tab-content'> <div class='tab-pane active' data-use-width='1' id='isp_overview_0'> <div class='row'> <div class='col-xs-12 overall_traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Upload Traffic Chart </h3> <div class='overall_traffic_chart'></div> </div> <div class='col-xs-12 toppers_table_div'> <h3> <i class='fa fa-table'></i> Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> </div> <div class='row'> <div class='col-xs-12 traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Traffic Chart </h3> <div class='traffic_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 sankey_chart_div'> <h3> <i class='fa fa-random'></i> Sankey Chart </h3> <div class='sankey_chart'></div> </div> </div> </div> <div class='tab-pane' data-use-width='1' id='isp_overview_1'> <div class='row'> <div class='col-xs-12 overall_traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Download Traffic Chart </h3> <div class='overall_traffic_chart'></div> </div> <div class='col-xs-12 toppers_table_div'> <h3> <i class='fa fa-table'></i> Toppers </h3> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> </div> <div class='row'> <div class='col-xs-12 traffic_chart_div'> <h3> <i class='fa fa-line-chart'></i> Traffic Chart </h3> <div class='traffic_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 donut_chart_div'> <h3> <i class='fa fa-pie-chart'></i> Toppers Chart </h3> <div class='donut_chart'></div> </div> </div> <div class='row'> <div class='col-xs-12 sankey_chart_div'> <h3> <i class='fa fa-random'></i> Sankey Chart </h3> <div class='sankey_chart'></div> </div> </div> </div> </div> </div> </div> </div> </div> </div>");
+    this.dom.find(".ui_data").remove();
+    this.data_dom = $(this.haml_dom[1]).clone();
     this.dom.append(this.data_dom);
     this.maxitems=10;
     this.cgguid = null;
@@ -178,8 +183,8 @@ class ISPOverviewMapping{
   }
   async get_data(){
     //find guid to load data
-    var selected_router = $('#routers_'+this.rand_id).val();
-    var selected_interface = $('#interfaces_'+this.rand_id).val();
+    var selected_router = $('#routers'+this.rand_id).val();
+    var selected_interface = $('#interfaces'+this.rand_id).val();
     
     if(Object.keys(this.cg_meters.crosskey).length == 0){
       this.crosskey_cgguid = null;
@@ -278,8 +283,8 @@ class ISPOverviewMapping{
     var model_data = {cgguid:cgguid,
         meter:meter,
         key:key,
-        from_date:this.form.find("#from_date_"+this.rand_id).val(),
-        to_date:this.form.find("#to_date_"+this.rand_id).val(),
+        from_date:this.form.find("#from_date"+this.rand_id).val(),
+        to_date:this.form.find("#to_date"+this.rand_id).val(),
         valid_input:1,
         surface:"AREA"
     };
@@ -426,8 +431,8 @@ class ISPOverviewMapping{
     var model_data = {cgguid:this.cgguid,
         meter:this.meter,
         key:keys.join(","),
-        from_date:this.form.find("#from_date_"+this.rand_id).val(),
-        to_date:this.form.find("#to_date_"+this.rand_id).val(),
+        from_date:this.form.find("#from_date"+this.rand_id).val(),
+        to_date:this.form.find("#to_date"+this.rand_id).val(),
         valid_input:1,
         surface:"STACKEDAREA"
     };
@@ -616,120 +621,3 @@ function run(opts) {
 
 
 //# sourceURL=peering_analytics.js
-
-
-//HAML PART
-/*
-.row.ui_form
-  .col-xs-12
-    %form.form-horizontal
-      .row
-        .col-xs-6
-          .form-group
-            .new_time_selector
-      .row
-        .col-xs-6 
-          .form-group 
-            %label.control-label.col-xs-4 Routers         
-            .col-xs-8 
-              %select{name:'routers'} 
-        .col-xs-6 
-          .form-group 
-            %label.control-label.col-xs-4 Interfaces 
-            .col-xs-8 
-              %select{name:'interfaces'}
-      .row
-        .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
-          %input{type:"hidden",name:"from_date"}
-          %input{type:"hidden",name:"to_date"}
-          %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
-
-
-
-.ui_data
-  .row
-    .col-xs-12
-      .panel.panel-info
-        .panel-body
-          %ul.nav.nav-tabs#isp_overview_tabs
-            %li.active
-              %a{href:"#isp_overview_0","data-toggle":"tab",role:"tab"}
-                %i.fa.fa-upload
-                Upload
-            %li
-              %a{href:"#isp_overview_1","data-toggle":"tab",role:"tab"} 
-                %i.fa.fa-download
-                Download
-            
-          .tab-content
-            .tab-pane.active#isp_overview_0{"data-use-width":1}
-              .row
-                .col-xs-12.overall_traffic_chart_div
-                  %h3
-                    %i.fa.fa-line-chart 
-                    Upload Traffic Chart
-                  .overall_traffic_chart
-                .col-xs-12.toppers_table_div
-                  %h3 
-                    %i.fa.fa-table
-                    Toppers
-                  .toppers_table
-                    %table
-                      %thead
-                      %tbody
-              .row
-                .col-xs-12.traffic_chart_div
-                  %h3
-                    %i.fa.fa-line-chart 
-                    Traffic Chart
-                  .traffic_chart
-              .row
-                .col-xs-12.donut_chart_div
-                  %h3
-                    %i.fa.fa-pie-chart 
-                    Toppers Chart
-                  .donut_chart
-              .row
-                .col-xs-12.sankey_chart_div
-                  %h3 
-                    %i.fa.fa-random 
-                    Sankey Chart
-                  .sankey_chart
-            .tab-pane#isp_overview_1{"data-use-width":1}
-              .row
-                .col-xs-12.overall_traffic_chart_div
-                  %h3
-                    %i.fa.fa-line-chart 
-                    Download Traffic Chart
-                  .overall_traffic_chart
-                .col-xs-12.toppers_table_div
-                  %h3
-                    %i.fa.fa-table
-                    Toppers
-                  .toppers_table
-                    %table
-                      %thead
-                      %tbody
-                
-              .row
-                .col-xs-12.traffic_chart_div
-                  %h3
-                    %i.fa.fa-line-chart 
-                    Traffic Chart
-                  .traffic_chart
-              .row
-                .col-xs-12.donut_chart_div
-                  %h3
-                    %i.fa.fa-pie-chart
-                    Toppers Chart
-                  .donut_chart
-              .row
-                .col-xs-12.sankey_chart_div
-                  %h3 
-                    %i.fa.fa-random
-                    Sankey Chart
-                  .sankey_chart
-
-  */
-
-
