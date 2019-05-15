@@ -20,7 +20,11 @@
   border-radius: 10px;
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
-  min-height: 175px;
+  min-height: 210px;
+}
+.panel-stat3 a {
+  display: block;
+  color: #fff;
 }
 
 .bg-danger {
@@ -93,3 +97,14 @@
     left: 0;
     background: rgba(0,0,0,.4);
     text-align: center;
+}
+h3 {
+  font-size: 20px;
+}
+
+h3 small {
+  font-size: 75%;
+}
+.panel-heading {
+  padding: 5px 15px;
+}

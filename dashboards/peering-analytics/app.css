@@ -6,11 +6,12 @@
   min-height: 500px;
 }
 
-h3 {
+.panel h3 {
 	font-size: 20px;
+	margin-top:10px;
 }
 
-h3 small {
+h3 small{
 	font-size: 75%;
 }
 .panel-heading {
@@ -25,4 +26,14 @@ span.badge{
 	background-color:#6bafbd;
 	margin-left: 10px;
 	font-size:20px;
+}
+small.target{
+	color:#888;
+	font-size: 14px;
+	font-weight: 500;
+    line-height: 1;
+}
+
+.panel-heading p{
+	margin: 0px;
 }
