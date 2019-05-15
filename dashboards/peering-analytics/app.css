@@ -16,3 +16,13 @@ h3 small {
 .panel-heading {
 	padding: 5px 15px;
 }
+
+.widget-tool{
+	float:right;
+}
+
+span.badge{
+	background-color:#6bafbd;
+	margin-left: 10px;
+	font-size:20px;
+}

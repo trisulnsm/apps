@@ -208,7 +208,9 @@ class ISPOverviewMapping{
       this.data_dom.html('<div class="alert alert-info">Crosskey counter groups not created. Need crosskey counter groups to work with this app</div>');
       return
     }
+   
     this.top_bucket_size = this.cg_meters.all_cg_bucketsize[this.cgguid].top_bucket_size;
+    this.bucket_size = this.cg_meters.all_cg_bucketsize[this.cgguid].bucket_size;
     this.multiplier = 1;
     if(Object.keys(this.cg_meters.all_meters_type[this.cgguid]).length !=0 &&
         this.cg_meters.all_meters_type[this.cgguid][this.meter].type==4 &&
@@ -261,8 +263,6 @@ class ISPOverviewMapping{
   //draw a in and out traffic chart for selected interfaces 
   //if no interface selected draw chart for aggregates
   async draw_traffic_chart(){
-    let key_arr = ["DIR_OUTOFHOME","DIR_INTOHOME"];
-    let meter_arr = [2,1]
     let cgguid = this.cgguid;
     let key = this.filter_text;
     let meter = this.meter;
@@ -270,11 +270,11 @@ class ISPOverviewMapping{
 
     if(this.filter_text==null || this.filter_text == undefined){
       cgguid = GUID.GUID_CG_AGGREGATE();
-      key = key_arr[this.meter];
+      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter];
       meter=0;
     }else if(this.filter_text.match(/_/)){
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
-      meter = meter_arr[this.meter_index];
+      meter = [2,1][this.meter_index];
     }else{
       //no in and out meterid for routers only total
       this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".overall_traffic_chart_div").remove();
@@ -286,18 +286,27 @@ class ISPOverviewMapping{
         from_date:this.form.find("#from_date"+this.rand_id).val(),
         to_date:this.form.find("#to_date"+this.rand_id).val(),
         valid_input:1,
-        surface:"AREA"
+        surface:"AREA",
+        chart_height:250
     };
-
+    let div =this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".overall_traffic_chart");
     await $.ajax({
       url:"/trpjs/generate_chart",
       data:model_data,
       context:this,
       success:function(resp){
-        let div =this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".overall_traffic_chart")
         div.html(resp);
       }
     });
+
+    let cgresp=await fetch_trp(TRP.Message.Command.COUNTER_ITEM_REQUEST, {
+        counter_group:cgguid,
+        key:TRP.KeyT.create({key:key}),
+        time_interval:this.tmint,
+        volumes_only:1
+    });
+    let volume = cgresp.totals.values[meter].toNumber()*this.bucket_size;
+    div.closest('.panel').find(".badge").html(h_fmtvol(volume));
 
   }
 
@@ -305,7 +314,7 @@ class ISPOverviewMapping{
     let rows = [];
     this.data_dom.find(`#isp_overview_${this.meter_index}`).find('.notify').remove();
     var table = this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".toppers_table").find("table");
-    this.table_id = `table_${this.meter}_${this.rand_id}`;
+    this.table_id = `table_${this.meter}${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
     table.find("thead").append(`<tr><th>Key</th><th>Label</th><th sort='volume' barspark='auto'>Volume </th><th sort='volume'>Avg Bandwidth</th><th class='nosort'></th></tr>`);
@@ -350,10 +359,11 @@ class ISPOverviewMapping{
       this.dropdown_click(event);
     },this));
     table.tablesorter();
+    table.closest('.panel').find(".badge").html(rows.length);
+    new ExportToCSV({table_id:this.table_id,filename_prefix:"top_upload_asn",append_to:"panel"});
   }
 
   pagination_callback(){
-    console.log(this.table_id)
     this.data_dom.find("table").find('.dropdown-menu').find('a').bind('click',$.proxy(function(event){
       this.dropdown_click(event);
     },this));
@@ -451,8 +461,7 @@ class ISPOverviewMapping{
     this.sankey_div_id = `sankey_chart_${this.meter_index}_${this.rand_id}`;
     this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".sankey_chart").append($("<div>",{id:this.sankey_div_id}));
     if(this.crosskey_cgguid == this.filter_cgguid){
-      $('#'+this.sankey_div_id).html('<div class="alert alert-info">Crosskey counter groups not created. Need crosskey counter groups to work with this app</div>');
-      return;
+      this.crosskey_cgguid = this.crosskey_router;
     }
 
     // Get Bytes Toppers

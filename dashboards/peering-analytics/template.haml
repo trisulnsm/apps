@@ -1,26 +1,32 @@
 .row.ui_form
   .col-xs-12
-    %form.form-horizontal
-      .row
-        .col-xs-6
-          .form-group
-            .new_time_selector#new_time_selector
-      .row
-        .col-xs-6 
-          .form-group 
-            %label.control-label.col-xs-4 Routers         
-            .col-xs-8 
-              %select#routers{name:'routers'} 
-        .col-xs-6 
-          .form-group 
-            %label.control-label.col-xs-4 Interfaces 
-            .col-xs-8 
-              %select#interfaces{name:'interfaces'}
-      .row
-        .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
-          %input#from_date{type:"hidden",name:"from_date"}
-          %input#to_date{type:"hidden",name:"to_date"}
-          %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
+    .widget
+      .widget-header
+        %h4 
+          %i.fa.fa-filter.fa-fw
+          Filter criteria
+      .widget-body
+        %form.form-horizontal
+          .row
+            .col-xs-6
+              .form-group
+                .new_time_selector#new_time_selector
+          .row
+            .col-xs-6
+              .form-group 
+                %label.control-label.col-xs-4 Routers         
+                .col-xs-8 
+                  %select#routers{name:'routers'} 
+            .col-xs-6
+              .form-group 
+                %label.control-label.col-xs-4 Interfaces 
+                .col-xs-8 
+                  %select#interfaces{name:'interfaces'}
+          .row
+            .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+              %input#from_date{type:"hidden",name:"from_date"}
+              %input#to_date{type:"hidden",name:"to_date"}
+              %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
 
 
 
@@ -46,6 +52,7 @@
                     %i.fa.fa-line-chart.fa-fw 
                     Upload Traffic Chart 
                     %small Shows total upload volume in selected time interval
+                    %span.badge.badge-info
                     %small#target
 
                 .panel-body
@@ -58,6 +65,7 @@
                     %i.fa.fa-table.fa-fw
                     Top Upload AS 
                     %small Show top 100 AS to which you are uploading data
+                    %span.badge.badge-info
                     %small#target
                 .panel-body
                   .toppers_table
@@ -102,46 +110,59 @@
               .panel.panel-warning
                 .panel-heading
                   %h3
-                    %i.fa.fa-line-chart 
-                    Download Traffic Chart
+                    %i.fa.fa-line-chart.fa-fw 
+                    Download Traffic Chart 
+                    %small Shows total download volume in selected time interval
+                    %span.badge.badge-info
+                    %small#target
+
                 .panel-body
                   .overall_traffic_chart
+          .row
             .col-xs-12.toppers_table_div
               .panel.panel-warning
                 .panel-heading
-                  %h3
-                    %i.fa.fa-table
-                    Toppers
-              .panel-body
-                .toppers_table
-                  %table
-                    %thead
-                    %tbody
-            
+                  %h3 
+                    %i.fa.fa-table.fa-fw
+                    Top Download AS 
+                    %small Show top 100 AS to which you are downloading data
+                    %span.badge.badge-info
+                    %small#target
+                .panel-body
+                  .toppers_table
+                    %table
+                      %thead
+                      %tbody
           .row
             .col-xs-12.traffic_chart_div
               .panel.panel-warning
                 .panel-heading
                   %h3
-                    %i.fa.fa-line-chart 
-                    Traffic Chart
-              .panel-body
-                .traffic_chart
+                    %i.fa.fa-area-chart.fa-fw 
+                    Stacked area chart  
+                    %small Showing top AS download traffic over the selected time period 
+                    %small#target
+                   
+                .panel-body
+                  .traffic_chart
           .row
             .col-xs-12.donut_chart_div
               .panel.panel-warning
                 .panel-heading
                   %h3
-                    %i.fa.fa-pie-chart
-                    Toppers Chart
-                .panel-body
-                  .donut_chart
+                    %i.fa.fa-pie-chart.fa-fw 
+                    Percent share of AS download traffic 
+              .panel-body
+                .donut_chart
           .row
             .col-xs-12.sankey_chart_div
               .panel.panel-warning
                 .panel-heading
                   %h3 
-                    %i.fa.fa-random
-                    Sankey Chart
+                    %i.fa.fa-random.fa-fw 
+                    Sankey Chart 
+                    %small
+                      Shows download traffic flows from the left side (AS) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
                 .panel-body
                   .sankey_chart
+
