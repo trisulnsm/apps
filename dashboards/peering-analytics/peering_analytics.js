@@ -20,6 +20,7 @@ class ISPOverviewMapping{
       this.crosskey_interface = opts.jsparams.crosskey_interface;
       this.meter_details_in = opts.jsparams.meters || this.meter_details_in
     } 
+    this.probe_id = opts.probe_id;
     this.add_form(opts);
   }
 
@@ -181,14 +182,14 @@ class ISPOverviewMapping{
     let selected_interface = $('#interfaces'+this.rand_id).val();
     let selected_router_text = $('#routers'+this.rand_id +' option:selected').text();
     let selected_intf_text = $('#interfaces'+this.rand_id +' option:selected').text();
-    let text="";
+    this.target_text="";
     if(selected_router != "0"){
-      text = `${selected_router_text}`;
+      this.target_text = `${selected_router_text}`;
     }
     if(selected_interface != "0"){
-      text = `${text}->${selected_intf_text}`;
+      this.target_text = `${this.target_text}->${selected_intf_text}`;
     }
-    $('small.target').html(text);
+    $('small.target').html(this.target_text);
   }
   async get_data(){
     //find guid to load data
@@ -205,7 +206,7 @@ class ISPOverviewMapping{
     }
     else if(selected_router != "0"){
       this.cgguid = this.crosskey_router;
-      this.filter_text = selected_interface;
+      this.filter_text = selected_router;
     }
     else if(selected_router){
       this.cgguid = this.filter_cgguid
@@ -354,7 +355,7 @@ class ISPOverviewMapping{
     table.addClass('table table-hover table-sysdata');
     table.find("thead").append(`<tr><th>Key</th><th style="width:400px">Label</th>
                                 <th sort='volume' barspark='auto'>Volume</th>
-                                <th sort='volume'>Avg Bandwidth</th><th>Uniq AS</th><th>Uniq Prefix</th><th class='nosort'></th>
+                                <th sort='volume'>Avg <br/>Bandwidth</th><th>Uniq <br/>ASPath</th><th>Uniq <br/>Prefix</th><th class='nosort'></th>
                                 </tr>`);
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,100);
     for(let i= 0 ; i < cgtoppers.length  ; i++){
@@ -365,7 +366,8 @@ class ISPOverviewMapping{
       dropdown_menu.append("<li><a href='javascript:;;'>Drilldown</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>ASN Path</a></li>");
+      dropdown_menu.append("<li><a href='javascript:;;'>ASN Path Analytics</a></li>");
+      dropdown_menu.append("<li><a href='javascript:;;'>Top Prefixes</a></li>");
 
 
       dropdown.append(dropdown_menu);
@@ -378,7 +380,7 @@ class ISPOverviewMapping{
         }
       let readable = topper.readable.split("\\").shift();
       let label = topper.label.split("\\").shift();
-      let avg_bw = (topper.metric*this.top_bucket_size)/(this.tmint.to.tv_sec-this.tmint.from.tv_sec);
+      let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
       rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" data-readable="${topper.readable}" data-full_key="${full_key}">
                                 <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
@@ -675,8 +677,66 @@ class ISPOverviewMapping{
                         });
         window.open("/newdash/index?"+lp);
         break;
+      case 4:
+        this.get_top_prefixes(event)
+        break;
 
     } 
+  }
+  async get_top_prefixes(event){
+    let target = $(event.target);
+    let tr = target.closest("tr");
+    let statid = tr.data("statid");
+    var shell_modal = create_shell_modal();
+    shell_modal.find(".modal-header h4").html("Top prefixes <small>Show top 100 prefixes </small><span class='badge'></span>");
+    var message = "<h4><i class='fa fa-spin fa-spinner'></i> Please wait ... Getting data</h4>";
+    shell_modal.find(".modal-body").html(message);
+    $('#shortcut-div').html(shell_modal);
+    $(shell_modal).modal({
+      keyboard:true
+    });
+    let opts = {flowtag:`[asn]${tr.data("key")}`,
+                  time_interval:this.tmint,
+                  probe_id:this.probe_id,
+                  group_by_fields:["flowtag"]};
+
+    if(this.filter_text && this.filter_text.split("_").length >=1){
+      let interfaces = this.filter_text.split("_");
+      opts["nf_routerid"] = TRP.KeyT.create({key:interfaces[0]});
+      if(interfaces[1]){
+        if (statid == 0){
+          shell_modal.find(".modal-header h4 span.badge").addClass('badge-success');
+          opts[`nf_ifindex_out`]= TRP.KeyT.create({key:interfaces[1]});
+        }else{
+          shell_modal.find(".modal-header h4 span.badge").addClass('badge-warning');
+          opts[`nf_ifindex_in`]= TRP.KeyT.create({key:interfaces[1]});
+        }
+      }
+    }
+    let resp = await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts);
+
+    let prefix_toppers =resp.tag_group.find(x=>x.group_name=="prf")
+    if(! prefix_toppers){
+      shell_modal.find(".modal-body h4").html("<div class='alert alert-info'>No data found</div>");
+      return true;
+    }
+    let tag_metrics = prefix_toppers.tag_metrics.slice(0,100);
+    shell_modal.find(".modal-header h4 span.badge").html(tag_metrics.length);
+    var table = $("<table>",{class:"table table-sysdata"});
+    table.append("<thead><tr><th>Prefix</th><th>Count </th><th sort='volume'>Volume</th></thead>");
+    table.append("<tbody></tbody>");
+    _.each(tag_metrics,function(keyt){
+      let tr = $("<tr>");
+      tr.append(`<td>${keyt.key.key}</td>`);
+      tr.append(`<td>${keyt.count}</td>`);
+      tr.append(`<td>${h_fmtvol(keyt.metric.toNumber())}</td>`);
+      table.append(tr);
+    });
+    let label = tr.data("label").split("\\")[0];
+    this.target_text = `${this.target_text}->${tr.data("key")}(${label})`;
+    shell_modal.find(".modal-body h4").html(this.target_text);
+    shell_modal.find(".modal-body").append(table);
+    table.tablesorter()
   }
 };
 

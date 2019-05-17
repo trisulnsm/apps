@@ -23,7 +23,6 @@ h3 small{
 }
 
 span.badge{
-	background-color:#6bafbd;
 	margin-left: 10px;
 	font-size:20px;
 }
@@ -36,4 +35,10 @@ small.target{
 
 .panel-heading p{
 	margin: 0px;
+}
+.modal-body h4{
+	color:#888;
+}
+.modal-header h4{
+	font-size:20px;
 }
