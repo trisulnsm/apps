@@ -1,0 +1,153 @@
+.drilldown_data
+  %h3.drilldown_title
+  .row
+    .col-xs-12
+      .panel.panel-info
+        .panel-heading
+          %h3
+            %i.fa.fa-line-chart.fa-fw
+            Traffic Chart
+        .panel-body
+          .drill_traffic_chart
+  .row.routers_drilldown
+    .col-xs-7
+      .panel.panel-success
+        .panel-heading
+          %h3
+            %i.fa.fa-table.fa-fw
+            Routers Toppers
+        .panel-body
+          .toppers_table
+            %table
+              %thead
+              %tbody
+    .col-xs-5
+      .panel.panel-success
+        .panel-heading
+          %h3
+            %i.fa.fa-pie-chart.fa-fw
+            Toppers Chart
+         .panel-body
+            .donut_chart
+    .col-xs-12.routers_traffic_div
+      .panel.panel-success
+        .panel-heading
+          %h3
+            %i.fa.fa-area-chart.fa-fw
+             Traffic chart for Routers
+        .panel-body
+          .routers_traffic_chart
+    .col-xs-12.routers_sankey_div
+      .panel.panel-success
+        .panel-heading
+          %h3
+            %i.fa.fa-random.fa-fw
+            Routers Sankey Chart
+        .panel-body
+          .routers_sankey_chart
+
+  .row.interfaces_drilldown
+    .col-xs-6
+      .panel.panel-warning
+        .panel-heading
+          %h3
+            %i.fa.fa-table.fa-fw 
+            Interface Toppers
+        .panel-body
+          .toppers_table
+            %table
+              %thead
+              %tbody
+    .col-xs-6
+      .panel.panel-warning
+        .panel-heading
+          %h3
+            %i.fa.fa-pie-chart.fa-fw
+            Toppers Chart
+        .panel-body
+          .donut_chart
+
+    .col-xs-12
+      .panel.panel-warning
+        .panel-heading
+          %h3
+            %i.fa.fa-area-chart.fa-fw 
+            Traffic chart for interfaces
+        .panel-body
+          .interfaces_traffic_chart
+    .col-xs-12.interfaces_sankey_div
+      .panel.panel-warning
+        .panel-heading
+          %h3 
+            %i.fa.fa-random.fa-fw
+            Interfaces Sankey Chart
+        .panel-body
+          .interfaces_sankey_chart
+      
+      
+  .row
+    .col-xs-6
+      .panel.panel-info
+        .panel-heading
+          %h3
+            %i.fa.fa-table.fa-fw
+            Top ASNumbers
+        .panel-body
+          .tag_asnumber
+            %table
+              %thead
+                %tr
+                  %th Item
+                  %th Label
+                  %th Flows
+                  %th{sort:"volume"} Volume
+              %tbody
+    .col-xs-6
+      .panel.panel-info
+        .panel-heading
+          %h3
+            %i.fa.fa-table.fa-fw
+            Top Prefixes
+        .panel-body
+          .tag_prefixes
+            %table
+              %thead
+                %tr
+                  %th Item
+                  %th Label
+                  %th Flows
+                  %th{sort:"volume"} Volume
+              %tbody
+  .row
+    .col-xs-6
+      .panel.panel-info
+        .panel-heading
+          %h3
+            %i.fa.fa-table.fa-fw
+            Top Internal Hosts
+        .panel-body
+          .internal_ip
+            %table
+              %thead
+                %tr
+                  %th Item
+                  %th Label
+                  %th Flows
+                  %th{sort:"volume"} Volume
+              %tbody
+    .col-xs-6
+      .panel.panel-info
+        .panel-heading
+          %h3
+            %i.fa.fa-table.fa-fw
+            Top External Hosts
+        .panel-body
+          .external_ip
+            %table
+              %thead
+                %tr
+                  %th Item
+                  %th Label
+                  %th Flows
+                  %th{sort:"volume"} Volume
+              %tbody

@@ -189,7 +189,16 @@ class ISPOverviewMapping{
     if(selected_interface != "0"){
       this.target_text = `${this.target_text}->${selected_intf_text}`;
     }
-    $('small.target').html(this.target_text);
+    let selected_fromdate = $('#from_date'+this.rand_id).val();
+    let selected_todate = $('#to_date'+this.rand_id).val();
+    let fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
+    let toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
+
+    let duration  = `   <i class='fa fa-clock-o fa-fw '></i>
+                     from ${selected_fromdate} to ${selected_todate}
+                     (${h_fmtduration(toTS-fromTS)})`
+    
+    $('small.target').html(this.target_text + duration);
   }
   async get_data(){
     //find guid to load data

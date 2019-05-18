@@ -42,3 +42,6 @@ small.target{
 .modal-header h4{
 	font-size:20px;
 }
+.widget .widget-body{
+	padding:1px;
+}

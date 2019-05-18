@@ -9,16 +9,27 @@ class ASNPathAnalytics{
     if(opts.jsparams){
       this.cgguid = opts.jsparams.crosskey_interface || "{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}";
     }
-    load_css_file(opts);
+    this.dash_params = opts.dash_params;
     this.remove_topper_count=0;
     this.max_crosskey_nodes=30;
-    this.add_form();
-    this.dash_params = opts.dash_params;
-    
+    this.add_form(opts);
   }
 
-  async add_form(){
-    this.form=$("<div class='row pathanalytics_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Routers</label> <div class='col-xs-8'> <select name='routers'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Interfaces</label> <div class='col-xs-8'> <select name='interfaces'></select> </div> </div> </div> <div class='col-xs-6'> <div class='from-group'> <label class='control-label col-xs-4'>Filter ASN</label> <div class='col-xs-8'> <input class='filter_asn' type='text'> <span class='help-block text-left'>Please enter AS Number to filter the result</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Remove Toppers</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider-remove-topn'> <div class='ui-slider-handle' id='remove-top-n'></div> </div> <span class='help-block text-left'>Remove the top N flows from view to reveal the smaller flows</span> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Show max nodes</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider-max-nodes'> <div class='ui-slider-handle' id='max-nodes'></div> </div> <span class='help-block text-left'>Show approximately these many nodes on the sankey (default 30)</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Submit'> </div> </div> </form> </div> </div>");
+   // load the frame 
+  async load_assets(opts)
+  {
+    // load app.css file
+    load_css_file(opts);
+
+    // load template.haml file 
+    let html_str = await get_html_from_hamltemplate(opts);
+    this.haml_dom =$(html_str)
+  }
+
+  async add_form(opts){
+    await this.load_assets(opts)
+    this.form = $(this.haml_dom[0]);
+    this.dom.append(this.form);
     //we are updating router and meter based on id.
     this.form.find("select[name*='routers']").attr("id","routers_"+this.rand_id);
     this.form.find("select[name*='interfaces']").attr("id","interfaces_"+this.rand_id);
@@ -158,10 +169,10 @@ class ASNPathAnalytics{
   }
  
   reset_ui(){
-    this.dom.find(".path_data").html('');
-    this.data_dom = $("<div class='path_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <div class='col-xs-12 toppers_table_div'> <h3 class='noitify'> <i class='fa fa-spinner fa-spin'></i> Please wait .... Getting data .....  </h3> <h2> <i class='fa fa-table'></i> Busiest Routes <small> Shows the top used AS PATHS </small> </h2> <div class='toppers_table'> <table> <thead></thead> <tbody></tbody> </table> </div> </div> <div class='col-xs-12 sankey_asn_upload sankey_chart'> <h2> <i class='fa fa-random'></i> Route Per Hop Analytics - Transmit <small> Usage of busiest route segments </small> </h2> <div class='sankey_chart_upload'></div> </div> <div class='col-xs-12 sankey_asn_download sankey_chart'> <h2> <i class='fa fa-random'></i> Route Per Hop Analytics - Receive <small> Usage of busiest route segments - Download </small> </h2> <div class='sankey_chart_download'></div> </div> </div> </div> </div> </div> </div>");
+    this.dom.find(".path_data").remove();
+    this.data_dom = $(this.haml_dom[1]).clone();
     this.dom.append(this.data_dom);
-    this.data_dom.find('.toppers_table_div').attr("id","toppers_table_"+this.rand_id);
+    this.data_dom.find('.toppers_table').attr("id","toppers_table_"+this.rand_id);
     this.data_dom.find(".sankey_chart_upload").attr("id","sankey_chart_upload_"+this.rand_id);
     this.data_dom.find(".sankey_chart_download").attr("id","sankey_chart_download_"+this.rand_id);
   }
@@ -177,7 +188,7 @@ class ASNPathAnalytics{
     let selected_interface = $('#interfaces_'+this.rand_id).val();
     let selected_router = $('#interfaces_'+this.rand_id).val();
     let filter_asn = this.form.find(".filter_asn").val();
-
+    this.update_target_text();
     if(selected_interface != 0)
     {
       req_opts["key_filter"]= selected_interface;
@@ -259,12 +270,13 @@ class ASNPathAnalytics{
     }
     this.dom.find('.noitify').remove();
     let rows = [];
-    var table = this.data_dom.find(`#toppers_table_${this.rand_id}`).find(".toppers_table").find("table");
+    var table = this.data_dom.find(`#toppers_table_${this.rand_id}`).find("table");
     this.table_id = `table_${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
     table.find("thead").append(`<tr><th>ASN Path</th><th style='width:400px'>Label</th><th sort='volume'>Upload </th><th sort='volume'>Download</th></tr>`);
     let cgtoppers =  Object.values(table_data).slice(0,100);
+    table.closest('.panel').find("span.badge").html(cgtoppers.length);
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       rows.push(`<tr data-key="${topper[0]}"  data-label="${topper[2]}" data-readable="${topper[1]}">
@@ -368,98 +380,38 @@ class ASNPathAnalytics{
     Plotly.react(this.sankey_div_id, data, layout, ploty_options)
   }
 
+  update_target_text(){
+    let selected_router = $('#routers_'+this.rand_id).val();
+    let selected_interface = $('#interfaces_'+this.rand_id).val();
+    let selected_router_text = $('#routers_'+this.rand_id +' option:selected').text();
+    let selected_intf_text = $('#interfaces_'+this.rand_id +' option:selected').text();
+    let  filter_asn = this.form.find(".filter_asn").val(); 
+    this.target_text="";
+    if(selected_router != "0"){
+      this.target_text = `${selected_router_text}`;
+    }
+    if(selected_interface != "0"){
+      this.target_text = `${this.target_text} -> ${selected_intf_text}`;
+    }
+    if(filter_asn != ""){
+      this.target_text = `${this.target_text} -> ${filter_asn}`;
+    }
+    let selected_fromdate = $('#from_date_'+this.rand_id).val();
+    let selected_todate = $('#to_date_'+this.rand_id).val();
+    let fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
+    let toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
+
+    let duration  = `   <i class='fa fa-clock-o fa-fw '></i>
+                     from ${selected_fromdate} to ${selected_todate}
+                     (${h_fmtduration(toTS-fromTS)})`
+    
+    $('small.target').html(this.target_text + duration);
+  }
+
 }
  
  function run(opts){
   new ASNPathAnalytics(opts)
  }
 
-//# sourceURL=path_analytics.js
-
-
-// HAML for from
-/*
-.row.pathanalytics_form
-  .col-xs-12
-    %form.form-horizontal
-      .row
-        .col-xs-6 
-          .form-group 
-            %label.control-label.col-xs-4 Routers          
-            .col-xs-8 
-              %select{name:'routers'} 
-        .col-xs-6
-          .form-group
-            .new_time_selector
-       
-          
-      .row
-        .col-xs-6
-          .form-group 
-            %label.control-label.col-xs-4 Interfaces          
-            .col-xs-8 
-              %select{name:'interfaces'} 
-        .col-xs-6
-          .from-group
-            %label.control-label.col-xs-4 Filter ASN
-            .col-xs-8
-              %input{type:"text",class:"filter_asn"}
-              %span.help-block.text-left Please enter AS Number to filter the result
-      .row
-        .col-xs-6
-          .form-group
-            %label.control-label.col-xs-4 Remove Toppers
-            .col-xs-8{style:"padding-top:10px"}
-              #slider-remove-topn
-                %div#remove-top-n.ui-slider-handle
-              %span.help-block.text-left Remove the top N flows from view to reveal the smaller flows
-        .col-xs-6
-          .form-group
-            %label.control-label.col-xs-4 Show max nodes
-            .col-xs-8{style:"padding-top:10px"}
-              #slider-max-nodes
-                %div#max-nodes.ui-slider-handle
-              %span.help-block.text-left Show approximately these many nodes on the sankey (default 30)
-
-      .row
-        .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
-          %input{type:"hidden",name:"from_date"}
-          %input{type:"hidden",name:"to_date"}
-          %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
-*/
-
-/*
-.path_data
-  .row
-    .col-xs-12
-      .panel.panel-info
-        .panel-body
-          .col-xs-12.toppers_table_div
-            %h3.noitify
-              %i.fa.fa-spinner.fa-spin
-              Please wait .... Getting data .....
-            %h2 
-              %i.fa.fa-table
-              Busiest Routes
-              %small
-                Shows the top used AS PATHS 
-            .toppers_table
-              %table
-                %thead
-                %tbody
-          .col-xs-12.sankey_asn_upload.sankey_chart
-            %h2 
-              %i.fa.fa-random
-              Route Per Hop Analytics - Transmit 
-              %small
-                Usage of busiest route segments
-            .sankey_chart_upload
-          .col-xs-12.sankey_asn_download.sankey_chart
-            %h2 
-              %i.fa.fa-random
-              Route Per Hop Analytics - Receive
-              %small
-                Usage of busiest route segments - Download 
-            .sankey_chart_download
-            
-*/
+//# sourceURL=path_analytics.js          
