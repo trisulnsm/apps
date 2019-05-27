@@ -1,11 +1,3 @@
-.toppers_table_div,.donut_chart_div,.traffic_chart_div,.sankey_chart_div
-{
-  min-height: 300px;
-}
-.toppers_table_div,.donut_chart_div{
-  min-height: 500px;
-}
-
 .panel h3 {
 	font-size: 20px;
 	margin-top:10px;
@@ -44,4 +36,25 @@ small.target{
 }
 .widget .widget-body{
 	padding:1px;
+}
+
+@keyframes placeHolderShimmer{
+  0%{
+    background-position: -750px 0
+  }
+  100%{
+    background-position: 750px 0
+  }
+}
+
+.animated-background {
+  animation-duration: 1.5s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: placeHolderShimmer;
+  animation-timing-function: linear;
+  background: darkgray;
+  background: linear-gradient(to right, #eeeeee 10%, #dddddd 18%, #eeeeee 33%);
+  height: 100px;
+  position: relative;
 }

@@ -173,7 +173,7 @@ class ISPOverviewMapping{
       e.preventDefault()
       $(this).tab('show')
     });
-    this.data_dom.find('.toppers_table_div').append("<span class='notify'><i class='fa fa-spinner fa-spin'></i>Please wait...</span>");
+    //this.data_dom.find('.toppers_table_div').append("<span class='notify'><i class='fa fa-spinner fa-spin'></i>Please wait...</span>");
     //title part
 
   }
@@ -286,7 +286,7 @@ class ISPOverviewMapping{
     let key = this.filter_text;
     let meter = this.meter;
     //if none of router or interfaces selectd show total bandwidth
-
+    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".overall_traffic_chart_div").find('.animated-background').remove();
     if(this.filter_text==null || this.filter_text == undefined){
       cgguid = GUID.GUID_CG_AGGREGATE();
       key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter];
@@ -357,7 +357,7 @@ class ISPOverviewMapping{
       });
     }
     let rows = [];
-    this.data_dom.find(`#isp_overview_${this.meter_index}`).find('.notify').remove();
+    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".toppers_table_div").find('.animated-background').remove();
     var table = this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".toppers_table").find("table");
     this.table_id = `table_${this.meter}${this.rand_id}`;
     table.attr("id",this.table_id)
@@ -449,6 +449,10 @@ class ISPOverviewMapping{
     this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
     this.trfchart_div_id = `traffic_chart_${this.meter_index}_${this.rand_id}`;
     this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".traffic_chart").append($("<div>",{id:this.trfchart_div_id}));
+    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".traffic_chart_div").find(".animated-background").remove();
+    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".donut_chart_div").find(".animated-background").remove();
+
+
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,this.maxitems);
     var values = [];
     var labels = [];
@@ -544,7 +548,8 @@ class ISPOverviewMapping{
     }else{
       this.cgtoppers_bytes = this.cgtoppers_resp.keys;
     }
-    
+    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".sankey_chart_div").find(".animated-background").remove();
+
     this.cgtoppers_bytes = this.cgtoppers_bytes.slice(0,30);
     if(this.cgtoppers_bytes.length==0){
       $('#'+this.sankey_div_id).html("<div class='alert alert-info'>No data found.</div>"); 
