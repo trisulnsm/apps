@@ -14,6 +14,7 @@ var InKeysMagicMap   =  $.klass({
     prom = deferq.promise();
     var cthis = this;
     this.available_inkeys = {};
+    this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
     this.meters = {};
     prom = prom.then( function( f) {
       return get_counters_and_meters_json(opts);
@@ -27,12 +28,18 @@ var InKeysMagicMap   =  $.klass({
     deferq.resolve();
     this.max_group_size=16;
     this.recentsecs = 86400;
+    this.default_selected_time = opts.new_time_selector;
   },
   // Add a text box to filter the host
   // add table to show keys
   add_form:function(){
-    var form = $("<div id='inkey_search_form'> <form class='form-horizontal' id='fkeymatch'> <div class='row'> <div class='col-xs-5'> <div class='form-group'> <label class='control-label col-xs-4'> Counter Group </label> <div class='col-xs-8'> <select name='counter[guid]' id='inkeys_counter_guid'></select> </div> </div> <div class='form-group'> <label class='control-label col-xs-4'> Key spaces </label> <div class='col-xs-8'> <textarea name='keys' id='in_keys'></textarea> <span class='help-block'>Enter one key range per line Ex.(192.168.1.10~192.168.1.20) (Port-10~Port-50) etc</span> </div> </div> </div> <div class='col-xs-5'> <div class='form-group'> <label class='control-label col-xs-4'> Meters </label> <div class='col-xs-8'> <select name='meter[]' id='inkeys_meter_id' multiple='multiple' size='5'> </select> </div> </div> </div> </div> <div class='row'> <div class='form-group'> <div class='col-xs-2 col-md-offset-2'> <input type='submit' name='commit' value='Search' class='btn-submit'> </div> <div class='col-xs-3' id='in_keys_status'> </div> </div> </div> </form> </div>");
+    var form = $("<div id='inkey_search_form'> <form class='form-horizontal' id='fkeymatch'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select id='inkeys_counter_guid' name='counter[guid]'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Meters</label> <div class='col-xs-8'> <select id='inkeys_meter_id' multiple='multiple' name='meter[]' size='5'></select> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Key spaces</label> <div class='col-xs-8'> <textarea id='in_keys' name='keys'></textarea> <span class='help-block'>Enter one key range per line Ex.(192.168.1.10~192.168.1.20) (Port-10~Port-50) etc</span> </div> </div> </div> <div class='col-xs-6'> <div class='form_group'> <div id='new_time_selector_ks'></div> </div> </div> </div> <div class='row'> <div class='form-group'> <div class='col-xs-2 col-md-offset-4'> <input id='from_date_ks' name='from_date' type='hidden'> <input id='to_date_ks' name='to_date' type='hidden'> <input class='btn-submit' name='commit' type='submit' value='Search'> </div> </div> </div> </form> </div> <div id='in_keys_status'></div>");
     $(this.domid).append(form);
+    new ShowNewTimeSelector({divid:"#new_time_selector_ks",
+                               update_input_ids:"#from_date_ks,#to_date_ks",
+                               add_class:"pull-right",
+                               default_ts:this.default_selected_time
+                            });
     //auto_complete('in_keys',{cgguid:GUID.GUID_CG_HOSTS()},{});
     $(this.domid).append("<div id='inkey_treemap' class='col-xs-12' style='padding-top:10px'></div>");
     $(this.domid).append("<div id='trp_data_inkeys'></div>");
@@ -48,10 +55,12 @@ var InKeysMagicMap   =  $.klass({
 
   },
 
+
   //submit the form
   submit_form:function(){
     this.meters = {};
     this.units = {};
+    this.mk_time_interval();
     var val = $('#in_keys').val().trim();
     if(val.length ==  0 ){
       alert("Text field can't be empty.")
@@ -79,6 +88,14 @@ var InKeysMagicMap   =  $.klass({
     });
     deferq.resolve();
     return false;
+  },
+
+  mk_time_interval:function(){
+    var selected_fromdate = $('#from_date_ks').val();
+    var selected_todate = $('#to_date_ks').val();
+    var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
+    var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
+    this.tmint = mk_time_interval([fromTS,toTS]);
   },
   // send the ajax request and get all the matched host.
   load_keys:function(){
@@ -125,12 +142,10 @@ var InKeysMagicMap   =  $.klass({
         to_key : TRP.KeyT.create({label:inkey[1]})
       });
     });
-
     var req = mk_trp_request(TRP.Message.Command.KEYSPACE_REQUEST,
       {
         counter_group: this.cgguid,
-
-        time_interval:mk_time_interval($.extend({recentsecs:this.recentsecs},this.available_time)),
+        time_interval:this.tmint,
         spaces:spaces,
         maxitems:50
       });
@@ -170,15 +185,20 @@ var InKeysMagicMap   =  $.klass({
                          .values()
                          .flatten()
                          .value();
+      var pg_bar_max = cthis.all_inkeys.length == 0 ? 1 : cthis.all_inkeys.length
+      cthis.tris_pg_bar = new TrisProgressBar({max:pg_bar_max,
+                                            divid:'in_keys_status'
+                                            });
      
     });
 
   },
   //Get total usage for each hosts
   load_total:function(){
+    console.log(this.all_inkeys)
     var cthis = this;
     if(this.all_inkeys.length <= 0){
-      this.update_status();
+      this.tris_pg_bar.update_progress_bar();
       return true;
     }
     k = this.all_inkeys.shift();
@@ -187,7 +207,7 @@ var InKeysMagicMap   =  $.klass({
     {
         counter_group: this.cgguid,
         key:  TRP.KeyT.create({key:k.key}),
-        time_interval:mk_time_interval($.extend({recentsecs:this.recentsecs},this.available_time))
+        time_interval:this.tmint
     });
     return  get_response(req,function(resp){
       if(resp == undefined ) {
@@ -219,9 +239,6 @@ var InKeysMagicMap   =  $.klass({
     var classname = 'col-xs-'+Math.floor(12/_.size(this.meters))
     $('#trp_data_inkeys').html(" ");
     $('#in_keys_status').html('');
-    $('#in_keys_status').append($("<i>",{id:'in_keys_status_fa',class:'fa fa-spinner fa-spin fa-lw'}));
-    $('#in_keys_status').append($("<span>",{id:'in_keys_status_text',class:"text-info"}));
-    $('#host_search_form').after("<div class='col-xs-4' id='in_keys_status'></div>");
     this.available_inkeys={};
     this.all_inkeys=[];
     var table = get_table_shell();
@@ -395,24 +412,8 @@ var InKeysMagicMap   =  $.klass({
   },
 
   update_status:function(){
-    var data = _.chain(this.available_inkeys)
-                .values()
-                .flatten()
-                .value();
+    this.tris_pg_bar.update_progress_bar();
 
-    var processed = data.length- this.all_inkeys.length;
-    $('#in_keys_status_text').text(processed+"/"+data.length );
-
-    if(data.length == 0 ){
-      $('#in_keys_status_fa').removeClass();
-      $('#in_keys_status_fa').addClass("fa fa-info-circle fa-fw fa-lg");
-      $('#in_keys_status_text').text("No keys found" );
-    }
-    else if(processed >= data.length ) {
-      $('#in_keys_status_fa').removeClass();
-      $('#in_keys_status_fa').addClass("fa fa-check fa-fw fa-lg");      
-      $('#in_keys_status_text').text("Completed" );
-    }
 
   }
 });
@@ -424,3 +425,42 @@ function run(opts)
 
 
 //# sourceURL=key_space_explorer.js
+
+/*
+
+#inkey_search_form
+  %form#fkeymatch.form-horizontal
+    .row
+      .col-xs-6
+        .form-group
+          %label.control-label.col-xs-4 Counter Group
+          .col-xs-8
+            %select#inkeys_counter_guid{:name => "counter[guid]"}
+      .col-xs-6
+        .form-group
+          %label.control-label.col-xs-4 Meters
+          .col-xs-8
+            %select#inkeys_meter_id{:multiple => "multiple", :name => "meter[]", :size => "5"}
+    .row
+      .col-xs-6
+        .form-group
+          %label.control-label.col-xs-4 Key spaces
+          .col-xs-8
+            %textarea#in_keys{:name => "keys"}
+            %span.help-block Enter one key range per line Ex.(192.168.1.10~192.168.1.20) (Port-10~Port-50) etc
+      .col-xs-6
+        .form_group
+          #new_time_selector_ks
+      
+    .row
+      .form-group
+        .col-xs-2.col-md-offset-4
+          %input#from_date_ks{type:"hidden",name:"from_date"}
+          %input#to_date_ks{type:"hidden",name:"to_date"}
+          %input.btn-submit{:name => "commit", :type => "submit", :value => "Search"}
+#in_keys_status
+      
+
+
+
+*/
