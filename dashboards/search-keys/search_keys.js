@@ -42,7 +42,7 @@ class KeySpaceExplorer{
   }
   reset_ui(){
     this.dom.find(".ui_data").remove();
-    this.data_dom = $("<div class='ui_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <div class='progress_bar'></div> <h3> <i class='fa fa-table'></i> List of seen keys by day wise </h3> <table class='table table-sysdata'> <thead> <tr> <th>Date</th> <th>Seen keys</th> <th>Count</th> </tr> </thead> <tbody></tbody> </table> </div> </div> </div> </div> </div>");
+    this.data_dom = $("<div class='ui_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <div class='progress_bar'></div> <h3> <i class='fa fa-table'></i> Matching keys seen per day</h3> <table class='table table-sysdata'> <thead> <tr> <th>Date</th> <th>Seen keys</th> <th>Count</th> </tr> </thead> <tbody></tbody> </table> </div> </div> </div> </div> </div>");
     this.data_dom.find(".progress_bar").attr("id","pg_bar_"+this.rand_id);
     this.dom.append(this.data_dom);
     this.tint_arr = [];
