@@ -1,6 +1,6 @@
 name: Path  Analytics
 
-version: 0.0.11
+version: 0.1.1
 
 author: trisul
 
@@ -15,4 +15,4 @@ apptype: dashboard_js
 
 appresources: path_analytics.js app.css crrosskey_intf_asnpath.json template.haml
 jsparams:
-  crosskey_cgguid: "{FBD6EAA4-631E-F34C-82E5-ED6613BB9D54}"
+  crosskey_interface: "{FBD6EAA4-631E-F34C-82E5-ED6613BB9D54}"

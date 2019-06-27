@@ -1,5 +1,6 @@
 //ASN Path analytics
 class ASNPathAnalytics{
+
   constructor(opts){
     this.dom = $(opts.divid);
     this.rand_id=parseInt(Math.random()*100000);
@@ -123,10 +124,12 @@ class ASNPathAnalytics{
       }
       intf_dropdown[1].push([intf_keyt.key,this.intf_keymap[intf_keyt.key]]);
     }
+    
+    // if  already passed an interface filter
     let incoming_key = this.dash_params.key || ""
     incoming_key = incoming_key.split(/\\/);
-    let selected_cg = "";
-    let selected_st = "0";
+    let selected_cg = null, selected_st=null;
+
     if(incoming_key.length == 2){
       this.form.find(".filter_asn").val(incoming_key[0]);
       let rout_intf = incoming_key[1].split("_");
@@ -141,14 +144,15 @@ class ASNPathAnalytics{
       this.form.find(".filter_asn").val(incoming_key[0]);
     }
     var js_params = {meter_details:drop_down_items,
-      selected_cg : selected_cg,
-      selected_st : selected_st,
+      selected_cg : selected_cg || localStorage.getItem("apps.pathanalytics.last-selected-router"),
+      selected_st : selected_st || localStorage.getItem("apps.pathanalytics.last-selected-interface"),
       update_dom_cg : "routers_"+this.rand_id,
       update_dom_st : "interfaces_"+this.rand_id,
       chosen:true
     }
     new CGMeterCombo(JSON.stringify(js_params));
-  }
+
+   }
   async get_cgmeters(){
     this.cg_meters={};
     await get_counters_and_meters_json(this.cg_meters);
@@ -162,6 +166,15 @@ class ASNPathAnalytics{
   }
 
   submit_form(){
+
+    // last used is the next default 
+    localStorage.setItem("apps.pathanalytics.last-selected-router", 
+                            $('.pathanalytics_form select[name="routers"] option:selected').val());
+
+    localStorage.setItem("apps.pathanalytics.last-selected-interface", 
+                            $('.pathanalytics_form select[name="interfaces"] option:selected').val());
+
+
     this.reset_ui();
     this.mk_time_interval();
     this.get_data();
@@ -178,7 +191,7 @@ class ASNPathAnalytics{
   }
   async get_data(){
     this.data ={};
-    this.bucket_size = this.cg_meters.all_cg_bucketsize[this.cgguid].top_bucket_size;
+    let bucketsize = this.cg_meters.all_cg_bucketsize[this.cgguid].top_bucket_size;
 
     let req_opts = {
       counter_group: this.cgguid,
@@ -202,6 +215,16 @@ class ASNPathAnalytics{
     this.data[0]=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts );
     req_opts["meter"] = 1;
     this.data[1]=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts);
+
+    // multiply by bucketsize 
+    for (let i =0 ; i < this.data[0].keys.length; i++) {   
+      this.data[0].keys[i].metric  *= bucketsize;
+    }
+    for (let i =0 ; i < this.data[1].length; i++) {   
+      this.data[1].keys[i].metric  *= bucketsize;
+    }
+   
+
     //key_filter in trp support one like 
     //we can't combine router with asn to make key filter
     //so support added via code.
@@ -251,6 +274,9 @@ class ASNPathAnalytics{
     this.draw_table();
     this.draw_sankey_chart(this.data[0],"upload")
     this.draw_sankey_chart(this.data[1],"download")
+
+    this.draw_path_table(this.data[0],'#nested-upload  table')
+    this.draw_path_table(this.data[1],'#nested-download table')
     
   }
 
@@ -265,7 +291,7 @@ class ASNPathAnalytics{
         if(table_data[label]==undefined){
           table_data[label] = [keyt.key,keyt.readable,label,0,0]
         }
-        table_data[label][meterid+3]=table_data[label][meterid+3] + (keyt.metric.toNumber()*this.bucket_size)
+        table_data[label][meterid+3] +=  parseInt(keyt.metric)
       }
     }
     this.dom.find('.noitify').remove();
@@ -273,7 +299,7 @@ class ASNPathAnalytics{
     var table = this.data_dom.find(`#toppers_table_${this.rand_id}`).find("table");
     this.table_id = `table_${this.rand_id}`;
     table.attr("id",this.table_id)
-    table.addClass('table table-hover table-sysdata');
+    table.addClass('table table-hover table-bordered table-condensed');
     table.find("thead").append(`<tr><th>ASN Path</th><th style='width:400px'>Label</th><th sort='volume'>Upload </th><th sort='volume'>Download</th></tr>`);
     let cgtoppers =  Object.values(table_data).slice(0,100);
     table.closest('.panel').find("span.badge").html(cgtoppers.length);
@@ -331,10 +357,11 @@ class ASNPathAnalytics{
        for(let j=1;j < parts.length; j++){
         links.source.push(keylookup[parts[j-1]]);
         links.target.push(keylookup[parts[j]]);
-        links.value.push(parseInt(item.metric*this.bucket_size))
+        links.value.push(parseInt(item.metric))
       }
 
     }
+
     let labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2|:3|:4|:5|:6|:7|:8|:9/g,"")).value()
     Plotly.purge(this.sankey_div_id);
     var data = {
@@ -408,7 +435,73 @@ class ASNPathAnalytics{
     $('small.target').html(this.target_text + duration);
   }
 
+  // draw a nested table view 
+  draw_path_table(toppers,divid)
+  {
+
+    let cgtoppers_bytes = toppers.keys.slice(this.remove_topper_count,this.max_crosskey_nodes);
+
+
+    let tree = { name: "root", key: "root", metric: 0, children : {} }
+
+    for (let i =0 ; i < cgtoppers_bytes.length; i++)
+    {   
+      let metric=parseInt(cgtoppers_bytes[i].metric);
+      let labelparts=cgtoppers_bytes[i].label.split("\\");
+      let keyparts=cgtoppers_bytes[i].readable.split("\\");
+      let pos=tree;
+
+      for (let i=0; i< keyparts.length; i++)
+      {
+        let k=keyparts[i];
+        let l=labelparts[i];
+        let c=pos.children[k];
+
+        if (c==null)  {
+          c={ name: l, key: k, metric: metric, children: {} }
+          pos.children[k]=c;
+        } else {
+          c.metric += metric;
+        }
+        pos=c
+      }
+    }
+
+    let fix_asname=function(str){
+      return str
+            .replace(/\W/g, ' ')
+            .replace('  ',' ')
+            .split(' ')
+            .splice(0,2)
+            .join(' ');
+    }
+
+
+    let drawcell=function(tbl, node) {
+      let tbody = $('<tbody>');
+
+      // row for each child
+      _.chain(node.children).values().sortBy((a)=>{return -a.metric}).each( (c) => {
+        let tr=$('<tr>');
+        tr.append(`<td> <h4>${c.key}  <span class="text-primary pull-right" title=${c.metric}>${h_fmtvol(c.metric)}</span></h4>${fix_asname(c.name)} peers: ${_.size(c.children)}</td>`);
+
+        let td=$('<td>', {style:"padding:0px"});
+        let subtbl=$('<table>',{class:"table table-condensed table-bordered", style:"margin-bottom:0px"});
+        drawcell(subtbl,c);
+        td.append(subtbl);
+        tr.append(td);
+        tbody.append(tr);
+      });
+      tbl.append(tbody);
+    }
+
+    let tbl = $(divid);
+    drawcell(tbl,tree);
+
+  }
 }
+
+
  
  function run(opts){
   new ASNPathAnalytics(opts)

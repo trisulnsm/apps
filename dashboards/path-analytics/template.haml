@@ -54,7 +54,7 @@
 
 .row.path_data
   .col-xs-12
-    .panel.panel-success
+    .panel.panel-primary
       .panel-heading
         %h3
           %i.fa.fa-table.fa-fw
@@ -90,3 +90,24 @@
           %small Usage of busiest route segments
       .panel-body
         .sankey_chart_download
+
+
+  .col-xs-12#nested-upload
+    .panel.panel-success
+      .panel-heading
+        %h3
+          %i.fa.fa-random
+          Per Hop Path Analytics  : Upload
+          %small Shows volume transfer on entire path 
+      .panel-body
+        %table.table.table-hover.table-bordered.table-condensed
+
+  .col-xs-12#nested-download
+    .panel.panel-success
+      .panel-heading
+        %h3
+          %i.fa.fa-random
+          Per Hop Path Analytics  : Download
+          %small Shows volume transfer on entire path 
+      .panel-body
+        %table.table.table-hover.table-bordered.table-condensed
