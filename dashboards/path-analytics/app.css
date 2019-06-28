@@ -3,6 +3,9 @@
 	margin-top:10px;
 }
 
+.panel-primary h3 small {
+	color:#fff;
+}
 h3 small{
 	font-size: 75%;
 }

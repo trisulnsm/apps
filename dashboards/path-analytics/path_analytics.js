@@ -58,10 +58,9 @@ class ASNPathAnalytics{
          $( "#remove-top-n" ).text( $( this ).slider( "value" ) );
       },
       slide: function( event, ui ) {
-         $( "#remove-top-n" ).text( ui.value );
+        $( "#remove-top-n" ).text( ui.value );
         cthis.remove_topper_count=ui.value;
-        cthis.draw_sankey_chart(cthis.data[0],"upload");
-        cthis.draw_sankey_chart(cthis.data[1],"download");
+        cthis.redraw_all();
       }
     });
 
@@ -144,8 +143,8 @@ class ASNPathAnalytics{
       this.form.find(".filter_asn").val(incoming_key[0]);
     }
     var js_params = {meter_details:drop_down_items,
-      selected_cg : selected_cg || localStorage.getItem("apps.pathanalytics.last-selected-router"),
-      selected_st : selected_st || localStorage.getItem("apps.pathanalytics.last-selected-interface"),
+      selected_cg : selected_cg || localStorage.getItem("apps.pathanalytics.last-selected-router") || "",
+      selected_st : selected_st || localStorage.getItem("apps.pathanalytics.last-selected-interface")||"",
       update_dom_cg : "routers_"+this.rand_id,
       update_dom_st : "interfaces_"+this.rand_id,
       chosen:true
@@ -245,7 +244,7 @@ class ASNPathAnalytics{
     _.each(asn_keys.hits,function(keyt){
       asn_keymap[keyt.key] = keyt.label || keyt.readable;
     },this);
-
+    let tot_volume =[0,0]
     for(let meterid in this.data){
       this.data[meterid].keys = _.chain(this.data[meterid].keys)
                                 .select(function(topper){
@@ -264,57 +263,48 @@ class ASNPathAnalytics{
                                     intf=readable.pop();
                                   }
                                   let asn_path = _.unique(readable);
-                                  let asn_resolved = asn_path.map(x=> asn_keymap[x] || x).join("\\")
+                                  let asn_resolved = asn_path.map(x=> this.fix_asname(asn_keymap[x] || x)).join("\\")
                                   keyt.label=[intf,asn_resolved].join("\\");
                                   keyt.readable=[intf,asn_path.join("\\")].join("\\");
+                                  tot_volume[meterid] +=parseInt(keyt.metric);
                                 },this)
                               .value();
     }
+    $('.tot_upload_vol').text(` (${h_fmtvol(tot_volume[0])})`);
+    $('.tot_download_vol').text(` (${h_fmtvol(tot_volume[1])})`);
+    this.redraw_all();
+  }
+
+  redraw_all(){
     
-    this.draw_table();
+    this.draw_table(this.data[0],"#table_upload");
+    this.draw_table(this.data[1],"#table_download");
     this.draw_sankey_chart(this.data[0],"upload")
     this.draw_sankey_chart(this.data[1],"download")
-
     this.draw_path_table(this.data[0],'#nested-upload  table')
     this.draw_path_table(this.data[1],'#nested-download table')
-    
   }
 
 
-  draw_table(){
-    let table_data = {}
-    for(let meterid in this.data){
-       meterid = parseInt(meterid);
-      for(let i=0;i<this.data[meterid].keys.length;i++){
-        let keyt = this.data[meterid].keys[i];
-        let label = keyt.label;
-        if(table_data[label]==undefined){
-          table_data[label] = [keyt.key,keyt.readable,label,0,0]
-        }
-        table_data[label][meterid+3] +=  parseInt(keyt.metric)
-      }
-    }
+  draw_table(data,table_id){
     this.dom.find('.noitify').remove();
     let rows = [];
-    var table = this.data_dom.find(`#toppers_table_${this.rand_id}`).find("table");
-    this.table_id = `table_${this.rand_id}`;
-    table.attr("id",this.table_id)
-    table.addClass('table table-hover table-bordered table-condensed');
-    table.find("thead").append(`<tr><th>ASN Path</th><th style='width:400px'>Label</th><th sort='volume'>Upload </th><th sort='volume'>Download</th></tr>`);
-    let cgtoppers =  Object.values(table_data).slice(0,100);
+    var table = this.data_dom.find(table_id);
+    table.find("tbody").html("");
+    table.siblings("ul.pagination").remove();
+    let cgtoppers =  data.keys.slice(this.remove_topper_count,100+this.remove_topper_count);
     table.closest('.panel').find("span.badge").html(cgtoppers.length);
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
-      rows.push(`<tr data-key="${topper[0]}"  data-label="${topper[2]}" data-readable="${topper[1]}">
-                                <td class='linkdrill'>${topper[1]}</a></td>
-                                <td class='linkdrill'>${topper[2]}</a></td>
-                                <td>${h_fmtvol(topper[3])}</td>
-                                <td>${h_fmtvol(topper[4])}</td>
+      rows.push(`<tr data-key="${topper.label}"  data-label="${topper.label}" data-readable="${topper.readble}">
+                                <td class='linkdrill'>${topper.readable}</a></td>
+                                <td class='linkdrill'>${topper.label.replace(/:\d/g,"")}</a></td>
+                                <td>${h_fmtvol(topper.metric)}</td>
                                 </tr>`);
 
 
     }
-    new TrisTablePagination(this.table_id,{no_of_rows:10,rows:rows});
+    new TrisTablePagination(table_id.replace("#",""),{no_of_rows:10,rows:rows});
     table.tablesorter();
 
   }
@@ -467,23 +457,14 @@ class ASNPathAnalytics{
       }
     }
 
-    let fix_asname=function(str){
-      return str
-            .replace(/\W/g, ' ')
-            .replace('  ',' ')
-            .split(' ')
-            .splice(0,2)
-            .join(' ');
-    }
-
-
+    var cthis = this;
     let drawcell=function(tbl, node) {
       let tbody = $('<tbody>');
 
       // row for each child
       _.chain(node.children).values().sortBy((a)=>{return -a.metric}).each( (c) => {
         let tr=$('<tr>');
-        tr.append(`<td> <h4>${c.key}  <span class="text-primary pull-right" title=${c.metric}>${h_fmtvol(c.metric)}</span></h4>${fix_asname(c.name)} peers: ${_.size(c.children)}</td>`);
+        tr.append(`<td> <h4>${c.key}  <span class="text-primary pull-right" title=${c.metric}>${h_fmtvol(c.metric)}</span></h4>${c.name.replace(/:\d$/,"")} peers: ${_.size(c.children)}</td>`);
 
         let td=$('<td>', {style:"padding:0px"});
         let subtbl=$('<table>',{class:"table table-condensed table-bordered", style:"margin-bottom:0px"});
@@ -496,8 +477,17 @@ class ASNPathAnalytics{
     }
 
     let tbl = $(divid);
+    tbl.html('');
     drawcell(tbl,tree);
 
+  }
+  fix_asname(str){
+    return str
+          .replace(/\W/g, ' ')
+          .replace('  ',' ')
+          .split(' ')
+          .splice(0,2)
+          .join(' ');
   }
 }
 
