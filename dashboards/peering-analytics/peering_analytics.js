@@ -21,6 +21,7 @@ class ISPOverviewMapping{
       this.meter_details_in = opts.jsparams.meters || this.meter_details_in
     } 
     this.probe_id = opts.probe_id;
+    this.dash_params = opts.dash_params;
     this.add_form(opts);
   }
 
@@ -118,23 +119,41 @@ class ISPOverviewMapping{
       meters.unshift(["0","Please select"]);
       all_dropdown[key]=[router_key_map[key],meters];
     }
+
+    let selected_router = null, selected_interface=null;
+    let incoming_key = this.dash_params.key || ""
+    let keyparts = incoming_key.split("_");
+    if (keyparts.length==2) {
+      selected_router = keyparts[0];
+      selected_interface = keyparts.join("_");
+    }
+
     var js_params = {meter_details:all_dropdown,
-      selected_cg : "",
-      selected_st : "0",
+      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router"),
+      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface"),
       update_dom_cg : "routers"+this.rand_id,
       update_dom_st : "interfaces"+this.rand_id,
       chosen:true
     }
     //Load meter combo for routers and interfaces
     new CGMeterCombo(JSON.stringify(js_params));
+
+
     this.cg_meters = {};
     await get_counters_and_meters_json(this.cg_meters);
     //find crosskeyguid is present automatically find base counter group
     if(this.crosskey_interface && this.cg_meters.crosskey[this.crosskey_interface]){
       this.filter_cgguid = this.cg_meters.crosskey[this.crosskey_interface][1];
     }
+
     this.form.submit($.proxy(this.submit_form,this));
+    if(this.dash_params.valid_input == "1" || this.dash_params.valid_input==1){
+      this.form.submit();
+    }    
   }
+
+
+
   //make time interval to get toppers.
   mk_time_interval(){
     var selected_fromdate = $('#from_date'+this.rand_id).val();
@@ -144,6 +163,15 @@ class ISPOverviewMapping{
     this.tmint = mk_time_interval([fromTS,toTS]);
   }
   submit_form(){
+
+    // last used is the next default 
+    localStorage.setItem("apps.peeringanalytics.last-selected-router", 
+                            $('.peeringanalytics_form select[name="routers"] option:selected').val());
+
+    localStorage.setItem("apps.peeringanalytics.last-selected-interface", 
+                            $('.peeringanalytics_form select[name="interfaces"] option:selected').val());
+
+
     this.form.find("#btn_submit").prop('disabled', true);
     this.reset_ui();
     this.mk_time_interval();
@@ -398,7 +426,6 @@ class ISPOverviewMapping{
                                 <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
                                 <td>${uniques[full_key][0]}</td>
                                 <td>${uniques[full_key][1]}</td>
-                                <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
                                 <td>${dropdown[0].outerHTML}</td>
                                 </tr>`);
 

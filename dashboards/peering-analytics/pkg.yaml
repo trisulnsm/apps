@@ -13,7 +13,7 @@ description:
 
 apptype: dashboard_js
 
-appresources: peering_analytics.js app.css crosskey_router_asn.json crosskey_interface_asn.json flowtager_asn.json flowtager_prefix.json template.haml  conetxtmenu.js
+appresources: peering_analytics.js app.css crosskey_router_asn.json crosskey_interface_asn.json flowtager_asn.json flowtager_prefix.json template.haml
 
 dependencies: 
 

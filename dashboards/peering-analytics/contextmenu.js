@@ -1,4 +1,3 @@
-//meter id should be in array 
 function getattachmentpoints(){
   return [{
     cgguid: "{C0B04CA7-95FA-44EF-8475-3835F3314761}",
@@ -13,7 +12,8 @@ function onclick(opts){
                    key:opts.key,
                    valid_input:1,
                    window_fromts:opts.time_interval.window_fromts,
-                   window_tots:opts.time_interval.window_secs
+                   window_seconds:opts.time_interval.window_secs
                 });
   window.open("/newdash/index?"+lp);
 }
+
