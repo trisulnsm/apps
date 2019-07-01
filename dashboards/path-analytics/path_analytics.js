@@ -374,9 +374,9 @@ class ASNPathAnalytics{
     //width of div widht
     var width = this.data_dom.find(".sankey_chart").width();
     width = parseInt(width)-50;
-    var height = labels.length *50;
-    if(height < 500){
-      height =500;
+    var height = labels.length *25;
+    if(height < 250){
+      height =250;
     }
     var layout = {
       title: '',

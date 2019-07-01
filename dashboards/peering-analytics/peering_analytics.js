@@ -12,7 +12,7 @@ class ISPOverviewMapping{
     this.filter_cgguid = "{03E016FC-46AA-4340-90FC-0E278B93C677}";
     this.crosskey_router = null;
     this.crosskey_interface=null;
-    this.meter_details_in = {upload:0,download:1,uniq_asn:2,uniq_prefix:3}
+    this.meter_details_in = {upload:0,download:1,uniq_aspath:2,uniq_prefix:3}
     //filter by router and interface crosskey
 
     if(opts.jsparams &&  _.size(opts.jsparams)>0){
@@ -47,7 +47,7 @@ class ISPOverviewMapping{
 
     try {
       opts= { 
-          crosskey_router :  cginfo.group_details.find( (item) => item.name=="Auto_Routers_ASN").guid ,
+          crosskey_router:    cginfo.group_details.find( (item) => item.name=="Auto_Routers_ASN").guid ,
           crosskey_interface: cginfo.group_details.find( (item) => item.name=="Auto_Interfaces_ASN").guid
       }
     } catch(err) {
@@ -57,7 +57,6 @@ class ISPOverviewMapping{
   }
 
   async add_form(opts){
-
 
     await this.load_assets(opts);
     
@@ -188,7 +187,8 @@ class ISPOverviewMapping{
     };
     this.form.find("#btn_submit").prop('disabled', false);
   }
-  //Reset UI for every submit
+
+  // reset UI for every submit
   reset_ui(){
     this.dom.find(".ui_data").remove();
     this.data_dom = $(this.haml_dom[1]).clone();
@@ -205,6 +205,8 @@ class ISPOverviewMapping{
     //title part
 
   }
+
+  
   update_target_text(){
     let selected_router = $('#routers'+this.rand_id).val();
     let selected_interface = $('#interfaces'+this.rand_id).val();
@@ -228,7 +230,9 @@ class ISPOverviewMapping{
     
     $('small.target').html(this.target_text + duration);
   }
-  async get_data(){
+
+  // build model 
+  async get_data()  {
     //find guid to load data
     let selected_router = $('#routers'+this.rand_id).val();
     let selected_interface = $('#interfaces'+this.rand_id).val();
@@ -262,10 +266,10 @@ class ISPOverviewMapping{
     if(Object.keys(this.cg_meters.all_meters_type[this.cgguid]).length !=0 &&
         this.cg_meters.all_meters_type[this.cgguid][this.meter].type==4 &&
         this.cg_meters.all_meters_type[this.cgguid][this.meter].units=="Bps"){
-
-      this.multiplier=8;
+          this.multiplier=8;
     }
-    //crosskey bucket size 
+
+    // crosskey bucket size 
     this.ck_top_bucket_size =  300;
     this.meter_types=this.cg_meters.all_meters_type[this.cgguid];
     if(this.crosskey_cgguid){
@@ -276,7 +280,8 @@ class ISPOverviewMapping{
         this.meter_types = this.cg_meters.all_meters_type[parent_cgguid];
       }
     }
-    //load_toppers
+
+    // load_toppers
     let req_opts = {
       counter_group: this.cgguid,
       time_interval: this.tmint ,
@@ -287,10 +292,9 @@ class ISPOverviewMapping{
       req_opts["key_filter"]=this.filter_text
     }
     this.cgtoppers_resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, req_opts);
-
     this.cgtoppers_resp.keys = this.sort_hash(this.cgtoppers_resp,"metric");
     
-    //reject sysgrup and xx
+    // reject sysgrup and xx
     this.cgtoppers_resp.keys = _.reject(this.cgtoppers_resp.keys,function(topper){
       return topper.key=="SYS:GROUP_TOTALS" || topper.key.includes("XX");
     });
@@ -307,6 +311,8 @@ class ISPOverviewMapping{
     await this.draw_traffic_chart();
     await this.draw_sankey_chart();
   }
+
+
   //draw a in and out traffic chart for selected interfaces 
   //if no interface selected draw chart for aggregates
   async draw_traffic_chart(){
@@ -358,17 +364,20 @@ class ISPOverviewMapping{
   }
 
   async draw_table(){
-    //get uniq prefix and interfaces
+
+    // get uniq prefix and interfaces
     let uniques = {};
     let keys = Object.keys(this.meter_details_in);
     keys = keys.slice(2,4);
     if(keys.length==0){
-      this.meter_details_in["uniq_asn"] = 2
+      this.meter_details_in["uniq_aspath"] = 2
       this.meter_details_in["uniq_prefix"] = 3
-      keys =["uniq_asn","uniq_prefix"];
+      keys =["uniq_aspath","uniq_prefix"];
     }
-    //always first as second prefix
+
+    // always first as second prefix
     keys = _.sortBy(keys);
+
     for (const [i, key] of keys.entries()) {
       let req_opts = {
         counter_group: this.cgguid,
@@ -381,9 +390,11 @@ class ISPOverviewMapping{
         if(! uniques.hasOwnProperty(keyt.key)){
           uniques[keyt.key]=[0,0]
         }
-        uniques[keyt.key][i] = keyt.metric_avg.toNumber();
+        uniques[keyt.key][i] = keyt.metric_max.toNumber();
       });
     }
+
+
     let rows = [];
     this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".toppers_table_div").find('.animated-background').remove();
     var table = this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".toppers_table").find("table");
@@ -405,6 +416,7 @@ class ISPOverviewMapping{
       dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>ASN Path Analytics</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Top Prefixes</a></li>");
+      dropdown_menu.append("<li><a href='javascript:;;'>Show Routes</a></li>");
 
 
       dropdown.append(dropdown_menu);
@@ -648,9 +660,9 @@ class ISPOverviewMapping{
     //width of div widht
     var width = this.data_dom.find(".sankey_chart").width();
     width = parseInt(width)-50;
-    var height = labels.length *50;
-    if(height < 500){
-      height =500;
+    var height = labels.length *25;
+    if(height < 250){
+      height =250;
     }
     var layout = {
       title: '',
@@ -722,6 +734,10 @@ class ISPOverviewMapping{
         this.get_top_prefixes(event)
         break;
 
+      case 5:
+        this.query_routes_for_as(event)
+        break;
+
     } 
   }
   async get_top_prefixes(event){
@@ -779,7 +795,42 @@ class ISPOverviewMapping{
     shell_modal.find(".modal-body").append(table);
     table.tablesorter()
   }
+
+
+async query_routes_for_as(event){
+    let target = $(event.target);
+    let tr = target.closest("tr");
+    let statid = tr.data("statid");
+    var shell_modal = create_shell_modal();
+    shell_modal.find(".modal-header h4").html("Query Route Information<small>Shows routes in DB for this AS</small>");
+    var message = "<h4><i class='fa fa-spin fa-spinner'></i> Please wait ... Getting data</h4>";
+    shell_modal.find(".modal-body").html(message);
+    $('#shortcut-div').html(shell_modal);
+    
+
+    $(shell_modal).modal({
+      keyboard:true
+    });
+
+    let router = this.target_text.split("->")[0];
+    let asnumber = tr.data('key');
+
+
+
+    let resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
+                                {
+                                  tool:5,
+                                  tool_input: `${router} 0 'SELECT * FROM PREFIX_PATHS_V4 WHERE ASPATH LIKE "% ${asnumber}"'`,
+                                  destination_node:this.probe_id
+                                });
+
+    var output = $("<pre>").html( resp.tool_output);
+    shell_modal.find(".modal-body").append(output);
+  
+  }
+
 };
+
 
 
 function run(opts) {
