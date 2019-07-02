@@ -306,6 +306,8 @@ class ASNPathAnalytics{
     }
     new TrisTablePagination(table_id.replace("#",""),{no_of_rows:10,rows:rows});
     table.tablesorter();
+    new ExportToCSV({table_id:table_id.replace("#",""),filename_prefix:"top_asn_panel",append_to:"panel"});
+
 
   }
 
@@ -375,7 +377,7 @@ class ASNPathAnalytics{
     var width = this.data_dom.find(".sankey_chart").width();
     width = parseInt(width)-50;
     var height = labels.length *25;
-    if(height < 250){
+    if(height < 250 ){
       height =250;
     }
     var layout = {
