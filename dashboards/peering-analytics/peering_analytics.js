@@ -286,7 +286,7 @@ class ISPOverviewMapping{
       counter_group: this.cgguid,
       time_interval: this.tmint ,
       meter:this.meter,
-      maxitems:1000
+      maxitems:5000
     }
     if(this.filter_text){
       req_opts["key_filter"]=this.filter_text
@@ -308,60 +308,9 @@ class ISPOverviewMapping{
     
     await this.draw_table();
     await this.draw_chart();
-    await this.draw_traffic_chart();
     await this.draw_sankey_chart();
   }
 
-
-  //draw a in and out traffic chart for selected interfaces 
-  //if no interface selected draw chart for aggregates
-  async draw_traffic_chart(){
-    let cgguid = this.cgguid;
-    let key = this.filter_text;
-    let meter = this.meter;
-    //if none of router or interfaces selectd show total bandwidth
-    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".overall_traffic_chart_div").find('.animated-background').remove();
-    if(this.filter_text==null || this.filter_text == undefined){
-      cgguid = GUID.GUID_CG_AGGREGATE();
-      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter];
-      meter=0;
-    }else if(this.filter_text.match(/_/)){
-      cgguid = GUID.GUID_CG_FLOWINTERFACE();
-      meter = [2,1][this.meter_index];
-    }else{
-      //no in and out meterid for routers only total
-      this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".overall_traffic_chart_div").remove();
-      return true;
-    }
-    var model_data = {cgguid:cgguid,
-        meter:meter,
-        key:key,
-        from_date:this.form.find("#from_date"+this.rand_id).val(),
-        to_date:this.form.find("#to_date"+this.rand_id).val(),
-        valid_input:1,
-        surface:"AREA",
-        chart_height:250
-    };
-    let div =this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".overall_traffic_chart");
-    await $.ajax({
-      url:"/trpjs/generate_chart",
-      data:model_data,
-      context:this,
-      success:function(resp){
-        div.html(resp);
-      }
-    });
-
-    let cgresp=await fetch_trp(TRP.Message.Command.COUNTER_ITEM_REQUEST, {
-        counter_group:cgguid,
-        key:TRP.KeyT.create({key:key}),
-        time_interval:this.tmint,
-        volumes_only:1
-    });
-    let volume = cgresp.totals.values[meter].toNumber()*this.bucket_size;
-    div.closest('.panel').find(".badge").html(h_fmtvol(volume));
-
-  }
 
   async draw_table(){
 
@@ -387,6 +336,7 @@ class ISPOverviewMapping{
       }
       let resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, req_opts);
       _.each(resp.keys,function(keyt){
+        console.log
         if(! uniques.hasOwnProperty(keyt.key)){
           uniques[keyt.key]=[0,0]
         }
@@ -405,6 +355,8 @@ class ISPOverviewMapping{
                                 <th sort='volume' barspark='auto'>Volume</th>
                                 <th sort='volume'>Avg <br/>Bandwidth</th><th>Uniq <br/>ASPath</th><th>Uniq <br/>Prefix</th><th class='nosort'></th>
                                 </tr>`);
+    let totvol=this.cgtoppers_resp.keys.reduce((a,b)=>a +parseInt(b.metric),0);
+    $('.volume_'+this.meter).text(` (${h_fmtvol(totvol*this.top_bucket_size)}) `);
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,100);
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
@@ -546,13 +498,28 @@ class ISPOverviewMapping{
       $('#'+this.trfchart_div_id).html("<div class='alert alert-info'>No data found.</div>"); 
       return true;
     }
+    let cgguid = this.cgguid;
+    let key = this.filter_text;
+    let meter = this.meter;
+    let ref_model =[];
+    if(this.filter_text==null || this.filter_text == undefined){
+      cgguid = GUID.GUID_CG_AGGREGATE();
+      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter];
+      meter=0;
+    }else if(this.filter_text.match(/_/)){
+      cgguid = GUID.GUID_CG_FLOWINTERFACE();
+      meter = [2,1][this.meter_index];
+    }
+    ref_model = [cgguid,key,meter,"Total"]
+
     var model_data = {cgguid:this.cgguid,
         meter:this.meter,
         key:keys.join(","),
         from_date:this.form.find("#from_date"+this.rand_id).val(),
         to_date:this.form.find("#to_date"+this.rand_id).val(),
         valid_input:1,
-        surface:"STACKEDAREA"
+        surface:"STACKEDAREA",
+        ref_model:ref_model
     };
     await $.ajax({
       url:"/trpjs/generate_chart",
