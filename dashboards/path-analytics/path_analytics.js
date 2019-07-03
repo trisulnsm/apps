@@ -329,6 +329,7 @@ class ASNPathAnalytics{
       parts = _.map(parts,function(ai,ind){
         return ai.replace(/:0|:1|:2|:3|:4|:5|:6|:7|:8|:9/g,"")+":"+ind;
       });
+
       cgtoppers_bytes[i].label=parts.join("\\")
       keylookup[parts[0]] = keylookup[parts[0]]==undefined ? idx++ : keylookup[parts[0]];
       keylookup[parts[1]] = keylookup[parts[1]] || idx++;
@@ -376,6 +377,9 @@ class ASNPathAnalytics{
     //width of div widht
     var width = this.data_dom.find(".sankey_chart").width();
     width = parseInt(width)-50;
+    if(width < 900){
+      width = 900;
+    }
     var height = labels.length *25;
     if(height < 250 ){
       height =250;

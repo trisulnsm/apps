@@ -793,6 +793,8 @@ async query_routes_for_as(event){
 
     var output = $("<pre>").html( resp.tool_output);
     shell_modal.find(".modal-body").append(output);
+    shell_modal.find(".modal-body h4").remove();
+
   
   }
 

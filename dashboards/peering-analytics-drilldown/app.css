@@ -22,4 +22,6 @@ h3 small{
 .panel-heading {
 	padding: 5px 15px;
 }
-
+.widget-tool {
+    float: right;
+}
