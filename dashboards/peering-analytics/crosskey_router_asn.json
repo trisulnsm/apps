@@ -16,8 +16,8 @@
       {
         "id": 48,
         "CounterGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
-        "Name": "Auto_Routers_ASN",
-        "Description": "router asn",
+        "Name": "Flow-AS x Router",
+        "Description": "Cross key of Flow-AS and netflow generator router",
         "TopNCommitIntervalSecs": 300,
         "BucketSizeMS": 60000,
         "TrackHiWater": 25000,

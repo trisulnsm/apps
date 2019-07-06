@@ -21,5 +21,7 @@ jsparams:
   crosskey_router: "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}"
   crosskey_interface: "{A6411875-1C9C-2C6C-4879-54C437223815}"
   meters:
-    upload: 0
-    download: 1
+    upload: 1
+    download: 2
+    uniq_aspath: 3
+    unit_prefix: 4
