@@ -356,7 +356,7 @@ class ISPOverviewMapping{
                                 <th sort='volume'>Avg <br/>Bandwidth</th><th>Uniq <br/>ASPath</th><th>Uniq <br/>Prefix</th><th class='nosort'></th>
                                 </tr>`);
     let totvol=this.cgtoppers_resp.keys.reduce((a,b)=>a +parseInt(b.metric),0);
-    $('.volume_'+this.meter).text(` (${h_fmtvol(totvol*this.top_bucket_size)}) `);
+    $('.volume_'+this.meter_index).text(` (${h_fmtvol(totvol*this.top_bucket_size)}) `);
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,100);
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
