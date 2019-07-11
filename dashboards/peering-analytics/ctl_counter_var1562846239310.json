@@ -1,0 +1,61 @@
+{
+  "TrisulCtlCountervar": [
+    [
+      {
+        "id": 326,
+        "ItemGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
+        "SubItem": 0,
+        "VarType": 4,
+        "TopNCount": 10000,
+        "BottomNCount": 0,
+        "Name": "total",
+        "Description": "Total",
+        "Units": "Bps"
+      },
+      {
+        "id": 327,
+        "ItemGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
+        "SubItem": 1,
+        "VarType": 4,
+        "TopNCount": 30000,
+        "BottomNCount": 0,
+        "Name": "recv",
+        "Description": "Recv from AS",
+        "Units": "Bps"
+      },
+      {
+        "id": 328,
+        "ItemGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
+        "SubItem": 2,
+        "VarType": 4,
+        "TopNCount": 30000,
+        "BottomNCount": 0,
+        "Name": "xmit",
+        "Description": "Transmit to AS",
+        "Units": "Bps"
+      },
+      {
+        "id": 329,
+        "ItemGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
+        "SubItem": 3,
+        "VarType": 5,
+        "TopNCount": 30000,
+        "BottomNCount": 20,
+        "Name": "uniqs",
+        "Description": "Unique ASPATHS",
+        "Units": "Uniques "
+      },
+      {
+        "id": 330,
+        "ItemGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
+        "SubItem": 4,
+        "VarType": 5,
+        "TopNCount": 30000,
+        "BottomNCount": 20,
+        "Name": "uniqs",
+        "Description": "Unique External Prefixes",
+        "Units": "Uniques "
+      }
+    ]
+  ]
+}
