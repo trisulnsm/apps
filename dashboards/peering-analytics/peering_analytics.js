@@ -383,15 +383,17 @@ class ISPOverviewMapping{
       let label = topper.label.split("\\").shift();
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
-      rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" data-readable="${topper.readable}" data-full_key="${full_key}">
-                                <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
-                                <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
-                                <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
-                                <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
-                                <td>${uniques[full_key][0]}</td>
-                                <td>${uniques[full_key][1]}</td>
-                                <td>${dropdown[0].outerHTML}</td>
-                                </tr>`);
+      rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" 
+                    data-readable="${topper.readable}" data-full_key="${full_key}"
+                    data-statid-index=${this.meter_index}>
+                      <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
+                      <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
+                      <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
+                      <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
+                      <td>${uniques[full_key][0]}</td>
+                      <td>${uniques[full_key][1]}</td>
+                      <td>${dropdown[0].outerHTML}</td>
+                      </tr>`);
 
 
     }
@@ -508,7 +510,7 @@ class ISPOverviewMapping{
       meter=0;
     }else if(this.filter_text.match(/_/)){
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
-      meter = [2,1][this.meter_index];
+      meter = [1,2][this.meter_index];
     }
     ref_model = [cgguid,key,meter,"Total"]
 
@@ -710,7 +712,7 @@ class ISPOverviewMapping{
   async get_top_prefixes(event){
     let target = $(event.target);
     let tr = target.closest("tr");
-    let statid = tr.data("statid");
+    let statid = tr.data("statid-index");
     var shell_modal = create_shell_modal();
     shell_modal.find(".modal-header h4").html("Top prefixes <small>Show top 100 prefixes </small><span class='badge'></span>");
     var message = "<h4><i class='fa fa-spin fa-spinner'></i> Please wait ... Getting data</h4>";
