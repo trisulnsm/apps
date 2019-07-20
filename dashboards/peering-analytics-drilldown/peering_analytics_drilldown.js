@@ -274,7 +274,7 @@
     this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(`.interfaces_traffic_chart`).attr("id",this.traf_chart_id);
     let ref_model = [this.dash_params.cgguid,this.dash_params.key,this.meter,"Total"]
     var model_data = {cgguid:this.crosskey_cgguid,
-        meter:this.dash_params.statid,
+        meter:this.meter,
         key:keys.join(","),
         window_fromts:this.time_selector.start_time_db,
         window_tots:this.time_selector.end_time_db,
