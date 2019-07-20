@@ -383,9 +383,10 @@ class ISPOverviewMapping{
       let label = topper.label.split("\\").shift();
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
+      let statids = Object.values(this.meter_details_in).slice(0,2)
       rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" 
                     data-readable="${topper.readable}" data-full_key="${full_key}"
-                    data-statid-index=${this.meter_index}>
+                    data-statids="${statids}" data-statid-index=${this.meter_index}>
                       <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
                       <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
                       <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
@@ -660,7 +661,7 @@ class ISPOverviewMapping{
         window.open("/newdash/index?" + 
                     $.param({
                         key: tr.data("key"),
-                        statid:tr.data("statid"),
+                        statids:tr.data("statids"),
                         label:`${tr.data("label")}`.toString().replace(/\\/g,"\\\\"),
                         readable:`${tr.data("readable")}`.toString().replace(/\\/g,"\\\\"),                        
                         cgguid:this.filter_cgguid,
