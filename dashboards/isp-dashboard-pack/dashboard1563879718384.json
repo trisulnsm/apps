@@ -1,0 +1,82 @@
+{
+  "WebtrisulDashboard": [
+    [
+      {
+        "id": 10008,
+        "webtrisul_addon_package_id": 1,
+        "trisul_web_user_id": 2,
+        "key": "ispprefix",
+        "name": "Active Home vs External Prefixes",
+        "description": "Shows number of active home vs external prefixes",
+        "moduri": "/webtrisul_module/getmod",
+        "axupdateuri": "/newdash/traffic_axsavepos",
+        "collapsedmods": null,
+        "undecoratedmods": null,
+        "pos_head": null,
+        "pos_left": null,
+        "pos_right": null,
+        "pos_foot": null,
+        "pos_top1": "",
+        "pos_top2": "10009,10011|10008,10010",
+        "pos_mid3": "||",
+        "pos_bot2": "|",
+        "pos_bot1": "",
+        "pos_mid4": "|||",
+        "pos_reserved1": null,
+        "pos_reserved2": null,
+        "pos_reserved3": null,
+        "dashboard_type": "LIVE"
+      }
+    ],
+    [
+      {
+        "id": 10009,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "Active Prefixes in Home AS ",
+        "description": "Active Prefixes in Home AS ",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":60,\"height\":300,\"surface\":\"AREA\",\"title\":\"Number of active prefixes in Home AS\",\"models\":\"[\\r\\n  [\\r\\n    \\\"{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}\\\",\\r\\n    \\\"{C6D9D91D-7020-404D-C99E-7032455E6244}\\\",\\r\\n    0,\\r\\n    \\\"Master Size\\\"\\r\\n  ]\\r\\n]\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 10011,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Top Active Prefixes - ISP Home AS",
+        "description": "This module shows the currently active prefixes for the selected time period in the ISP Home Network",
+        "options": "{\"name\":\"Active Prefixes (Home)\",\"topcount\":20,\"autotooltips\":true,\"cgguid\":\"{C6D9D91D-7020-404D-C99E-7032455E6244}\",\"statid\":\"0\",\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10008,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 34,
+        "name": "Active Prefixes - Internet",
+        "description": "Number of Active Prefixes outside the Home AS",
+        "options": "{\"recentsecs\":86400,\"width\":350,\"bucketsize\":60,\"height\":300,\"surface\":\"AREA\",\"title\":\"Number of active prefixes (Internet)\",\"models\":\"[\\r\\n  [\\r\\n    \\\"{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}\\\",\\r\\n    \\\"{2BE2A3B6-613D-4216-0737-3684E824EA33}\\\",\\r\\n    0,\\r\\n    \\\"Master Size\\\"\\r\\n  ]\\r\\n]\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 10010,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": null,
+        "webtrisul_module_template_id": 1,
+        "name": "Top Active Prefixes - ISP External",
+        "description": "Shows the most active prefixes external to the ISP network (the internet) ",
+        "options": "{\"name\":\"Active Prefixes (External)\",\"topcount\":20,\"autotooltips\":true,\"cgguid\":\"{2BE2A3B6-613D-4216-0737-3684E824EA33}\",\"statid\":\"0\",\"ajaxfreq\":300}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      }
+    ]
+  ]
+}

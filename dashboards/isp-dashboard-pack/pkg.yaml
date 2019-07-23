@@ -1,0 +1,17 @@
+name: ISP Dashboard Pack
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: Some useful dashboards for ISP Analytics
+   long:  |
+      Dashboards include Prefix analysis, Int, Ext, Toppers
+
+apptype: dashboard_share
+
+appresources: dashboard1563879718384.json
+
+dependencies : 
