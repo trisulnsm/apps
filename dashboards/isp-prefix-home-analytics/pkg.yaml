@@ -1,0 +1,25 @@
+name: ISP Home Prefixes Analytics
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: View home prefixes mappings for routers and interfaces
+   long:  |
+      A breakup of home prefixes to router mappings in table and chart format
+      This plugin is a visualization of that. 
+
+apptype: dashboard_js
+
+appresources: isp_prefix_home_analytics.js app.css template.haml crosskey_prefixhome_interface.json crosskey_prefixhome_router.json ctl_counter_prefixhome_interface.json ctl_counter_prefixhome_router.json
+
+dependencies: 
+
+jsparams:
+  crosskey_router: "{649E1E48-FADF-E8D8-D8F7-120D29C30E6E}"
+  crosskey_interface: "{97D3FB96-0389-A6AB-532E-90FAF3E4EECE}"
+  meters:
+    upload: 2
+    download: 1
