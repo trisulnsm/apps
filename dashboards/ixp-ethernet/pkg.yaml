@@ -1,18 +1,17 @@
-name: Path  Analytics
+name: IXP Analytics
 
-version: 0.1.2
+version: 0.0.1
 
 author: trisul
 
 
 description: 
-   short:   Shows the top used AS PATHS
+   short:   L2 IXP Traffic Analytics
    long:  |
-      Route Per Hop Analytics - Receive
-      Usage of busiest route segments 
+      Traffic Matrix at Internet Exchange Points 
+      Matrix, Per Member, traffic history of each RX/TX Flow for planning and billing
 
 apptype: dashboard_js
 
-appresources: path_analytics.js app.css crrosskey_intf_asnpath.json template.haml
+appresources: ixp_analytics.js app.css template.haml
 jsparams:
-  crosskey_interface: "{FBD6EAA4-631E-F34C-82E5-ED6613BB9D54}"
