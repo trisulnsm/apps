@@ -8,10 +8,20 @@ class IPGeoAsnPath{
   constructor(opts) {
     this.dom = $(opts.divid);
     this.probe = opts.probe_id;
-    this.add_form();
+    this.add_form(opts);
   }
-  add_form(){
-    this.form = $("<div class='row ui_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-12'> <div class='from-group'> <label class='control-label col-xs-2'>IPs</label> <div class='col-xs-10'> <textarea name='searchipasn' rows='10'></textarea> <span class='help-block text-left'>Please enter comma(,) seperated ips or one key per line.</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Search'> </div> </div> </form> </div> </div>");
+  // load the frame 
+  async load_assets(opts)
+  {
+    // load app.css file
+    load_css_file(opts);
+    // load template.haml file 
+    let html_str = await get_html_from_hamltemplate(opts);
+    this.haml_dom =$(html_str)
+  }
+  async add_form(opts){
+    await this.load_assets(opts)
+    this.form = $(this.haml_dom[0]);
     this.dom.append(this.form);
     this.form.submit($.proxy(this.submit_form,this));
   }
@@ -21,8 +31,8 @@ class IPGeoAsnPath{
     return false;
   }
   reset_ui(){
-    this.dom.find(".ui_data").html('');
-    this.data_dom = $("<div class='ui_data'> <div class='row'> <div class='col-xs-12'> <h3>IP Lookup</h3> <h4 class='notify'> <i class='fa fa-spinner fa-spin'></i> Please wait....  </h4> <table class='table'> <thead> <tr> <th>IP</th> <th>ASNumber Path</th> <th>Country</th> <th>ASNumber</th> <th>Prefix</th> </tr> </thead> <tbody></tbody> </table> </div> <div class='col-xs-12'> <h4>Map Visualization</h4> <h4 class='nofity'> <i class='fa fa-spinner fa-spin'></i> Please wait ....  </h4> <div class='jvector_map' style='height:500px'></div> </div> </div> </div>");
+    this.dom.find(".ui_data").remove();
+    this.data_dom = $(this.haml_dom[1]).clone();
     this.dom.append(this.data_dom);
     this.data_dom.find('.table').hide();
   }
@@ -33,6 +43,7 @@ class IPGeoAsnPath{
     this.ips = this.form.find("textarea").val();
     if(_.isEmpty(this.ips)){
       alert("Search ip filed can't be empty.");
+      this.dom.find(".ui_data").remove();
       return true;
     }
     this.ips = this.ips.split(/\n|,/);
@@ -112,7 +123,7 @@ class IPGeoAsnPath{
   }
 
   draw_table(){
-    this.data_dom.find(".notify").remove();
+    this.data_dom.find(".animated-background").remove();
     let table = this.data_dom.find("table");
     table.show();
     table.addClass('table table-sysdata');
@@ -129,64 +140,8 @@ class IPGeoAsnPath{
       tr.append(`<td>${this.data[k]["asnpath"][1]}</td>`)
       table.append(tr);
     }
-    this.geo_map();
   } 
- async geo_map(){
-    let markers = [];
-    let palette = [].concat.apply([], [d3.schemeCategory10,d3.schemeCategory20,d3.schemeCategory20b,d3.schemeCategory20c]);
-    let colors = {};
-    for (var k in this.data) { 
-      let url = "http://ip-api.com/json/" + k;
-      await $.getJSON(url, null, $.proxy(function (data) {
-        markers.push({latLng:[data.lat,data.lon],name:k,offsets:[0, 2]});
-        var region_key = `${data.countryCode}-${data.region}`;
-        colors[region_key]=palette[Math.floor(Math.random()*palette.length)];
-      },this))
-    }
-
-    let map_div =  this.data_dom.find(".jvector_map");
-    map_div.css({height:"500px"});
-    let map = new jvm.Map({ map: 'in_mill',
-                            container:map_div,
-                            backgroundColor: null,
-                            regionStyle:{
-                              initial: {
-                                fill: '#8d8d8d',
-                              }
-                            },
-                            scaleColors: ['#C8EEFF', '#0071A4'],
-                            normalizeFunction: 'polynomial',
-                            hoverOpacity: 0.7,
-                            hoverColor: false,
-                            markers:markers,
-                            markerStyle: {
-                              initial: {
-                                fill: '#F8E23B',
-                                stroke: '#383f47'
-                              }
-                            },  
-                            series: {
-                              regions: [{
-                                attribute: 'fill',
-                              }]
-                            },
-                            labels: {
-                              markers: {
-                                render: function(index){
-                                  return markers[index].name;
-                                },
-                                offsets: function(index){
-                                  var offset = markers[index]['offsets'] || [0, 0];
-                                  return [offset[0] - 7, offset[1] + 3];
-                                }
-                              }
-                            },
-                            onRegionClick: function (event, code) {
-                              console.log(code);
-                            },
-                          });
-     map.series.regions[0].setValues(colors);
-  }
+ 
 }
 function run(opts){
   new IPGeoAsnPath(opts)
@@ -214,28 +169,7 @@ function run(opts){
 
 /*
 
-.ui_data
-  .row
-    .col-xs-12
-      %h3 IP Lookup
-      %h4.notify
-        %i.fa.fa-spinner.fa-spin
-        Please wait....
-      %table.table
-        %thead
-          %tr
-            %th IP
-            %th ASNumber Path
-            %th Country
-            %th ASNumber
-            %th Prefix
-        %tbody
-    .col-xs-12
-      %h4 Map Visualization
-      %h4.nofity
-        %i.fa.fa-spinner.fa-spin
-        Please wait ....
-      .jvector_map{style:"height:500px"}
+
 
 
 */

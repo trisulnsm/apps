@@ -1,6 +1,6 @@
 name: Geo IP Lookup
 
-version: 0.0.1
+version: 0.0.2
 
 author: trisul
 
@@ -12,5 +12,5 @@ description:
 
 apptype: dashboard_js
 
-appresources: geo_ip_lookup.js
+appresources: geo_ip_lookup.js app.css template.haml
 

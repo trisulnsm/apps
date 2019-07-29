@@ -1,0 +1,18 @@
+name: ISP Router Geo Map
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: View country locations for your router
+   long:  |
+      View your routers location in vector map
+
+apptype: dashboard_js
+
+appresources: isp_router_geomap.js app.css template.haml jvector-in-mill.js  jvector_map.css  jvector_map.min.js
+
+
+dependencies: 

@@ -1,0 +1,25 @@
+name: ISP Country Analytics
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: View country mappings for routers and interfaces
+   long:  |
+      A breakup of country to router mappings in table and chart format
+      This plugin is a visualization of that. 
+
+apptype: dashboard_js
+
+appresources: isp_country_analytics.js app.css template.haml crosskey_country_interface.json crosskey_country_router.json ctl_countervar_xinterface.json ctl_countervar_xrouter.json
+
+dependencies: 
+
+jsparams:
+  crosskey_router: "{10CF1400-DD68-5986-B7A0-D89B6E0675FF}"
+  crosskey_interface: "{ADE664B1-799C-96E1-1705-D933CB9A9A30}"
+  meters:
+    upload: 0
+    download: 1

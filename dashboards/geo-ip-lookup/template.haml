@@ -1,0 +1,34 @@
+.row.ui_form
+  .col-xs-12
+    %form.form-horizontal
+      .row
+        .col-xs-12
+          .from-group
+            %label.control-label.col-xs-2 IPs
+            .col-xs-10
+              %textarea{name:"searchipasn",rows:10}
+              %span.help-block.text-left Please enter comma(,) seperated ips or one key per line.
+      .row
+        .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+          %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Search"}
+
+.ui_data{style:"padding-top:10px"}
+  .row
+    .col-xs-12
+      .panel.panel-primary
+        .panel-heading
+          %h3
+            %i.fa.fa-table.fa-fw 
+            IP lookup   
+            %small Showing ASNumber path,country,prefix etc..
+        .panel-body
+          .animated-background
+          %table.table
+            %thead
+              %tr
+                %th IP
+                %th ASNumber Path
+                %th Country
+                %th ASNumber
+                %th Prefix
+            %tbody

@@ -9,7 +9,7 @@ class ISPOverviewMapping{
     this.default_selected_time = opts.new_time_selector;
     //we need it for time zone conversion
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
-    this.filter_cgguid = "{03E016FC-46AA-4340-90FC-0E278B93C677}";
+    this.filter_cgguid = "{00990011-44BD-4C55-891A-77823D59161B}";
     this.crosskey_router = null;
     this.crosskey_interface=null;
     this.meter_details_in = {upload:0,download:1,uniq_aspath:2,uniq_prefix:3}
@@ -128,8 +128,8 @@ class ISPOverviewMapping{
     }
 
     var js_params = {meter_details:all_dropdown,
-      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router"),
-      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface"),
+      selected_cg : selected_router || localStorage.getItem("apps.countryanalytics.last-selected-router"),
+      selected_st : selected_interface || localStorage.getItem("apps.countryanalytics.last-selected-interface"),
       update_dom_cg : "routers"+this.rand_id,
       update_dom_st : "interfaces"+this.rand_id,
       chosen:true
@@ -164,11 +164,11 @@ class ISPOverviewMapping{
   submit_form(){
 
     // last used is the next default 
-    localStorage.setItem("apps.peeringanalytics.last-selected-router", 
-                            $('.peeringanalytics_form select[name="routers"] option:selected').val());
+    localStorage.setItem("apps.countryanalytics.last-selected-router", 
+                            $('.countryanalytics_form select[name="routers"] option:selected').val());
 
-    localStorage.setItem("apps.peeringanalytics.last-selected-interface", 
-                            $('.peeringanalytics_form select[name="interfaces"] option:selected').val());
+    localStorage.setItem("apps.countryanalytics.last-selected-interface", 
+                            $('.countryanalytics_form select[name="interfaces"] option:selected').val());
 
 
     this.form.find("#btn_submit").prop('disabled', true);
@@ -197,7 +197,7 @@ class ISPOverviewMapping{
     this.cgguid = null;
     this.crosskey_cgguid = null;
     this.filter_text=null;
-      $('#isp_overview_tabs a').click(function (e) {
+      $('#isp_country_overview_tabs a').click(function (e) {
       e.preventDefault()
       $(this).tab('show')
     });
@@ -314,46 +314,16 @@ class ISPOverviewMapping{
 
   async draw_table(){
 
-    // get uniq prefix and interfaces
-    let uniques = {};
-    let keys = Object.keys(this.meter_details_in);
-    keys = keys.slice(2,4);
-    if(keys.length==0){
-      this.meter_details_in["uniq_aspath"] = 2
-      this.meter_details_in["uniq_prefix"] = 3
-      keys =["uniq_aspath","uniq_prefix"];
-    }
-
-    // always first as second prefix
-    keys = _.sortBy(keys);
-
-    for (const [i, key] of keys.entries()) {
-      let req_opts = {
-        counter_group: this.cgguid,
-        time_interval: this.tmint ,
-        meter:this.meter_details_in[key],
-        maxitems:10000
-      }
-      let resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, req_opts);
-      _.each(resp.keys,function(keyt){
-        console.log
-        if(! uniques.hasOwnProperty(keyt.key)){
-          uniques[keyt.key]=[0,0]
-        }
-        uniques[keyt.key][i] = keyt.metric_max.toNumber();
-      });
-    }
-
 
     let rows = [];
-    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".toppers_table_div").find('.animated-background').remove();
-    var table = this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".toppers_table").find("table");
+    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".toppers_table_div").find('.animated-background').remove();
+    var table = this.data_dom.find(`#country_overview_${this.meter_index}`).find(".toppers_table").find("table");
     this.table_id = `table_${this.meter}${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
     table.find("thead").append(`<tr><th>Key</th><th style="width:400px">Label</th>
                                 <th sort='volume' barspark='auto'>Volume</th>
-                                <th sort='volume'>Avg <br/>Bandwidth</th><th>Uniq <br/>ASPath</th><th>Uniq <br/>Prefix</th><th class='nosort'></th>
+                                <th sort='volume'>Avg <br/>Bandwidth</th><th class='nosort'></th>
                                 </tr>`);
     let totvol=this.cgtoppers_resp.keys.reduce((a,b)=>a +parseInt(b.metric),0);
     $('.volume_'+this.meter_index).text(` (${h_fmtvol(totvol*this.top_bucket_size)}) `);
@@ -363,36 +333,25 @@ class ISPOverviewMapping{
       
       let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;;'><small>Options<i class='fa fa-caret-down fa-fw'></i></small></a></span>");
       let dropdown_menu = $("<ul class='dropdown-menu  pull-right'></ul>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Drilldown</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>ASN Path Analytics</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Top Prefixes</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Show Routes</a></li>");
-
 
       dropdown.append(dropdown_menu);
 
       let key = topper.key.split("\\").shift();
       let full_key= topper.key;
 
-      if(! uniques.hasOwnProperty(full_key)){
-          uniques[full_key]=[0,0]
-        }
       let readable = topper.readable.split("\\").shift();
       let label = topper.label.split("\\").shift();
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
-      let statids = Object.values(this.meter_details_in).slice(0,2)
       rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" 
                     data-readable="${topper.readable}" data-full_key="${full_key}"
-                    data-statids="${statids}" data-statid-index=${this.meter_index}>
+                    data-statid-index=${this.meter_index}>
                       <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
                       <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
                       <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
                       <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
-                      <td>${uniques[full_key][0]}</td>
-                      <td>${uniques[full_key][1]}</td>
                       <td>${dropdown[0].outerHTML}</td>
                       </tr>`);
 
@@ -440,11 +399,11 @@ class ISPOverviewMapping{
 
   async draw_chart(){
     this.dount_div_id = `dount_chart${this.meter_index}_${this.rand_id}`;
-    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
+    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
     this.trfchart_div_id = `traffic_chart_${this.meter_index}_${this.rand_id}`;
-    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".traffic_chart").append($("<div>",{id:this.trfchart_div_id}));
-    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".traffic_chart_div").find(".animated-background").remove();
-    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".donut_chart_div").find(".animated-background").remove();
+    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".traffic_chart").append($("<div>",{id:this.trfchart_div_id}));
+    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".traffic_chart_div").find(".animated-background").remove();
+    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".donut_chart_div").find(".animated-background").remove();
 
 
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,this.maxitems);
@@ -511,7 +470,7 @@ class ISPOverviewMapping{
       meter=0;
     }else if(this.filter_text.match(/_/)){
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
-      meter = [1,2][this.meter_index];
+      meter = [2,1][this.meter_index];
     }
     ref_model = [cgguid,key,meter,"Total"]
 
@@ -537,7 +496,7 @@ class ISPOverviewMapping{
   }
   async draw_sankey_chart(){
     this.sankey_div_id = `sankey_chart_${this.meter_index}${this.rand_id}`;
-    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".sankey_chart").append($("<div>",{id:this.sankey_div_id}));
+    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".sankey_chart").append($("<div>",{id:this.sankey_div_id}));
     if(this.crosskey_cgguid == this.filter_cgguid){
       this.crosskey_cgguid = this.crosskey_router;
     }
@@ -557,7 +516,7 @@ class ISPOverviewMapping{
     }else{
       this.cgtoppers_bytes = this.cgtoppers_resp.keys;
     }
-    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".sankey_chart_div").find(".animated-background").remove();
+    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".sankey_chart_div").find(".animated-background").remove();
 
     this.cgtoppers_bytes = this.cgtoppers_bytes.slice(0,30);
     if(this.cgtoppers_bytes.length==0){
@@ -658,21 +617,6 @@ class ISPOverviewMapping{
     switch($.inArray(target.parent()[0],target.closest("td").find("li:not(.divider)"))){
       case 0:
       case -1:
-        window.open("/newdash/index?" + 
-                    $.param({
-                        key: tr.data("key"),
-                        statids:tr.data("statids"),
-                        label:`${tr.data("label")}`.toString().replace(/\\/g,"\\\\"),
-                        readable:`${tr.data("readable")}`.toString().replace(/\\/g,"\\\\"),                        
-                        cgguid:this.filter_cgguid,
-                        ck_cgguid:this.crosskey_cgguid,
-                        filter_cgname:this.filter_cgname,
-                        window_fromts:this.tmint.from.tv_sec,
-                        window_tots:this.tmint.to.tv_sec,
-                        "dash_key_regex":"gitPeeringAnalyticsDrilldown"
-                    }));
-        break;
-      case 1:
         let params = {
           key: tr.data("full_key").toString().replace(/\\/g,"\\\\"),
           statids:tr.data("statid"),
@@ -683,31 +627,15 @@ class ISPOverviewMapping{
         let url = "/trpjs/generate_chart_lb?"+$.param(params);
         load_modal(url);
         break;
-      case 2:
-        let link_params =$.param({dash_key:"key",
+        
+      case 1:
+         let link_params =$.param({dash_key:"key",
                          guid:this.cgguid,
                          key:tr.data("full_key"),
                          statid:tr.data("statid")
                         });
         window.open("/newdash/index?"+link_params);
         break;
-      case 3:
-        let lp=$.param({dash_key_regex:"gitPathAnalytics",
-                         key:tr.data("full_key").toString().replace(/\\/g,"\\\\"),
-                         valid_input:1,
-                         window_fromts:this.tmint.from.tv_sec,
-                         window_tots:this.tmint.to.tv_sec,
-                        });
-        window.open("/newdash/index?"+lp);
-        break;
-      case 4:
-        this.get_top_prefixes(event)
-        break;
-
-      case 5:
-        this.query_routes_for_as(event)
-        break;
-
     } 
   }
   async get_top_prefixes(event){
@@ -811,4 +739,4 @@ function run(opts) {
 
 
 
-//# sourceURL=peering_analytics.js
+//# sourceURL=country_analytics.js

@@ -1,0 +1,72 @@
+{
+  "TrisulCtlCountervar": [
+    [
+      {
+        "id": 325,
+        "ItemGUID": "{649E1E48-FADF-E8D8-D8F7-120D29C30E6E}",
+        "SubItem": 0,
+        "VarType": 4,
+        "TopNCount": 10000,
+        "BottomNCount": 0,
+        "Name": "total",
+        "Description": "Prefixes Total",
+        "Units": "Bps"
+      },
+      {
+        "id": 326,
+        "ItemGUID": "{649E1E48-FADF-E8D8-D8F7-120D29C30E6E}",
+        "SubItem": 1,
+        "VarType": 4,
+        "TopNCount": 10000,
+        "BottomNCount": 0,
+        "Name": "recv",
+        "Description": "Prefixes Recv",
+        "Units": "Bps"
+      },
+      {
+        "id": 327,
+        "ItemGUID": "{649E1E48-FADF-E8D8-D8F7-120D29C30E6E}",
+        "SubItem": 2,
+        "VarType": 4,
+        "TopNCount": 10000,
+        "BottomNCount": 0,
+        "Name": "xmit",
+        "Description": "Prefixes Xmit",
+        "Units": "Bps"
+      },
+      {
+        "id": 328,
+        "ItemGUID": "{649E1E48-FADF-E8D8-D8F7-120D29C30E6E}",
+        "SubItem": 3,
+        "VarType": 4,
+        "TopNCount": 50,
+        "BottomNCount": 0,
+        "Name": "flows",
+        "Description": "Prefixes Flows",
+        "Units": "Flws"
+      },
+      {
+        "id": 329,
+        "ItemGUID": "{649E1E48-FADF-E8D8-D8F7-120D29C30E6E}",
+        "SubItem": 4,
+        "VarType": 5,
+        "TopNCount": 20,
+        "BottomNCount": 20,
+        "Name": "uniqs",
+        "Description": "Unused Cardinality counter",
+        "Units": "Uniques "
+      },
+      {
+        "id": 330,
+        "ItemGUID": "{649E1E48-FADF-E8D8-D8F7-120D29C30E6E}",
+        "SubItem": 5,
+        "VarType": 5,
+        "TopNCount": 20,
+        "BottomNCount": 20,
+        "Name": "uniqs",
+        "Description": "Unused Cardinality counter",
+        "Units": "Uniques "
+      }
+    ]
+  ]
+}

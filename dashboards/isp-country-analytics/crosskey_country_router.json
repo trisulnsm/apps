@@ -1,0 +1,37 @@
+{
+  "TrisulCounterGroupCrosskey": [
+    [
+      {
+        "id": 7,
+        "CounterGUID": "{10CF1400-DD68-5986-B7A0-D89B6E0675FF}",
+        "ParentCounterGUID": "{00990011-44BD-4C55-891A-77823D59161B}",
+        "CrosskeyCounterGUID": "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
+        "CrosskeyThirdCounterGUID": null,
+        "KeyLength1": null,
+        "KeyLength2": null,
+        "KeyLength3": null
+      }
+    ],
+    [
+      {
+        "id": 66,
+        "CounterGUID": "{10CF1400-DD68-5986-B7A0-D89B6E0675FF}",
+        "Name": "Auto x country router",
+        "Description": "auto x country",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 60000,
+        "TrackHiWater": 25000,
+        "TrackLoWater": 10000,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Active",
+        "CardinalityEstimateBits": "",
+        "TopperTrafficOnly": "False",
+        "EnableSliceKeys": 0,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1563185928,
+        "ResolverCounterGUID": ""
+      }
+    ]
+  ]
+}
