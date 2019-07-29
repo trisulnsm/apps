@@ -1,0 +1,18 @@
+name: Path  Analytics
+
+version: 0.1.2
+
+author: trisul
+
+
+description: 
+   short:   Shows the top used AS PATHS
+   long:  |
+      Route Per Hop Analytics - Receive
+      Usage of busiest route segments 
+
+apptype: dashboard_js
+
+appresources: path_analytics.js app.css crrosskey_intf_asnpath.json template.haml
+jsparams:
+  crosskey_interface: "{FBD6EAA4-631E-F34C-82E5-ED6613BB9D54}"
