@@ -131,31 +131,35 @@ class IXPPathAnalytics {
   // return a TD 
   mk_cell(row,col) 
   {
-        let tx=this.model[row][col][0] ,
-            rx=this.model[row][col][1];
+    let tx=this.model[row][col][0] ,
+        rx=this.model[row][col][1];
 
-        if (tx+rx==0) {
-          return $('<td>',{class:'zerovalue'});
-        } else {
-          let txtxt=h_fmtvol(tx) . toString() . replace(/ /g,''),
-              rxtxt=h_fmtvol(rx) . toString() . replace(/ /g,'');
+    if (tx+rx==0) {
+      return $('<td>',{class:'zerovalue'});
+    } else {
+      let txtxt=h_fmtvol(tx) . toString() . replace(/ /g,''),
+          rxtxt=h_fmtvol(rx) . toString() . replace(/ /g,'');
 
-          let tools= []
-          tools.push( [ "Peer A Name", this.labels[this.allkeys[row]]])
-          tools.push( [ "Peer A MAC",  this.allkeys[row]])
-          tools.push( [ "-- to --",  ' '])
-          tools.push( [ "Peer Z Name", this.labels[this.allkeys[col]]])
-          tools.push( [ "Peer Z MAC",  this.allkeys[col]])
-          tools.push( [ "-- vol --",  ' '])
-          tools.push( [ "Peer A --> Peer Z (TX/A) ",  txtxt])
-          tools.push( [ "Peer Z --> Peer A (RX/A) ",  rxtxt])
-          
+      let tools= []
+      tools.push( [ "Peer A Name", this.labels[this.allkeys[row]]])
+      tools.push( [ "Peer A MAC",  this.allkeys[row]])
+      tools.push( [ "-- to --",  ''])
+      tools.push( [ "Peer Z Name", this.labels[this.allkeys[col]]])
+      tools.push( [ "Peer Z MAC",  this.allkeys[col]])
+      tools.push( [ "-- vol --",  ''])
+      tools.push( [ "Peer A --> Peer Z (TX/A) ",  txtxt])
+      tools.push( [ "Peer Z --> Peer A (RX/A) ",  rxtxt])
+      tools.push( [ "-- Explore --",  ''])
+      //traffic chart
+      let onclicktext=`load_modal('${this.get_trpchart_url(row,col)}');`;
+      var anchor = $("<a>",{href:"javascript:;;",onclick:onclicktext}).text("Traffic Chart");
+      tools.push( [ "",anchor.prop('outerHTML')]);
 
-          let td=$('<td>', { class: "matrix-cell"});
-          td.html(`${txtxt}<br/>${rxtxt}`)
-          td.attr("data-key-popover", JSON.stringify(tools))
-          return td;
-        }
+      let td=$('<td>', { class: "matrix-cell"});
+      td.html(`${txtxt}<br/>${rxtxt}`)
+      td.attr("data-key-popover", JSON.stringify(tools))
+      return td;
+    }
   }
 
   // draw a nested table view 
@@ -184,6 +188,29 @@ class IXPPathAnalytics {
     }
 
     key_popover( {timeout_secs: 2});
+  }
+  get_trpchart_url(row,col){
+    let chart_models = [
+                          [GUID_DIRMAC,
+                          `${this.allkeys[row]} ->${this.allkeys[col]}`,
+                           0,
+                           `${this.labels[this.allkeys[row]]} ->${this.labels[this.allkeys[col]]}`
+                          ],
+                          [GUID_DIRMAC,
+                          `${this.allkeys[col]} ->${this.allkeys[col]}`,
+                           0,
+                           `${this.labels[this.allkeys[col]]} ->${this.labels[this.allkeys[row]]}`
+                          ],
+                      ]
+
+    let params = {
+      models:JSON.stringify(chart_models),
+      valid_input:1,
+      auto_label:false,
+      window_fromts:this.timeSelect.to_trp_time_interval().from.tv_sec,
+      window_tots:this.timeSelect.to_trp_time_interval().to.tv_sec
+    }
+    return "/trpjs/generate_chart_lb?"+$.param(params);
   }
 }
 
