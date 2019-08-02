@@ -4,161 +4,26 @@
       .widget-header
         %h4 
           %i.fa.fa-search.fa-fw
-          Search criteria
+          Search criteria - select a time intervalsdfs
       .widget-body
         %form.form-horizontal
           .row
-            .col-xs-6 
-              .form-group 
-                %label.control-label.col-xs-4 Routers          
-                .col-xs-8 
-                  %select{name:'routers'} 
-            .col-xs-6
+            .col-xs-12
               .form-group
-                .new_time_selector
-       
-              
-          .row
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Interfaces          
-                .col-xs-8 
-                  %select{name:'interfaces'} 
-            .col-xs-6
-              .from-group
-                %label.control-label.col-xs-4 Filter ASN
-                .col-xs-8
-                  %input{type:"text",class:"filter_asn"}
-                  %span.help-block.text-left Please enter AS Number to filter the result
-          .row
-            .col-xs-6
-              .form-group
-                %label.control-label.col-xs-4 Remove Toppers
-                .col-xs-8{style:"padding-top:10px"}
-                  #slider-remove-topn
-                    %div#remove-top-n.ui-slider-handle
-                  %span.help-block.text-left Remove the top N flows from view to reveal the smaller flows
-            .col-xs-6
-              .form-group
-                %label.control-label.col-xs-4 Show max nodes
-                .col-xs-8{style:"padding-top:10px"}
-                  #slider-max-nodes
-                    %div#max-nodes.ui-slider-handle
-                  %span.help-block.text-left Show approximately these many nodes on the sankey (default 30)
+                #new_time_selector
 
           .row
             .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
-              %input{type:"hidden",name:"from_date"}
-              %input{type:"hidden",name:"to_date"}
+              %input#from_date{type:"hidden",name:"from_date"}
+              %input#to_date{type:"hidden",name:"to_date"}
               %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
-
-.path_data
-  .row
-    .row
-    .col-xs-12
-      %ul.nav.nav-tabs#isp_overview_tabs
-        %li.active
-          %a.text-primary{href:"#path_analytics_upload",data-toggle:"tab",role:"tab"}
-            %i.fa.fa-upload.fa-fw
-            Upload
-            %span.tot_upload_vol
-        %li
-          %a.text-warning{href:"#path_analytics_download",data-toggle:"tab",role:"tab"} 
-            %i.fa.fa-download.fa-fw
-            Download
-            %span.tot_download_vol
-      .tab-content{style:"padding-top:10px"}
-        .tab-pane.active#path_analytics_upload{data-use-width:1}
-          .row
-            .col-xs-12
-              .panel.panel-primary
-                .panel-heading
-                  %h3
-                    %i.fa.fa-table.fa-fw
-                    Busiest Routes 
-                    %small Shows  top 100 used AS PATHS 
-                    %span.badge.badge-success
-                    .widget-tool
-                      %ul.list-inline
-                    %p
-                      %small.target
-                .panel-body
-                  %h3.noitify
-                    %i.fa.fa-spinner.fa-spin
-                    Please wait .... Getting data .....
-                  .toppers_table
-                    %table#table_upload.table.table-hover.table-bordered.table-condensed
-                      %thead
-                        %tr
-                          %th AS Path
-                          %th{style:"width:450px"} Label
-                          %th{sort:"volume"} Volume
-                      %tbody
-            .col-xs-12#nested-upload
-              .panel.panel-primary
-                .panel-heading
-                  %h3
-                    %i.fa.fa-table.fa-fw
-                    Per Hop Path Analytics  : Transmit 
-                    %small Shows volume transfer on entire path 
-                .panel-body
-                  %table.table.table-hover.table-bordered.table-condensed
-
-            .col-xs-12.sankey_asn_upload.sankey_chart
-              .panel.panel-primary
-                .panel-heading
-                  %h3
-                    %i.fa.fa-random.fa-fw
-                    Route Per Hop Analytics - Transmit 
-                    %small Usage of busiest route segments
-                .panel-body
-                  .sankey_chart_upload
-
-        .tab-pane#path_analytics_download{data-use-width:1}
-          .row
-            .col-xs-12
-              .panel.panel-success
-                .panel-heading
-                  %h3
-                    %i.fa.fa-table.fa-fw
-                    Busiest Routes 
-                    %small Shows  top 100 used AS PATHS 
-                    %span.badge.badge-success
-                    .widget-tool
-                      %ul.list-inline
-                    %p
-                      %small.target
-                .panel-body
-                  %h3.noitify
-                    %i.fa.fa-spinner.fa-spin
-                    Please wait .... Getting data .....
-                  .toppers_table
-                    %table#table_download.table.table-hover.table-bordered.table-condensed
-                      %thead
-                        %tr
-                          %th AS Path
-                          %th{style:"width:450px"} Label
-                          %th{sort:"volume"} Volume
-                      %tbody
-
-            .col-xs-12#nested-download
-              .panel.panel-success
-                .panel-heading
-                  %h3
-                    %i.fa.fa-table.fa-fw
-                    Per Hop Path Analytics  : Download 
-                    %small Shows volume transfer on entire path 
-                .panel-body
-                  %table.table.table-hover.table-bordered.table-condensed
-
-            .col-xs-12.sankey_asn_download.sankey_chart
-              .panel.panel-success
-                .panel-heading
-                  %h3
-                    %i.fa.fa-random.fa-fw
-                    Route Per Hop Analytics - Download  
-                    %small Usage of busiest route segments
-                .panel-body
-                  .sankey_chart_download
-
-           
+  .col-xs-12#ixp-matrix
+    .panel.panel-success
+      .panel-heading
+        %h3
+          %i.fa.fa-table.fa-fw
+          IXP Crossconnect Traffic Matrix 
+          %small  Shows TX and RX traffic between IXP members
+      .panel-body
+        Select a time interval above..
+        %table.table.table-hover.table-bordered.table-condensed

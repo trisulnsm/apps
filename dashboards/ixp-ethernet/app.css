@@ -1,43 +1,12 @@
-.panel h3 {
-	font-size: 20px;
-	margin-top:10px;
+td.vertical-title {
+	writing-mode: vertical-rl;
+	text-orientation: mixed;
 }
 
-.panel-primary h3 small {
-	color:#fff;
-}
-h3 small{
-	font-size: 75%;
-}
-.panel-heading {
-	padding: 5px 15px;
+td.zerovalue {
+	background-color: #CCC
 }
 
-.widget-tool{
-	float:right;
-}
-
-span.badge{
-	margin-left: 10px;
-	font-size:20px;
-}
-small.target{
-	color:#888;
-	font-size: 14px;
-	font-weight: 500;
-    line-height: 1;
-}
-
-.panel-heading p{
-	margin: 0px;
-}
-.modal-body h4{
-	color:#888;
-}
-.modal-header h4{
-	font-size:20px;
-}
-
-.widget .widget-body{
-	padding:1px;
+td.matrix-cell {
+	font-size: 0.8em;
 }
