@@ -150,8 +150,8 @@ class IXPPathAnalytics {
       tools.push( [ "Peer A --> Peer Z (TX/A) ",  txtxt])
       tools.push( [ "Peer Z --> Peer A (RX/A) ",  rxtxt])
       tools.push( [ "-- Explore --",  ''])
-      //traffic chart
-      let onclicktext=`load_modal('${this.get_trpchart_url(row,col)}');`;
+      //traffic chart dirmac
+      let onclicktext=`load_modal('${this.get_dirmac_chart_url(row,col)}');`;
       var anchor = $("<a>",{href:"javascript:;;",onclick:onclicktext}).text("Traffic Chart");
       tools.push( [ "",anchor.prop('outerHTML')]);
 
@@ -173,14 +173,17 @@ class IXPPathAnalytics {
     let tr=$('<tr>');
     tr.append($('<td>'));
     for (let r=0;r<this.model.length;r++) {
-        tr.append($('<td>',{class:'vertical-title'}).text(this.labels[this.allkeys[r]]));
+      let span = $("<span>",{class:"vertical-title"}).text(this.labels[this.allkeys[r]])
+      let td = $('<td>').html(span);
+      td.attr("data-key-popover", JSON.stringify(this.get_mac_popover(r)));
+      tr.append(td);
     }
     tbody.append(tr)
 
     // matrix cells - use mk_cell to paint the cell.. 
     for (let r=0;r<this.model.length;r++) {
       let tr=$('<tr>');
-      tr.append($('<td>').text(this.labels[this.allkeys[r]]))
+      tr.append($('<td>',{"data-key-popover":JSON.stringify(this.get_mac_popover(r))}).text(this.labels[this.allkeys[r]]))
       for(let c=0;c<this.model.length;c++) {
         tr.append(this.mk_cell(r,c));
       }
@@ -189,7 +192,7 @@ class IXPPathAnalytics {
 
     key_popover( {timeout_secs: 2});
   }
-  get_trpchart_url(row,col){
+  get_dirmac_chart_url(row,col){
     let chart_models = [
                           [GUID_DIRMAC,
                           `${this.allkeys[row]} ->${this.allkeys[col]}`,
@@ -197,7 +200,7 @@ class IXPPathAnalytics {
                            `${this.labels[this.allkeys[row]]} ->${this.labels[this.allkeys[col]]}`
                           ],
                           [GUID_DIRMAC,
-                          `${this.allkeys[col]} ->${this.allkeys[col]}`,
+                          `${this.allkeys[col]} ->${this.allkeys[row]}`,
                            0,
                            `${this.labels[this.allkeys[col]]} ->${this.labels[this.allkeys[row]]}`
                           ],
@@ -212,6 +215,47 @@ class IXPPathAnalytics {
     }
     return "/trpjs/generate_chart_lb?"+$.param(params);
   }
+  get_mac_popover(r){
+    let tools= [];
+    tools.push( [ "Peer A Name", this.labels[this.allkeys[r]]])
+    tools.push( [ "Peer A MAC",  this.allkeys[r]]);
+    //traffic_chart
+    let chart_models = [
+                          [GUID_MAC,
+                          this.allkeys[r],
+                          0,
+                          `${this.labels[this.allkeys[r]]} -Transmit`
+                          ],
+                          [GUID_MAC,
+                          this.allkeys[r],
+                          1,
+                          `${this.labels[this.allkeys[r]]} -Receive`
+                          ]
+                      ]
+
+    let params = {
+      models:JSON.stringify(chart_models),
+      valid_input:1,
+      auto_label:false,
+      window_fromts:this.timeSelect.to_trp_time_interval().from.tv_sec,
+      window_tots:this.timeSelect.to_trp_time_interval().to.tv_sec
+    }
+
+    let onclicktext=`load_modal("/trpjs/generate_chart_lb?+${$.param(params)}");`;
+    var anchor = $("<a>",{href:"javascript:;;",onclick:onclicktext}).text("Traffic Chart");
+    tools.push( [ "",anchor.prop('outerHTML')]);
+
+    let href="/newdash/index?"+$.param({
+                                        dash_key:"key",
+                                        guid:GUID_MAC,
+                                        key:this.allkeys[r],
+                                        statid:"0,1"
+                                        });
+    anchor = $("<a>",{href:href,target:"_blank"}).text("Key Dashbboard");
+    tools.push( [ "",anchor.prop('outerHTML')]);
+    return tools;
+  }
+ 
 }
 
  

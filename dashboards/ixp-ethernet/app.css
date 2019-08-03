@@ -1,4 +1,4 @@
-td.vertical-title {
+span.vertical-title {
 	writing-mode: vertical-rl;
 	text-orientation: mixed;
 }
