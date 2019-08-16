@@ -1,0 +1,18 @@
+name: Country Analytics Drilldown
+
+version: 0.0.2
+
+author: trisul
+
+
+description: 
+   short: View country mappings for routers and interfaces
+   long:  |
+      A breakup of country to router mappings in table and chart format
+      This plugin is a visualization of that. 
+
+apptype: dashboard_js
+
+appresources: country_analytics_drilldown.js app.css  template.haml
+
+dependencies: 

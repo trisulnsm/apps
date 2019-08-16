@@ -1,0 +1,94 @@
+.drilldown_data
+  .row
+    .col-xs-12
+      %ul.nav.nav-tabs#country_drilldown_tabs
+        %li.active
+          %a{href:"#country_drilldown_upload",data-toggle:"tab",role:"tab"}
+            %i.fa.fa-upload.fa-fw
+            Upload
+            %span.upload_volume
+        %li
+          %a{href:"#country_drilldown_download",data-toggle:"tab",role:"tab"}
+            %i.fa.fa-download.fa-fw
+            Download
+            %span.download_volume
+      .tab-content{style:"padding-top:10px"}
+        .tab-pane.active#country_drilldown_upload{data-use-width:1}
+          .row
+            .col-xs-6
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-table.fa-fw
+                    Interface Toppers
+                .panel-body
+                  .toppers_table.animated-background 
+                    %table
+                      %thead
+                      %tbody
+            .col-xs-6
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-pie-chart.fa-fw
+                    Toppers Chart
+                .panel-body
+                  .donut_chart.animated-background 
+            .col-xs-12
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-area-chart.fa-fw
+                    Traffic chart for interfaces
+                .panel-body
+                  .interfaces_traffic_chart
+            .col-xs-12
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-random.fa-fw
+                    Interfaces Sankey Chart
+                .panel-body
+                  .interfaces_sankey_chart
+
+
+
+        .tab-pane#country_drilldown_download{data-use-width:1}
+          .row
+            .col-xs-6
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-table.fa-fw
+                    Interface Toppers
+                .panel-body
+                  .toppers_table.animated-background 
+                    %table
+                      %thead
+                      %tbody
+            .col-xs-6
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-pie-chart.fa-fw
+                    Toppers Chart
+                .panel-body
+                  .donut_chart.animated-background 
+            .col-xs-12
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-area-chart.fa-fw
+                    Traffic chart for interfaces
+                .panel-body
+                  .interfaces_traffic_chart
+            .col-xs-12
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-random.fa-fw
+                    Interfaces Sankey Chart
+                .panel-body
+                  .interfaces_sankey_chart
+
+       

@@ -1,0 +1,18 @@
+name: Prefix Analytics Drilldown
+
+version: 0.0.2
+
+author: trisul
+
+
+description: 
+   short: View prefix  mappings for routers and interfaces
+   long:  |
+      A breakup of prefix to router mappings in table and chart format
+      This plugin is a visualization of that. 
+
+apptype: dashboard_js
+
+appresources: peering_analytics_drilldown.js app.css  template.haml
+
+dependencies: 
