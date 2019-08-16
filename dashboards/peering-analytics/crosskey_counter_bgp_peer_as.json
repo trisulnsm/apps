@@ -1,0 +1,37 @@
+{
+  "TrisulCounterGroupCrosskey": [
+    [
+      {
+        "id": 1,
+        "CounterGUID": "{2489E2DC-9B13-4E5D-9433-359C69BEA734}",
+        "ParentCounterGUID": "{A643654F-2BA3-4832-4FF1-43EBDDE6E655}",
+        "CrosskeyCounterGUID": "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
+        "CrosskeyThirdCounterGUID": null,
+        "KeyLength1": null,
+        "KeyLength2": null,
+        "KeyLength3": null
+      }
+    ],
+    [
+      {
+        "id": 57,
+        "CounterGUID": "{2489E2DC-9B13-4E5D-9433-359C69BEA734}",
+        "Name": "BGP-AS-Peer x Router",
+        "Description": "Cross key of BGP-AS-Peer and netflow generator router",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 60000,
+        "TrackHiWater": 25000,
+        "TrackLoWater": 10000,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Active",
+        "CardinalityEstimateBits": "",
+        "TopperTrafficOnly": "False",
+        "EnableSliceKeys": 0,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1565937464,
+        "ResolverCounterGUID": null
+      }
+    ]
+  ]
+}

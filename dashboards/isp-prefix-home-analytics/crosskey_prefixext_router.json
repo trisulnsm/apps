@@ -1,0 +1,37 @@
+{
+  "TrisulCounterGroupCrosskey": [
+    [
+      {
+        "id": 9,
+        "CounterGUID": "{0B6149B2-2D5E-412E-4F5B-462DB552EB0E}",
+        "ParentCounterGUID": "{2BE2A3B6-613D-4216-0737-3684E824EA33}",
+        "CrosskeyCounterGUID": "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
+        "CrosskeyThirdCounterGUID": null,
+        "KeyLength1": null,
+        "KeyLength2": null,
+        "KeyLength3": null
+      }
+    ],
+    [
+      {
+        "id": 68,
+        "CounterGUID": "{0B6149B2-2D5E-412E-4F5B-462DB552EB0E}",
+        "Name": "Flow-prefix-external x router",
+        "Description": "flow prefix external x router",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 60000,
+        "TrackHiWater": 25000,
+        "TrackLoWater": 15000,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Active",
+        "CardinalityEstimateBits": "",
+        "TopperTrafficOnly": "False",
+        "EnableSliceKeys": 0,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1564035001,
+        "ResolverCounterGUID": ""
+      }
+    ]
+  ]
+}

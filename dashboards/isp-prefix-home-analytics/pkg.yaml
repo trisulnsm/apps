@@ -1,6 +1,6 @@
 name: ISP Home Prefixes Analytics
 
-version: 0.0.1
+version: 0.0.2
 
 author: trisul
 
@@ -13,7 +13,8 @@ description:
 
 apptype: dashboard_js
 
-appresources: isp_prefix_home_analytics.js app.css template.haml crosskey_prefixhome_interface.json crosskey_prefixhome_router.json ctl_counter_prefixhome_interface.json ctl_counter_prefixhome_router.json
+appresources: isp_prefix_home_analytics.js app.css template.haml crosskey_prefixhome_interface.json crosskey_prefixhome_router.json ctl_counter_prefixhome_interface.json ctl_counter_prefixhome_router.json crosskey_prefixext_interface.json crosskey_prefixext_router.json ctl_counter_prefixext_interface.json ctl_counter_prefixext_router.json
+
 
 dependencies: 
 

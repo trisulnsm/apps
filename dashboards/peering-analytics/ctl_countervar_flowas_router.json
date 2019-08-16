@@ -1,0 +1,50 @@
+{
+  "TrisulCtlCountervar": [
+    [
+      {
+        "id": 248,
+        "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
+        "SubItem": 0,
+        "VarType": 4,
+        "TopNCount": 1000,
+        "BottomNCount": 20,
+        "Name": "Upload",
+        "Description": "Upload Bytes",
+        "Units": "Bps"
+      },
+      {
+        "id": 249,
+        "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
+        "SubItem": 1,
+        "VarType": 4,
+        "TopNCount": 1000,
+        "BottomNCount": 20,
+        "Name": "Download",
+        "Description": "Download Bytes",
+        "Units": "Bps"
+      },
+      {
+        "id": 250,
+        "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
+        "SubItem": 2,
+        "VarType": 5,
+        "TopNCount": 1000,
+        "BottomNCount": 20,
+        "Name": "uniqs",
+        "Description": "Unique Prefix per AS",
+        "Units": "Uniques "
+      },
+      {
+        "id": 251,
+        "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
+        "SubItem": 3,
+        "VarType": 5,
+        "TopNCount": 1000,
+        "BottomNCount": 20,
+        "Name": "uniqs",
+        "Description": "Unique ASPATH per ASN",
+        "Units": "Uniques "
+      }
+    ]
+  ]
+}

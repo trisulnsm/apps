@@ -1,0 +1,50 @@
+{
+  "TrisulCtlCountervar": [
+    [
+      {
+        "id": 311,
+        "ItemGUID": "{2489E2DC-9B13-4E5D-9433-359C69BEA734}",
+        "SubItem": 0,
+        "VarType": 4,
+        "TopNCount": 10000,
+        "BottomNCount": 10,
+        "Name": "bytes",
+        "Description": "Upload to AS",
+        "Units": "Bps"
+      },
+      {
+        "id": 312,
+        "ItemGUID": "{2489E2DC-9B13-4E5D-9433-359C69BEA734}",
+        "SubItem": 1,
+        "VarType": 4,
+        "TopNCount": 10000,
+        "BottomNCount": 10,
+        "Name": "bytes",
+        "Description": "Download from AS",
+        "Units": "Bps"
+      },
+      {
+        "id": 313,
+        "ItemGUID": "{2489E2DC-9B13-4E5D-9433-359C69BEA734}",
+        "SubItem": 2,
+        "VarType": 5,
+        "TopNCount": 10000,
+        "BottomNCount": 20,
+        "Name": "uniqs",
+        "Description": "Unused Cardinality counter",
+        "Units": "Uniques "
+      },
+      {
+        "id": 314,
+        "ItemGUID": "{2489E2DC-9B13-4E5D-9433-359C69BEA734}",
+        "SubItem": 3,
+        "VarType": 5,
+        "TopNCount": 10000,
+        "BottomNCount": 20,
+        "Name": "uniqs",
+        "Description": "Unused Cardinality counter",
+        "Units": "Uniques "
+      }
+    ]
+  ]
+}
