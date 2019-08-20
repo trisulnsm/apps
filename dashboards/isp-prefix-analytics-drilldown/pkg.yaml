@@ -1,6 +1,6 @@
 name: Prefix Analytics Drilldown
 
-version: 0.0.2
+version: 0.0.3
 
 author: trisul
 
@@ -13,6 +13,6 @@ description:
 
 apptype: dashboard_js
 
-appresources: peering_analytics_drilldown.js app.css  template.haml
+appresources: prefix_analytics_drilldown.js app.css  template.haml
 
 dependencies: 
