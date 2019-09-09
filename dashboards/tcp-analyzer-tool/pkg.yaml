@@ -1,6 +1,6 @@
 name: TCP Analysis
 
-version: 0.0.1
+version: 0.0.2
 
 author: trisul
 
@@ -12,6 +12,7 @@ description:
       Shows Latency,Retransmisson for internal and external hosts
       Show hosts with high retransmisson rate and timout flows
       Shows poor quality flows that has more than 5% retransmisson rate.
+      Added timeseries chart to monitor timeouts, retransmissions, avg latencies 
 
 apptype: dashboard_share
 
