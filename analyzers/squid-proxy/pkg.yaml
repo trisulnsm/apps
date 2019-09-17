@@ -1,0 +1,16 @@
+name: Squid Proxy Metrics
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Extracts metrics from proxy servers traffic
+   long:  |
+      Extracts metrics from explict proxy servers which use CONNECT type tunnels. This is the most common type of proxy.
+
+apptype: lua
+
+appresources: proxied-servers.lua proxy-connect.lua 
+
+dependencies:  
