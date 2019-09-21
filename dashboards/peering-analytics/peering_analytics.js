@@ -234,7 +234,7 @@ class ISPOverviewMapping{
   // build model 
   async get_data()  {
     //find guid to load data
-    let selected_router = $('#routers'+this.rand_id).val();
+    this.selected_router = $('#routers'+this.rand_id).val();
     let selected_interface = $('#interfaces'+this.rand_id).val();
     
     if(Object.keys(this.cg_meters.crosskey).length == 0){
@@ -245,11 +245,11 @@ class ISPOverviewMapping{
       this.cgguid = this.crosskey_interface;
       this.filter_text = selected_interface;
     }
-    else if(selected_router != "0"){
+    else if(this.selected_router != "0"){
       this.cgguid = this.crosskey_router;
-      this.filter_text = selected_router;
+      this.filter_text = this.selected_router;
     }
-    else if(selected_router){
+    else if(this.selected_router){
       this.cgguid = this.filter_cgguid
     }
     
@@ -658,6 +658,10 @@ class ISPOverviewMapping{
     switch($.inArray(target.parent()[0],target.closest("td").find("li:not(.divider)"))){
       case 0:
       case -1:
+        let ck_cgguid = this.crosskey_cgguid;
+        if(this.selected_router=="0"){
+          ck_cgguid=this.crosskey_interface;
+        }
         window.open("/newdash/index?" + 
                     $.param({
                         key: tr.data("key"),
@@ -665,7 +669,7 @@ class ISPOverviewMapping{
                         label:`${tr.data("label")}`.toString().replace(/\\/g,"\\\\"),
                         readable:`${tr.data("readable")}`.toString().replace(/\\/g,"\\\\"),                        
                         cgguid:this.filter_cgguid,
-                        ck_cgguid:this.crosskey_cgguid,
+                        ck_cgguid:ck_cgguid,
                         filter_cgname:this.filter_cgname,
                         window_fromts:this.tmint.from.tv_sec,
                         window_tots:this.tmint.to.tv_sec,

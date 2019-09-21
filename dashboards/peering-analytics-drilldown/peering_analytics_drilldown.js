@@ -39,9 +39,14 @@
     this.html_str = await get_html_from_hamltemplate(opts);
   }
   async reset_ui(){
+    console.log(this.dash_params.readable)
     this.dom.find(".drilldown_data").remove();
     this.data_dom=$(this.html_str)
     this.dom.append(this.data_dom);
+
+    this.dom.find("#drilldown_asn").val(this.dash_params.readable.split("\\")[0])
+    this.form = this.dom.find(".drilldown_asn_form")
+    this.form.submit($.proxy(this.submit_form,this));
     this.filter_text = this.dash_params.key;
     this.agg_flows = [];
     for(let i=0;i<this.meters.length;i++){
@@ -57,7 +62,28 @@
     this.draw_aggregate_table('tag_asnumber');
     this.draw_aggregate_table('tag_prefixes');
   }
+  submit_form(){
+    var newasn = this.form.find("#drilldown_asn").val();
+    var readable = this.dash_params.readable.split("\\")
 
+    readable[0]=newasn
+    readable=readable.join("\\").replace(/\\/g,"\\\\")
+    window.open("/newdash/index?" + 
+                    $.param({
+                        key: newasn,
+                        statids:this.dash_params.statids,
+                        label:this.dash_params.label.replace(/\\/g,"\\\\"),
+                        readable:readable,                        
+                        cgguid:this.dash_params.cgguid,
+                        ck_cgguid:this.dash_params.ck_cgguid,
+                        filter_cgname:this.dash_params.filter_cgname,
+                        window_fromts:this.dash_params.window_fromts,
+                        window_tots:this.dash_params.window_tots,
+                        "dash_key_regex":"gitPeeringAnalyticsDrilldown"
+                    }),"_self");
+    console.log(this.dash_params)
+    return false;
+  }
   draw_drill_chart(){
     let traf_chart_id = `drill_traffic_chart_${this.rand_id}`;
    

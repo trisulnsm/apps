@@ -1,4 +1,11 @@
 .drilldown_data
+  .panel
+    .panel-body
+      %form.form-inline.drilldown_asn_form
+        .form-group
+          %label{style:"padding-right:10px"} ASNumber
+          %input{type:"text",class:"form-control",id:"drilldown_asn",style:"width:300px"}
+        %button{type:"submit",class:"btn btn-default",style:"margin-left:10px"} Drilldown
   .row
     .col-xs-12
       %ul.nav.nav-tabs#peering_drilldown_tabs
@@ -95,7 +102,7 @@
                 .panel-body
                   .interfaces_sankey_chart
 
-        .tab-pane.active#peering_drilldown_hostprefix{data-use-width:1}
+        .tab-pane#peering_drilldown_hostprefix{data-use-width:1}
             .row
               .col-xs-6
                 .panel.panel-success
