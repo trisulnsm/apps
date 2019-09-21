@@ -39,7 +39,6 @@
     this.html_str = await get_html_from_hamltemplate(opts);
   }
   async reset_ui(){
-    console.log(this.dash_params.readable)
     this.dom.find(".drilldown_data").remove();
     this.data_dom=$(this.html_str)
     this.dom.append(this.data_dom);
