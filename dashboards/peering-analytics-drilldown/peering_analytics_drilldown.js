@@ -6,6 +6,7 @@
       file_path = file_path.join("/");
       let css_file = `/plugins/${file_path}/app.css`;
       $('head').append(`<link rel="stylesheet" type="text/css" href="${css_file}">`);
+      this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
       this.dash_params = opts.dash_params;
       this.dom = $(opts.divid);
       this.time_selector = opts.new_time_selector;
@@ -14,6 +15,7 @@
       this.meters = this.dash_params.statids.split(",");
       this.maxitems=10;
       this.probe_id = opts.probe_id;
+      this.default_selected_time = opts.new_time_selector;
       this.load_meters(opts);
     }
     
@@ -45,9 +47,18 @@
 
     this.dom.find("#drilldown_asn").val(this.dash_params.readable.split("\\")[0])
     this.form = this.dom.find(".drilldown_asn_form")
+       //new time selector 
+    new ShowNewTimeSelector({divid:"#new_time_selector",
+                               update_input_ids:"#from_date,#to_date",
+                               default_ts:this.default_selected_time
+                            });
+    
+    this.mk_time_interval();
     this.form.submit($.proxy(this.submit_form,this));
     this.filter_text = this.dash_params.key;
     this.agg_flows = [];
+    this.update_description();
+    
     for(let i=0;i<this.meters.length;i++){
       this.meter = this.meters[i];
       this.meter_name=["upload","download"][i]
@@ -61,7 +72,29 @@
     this.draw_aggregate_table('tag_asnumber');
     this.draw_aggregate_table('tag_prefixes');
   }
+  mk_time_interval(){
+    var selected_fromdate = $('#from_date').val();
+    var selected_todate = $('#to_date').val();
+    var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
+    var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
+    this.tmint = mk_time_interval([fromTS,toTS]);
+
+  }
+  update_description(){
+    let description = "Drilldown for"
+    let label = this.dash_params.label.split("\\");
+    let readable = this.dash_params.readable.split("\\")
+
+    if (readable.length > 1){
+      description = `${description}  interface ${label[1]} -> ASN ${readable[0]} `
+    }else{
+      description = `${description}   ASN ${label[0]}`
+    }
+    description = `${description} <i class='fa fa-clock-o fa-fw'></i> ${h_fmtduration(this.tmint.to.tv_sec- this.tmint.from.tv_sec)}`
+    $('.show_description').html(description)
+  }
   submit_form(){
+    this.mk_time_interval();
     var newasn = this.form.find("#drilldown_asn").val();
     var readable = this.dash_params.readable.split("\\")
 
@@ -76,11 +109,10 @@
                         cgguid:this.dash_params.cgguid,
                         ck_cgguid:this.dash_params.ck_cgguid,
                         filter_cgname:this.dash_params.filter_cgname,
-                        window_fromts:this.dash_params.window_fromts,
-                        window_tots:this.dash_params.window_tots,
+                        window_fromts:this.tmint.from.tv_sec,
+                        window_tots:this.tmint.to.tv_sec,
                         "dash_key_regex":"gitPeeringAnalyticsDrilldown"
                     }),"_self");
-    console.log(this.dash_params)
     return false;
   }
   draw_drill_chart(){

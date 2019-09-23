@@ -1,13 +1,25 @@
 .drilldown_data
   .panel
     .panel-body
-      %form.form-inline.drilldown_asn_form
-        .form-group
-          %label{style:"padding-right:10px"} ASNumber
-          %input{type:"text",class:"form-control",id:"drilldown_asn",style:"width:300px"}
-        %button{type:"submit",class:"btn btn-default",style:"margin-left:10px"} Drilldown
+        %form.form-horizontal.drilldown_asn_form
+          .row
+            .col-xs-6
+              .from-group
+                 %label.control-label.col-xs-4 ASNumber         
+                .col-xs-8 
+                  %input{type:"text",class:"form-control",id:"drilldown_asn",style:"width:300px"}
+            .col-xs-6
+              .form-group
+                .new_time_selector#new_time_selector
+          .row
+            .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+              %input#from_date{type:"hidden",name:"from_date"}
+              %input#to_date{type:"hidden",name:"to_date"}
+              %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Drilldown"}
+
   .row
     .col-xs-12
+      %h4.show_description.text-muted
       %ul.nav.nav-tabs#peering_drilldown_tabs
         %li.active
           %a{href:"#peering_drilldown_upload",data-toggle:"tab",role:"tab"}
