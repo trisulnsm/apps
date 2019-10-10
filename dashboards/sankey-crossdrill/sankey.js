@@ -21,14 +21,15 @@ class SankeyCrossDrill  {
   async append_form(){
 
     this.rand_id=parseInt(Math.random()*100000);
-    this.form = $("<form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select name='cgguid'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Meter</label> <div class='col-xs-8'> <select name='meter'></select> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Remove Toppers</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider-remove-topn'> <div class='ui-slider-handle' id='remove-top-n'></div> </div> <span class='help-block text-left'>Remove the top N flows from view to reveal the smaller flows</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Filter Item</label> <div class='col-xs-8'> <input name='fltr_crs_items' type='text'> <span class='help-block text-left'>Type text to filter crosskey items</span> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Show max nodes</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider-max-nodes'> <div class='ui-slider-handle' id='max-nodes'></div> </div> <span class='help-block text-left'>Show approximately these many nodes on the sankey (default 30)</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Show Chart'> </div> </div> </form>");
+    this.form = $("<form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select name='cgguid'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Meter</label> <div class='col-xs-8'> <select name='meter'></select> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Remove Toppers</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider-remove-topn'> <div class='ui-slider-handle' id='remove-top-n'></div> </div> <span class='help-block text-left'>Remove the top N flows from view to reveal the smaller flows</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Filter Item</label> <div class='col-xs-8'> <input name='fltr_crs_items' type='text'> <span class='help-block text-left'>Type text to filter crosskey items</span> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Show max nodes</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider-max-nodes'> <div class='ui-slider-handle' id='max-nodes'></div> </div> <span class='help-block text-left'>Show approximately these many nodes on the sankey (default 30)</span> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Invert Filter</label> <div class='col-xs-8'></div> <input name='invertfilter' type='checkbox' value='1'> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Show Chart'> </div> </div> </form>");
     //all are randomid only
     this.form.find("select[name*='cgguid']").attr("id","cg_id_"+this.rand_id);
     this.form.find("select[name*='meter']").attr("id","meter_id_"+this.rand_id);
     this.form.find(".new_time_selector").attr("id","new_time_selector_"+this.rand_id);
     this.form.find("input[name*='from_date']").attr("id","from_date_"+this.rand_id);
     this.form.find("input[name*='to_date']").attr("id","to_date_"+this.rand_id);
-     this.form.find("input[name*='fltr_crs_items']").attr("id","fltr_crs_"+this.rand_id);
+    this.form.find("input[name*='fltr_crs_items']").attr("id","fltr_crs_"+this.rand_id);
+    this.form.find("input[name*='invertfilter']").attr("id","invert_filter_"+this.rand_id);
 
     $('#'+this.divid).append(this.form);
     
@@ -178,7 +179,12 @@ class SankeyCrossDrill  {
       var reg_exp = new RegExp(this.filter_text,"i")
       cgtoppers_bytes = _.select(cgtoppers_bytes,function(item){
         let k=item.label;
-        return k.match(reg_exp)
+        if($("input[name*='invertfilter']").prop('checked')==true){
+          return !k.match(reg_exp)
+        }
+        else{
+          return k.match(reg_exp)
+        }
       });
     }
 
@@ -291,8 +297,7 @@ class SankeyCrossDrill  {
 
   // table : show filtered toppers in a table 
   repaint_table(cgtoppers_bytes) {
-
-
+    $('#'+this.table_div_id).html('');
     let tbl=$(`<table class='table table-sysdata'><tbody></tbody></table>`);
     _.each(cgtoppers_bytes, function(kt) {
         let r = $('<tr>')
@@ -361,6 +366,12 @@ function run(opts)
           #slider-max-nodes
             %div#max-nodes.ui-slider-handle
           %span.help-block.text-left Show approximately these many nodes on the sankey (default 30)
+    .row 
+      .col-xs-6
+        .form-group
+          %label.control-label.col-xs-4 Invert Filter
+          .col-xs-8
+          %input{type:"checkbox",name:"invertfilter",value:1}
 
 
   .row
