@@ -9,10 +9,12 @@
 var HostTotal   =  $.klass({
   init:function(opts){
     this.available_time = opts["available_time"];
+    this.default_selected_time = opts.new_time_selector;
     this.domid = opts["divid"];
     this.available_host = [];
     this.add_form();
     this.bucketsize = 60;
+    this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
     this.ax_cancel = false;
   },
   
@@ -24,6 +26,7 @@ var HostTotal   =  $.klass({
       alert("Text field can't be empty.")
       return false;
     }
+    this.mk_time_interval();
     deferq = $.Deferred();
     prom = deferq.promise();
     // build a callback chain
@@ -62,7 +65,7 @@ var HostTotal   =  $.klass({
           {
             counter_group: GUID.GUID_CG_HOSTS(),
             key:  TRP.KeyT.create({key:k.key}),
-            time_interval:mk_time_interval($.extend({recentsecs:86400},this.available_time))
+            time_interval:cthis.tmint,
           });
         return  get_response(req,function(resp){
           var total = _.chain(resp.stats)
@@ -90,11 +93,26 @@ var HostTotal   =  $.klass({
   // Add a text box to filter the host
   // add table to show keys
   add_form:function(){
-    var form = $("<div id='host_search_form' class='col-xs-8'><form class='form-inline'><div class='form-group col-xs-10'><input type='text' class='form-control' id='search_host' placeholder='Enter host name' style='width:100%'></div><div class='form-group'><button type='submit' class='btn btn-primary'>Search</button></div></form></div>");
+    var form = $("<div class='col-xs-12' id='host_search_form'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-8'> <div class='form-group'> <div id='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='col-xs-8'> <div class='form-group'> <label class='control-label col-xs-4'>Enter Host</label> <div class='col-xs-8'> <input class='form-control' id='search_host' placeholder='Enter host name' style='width:100%' type='text'> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input id='from_date' name='from_date' type='hidden'> <input id='to_date' name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Search'> </div> </div> </form> </div>");
     $(this.domid).append(form);
     //auto_complete('search_host',{cgguid:GUID.GUID_CG_HOSTS()},{});
     $(this.domid).append("<div id='trp_data_hosts'></div>");
+
+    //new time selector 
+    new ShowNewTimeSelector({divid:"#new_time_selector",
+                               update_input_ids:"#from_date,#to_date",
+                               default_ts:this.default_selected_time
+                            });
+
     form.submit($.proxy(this.submit_form,this));
+  },
+
+  mk_time_interval(){
+    var selected_fromdate = $('#from_date').val();
+    var selected_todate = $('#to_date').val();
+    var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
+    var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
+    this.tmint = mk_time_interval([fromTS,toTS]);
   },
   reset_ui:function(){
     $('#trp_data_hosts').html(" ");
@@ -109,6 +127,7 @@ var HostTotal   =  $.klass({
     table.attr("id","search_host_tbl");
     table.find("thead tr").append("<th>Host</th><th>IP</th><th>Total</th><th>Received</th><th>Transmit</th>");
     $('#trp_data_hosts').append(table);
+
   },
 
   //redraw the table
