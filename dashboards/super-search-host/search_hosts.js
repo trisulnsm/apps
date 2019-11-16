@@ -49,11 +49,13 @@ var HostTotal   =  $.klass({
               {
                 counter_group: GUID.GUID_CG_HOSTS(),
                 pattern:  $('#search_host').val().trim(),
+                time_interval:cthis.tmint
               });
     return  get_response(req,function(resp){
       _.each(resp.keys,$.proxy(function(key){
         this.available_host.push({key:key.key,label:key.label,readable:key.readable,total:0,recv:0,transmit:0})
       },cthis));
+      cthis.available_host = cthis.available_host.slice(0,100);
     });
   },
   //Get total usage for each hosts
