@@ -1,159 +1,113 @@
-.row.prefix_external_analytics_form
-  .col-xs-12
-    .widget
-      .widget-header
-        %h4 
-          %i.fa.fa-filter.fa-fw
-          Filter criteria
-      .widget-body
-        %form.form-horizontal
+.drilldown_data
+  .panel
+    .panel-body
+        %form.form-horizontal.drilldown_prefix_form
           .row
+            .col-xs-6
+              .from-group
+                 %label.control-label.col-xs-4 Prefix         
+                .col-xs-8 
+                  %input{type:"text",class:"form-control",id:"drilldown_prefix",style:"width:300px"}
             .col-xs-6
               .form-group
                 .new_time_selector#new_time_selector
           .row
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Routers         
-                .col-xs-8 
-                  %select#routers{name:'routers'} 
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Interfaces 
-                .col-xs-8 
-                  %select#interfaces{name:'interfaces'}
-          .row
             .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
               %input#from_date{type:"hidden",name:"from_date"}
               %input#to_date{type:"hidden",name:"to_date"}
-              %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
+              %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Drilldown"}
 
-
-.ui_data
   .row
     .col-xs-12
-      %ul.nav.nav-tabs#isp_prefix_external_overview_tabs
+      %h4.show_description.text-muted
+      %ul.nav.nav-tabs#prefix_drilldown_tabs
         %li.active
-          %a{href:"#prefix_external_overview_0",data-toggle:"tab",role:"tab"}
+          %a{href:"#prefix_drilldown_upload",data-toggle:"tab",role:"tab"}
             %i.fa.fa-upload.fa-fw
             Upload
-            %span.volume_0
+            %span.upload_volume
         %li
-          %a{href:"#prefix_external_overview_1",data-toggle:"tab",role:"tab"} 
+          %a{href:"#prefix_drilldown_download",data-toggle:"tab",role:"tab"}
             %i.fa.fa-download.fa-fw
             Download
-            %span.volume_1
+            %span.download_volume
+       
       .tab-content{style:"padding-top:10px"}
-        .tab-pane.active#prefix_external_overview_0{data-use-width:1}
+        .tab-pane.active#prefix_drilldown_upload{data-use-width:1}
           .row
-            .col-xs-12.toppers_table_div
+            .col-xs-6
               .panel.panel-primary
                 .panel-heading
-                  %h3 
+                  %h3
                     %i.fa.fa-table.fa-fw
-                    Top upload prefixes 
-                    %small Show top 100 prefixes to which you are uploading data
-                    %span.badge.badge-info
-                  %p
-                    %small.target
+                    Interface Toppers
                 .panel-body
-                  .toppers_table
+                  .toppers_table.animated-background 
                     %table
                       %thead
                       %tbody
-                  .animated-background
-          .row
-            .col-xs-12.traffic_chart_div
+            .col-xs-6
               .panel.panel-primary
                 .panel-heading
                   %h3
-                    %i.fa.fa-area-chart.fa-fw 
-                    Stacked area chart  
-                    %small Showing top prefixes upload traffic over the selected time period 
-                  %p
-                    %small.target
-                   
+                    %i.fa.fa-pie-chart.fa-fw
+                    Toppers Chart
                 .panel-body
-                  .traffic_chart
-                  .animated-background
-          .row
-            .col-xs-12.donut_chart_div
+                  .donut_chart.animated-background 
+            .col-xs-12
               .panel.panel-primary
                 .panel-heading
                   %h3
-                    %i.fa.fa-pie-chart.fa-fw 
-                    Percent share of prefixes upload traffic 
-                  %p
-                    %small.target
+                    %i.fa.fa-area-chart.fa-fw
+                    Traffic chart for interfaces
                 .panel-body
-                  .donut_chart
-                  .animated-background
-          .row
-            .col-xs-12.sankey_chart_div
+                  .interfaces_traffic_chart
+            .col-xs-12
               .panel.panel-primary
                 .panel-heading
-                  %h3 
-                    %i.fa.fa-random.fa-fw 
-                    Sankey Chart 
-                    %small
-                      Shows upload traffic flows from the left side (External Prefixes) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
+                  %h3
+                    %i.fa.fa-random.fa-fw
+                    Interfaces Sankey Chart
                 .panel-body
-                  .sankey_chart
-                  .animated-background
-        .tab-pane#prefix_external_overview_1{data-use-width:1}
+                  .interfaces_sankey_chart
+
+
+
+        .tab-pane#prefix_drilldown_download{data-use-width:1}
           .row
-            .col-xs-12.toppers_table_div
+            .col-xs-6
               .panel.panel-success
                 .panel-heading
-                  %h3 
+                  %h3
                     %i.fa.fa-table.fa-fw
-                    Top Download prefixes  
-                    %small Show top 100 prefixes to which you are downloading data
-                    %span.badge.badge-info
-                  %p
-                    %small.target
+                    Interface Toppers
                 .panel-body
-                  .toppers_table
+                  .toppers_table.animated-background 
                     %table
                       %thead
                       %tbody
-                    .animated-background
-          .row
-            .col-xs-12.traffic_chart_div
+            .col-xs-6
               .panel.panel-success
                 .panel-heading
                   %h3
-                    %i.fa.fa-area-chart.fa-fw 
-                    Stacked area chart  
-                    %small Showing top prefixes download traffic over the selected time period 
-                  %p
-                    %small.target
-                   
+                    %i.fa.fa-pie-chart.fa-fw
+                    Toppers Chart
                 .panel-body
-                  .traffic_chart
-                  .animated-background
-          .row
-            .col-xs-12.donut_chart_div
+                  .donut_chart.animated-background 
+            .col-xs-12
               .panel.panel-success
                 .panel-heading
                   %h3
-                    %i.fa.fa-pie-chart.fa-fw 
-                    Percent share of prefixes download traffic 
-                  %p
-                    %small.target
+                    %i.fa.fa-area-chart.fa-fw
+                    Traffic chart for interfaces
                 .panel-body
-                  .donut_chart
-                  .animated-background
-          .row
-            .col-xs-12.sankey_chart_div
+                  .interfaces_traffic_chart
+            .col-xs-12
               .panel.panel-success
                 .panel-heading
-                  %h3 
-                    %i.fa.fa-random.fa-fw 
-                    Sankey Chart 
-                    %small
-                      Shows download traffic flows from the left side (External Prefixes) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
+                  %h3
+                    %i.fa.fa-random.fa-fw
+                    Interfaces Sankey Chart
                 .panel-body
-                  .sankey_chart
-                  .animated-background
+                  .interfaces_sankey_chart
 

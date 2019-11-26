@@ -1,0 +1,27 @@
+name: ISP External Prefixes Analytics
+
+version: 0.0.3
+
+author: trisul
+
+
+description: 
+   short: View external prefixes mappings for routers and interfaces
+   long:  |
+      A breakup of external prefixes to router mappings in table and chart format
+      This plugin is a visualization of that. 
+
+apptype: dashboard_js
+
+appresources: isp_prefix_external_analytics.js app.css template.haml  crosskey_prefixext_interface.json crosskey_prefixext_router.json ctl_counter_prefixext_interface.json ctl_counter_prefixext_router.json
+
+
+
+dependencies: 
+
+jsparams:
+  crosskey_router: "{0B6149B2-2D5E-412E-4F5B-462DB552EB0E}"
+  crosskey_interface: "{DB9CC485-B983-4BF9-1031-BB49131E891C}"
+  meters:
+    upload: 2
+    download: 1

@@ -6,6 +6,7 @@
       file_path = file_path.join("/");
       let css_file = `/plugins/${file_path}/app.css`;
       $('head').append(`<link rel="stylesheet" type="text/css" href="${css_file}">`);
+      this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
       this.dash_params = opts.dash_params;
       this.dom = $(opts.divid);
       this.time_selector = opts.new_time_selector;
@@ -14,6 +15,7 @@
       this.meters = this.dash_params.statids.split(",");
       this.maxitems=10;
       this.probe_id = opts.probe_id;
+      this.default_selected_time = opts.new_time_selector;
       this.load_meters(opts);
     }
     
@@ -42,16 +44,73 @@
     this.dom.find(".drilldown_data").remove();
     this.data_dom=$(this.html_str)
     this.dom.append(this.data_dom);
+
+    this.dom.find("#drilldown_country").val(this.dash_params.readable.split("\\")[0])
+    this.form = this.dom.find(".drilldown_country_form")
+       //new time selector 
+    new ShowNewTimeSelector({divid:"#new_time_selector",
+                               update_input_ids:"#from_date,#to_date",
+                               default_ts:this.default_selected_time
+                            });
+    
+    this.mk_time_interval();
+    this.form.submit($.proxy(this.submit_form,this));
     this.filter_text = this.dash_params.key;
     this.agg_flows = [];
+    this.update_description();
+    
     for(let i=0;i<this.meters.length;i++){
       this.meter = this.meters[i];
       this.meter_name=["upload","download"][i]
       await this.get_toppers()
       
     }
-    }
+    await this.get_aggregated_flows("in");
+    await this.get_aggregated_flows("out");
+  }
+  mk_time_interval(){
+    var selected_fromdate = $('#from_date').val();
+    var selected_todate = $('#to_date').val();
+    var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
+    var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
+    this.tmint = mk_time_interval([fromTS,toTS]);
 
+  }
+  update_description(){
+    let description = "Drilldown for"
+    let label = this.dash_params.label.split("\\");
+    let readable = this.dash_params.readable.split("\\")
+
+    if (readable.length > 1){
+      description = `${description}  interface ${label[1]} -> Country ${readable[0]} `
+    }else{
+      description = `${description}   ASN ${label[0]}`
+    }
+    description = `${description} <i class='fa fa-clock-o fa-fw'></i> ${h_fmtduration(this.tmint.to.tv_sec- this.tmint.from.tv_sec)}`
+    $('.show_description').html(description)
+  }
+  submit_form(){
+    this.mk_time_interval();
+    var newcn = this.form.find("#drilldown_country").val();
+    var readable = this.dash_params.readable.split("\\")
+
+    readable[0]=newcn
+    readable=readable.join("\\").replace(/\\/g,"\\\\")
+    window.open("/newdash/index?" + 
+                    $.param({
+                        key: newcn,
+                        statids:this.dash_params.statids,
+                        label:this.dash_params.label.replace(/\\/g,"\\\\"),
+                        readable:readable,                        
+                        cgguid:this.dash_params.cgguid,
+                        ck_cgguid:this.dash_params.ck_cgguid,
+                        filter_cgname:this.dash_params.filter_cgname,
+                        window_fromts:this.tmint.from.tv_sec,
+                        window_tots:this.tmint.to.tv_sec,
+                        "dash_key_regex":"gitCountryAnalyticsDrilldown"
+                    }),"_self");
+    return false;
+  }
   draw_drill_chart(){
     let traf_chart_id = `drill_traffic_chart_${this.rand_id}`;
    
@@ -102,6 +161,20 @@
     await this.draw_traffic_chart();
     await this.draw_sankey_chart();
 
+  }
+  async get_aggregated_flows(intf){
+    let readable = this.dash_params.readable.split("\\");
+    
+    let opts = {flowtag:`[asn]${this.dash_params.key}`,time_interval:this.tmint,probe_id:this.probe_id};
+    if(readable.length > 1){
+      let interfaces = readable[1].split("_");
+      opts["nf_routerid"] = TRP.KeyT.create({label:interfaces[0]});
+      if(interfaces[1]){
+        opts[`nf_ifindex_${intf}`]= TRP.KeyT.create({label:interfaces[1]});
+      }
+    }
+    this.agg_flows.push(await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts));
+    
   }
 
   draw_table(){
@@ -185,62 +258,6 @@
     }
   }
 
-  draw_aggregate_table(group){
-    var table = this.data_dom.find(`.${group}`).find("table");
-    this.data_dom.find(`.${group}`).removeClass('animated-background');
-    var table_id = "agg_flows_tbl_"+Math.floor(Math.random()*100000);
-    table.attr("id",table_id)
-    table.addClass('table table-hover table-sysdata');
-    let toppers = [];
-    if(group=="internal_ip" || group == "external_ip"){
-      toppers.push(this.agg_flows[0][group]);
-      toppers.push(this.agg_flows[1][group]);
-    }else if(group=="tag_asnumber"){
-      if(this.agg_flows[0].tag_group.find(x=>x.group_name=="asn")){
-        toppers.push(this.agg_flows[0].tag_group.find(x=>x.group_name=="asn").tag_metrics)
-      }
-      if(this.agg_flows[1].tag_group.find(x=>x.group_name=="asn")){
-        toppers.push(this.agg_flows[1].tag_group.find(x=>x.group_name=="asn").tag_metrics)
-      }
-    }
-    else if(group=="tag_prefixes"){
-      if(  this.agg_flows[0].tag_group.find(x=>x.group_name=="prf")){
-        toppers.push(this.agg_flows[0].tag_group.find(x=>x.group_name=="prf").tag_metrics);
-      }
-      if(  this.agg_flows[1].tag_group.find(x=>x.group_name=="prf")){
-        toppers.push(this.agg_flows[1].tag_group.find(x=>x.group_name=="prf").tag_metrics);
-      }
-    }
-    toppers =_.flatten(toppers).slice(0,50);
-    let toppers_obj = {};
-    for(let i=0 ; i < toppers.length; i++){
-      let t = toppers[i];
-      let k = t.key.key
-      if(toppers_obj[k]){
-        let  v = toppers_obj[k];
-        v.count = parseInt(v.count) + parseInt(t.count) ;
-        v.metric = v.metric.toNumber() + t.metric.toNumber() ;
-      }else{
-        toppers_obj[k] = t
-      }
-    }
-    toppers = _.sortBy(_.values(toppers_obj),function(k){return -k.metric;});
-    let rows = []
-    for(let i=0; i< toppers.length;i++){
-      var t = toppers[i];
-      rows.push(`<tr>
-                <td>${t.key.readable||t.key.key}</td>
-                <td>${t.key.label}</td>
-                <td>${t.count}</td>
-                <td>${h_fmtvol(t.metric)}</td>
-                </tr>`);
-    } 
-
-    new TrisTablePagination(table_id,{no_of_rows:10,rows:rows});
-    table.tablesorter();
-    new ExportToCSV({table_id:table_id,filename_prefix:"top_asn_panel",append_to:"panel"});
-
-  }
     
   async draw_traffic_chart(){
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,this.maxitems);

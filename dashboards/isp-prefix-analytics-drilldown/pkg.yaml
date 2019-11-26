@@ -1,28 +1,18 @@
 name: Prefix Analytics Drilldown
 
-version: 0.0.4
+version: 0.0.10
 
 author: trisul
 
 
 description: 
-   short: View External prefix  mappings for routers and interfaces
+   short: View Prefix mappings for routers and interfaces
    long:  |
-      A breakup of prefix to router mappings in table and chart format
+      A breakup of Prefix to router mappings in table and chart format
       This plugin is a visualization of that. 
 
 apptype: dashboard_js
 
-appresources: prefix_analytics_drilldown.js app.css  template.haml ctl_counter_prefixext_interface.json  ctl_counter_prefixext_router.json crosskey_prefixext_interface.json  crosskey_prefixext_router.json
-
-
+appresources: peering_analytics_drilldown.js app.css  template.haml
 
 dependencies: 
-
-jsparams:
-  crosskey_router: "{0B6149B2-2D5E-412E-4F5B-462DB552EB0E}"
-  crosskey_interface: "{DB9CC485-B983-4BF9-1031-BB49131E891C}"
-  meters:
-    upload: 2
-    download: 1
-

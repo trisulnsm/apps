@@ -1,7 +1,7 @@
 /*
   Explore router or interface usage details
 */
-class ISPOverviewMapping{
+class ISPPrefixExternalMapping{
   constructor(opts) {
 
     this.dom = $(opts.divid);
@@ -128,8 +128,8 @@ class ISPOverviewMapping{
     }
 
     var js_params = {meter_details:all_dropdown,
-      selected_cg : selected_router || localStorage.getItem("apps.countryanalytics.last-selected-router"),
-      selected_st : selected_interface || localStorage.getItem("apps.countryanalytics.last-selected-interface"),
+      selected_cg : selected_router || localStorage.getItem("apps.prefix_external_analytics.last-selected-router"),
+      selected_st : selected_interface || localStorage.getItem("apps.prefix_external_analytics.last-selected-interface"),
       update_dom_cg : "routers"+this.rand_id,
       update_dom_st : "interfaces"+this.rand_id,
       chosen:true
@@ -164,11 +164,11 @@ class ISPOverviewMapping{
   submit_form(){
 
     // last used is the next default 
-    localStorage.setItem("apps.countryanalytics.last-selected-router", 
-                            $('.countryanalytics_form select[name="routers"] option:selected').val());
+    localStorage.setItem("apps.prefix_external_analytics.last-selected-router", 
+                            $('.prefix_external_analytics_form select[name="routers"] option:selected').val());
 
-    localStorage.setItem("apps.countryanalytics.last-selected-interface", 
-                            $('.countryanalytics_form select[name="interfaces"] option:selected').val());
+    localStorage.setItem("apps.prefix_external_analytics.last-selected-interface", 
+                            $('.prefix_external_analytics_form select[name="interfaces"] option:selected').val());
 
 
     this.form.find("#btn_submit").prop('disabled', true);
@@ -197,7 +197,7 @@ class ISPOverviewMapping{
     this.cgguid = null;
     this.crosskey_cgguid = null;
     this.filter_text=null;
-      $('#isp_country_overview_tabs a').click(function (e) {
+      $('#isp_prefix_external_overview_tabs a').click(function (e) {
       e.preventDefault()
       $(this).tab('show')
     });
@@ -316,8 +316,8 @@ class ISPOverviewMapping{
 
 
     let rows = [];
-    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".toppers_table_div").find('.animated-background').remove();
-    var table = this.data_dom.find(`#country_overview_${this.meter_index}`).find(".toppers_table").find("table");
+    this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".toppers_table_div").find('.animated-background').remove();
+    var table = this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".toppers_table").find("table");
     this.table_id = `table_${this.meter}${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
@@ -335,7 +335,6 @@ class ISPOverviewMapping{
       let dropdown_menu = $("<ul class='dropdown-menu  pull-right'></ul>");
       dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Drilldown</a></li>");
 
       dropdown.append(dropdown_menu);
 
@@ -346,11 +345,9 @@ class ISPOverviewMapping{
       let label = topper.label.split("\\").shift();
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
-      let statids = Object.values(this.meter_details_in).slice(0,2)
-
       rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" 
                     data-readable="${topper.readable}" data-full_key="${full_key}"
-                    data-statid-index=${this.meter_index} data-statids=${statids}>
+                    data-statid-index=${this.meter_index}>
                       <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
                       <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
                       <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
@@ -402,11 +399,11 @@ class ISPOverviewMapping{
 
   async draw_chart(){
     this.dount_div_id = `dount_chart${this.meter_index}_${this.rand_id}`;
-    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
+    this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
     this.trfchart_div_id = `traffic_chart_${this.meter_index}_${this.rand_id}`;
-    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".traffic_chart").append($("<div>",{id:this.trfchart_div_id}));
-    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".traffic_chart_div").find(".animated-background").remove();
-    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".donut_chart_div").find(".animated-background").remove();
+    this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".traffic_chart").append($("<div>",{id:this.trfchart_div_id}));
+    this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".traffic_chart_div").find(".animated-background").remove();
+    this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".donut_chart_div").find(".animated-background").remove();
 
 
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,this.maxitems);
@@ -499,7 +496,7 @@ class ISPOverviewMapping{
   }
   async draw_sankey_chart(){
     this.sankey_div_id = `sankey_chart_${this.meter_index}${this.rand_id}`;
-    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".sankey_chart").append($("<div>",{id:this.sankey_div_id}));
+    this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".sankey_chart").append($("<div>",{id:this.sankey_div_id}));
     if(this.crosskey_cgguid == this.filter_cgguid){
       this.crosskey_cgguid = this.crosskey_router;
     }
@@ -519,7 +516,7 @@ class ISPOverviewMapping{
     }else{
       this.cgtoppers_bytes = this.cgtoppers_resp.keys;
     }
-    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".sankey_chart_div").find(".animated-background").remove();
+    this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".sankey_chart_div").find(".animated-background").remove();
 
     this.cgtoppers_bytes = this.cgtoppers_bytes.slice(0,30);
     if(this.cgtoppers_bytes.length==0){
@@ -639,26 +636,6 @@ class ISPOverviewMapping{
                         });
         window.open("/newdash/index?"+link_params);
         break;
-      case 2:
-        let ck_cgguid = this.crosskey_cgguid;
-        if(this.selected_router=="0"){
-          ck_cgguid=this.crosskey_interface;
-        }
-       window.open("/newdash/index?" + 
-                    $.param({
-                        key: tr.data("key"),
-                        statids:tr.data("statids"),
-                        label:`${tr.data("label")}`.toString().replace(/\\/g,"\\\\"),
-                        readable:`${tr.data("readable")}`.toString().replace(/\\/g,"\\\\"),                        
-                        cgguid:this.filter_cgguid,
-                        ck_cgguid:ck_cgguid,
-                        filter_cgname:this.filter_cgname,
-                        window_fromts:this.tmint.from.tv_sec,
-                        window_tots:this.tmint.to.tv_sec,
-                        "dash_key_regex":"gitCountryAnalyticsDrilldown"
-                    }));
-        break;
-
     } 
   }
   async get_top_prefixes(event){
@@ -757,9 +734,9 @@ async query_routes_for_as(event){
 
 
 function run(opts) {
-  new ISPOverviewMapping(opts);
+  new ISPPrefixExternalMapping(opts);
 }
 
 
 
-//# sourceURL=country_analytics.js
+//# sourceURL=prefix_external_analytics.js
