@@ -69,7 +69,7 @@
     await this.get_aggregated_flows("out");
     this.draw_aggregate_table('internal_ip');
     this.draw_aggregate_table('external_ip');
-    this.draw_aggregate_table('tag_prefixumber');
+    this.draw_aggregate_table('tag_country');
     this.draw_aggregate_table('tag_prefixes');
   }
   mk_time_interval(){
@@ -169,7 +169,7 @@
   async get_aggregated_flows(intf){
     let readable = this.dash_params.readable.split("\\");
     
-    let opts = {flowtag:`[asn]${this.dash_params.key}`,time_interval:this.tmint,probe_id:this.probe_id};
+    let opts = {flowtag:`[prf]${this.dash_params.key}`,time_interval:this.tmint,probe_id:this.probe_id};
     if(readable.length > 1){
       let interfaces = readable[1].split("_");
       opts["nf_routerid"] = TRP.KeyT.create({label:interfaces[0]});
@@ -177,6 +177,7 @@
         opts[`nf_ifindex_${intf}`]= TRP.KeyT.create({label:interfaces[1]});
       }
     }
+    console.log(opts)
     this.agg_flows.push(await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts));
     
   }
@@ -261,6 +262,64 @@
       }
     }
   }
+
+  draw_aggregate_table(group){
+    var table = this.data_dom.find(`.${group}`).find("table");
+    this.data_dom.find(`.${group}`).removeClass('animated-background');
+    var table_id = "agg_flows_tbl_"+Math.floor(Math.random()*100000);
+    table.attr("id",table_id)
+    table.addClass('table table-hover table-sysdata');
+    let toppers = [];
+    if(group=="internal_ip" || group == "external_ip"){
+      toppers.push(this.agg_flows[0][group]);
+      toppers.push(this.agg_flows[1][group]);
+    }else if(group=="tag_country"){
+      if(this.agg_flows[0].tag_group.find(x=>x.group_name=="cny")){
+        toppers.push(this.agg_flows[0].tag_group.find(x=>x.group_name=="cny").tag_metrics)
+      }
+      if(this.agg_flows[1].tag_group.find(x=>x.group_name=="cny")){
+        toppers.push(this.agg_flows[1].tag_group.find(x=>x.group_name=="cny").tag_metrics)
+      }
+    }
+    else if(group=="tag_prefixes"){
+      if(  this.agg_flows[0].tag_group.find(x=>x.group_name=="prf")){
+        toppers.push(this.agg_flows[0].tag_group.find(x=>x.group_name=="prf").tag_metrics);
+      }
+      if(  this.agg_flows[1].tag_group.find(x=>x.group_name=="prf")){
+        toppers.push(this.agg_flows[1].tag_group.find(x=>x.group_name=="prf").tag_metrics);
+      }
+    }
+    toppers =_.flatten(toppers).slice(0,50);
+    let toppers_obj = {};
+    for(let i=0 ; i < toppers.length; i++){
+      let t = toppers[i];
+      let k = t.key.key
+      if(toppers_obj[k]){
+        let  v = toppers_obj[k];
+        v.count = parseInt(v.count) + parseInt(t.count) ;
+        v.metric = v.metric.toNumber() + t.metric.toNumber() ;
+      }else{
+        toppers_obj[k] = t
+      }
+    }
+    toppers = _.sortBy(_.values(toppers_obj),function(k){return -k.metric;});
+    let rows = []
+    for(let i=0; i< toppers.length;i++){
+      var t = toppers[i];
+      rows.push(`<tr>
+                <td>${t.key.readable||t.key.key}</td>
+                <td>${t.key.label}</td>
+                <td>${t.count}</td>
+                <td>${h_fmtvol(t.metric)}</td>
+                </tr>`);
+    } 
+
+    new TrisTablePagination(table_id,{no_of_rows:10,rows:rows});
+    table.tablesorter();
+    new ExportToCSV({table_id:table_id,filename_prefix:"top_asn_panel",append_to:"panel"});
+
+  }
+  
 
     
   async draw_traffic_chart(){

@@ -31,6 +31,10 @@
             %i.fa.fa-download.fa-fw
             Download
             %span.download_volume
+        %li
+          %a{href:"#prefix_drilldown_hostprefix",data-toggle:"tab",role:"tab"}
+            %i.fa.fa-table.fa-fw
+            Prefixes and Hosts
        
       .tab-content{style:"padding-top:10px"}
         .tab-pane.active#prefix_drilldown_upload{data-use-width:1}
@@ -110,4 +114,113 @@
                     Interfaces Sankey Chart
                 .panel-body
                   .interfaces_sankey_chart
+      
+        .tab-pane#prefix_drilldown_download{data-use-width:1}
+          .row
+            .col-xs-6
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-table.fa-fw
+                    Interface Toppers
+                .panel-body
+                  .toppers_table.animated-background 
+                    %table
+                      %thead
+                      %tbody
+            .col-xs-6
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-pie-chart.fa-fw
+                    Toppers Chart
+                .panel-body
+                  .donut_chart.animated-background 
+            .col-xs-12
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-area-chart.fa-fw
+                    Traffic chart for interfaces
+                .panel-body
+                  .interfaces_traffic_chart
+            .col-xs-12
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-random.fa-fw
+                    Interfaces Sankey Chart
+                .panel-body
+                  .interfaces_sankey_chart
+
+         .tab-pane#prefix_drilldown_hostprefix{data-use-width:1}
+            .row
+              .col-xs-6
+                .panel.panel-success
+                  .panel-heading
+                    %h3
+                      %i.fa.fa-table.fa-fw
+                      Top Country
+                  .panel-body
+                    .tag_country.animated-background 
+                      %table
+                        %thead
+                          %tr
+                            %th Item
+                            %th Label
+                            %th Flows
+                            %th{sort:"volume"} Volume
+                        %tbody
+              .col-xs-6
+                .panel.panel-success
+                  .panel-heading
+                    %h3
+                      %i.fa.fa-table.fa-fw
+                      Top Prefixes
+                  .panel-body
+                    .tag_prefixes.animated-background 
+                      %table
+                        %thead
+                          %tr
+                            %th Item
+                            %th Label
+                            %th Flows
+                            %th{sort:"volume"} Volume
+                        %tbody
+            .row
+              .col-xs-6
+                .panel.panel-success
+                  .panel-heading
+                    %h3
+                      %i.fa.fa-table.fa-fw
+                      Top Internal Hosts
+                  .panel-body
+                    .internal_ip.animated-background 
+                      %table
+                        %thead
+                          %tr
+                            %th Item
+                            %th Label
+                            %th Flows
+                            %th{sort:"volume"} Volume
+                        %tbody
+              .col-xs-6
+                .panel.panel-success
+                  .panel-heading
+                    %h3
+                      %i.fa.fa-table.fa-fw
+                      Top External Hosts
+                  .panel-body
+                    .external_ip.animated-background 
+                      %table
+                        %thead
+                          %tr
+                            %th Item
+                            %th Label
+                            %th Flows
+                            %th{sort:"volume"} Volume
+                        %tbody
+
+
+
 
