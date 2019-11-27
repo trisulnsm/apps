@@ -1,4 +1,4 @@
-  class ISPDrilldownMapping{
+  class ISPCountryDrilldownMapping{
     constructor(opts) {
       let js_file =opts.jsfile;
       let file_path = js_file.split("/")
@@ -412,7 +412,7 @@
 
 
 function run(opts) {
-  new ISPDrilldownMapping(opts);
+  new ISPCountryDrilldownMapping(opts);
 }
 
 
