@@ -22,7 +22,7 @@ Adds the following extra metrics and analytics :
 
 ## Sample
 
-![Sample screenshot](appinstall.png) 
+![Sample screenshot](ss1.png) 
 
 
 UPDATES
