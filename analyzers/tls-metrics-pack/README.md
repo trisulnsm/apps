@@ -4,9 +4,9 @@ Adds the following extra metrics and analytics :
 
 ## Metrics 
 
-1. *TLS Versions* : Traffic and flow using each TLS version in your network
-2. *TLS Cert Public Key Algorithms* : Certficate metrics,  meters type of public key algorithm (RSA/ECC). If using ECC, the name of the curve, or "explicit-parameters"
-3. *TLS Cert Signature Algorithms* : Certificate metrics, meters type of signature algorithms
+1. _TLS Versions_ : Traffic and flow using each TLS version in your network
+2. _TLS Cert Public Key Algorithms_ : Certficate metrics,  meters type of public key algorithm (RSA/ECC). If using ECC, the name of the curve, or "explicit-parameters"
+3. _TLS Cert Signature Algorithms_ : Certificate metrics, meters type of signature algorithms
 
 
 ## Graphs
@@ -19,6 +19,10 @@ Adds the following extra metrics and analytics :
 
 1. Logon as admin, then select _TLS Metrics Pack_  from  _Web Admin > Manage > Apps._ to install
 2. Restart the Trisul Probes 
+
+## Sample
+
+![Sample screenshot](appinstall.png) 
 
 
 UPDATES
