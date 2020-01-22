@@ -184,7 +184,7 @@ TrisulPlugin = {
 
       local payload = SWP.new(attr_value)
 
-      -- Only interested in TLS handshake (type = 22) + client_hello only
+      -- Only interested in TLS handshake (type = 22) 
       if payload:next_u8() == 22 and payload:skip(4) then
 
       local hstype = payload:next_u8()

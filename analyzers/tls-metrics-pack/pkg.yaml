@@ -1,0 +1,16 @@
+name: TLS Metrics Pack
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Generates extra metrics and relationships in TLS traffic
+   long:  |
+      Meters TLS versions, Signature Algorithms, Public Key Algorithms, Curve names 
+
+apptype: lua
+
+appresources: counter_pk_algos.lua  counter_sig_algos.lua  sweepbuf.lua  tlscertalgos.lua  tlsversions.lua
+
+dependencies:  
