@@ -1,0 +1,16 @@
+name: Flexible CIDR Tagger
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Adds CIDR tags to flows
+   long:  |
+      Install this app to add CIDR tags to flows, this allows you to search fast for entire subnet flows
+
+apptype: lua
+
+appresources: cidrtagger.lua mkconfig.lua
+
+dependencies:  
