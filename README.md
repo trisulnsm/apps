@@ -37,6 +37,7 @@ To install these tools
 |Suricata via EVE UnixSocket|Suricata alerts via EVE Unix Socket|
 |TCP Analyzer|Identify hosts experiencing TCP performance|
 |TLS Fingerprinter|Generates and tracks TLS Fingerprint indicators|
+|CIDR Tagger |Tags flows with CIDR subnets|
 
 
 ## JS Dashboards
