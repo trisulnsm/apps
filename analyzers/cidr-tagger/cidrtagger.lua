@@ -62,14 +62,14 @@ TrisulPlugin = {
 			local ipa = newflow:flow():ipa()
 			if not T.config.tag_internal_hosts_only or T.host:is_homenet_key(ipa) then 
 				for _,tag in ipairs( gen_subnet_tags( ipa, T.config.tag_masks)) do 
-					engine:tag_flow( newflow:key(),  tag)
+					newflow:add_tag(tag)
 				end 
 			end 
 
 			local ipz = newflow:flow():ipz()
 			if not T.config.tag_internal_hosts_only or T.host:is_homenet_key(ipz) then
 				for _,tag in ipairs( gen_subnet_tags( ipz, T.config.tag_masks)) do 
-					engine:tag_flow( newflow:key(),  tag)
+					newflow:add_tag(tag)
 				end 
 			end
 		end,
