@@ -27,11 +27,11 @@ integrated into the backend indices.
 
 
 return    {
-		  	-- only tag these subnet networks
+            -- only tag these subnet networks
             tag_masks={26,27,28},
 
-			-- only tag internalhosts 
-		    tag_internal_hosts_only = true
+            -- only tag internalhosts 
+            tag_internal_hosts_only = true
           } 
 } 
 
