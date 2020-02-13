@@ -55,7 +55,7 @@ class RouterGeoMap{
       let rattr = routerkeys.keys[i].attributes;
       let rattr_obj = {}
       _.each(rattr,function(attr){rattr_obj[attr.attr_name]=attr.attr_value});
-      markers.push({latLng:[rattr_obj["geo.lat"],rattr_obj["geo.lan"]],name:routerkeys.keys[i].readable,offsets:[0, 2]});
+      markers.push({latLng:[rattr_obj["geo.lat"],rattr_obj["geo.long"]],name:routerkeys.keys[i].readable,offsets:[0, 2]});
       var region_key = `${rattr_obj["geo.country"]}-${rattr_obj["geo.city"]}`;
       colors[region_key]=palette[i%palette.length];
     }
