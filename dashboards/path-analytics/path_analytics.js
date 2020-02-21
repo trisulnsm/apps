@@ -43,11 +43,12 @@ class ASNPathAnalytics{
     new ShowNewTimeSelector({divid:"#new_time_selector_"+this.rand_id,
                                update_input_ids:update_ids,
                                default_ts:this.default_selected_time
-                            });
+                            },this.callback_load_routers,this);
 
     //loading router and interface in dropdown
     //get interface search key request
     this.mk_time_interval();
+
     await this.load_routers_interfaces();
     await this.get_cgmeters();
 
@@ -82,7 +83,11 @@ class ASNPathAnalytics{
       this.form.submit();
     }
   }
+  async callback_load_routers(s,e,args){
+    await args.load_routers_interfaces();
+  }
   async load_routers_interfaces(){
+    this.mk_time_interval();
     //get routers from keyspace request
     let top_routers=await fetch_trp(TRP.Message.Command.KEYSPACE_REQUEST, {
       counter_group: GUID.GUID_CG_FLOWGENS(),
