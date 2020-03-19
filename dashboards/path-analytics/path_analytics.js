@@ -118,10 +118,10 @@ class ASNPathAnalytics{
 
     let drop_down_items = {"0":["Please select",[["0","Please select"]]]};
 
-    let interface_keys = _.sortBy(top_intfs.hits,function(keyt) { return keyt.key })
+    let interface_keys = _.sortBy(_.keys(this.intf_keymap),function(key) { return key })
     for(let i=0;i<interface_keys.length; i++){
       let intf_keyt = interface_keys[i];
-      let router_key=intf_keyt.key.split("_")[0];
+      let router_key=intf_keyt.split("_")[0];
       let router_label = this.router_keymap[router_key];
       let intf_dropdown = [];
       if(_.has(drop_down_items,router_key)){
@@ -130,7 +130,7 @@ class ASNPathAnalytics{
         drop_down_items[router_key]=[router_label,[["0","Please Select"]]];
         intf_dropdown = drop_down_items[router_key];
       }
-      intf_dropdown[1].push([intf_keyt.key,this.intf_keymap[intf_keyt.key]]);
+      intf_dropdown[1].push([intf_keyt,this.intf_keymap[intf_keyt]]);
     }
     
     // if  already passed an interface filter
