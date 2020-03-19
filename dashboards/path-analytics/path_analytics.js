@@ -97,7 +97,9 @@ class ASNPathAnalytics{
 
     this.router_keymap ={}
     _.each(top_routers.hits,function(keyt){
-      this.router_keymap[keyt.key] = keyt.label || keyt.readable;
+      if(! _.has(this.router_keymap,keyt.key)){
+        this.router_keymap[keyt.key] = keyt.label || keyt.readable;
+      }
     },this);
 
 
@@ -109,7 +111,9 @@ class ASNPathAnalytics{
 
     this.intf_keymap ={}
     _.each(top_intfs.hits,function(keyt){
-      this.intf_keymap[keyt.key] = keyt.label || keyt.readable;
+      if(! _.has(this.intf_keymap,keyt.key)){
+        this.intf_keymap[keyt.key] = keyt.label || keyt.readable;
+      }
     },this);
 
     let drop_down_items = {"0":["Please select",[["0","Please select"]]]};
@@ -147,6 +151,12 @@ class ASNPathAnalytics{
     else if (incoming_key.length == 1){
       this.form.find(".filter_asn").val(incoming_key[0]);
     }
+    //empty the router and interfaces for each time user changes time
+    // Changing time will again reload the routers and interfaces
+
+    $('#routers_'+this.rand_id).empty();
+    $('#interfaces_'+this.rand_id).empty();
+
     var js_params = {meter_details:drop_down_items,
       selected_cg : selected_cg || localStorage.getItem("apps.pathanalytics.last-selected-router") || "",
       selected_st : selected_st || localStorage.getItem("apps.pathanalytics.last-selected-interface")||"",
@@ -155,8 +165,13 @@ class ASNPathAnalytics{
       chosen:true
     }
     new CGMeterCombo(JSON.stringify(js_params));
+    //if previous selected router and interface not availble please select the first one
+    if($('#routers_'+this.rand_id).val()==null){
+      $('#routers_'+this.rand_id).val($(`#routers_${this.rand_id} option:first`).val());
+      $('#routers_'+this.rand_id).trigger('change');
+    }
 
-   }
+  }
   async get_cgmeters(){
     this.cg_meters={};
     await get_counters_and_meters_json(this.cg_meters);
