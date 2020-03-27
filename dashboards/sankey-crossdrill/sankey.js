@@ -8,35 +8,34 @@ class SankeyCrossDrill  {
     this.remove_topper_count = 0;
     this.max_nodes=30;
     this.select_cgname=opts.jsparams.default_cgname
-
+    this.dom = $(opts.divid);
 
     //we need it for time zone conversion
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
 
     //append form in the div
-    this.append_form();
-
+    this.append_form(opts);
 
   }
-  async append_form(){
 
-    this.rand_id=parseInt(Math.random()*100000);
-    this.form = $("<form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select name='cgguid'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Meter</label> <div class='col-xs-8'> <select name='meter'></select> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Remove Toppers</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider-remove-topn'> <div class='ui-slider-handle' id='remove-top-n'></div> </div> <span class='help-block text-left'>Remove the top N flows from view to reveal the smaller flows</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Filter Item</label> <div class='col-xs-8'> <input name='fltr_crs_items' type='text'> <span class='help-block text-left'>Type text to filter crosskey items</span> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Show max nodes</label> <div class='col-xs-8' style='padding-top:10px'> <div id='slider-max-nodes'> <div class='ui-slider-handle' id='max-nodes'></div> </div> <span class='help-block text-left'>Show approximately these many nodes on the sankey (default 30)</span> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Invert Filter</label> <div class='col-xs-8'></div> <input name='invertfilter' type='checkbox' value='1'> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Show Chart'> </div> </div> </form>");
-    //all are randomid only
-    this.form.find("select[name*='cgguid']").attr("id","cg_id_"+this.rand_id);
-    this.form.find("select[name*='meter']").attr("id","meter_id_"+this.rand_id);
-    this.form.find(".new_time_selector").attr("id","new_time_selector_"+this.rand_id);
-    this.form.find("input[name*='from_date']").attr("id","from_date_"+this.rand_id);
-    this.form.find("input[name*='to_date']").attr("id","to_date_"+this.rand_id);
-    this.form.find("input[name*='fltr_crs_items']").attr("id","fltr_crs_"+this.rand_id);
-    this.form.find("input[name*='invertfilter']").attr("id","invert_filter_"+this.rand_id);
+  // load the frame 
+  async load_assets(opts)
+  {
+    // load app.css file
+    load_css_file(opts);
 
-    $('#'+this.divid).append(this.form);
-    
+    // load template.haml file 
+    let html_str = await get_html_from_hamltemplate(opts);
+    this.haml_dom =$(html_str)
+  }
 
+  async append_form(opts){
+    await this.load_assets(opts)
+    this.form = $(this.haml_dom[0]);
+    this.dom.append(this.form);
     //time selector
-    var update_ids = "#from_date_"+this.rand_id+","+"#to_date_"+this.rand_id;
-    new ShowNewTimeSelector({divid:"#new_time_selector_"+this.rand_id,
+    var update_ids = "#from_date_sk"+",#to_date_sk";
+    new ShowNewTimeSelector({divid:"#new_time_selector_sk",
                               update_input_ids:update_ids});
 
 
@@ -88,8 +87,8 @@ class SankeyCrossDrill  {
     var js_params = {meter_details:this.cg_meters.all_cg_meters,
       selected_cg : selectcgguid,
       selected_st : "0",
-      update_dom_cg :"cg_id_"+this.rand_id,
-      update_dom_st :"meter_id_"+this.rand_id  
+      update_dom_cg :"cg_id",
+      update_dom_st :"meter_id",  
     }
 
     new CGMeterCombo(JSON.stringify(js_params));
@@ -102,27 +101,25 @@ class SankeyCrossDrill  {
 
 
     this.reset();
-    var selected_fromdate = $('#from_date_'+this.rand_id).val();
-    var selected_todate = $('#to_date_'+this.rand_id).val();
+    var selected_fromdate = this.form.find('#from_date_sk').val();
+    var selected_todate = this.form.find('#to_date_sk').val();
     var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
     var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
     this.tmint = mk_time_interval([fromTS,toTS]);
-    this.cgguid = $('#cg_id_'+this.rand_id).val();
-    this.meter = $('#meter_id_'+this.rand_id).val();
-    this.filter_text=$('#fltr_crs_'+this.rand_id).val();
+    this.cgguid = this.form.find('#cg_id').val();
+    this.meter = this.form.find('#meter_id').val();
+    this.filter_text=this.form.find('#fltr_crs').val();
     this.run();
     return false;
   }
 
   reset(){
-    $('#'+this.divid).find(".panel").remove();
-    $('#'+this.divid).append("<div class='panel panel-info'> <div class='panel-body'> <h4> <i class='fa fa-spinner fa-spin'></i> Pleae wait ....  </h4> </div> </div>");
-    this.chart_div_id = 'sankey_chart_'+this.rand_id;
-    $('#'+this.divid).find(".panel-body").append($("<div>",{id:this.chart_div_id}));
-    this.table_div_id = 'table_'+this.rand_id;
-    $('#'+this.divid).find(".panel-body").append($("<div>",{id:this.table_div_id}));
+    
+    this.dom.find(".ui_data").remove();
+    this.data_dom = $(this.haml_dom[1]).clone();
+    this.dom.append(this.data_dom);
+   
   }
-
 
   async run() {
 
@@ -206,7 +203,7 @@ class SankeyCrossDrill  {
   // sankey 
   repaint_sankey(cgtoppers_bytes) {
 
-
+    let chart_div_id = 'sankey_chart';
     let keylookup = {};
     let idx=0;
 
@@ -248,9 +245,7 @@ class SankeyCrossDrill  {
     }
     let labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2|:3|:4|:5|:6/g,"")).value()
 
-
-    $('#'+this.divid).find(".panel-body h4").remove();
-    Plotly.purge(this.chart_div_id);
+    Plotly.purge(chart_div_id);
     var data = {
       type: "sankey",
       orientation: "h",
@@ -289,16 +284,16 @@ class SankeyCrossDrill  {
                           showSendToCloud:false,
                           responsive: true };
 
-    Plotly.react(this.chart_div_id, [data], layout, ploty_options)
-
+    Plotly.react(chart_div_id, [data], layout, ploty_options)
+    $(`#${chart_div_id}`).siblings('.animated-background').remove();
 
   }
 
 
   // table : show filtered toppers in a table 
   repaint_table(cgtoppers_bytes) {
-    $('#'+this.table_div_id).html('');
-    let tbl=$(`<table class='table table-sysdata'><tbody></tbody></table>`);
+    let tbl=this.data_dom.find('.toppers_table');
+    tbl.addClass('table table-sysdata');
     _.each(cgtoppers_bytes, function(kt) {
         let r = $('<tr>')
         _.each(kt.label.split("\\"),function(ai){
@@ -308,9 +303,7 @@ class SankeyCrossDrill  {
         r.append(`<td>${h_fmtvol(kt.metric)}</td>`)
         tbl.find("tbody").append(r)
     });
-
-    $('#'+this.table_div_id).append(tbl)
-
+    this.data_dom.find('.toppers_table').siblings('.animated-background').remove();
   }
 
 
@@ -323,71 +316,3 @@ function run(opts)
 
 //# sourceURL=sankey1.js
 
-//from
-
-/*
-%form.form-horizontal
-  .row
-    .col-xs-6 
-      .form-group 
-        %label.control-label.col-xs-4 Counter Group         
-        .col-xs-8 
-          %select{name:'cgguid'} 
-    .col-xs-6 
-      .form-group 
-        %label.control-label.col-xs-4 Meter 
-        .col-xs-8 
-          %select{name:'meter'}
-  .row
-    .col-xs-6
-      .form-group
-        .new_time_selector
-
-    .col-xs-6
-      .form-group
-        %label.control-label.col-xs-4 Remove Toppers
-        .col-xs-8{style:"padding-top:10px"}
-          #slider-remove-topn
-            %div#remove-top-n.ui-slider-handle
-          %span.help-block.text-left Remove the top N flows from view to reveal the smaller flows
-
-  .row 
-    .col-xs-6
-      .form-group
-        %label.control-label.col-xs-4 Filter Item
-        .col-xs-8
-          %input{type:"text",name:"fltr_crs_items"}
-          %span.help-block.text-left Type text to filter crosskey items
-
-    .col-xs-6
-      .form-group
-        %label.control-label.col-xs-4 Show max nodes
-        .col-xs-8{style:"padding-top:10px"}
-          #slider-max-nodes
-            %div#max-nodes.ui-slider-handle
-          %span.help-block.text-left Show approximately these many nodes on the sankey (default 30)
-    .row 
-      .col-xs-6
-        .form-group
-          %label.control-label.col-xs-4 Invert Filter
-          .col-xs-8
-          %input{type:"checkbox",name:"invertfilter",value:1}
-
-
-  .row
-    .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
-      %input{type:"hidden",name:"from_date"}
-      %input{type:"hidden",name:"to_date"}
-      %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Show Chart"}
-
-  
-*/
-
-/*
-.panel.panel-info
-  .panel-body
-    %h4
-      %i.fa.fa-spinner.fa-spin
-      Pleae wait ....
-
-*/

@@ -1,0 +1,81 @@
+%form.form-horizontal
+  .row
+    .col-xs-6 
+      .form-group 
+        %label.control-label.col-xs-4 Counter Group         
+        .col-xs-8 
+          %select#cg_id{name:'cgguid'} 
+    .col-xs-6 
+      .form-group 
+        %label.control-label.col-xs-4 Meter 
+        .col-xs-8 
+          %select#meter_id{name:'meter'}
+  .row
+    .col-xs-6
+      .form-group
+        .new_time_selector#new_time_selector_sk
+
+    .col-xs-6
+      .form-group
+        %label.control-label.col-xs-4 Remove Toppers
+        .col-xs-8{style:"padding-top:10px"}
+          #slider-remove-topn
+            %div#remove-top-n.ui-slider-handle
+          %span.help-block.text-left Remove the top N flows from view to reveal the smaller flows
+
+  .row 
+    .col-xs-6
+      .form-group
+        %label.control-label.col-xs-4 Filter Item
+        .col-xs-8
+          %input#fltr_crs{type:"text",name:"fltr_crs_items"}
+          %span.help-block.text-left Type text to filter crosskey items
+
+    .col-xs-6
+      .form-group
+        %label.control-label.col-xs-4 Show max nodes
+        .col-xs-8{style:"padding-top:10px"}
+          #slider-max-nodes
+            %div#max-nodes.ui-slider-handle
+          %span.help-block.text-left Show approximately these many nodes on the sankey (default 30)
+    .row 
+      .col-xs-6
+        .form-group
+          %label.control-label.col-xs-4 Invert Filter
+          .col-xs-8
+          %input#invert_filter{type:"checkbox",name:"invertfilter",value:1}
+
+
+  .row
+    .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+      %input#form_date_sk{type:"hidden",name:"from_date"}
+      %input#to_date_sk{type:"hidden",name:"to_date"}
+      %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Show Chart"}
+
+
+.ui_data
+  .row
+    .col-xs-12
+      .panel.panel-info.sankey_chart_div
+        .panel-heading
+          %h3 
+            %i.fa.fa-random.fa-fw
+            Sankey Chart
+            %small
+              Thickness represents volume of traffic. Put your mouse over a node to show actual values
+        .panel-body
+          .animated-background
+          #sankey_chart
+  .row
+    .col-xs-12
+      .panel.panel-info.table_div
+        .panel-heading
+          %h3 
+            %i.fa.fa-table.fa-fw
+            Table Toppers
+            %small
+        .panel-body
+          %table.table.table-sysdata.toppers_table
+            %thead
+            %tbody
+          .animated-background    
