@@ -12,7 +12,7 @@ description:
 
 apptype: dashboard_js
 
-appresources: sankey.js crosskeycg.json
+appresources: sankey.js crosskeycg.json app.css template.yaml
 
 dependencies:
 
