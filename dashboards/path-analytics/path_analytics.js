@@ -201,6 +201,7 @@ class ASNPathAnalytics{
   }
  
   reset_ui(){
+    $('#app_error_box').addClass('hidden');
     this.dom.find(".path_data").remove();
     this.data_dom = $(this.haml_dom[1]).clone();
     this.dom.append(this.data_dom);
@@ -228,22 +229,30 @@ class ASNPathAnalytics{
       req_opts["key_filter"]= selected_router;
     }
     if(filter_asn.length > 0){
-      req_opts["key_filter"] = filter_asn;
+      req_opts["key_filter"] = "[^0-9a-fA-F]"+filter_asn+"[^0-9a-fA-F]";
     }
+
     req_opts["meter"] = 0;
     this.data[0]=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts );
     req_opts["meter"] = 1;
     this.data[1]=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts);
 
+    // Validate TRP 
+    if (is_error_response(this.data[0])) {
+      return show_app_error_box(this.data[0]);
+    }
+    if (is_error_response(this.data[1])) {
+      return show_app_error_box(this.data[1]);
+    }
+
     // multiply by bucketsize 
     for (let i =0 ; i < this.data[0].keys.length; i++) {   
-      this.data[0].keys[i].metric  *= bucketsize;
-    }
-    for (let i =0 ; i < this.data[1].length; i++) {   
-      this.data[1].keys[i].metric  *= bucketsize;
+      this.data[0].keys[i].metric  = this.data[0].keys[i].metric * bucketsize;
+    }    
+    for (let i =0 ; i < this.data[1].keys.length; i++) {   
+      this.data[1].keys[i].metric  = this.data[1].keys[i].metric * bucketsize;
     }
    
-
     //key_filter in trp support one like 
     //we can't combine router with asn to make key filter
     //so support added via code.
