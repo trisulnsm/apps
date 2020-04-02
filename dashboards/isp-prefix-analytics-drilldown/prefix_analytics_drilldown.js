@@ -61,7 +61,6 @@
                                default_ts:this.default_selected_time
                             });
     if(this.valid_input == 0){
-      console.log("no valid inputs")
       this.dom.find(".drilldown_data").remove();
       return;
     }
