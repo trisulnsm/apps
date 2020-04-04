@@ -8,6 +8,16 @@
       $('head').append(`<link rel="stylesheet" type="text/css" href="${css_file}">`);
       this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
       this.dash_params = opts.dash_params;
+      this.valid_input =  1;
+      if(this.dash_params.statids == undefined){
+        this.dash_params.cgguid = opts.jsparams.crosskey_router;
+        this.dash_params.ck_cgguid = opts.jsparams.crosskey_interface;
+        this.dash_params.statids=`${opts.jsparams.meters.upload},${opts.jsparams.meters.download}`;
+        this.dash_params.readable = "\\";
+        this.dash_params.label = "\\";
+        this.valid_input=0;
+      }
+
       this.dom = $(opts.divid);
       this.time_selector = opts.new_time_selector;
       this.rand_id=parseInt(Math.random()*100000);
@@ -41,20 +51,26 @@
     this.html_str = await get_html_from_hamltemplate(opts);
   }
   async reset_ui(){
-    this.dom.find(".drilldown_data").remove();
+    this.dom.find(".drilldown_data_form").remove();
     this.data_dom=$(this.html_str)
     this.dom.append(this.data_dom);
-
-    this.dom.find("#drilldown_prefix").val(this.dash_params.readable.split("\\")[0])
-    this.form = this.dom.find(".drilldown_prefix_form")
-       //new time selector 
+    this.form = this.dom.find(".drilldown_prefix_form");
+    this.form.submit($.proxy(this.submit_form,this));
     new ShowNewTimeSelector({divid:"#new_time_selector",
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
                             });
+    if(this.valid_input == 0){
+      this.dom.find(".drilldown_data").remove();
+      return;
+    }
+    this.dom.find("#drilldown_prefix").val(this.dash_params.readable.split("\\")[0])
+    
     
     this.mk_time_interval();
     this.form.submit($.proxy(this.submit_form,this));
+  
+    
     this.filter_text = this.dash_params.key;
     this.agg_flows = [];
     this.update_description();
@@ -111,7 +127,7 @@
                         filter_cgname:this.dash_params.filter_cgname,
                         window_fromts:this.tmint.from.tv_sec,
                         window_tots:this.tmint.to.tv_sec,
-                        "dash_key_regex":"gitPeeringAnalyticsDrilldown"
+                        "dash_key_regex":"gitPrefixAnalyticsDrilldown"
                     }),"_self");
     return false;
   }
@@ -177,7 +193,6 @@
         opts[`nf_ifindex_${intf}`]= TRP.KeyT.create({label:interfaces[1]});
       }
     }
-    console.log(opts)
     this.agg_flows.push(await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts));
     
   }
@@ -479,6 +494,6 @@ function run(opts) {
 }
 
 
-  //# sourceURL=ips_drilldown_mappings.js
+  //# sourceURL=ips_prefix_drilldown_mappings.js
 
   
