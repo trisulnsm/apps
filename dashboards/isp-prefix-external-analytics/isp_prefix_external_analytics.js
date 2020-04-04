@@ -286,7 +286,7 @@ class ISPPrefixExternalMapping{
       counter_group: this.cgguid,
       time_interval: this.tmint ,
       meter:this.meter,
-      maxitems:5000
+      maxitems:200
     }
     if(this.filter_text){
       req_opts["key_filter"]=this.filter_text
@@ -305,10 +305,14 @@ class ISPPrefixExternalMapping{
     },this);
     this.sys_group_totals = this.sys_group_totals*this.top_bucket_size;
    
-    
+
+    // start this 
+    await this.resolve_prefixes();
+    await this.resolve_aspath();
     await this.draw_table();
     await this.draw_chart();
     await this.draw_sankey_chart();
+
   }
 
 
@@ -321,7 +325,9 @@ class ISPPrefixExternalMapping{
     this.table_id = `table_${this.meter}${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
-    table.find("thead").append(`<tr><th>Key</th><th style="width:400px">Label</th>
+    table.find("thead").append(`<tr><th>Routed Prefix</th><th>BGP Prefix</th>
+                                <th>Peer-AS</th><th>Origin-AS</th>
+                                <th>Org</th>
                                 <th sort='volume' barspark='auto'>Volume</th>
                                 <th sort='volume'>Avg <br/>Bandwidth</th><th class='nosort'></th>
                                 </tr>`);
@@ -353,7 +359,10 @@ class ISPPrefixExternalMapping{
                     data-readable="${topper.readable}" data-full_key="${full_key}"
                     data-statid-index=${this.meter_index} data-statids=${statids}>
                       <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
-                      <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
+                      <td>${topper.bgp_prefix}</a></td>
+                      <td>${topper.peer_as}</td>
+                      <td>${topper.origin_as}</td>
+                      <td>${topper.org}</td>
                       <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
                       <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
                       <td>${dropdown[0].outerHTML}</td>
@@ -718,48 +727,101 @@ class ISPPrefixExternalMapping{
   }
 
 
-async query_routes_for_as(event){
-    let target = $(event.target);
-    let tr = target.closest("tr");
-    let statid = tr.data("statid");
-    var shell_modal = create_shell_modal();
-    shell_modal.find(".modal-header h4").html("Query Route Information<small>Shows routes in DB for this AS</small>");
-    var message = "<h4><i class='fa fa-spin fa-spinner'></i> Please wait ... Getting data</h4>";
-    shell_modal.find(".modal-body").html(message);
-    $('#shortcut-div').html(shell_modal);
-    
-
-    $(shell_modal).modal({
-      keyboard:true
-    });
-
-    let router = this.target_text.split("->")[0];
-    let asnumber = tr.data('key');
+async resolve_prefixes(event){
 
 
+  let prefix_csv = _.chain(this.cgtoppers_resp.keys)
+                     .collect((a)=>{ 
+                        let key = a.key.split("\\").shift();
+                        return key;})
+                     .join('\n')
+                     .value();
 
-    let resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
+  // bgp query prefix to ORG 
+  let resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
+                                {
+                                  tool:3,
+                                  tool_input: `-o -t -p  /tmp -P TOOL_INPUT_FILE`,
+                                  destination_node:this.probe_id,
+                                  tool_input_file_data: prefix_csv
+                                });
+  let lkp = {}
+  let maparr = resp.tool_output.split("\n");
+  maparr.forEach((a) => {
+      let v=a.split('\t');
+      lkp[v[0]]=v[1];
+  });
+
+  // update model
+  this.cgtoppers_resp.keys.forEach((a) => {
+    let key = a.key.split("\\").shift();
+    let org=lkp[key];
+    if(org) {
+      a.org=org;
+    } else {
+      a.org="";
+    }
+  });
+
+}
+
+async resolve_aspath(event){
+
+
+  let prefix_csv = _.chain(this.cgtoppers_resp.keys)
+                     .collect((a)=>{ 
+                        let key = a.key.split("\\").shift();
+                        return key;})
+                     .join('\n')
+                     .value();
+
+  // bgp query prefix to ORG 
+  let resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
                                 {
                                   tool:5,
-                                  tool_input: `${router} 0 'SELECT * FROM PREFIX_PATHS_V4 WHERE ASPATH LIKE "% ${asnumber}"'`,
-                                  destination_node:this.probe_id
+                                  tool_input: `-t -B -d -n 0 -P TOOL_INPUT_FILE`,
+                                  destination_node:this.probe_id,
+                                  tool_input_file_data: prefix_csv
                                 });
+  let lkp_aspath = {}
+  let lkp_bgp_prefix= {}
+  let maparr = resp.tool_output.split("\n");
+  maparr.forEach((a) => {
+      let v=a.split('\t');
+      if (v.length==3) {
+        lkp_bgp_prefix[v[0]]=v[1];
+        lkp_aspath[v[0]]=v[2];
+      }
+  });
 
-    var output = $("<pre>").html( resp.tool_output);
-    shell_modal.find(".modal-body").append(output);
-    shell_modal.find(".modal-body h4").remove();
+  // update model
+  this.cgtoppers_resp.keys.forEach((a) => {
+    let key = a.key.split("\\").shift();
+    let org=lkp_aspath[key];
+    if(org) {
+      let asnarr = org.split(' ');
+      a.peer_as = _.first(asnarr);
+      a.origin_as = _.last(asnarr);
+    } else {
+      a.peer_as="";
+      a.origin_as="";
+    }
+    let bgpprefix = lkp_bgp_prefix[key];
+    if (bgpprefix) {
+      a.bgp_prefix=bgpprefix;
+    } else {
+      a.bgpprefix="";
+    }
+  });
+}
+
 
   
-  }
-
-};
-
+}; // class 
 
 
 function run(opts) {
   new ISPPrefixExternalMapping(opts);
 }
-
-
 
 //# sourceURL=prefix_external_analytics.js
