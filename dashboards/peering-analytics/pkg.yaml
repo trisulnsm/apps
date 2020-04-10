@@ -1,12 +1,12 @@
 name: Peering Analytics
 
-version: 1.0.8
+version: 1.0.9
 
 author: trisul
 
 
 description: 
-   short: View ASN mappings for routers and interfaces
+   short: View ASN traffic maps for routers and interfaces
    long:  |
       A breakup of ASN to router mappings in table and chart format
       This plugin is a visualization of that. 

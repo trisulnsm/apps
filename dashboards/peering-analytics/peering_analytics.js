@@ -369,8 +369,7 @@ class ISPOverviewMapping{
       dropdown_menu.append("<li><a href='javascript:;;'>ASN Path Analytics</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Top Prefixes</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Show Routes</a></li>");
-
-
+      dropdown_menu.append("<li><a href='javascript:;;'>ASN Lookup</a></li>");
       dropdown.append(dropdown_menu);
 
       let key = topper.key.split("\\").shift();
@@ -712,6 +711,10 @@ class ISPOverviewMapping{
         this.query_routes_for_as(event)
         break;
 
+      case 6:
+        let asn=tr.data('full_key').match(/\w+/)[0]
+        window.open("https://bgpview.io/asn/"+asn,"_blank")
+        break;
     } 
   }
   async get_top_prefixes(event){
