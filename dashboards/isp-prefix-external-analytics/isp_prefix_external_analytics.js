@@ -326,7 +326,8 @@ class ISPPrefixExternalMapping{
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
     table.find("thead").append(`<tr><th>Routed Prefix</th><th>BGP Prefix</th>
-                                <th>Peer-AS</th><th>Origin-AS</th>
+                                <th>Peer-AS</th>
+                                <th>Origin-AS</th>
                                 <th>Org</th>
                                 <th sort='volume' barspark='auto'>Volume</th>
                                 <th sort='volume'>Avg <br/>Bandwidth</th><th class='nosort'></th>
@@ -342,6 +343,9 @@ class ISPPrefixExternalMapping{
       dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Drilldown</a></li>");
+      dropdown_menu.append("<li><a href='javascript:;;'>Lookup Peer AS</a></li>");
+      dropdown_menu.append("<li><a href='javascript:;;'>Lookup Origin AS</a></li>");
+      dropdown_menu.append("<li><a href='javascript:;;'>Lookup Prefix</a></li>");
 
 
       dropdown.append(dropdown_menu);
@@ -360,8 +364,8 @@ class ISPPrefixExternalMapping{
                     data-statid-index=${this.meter_index} data-statids=${statids}>
                       <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
                       <td>${topper.bgp_prefix}</a></td>
-                      <td>${topper.peer_as}</td>
-                      <td>${topper.origin_as}</td>
+                      <td>${topper.peer_as} [${topper.peer_as_code}]</td>
+                      <td>${topper.origin_as} [${topper.origin_as_code}]</td>
                       <td>${topper.org}</td>
                       <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
                       <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
@@ -668,8 +672,21 @@ class ISPPrefixExternalMapping{
                         "dash_key_regex":"gitPrefixAnalyticsDrilldown"
                     }));
         break;
+      case 3:
+        let asn1=tr.find('td')[2].innerHTML;
+        window.open("https://bgpview.io/asn/"+asn1,"_blank")
+        break;
+      case 4:
+        let asn2=tr.find('td')[3].innerHTML;
+        window.open("https://bgpview.io/asn/"+asn2,"_blank")
+        break;
+      case 5:
+        let prefix1=tr.data('key');
+        window.open("https://bgpview.io/prefix/"+prefix1,"_blank")
+        break;
     } 
   }
+
   async get_top_prefixes(event){
     let target = $(event.target);
     let tr = target.closest("tr");
@@ -767,7 +784,6 @@ async resolve_prefixes(event){
 
 async resolve_aspath(event){
 
-
   let prefix_csv = _.chain(this.cgtoppers_resp.keys)
                      .collect((a)=>{ 
                         let key = a.key.split("\\").shift();
@@ -785,12 +801,16 @@ async resolve_aspath(event){
                                 });
   let lkp_aspath = {}
   let lkp_bgp_prefix= {}
+  let lkp_ascodes = {}
   let maparr = resp.tool_output.split("\n");
   maparr.forEach((a) => {
       let v=a.split('\t');
-      if (v.length==3) {
+      if (v.length>=3) {
         lkp_bgp_prefix[v[0]]=v[1];
         lkp_aspath[v[0]]=v[2];
+        if (v.length>=4) {
+          lkp_ascodes[v[0]]=v[3];
+        }
       }
   });
 
@@ -810,8 +830,19 @@ async resolve_aspath(event){
     if (bgpprefix) {
       a.bgp_prefix=bgpprefix;
     } else {
-      a.bgpprefix="";
+      a.bgp_prefix="";
     }
+
+    let ascodes=lkp_ascodes[key];
+    if (ascodes) {
+      let asnarr = ascodes.split(' ');
+      a.peer_as_code = _.first(asnarr);
+      a.origin_as_code = _.last(asnarr);
+    } else {
+      a.peer_as_code="";
+      a.origin_as_code="";
+    }
+
   });
 }
 
