@@ -6,7 +6,7 @@ author: trisul
 
 
 description: 
-   short: View ASN mappings for routers and interfaces
+   short: View ASN traffic maps for routers and interfaces
    long:  |
       A breakup of ASN to router mappings in table and chart format
       This plugin is a visualization of that. 
