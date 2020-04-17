@@ -1,0 +1,6 @@
+.widget .widget-body {
+  padding: 1px;
+}
+.ips_count,.cidr_subnet_text{
+  margin:0px 5px 0px 5px;
+}

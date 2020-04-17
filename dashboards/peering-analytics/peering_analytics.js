@@ -74,68 +74,10 @@ class ISPOverviewMapping{
     new ShowNewTimeSelector({divid:"#new_time_selector"+this.rand_id,
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
-                            });
+                            },this.callback_load_routers,this);
     this.mk_time_interval();
-    //get router toppers for drowdown in form
-    var top_routers=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
-      time_interval: this.tmint ,
-      meter:0,
-      maxitems:500
-    });
-    var router_key_map ={}
-    for(let i= 0 ; i <  top_routers.keys.length  ; i++){
-      if (top_routers.keys[i].key=="SYS:GROUP_TOTALS"){
-        continue;
-      }
-      router_key_map[top_routers.keys[i].key] = top_routers.keys[i].label
-    }
-    //get interface toppers for dropdown in form
-    var top_intfs=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: "{C0B04CA7-95FA-44EF-8475-3835F3314761}",
-      time_interval: this.tmint ,
-      meter:0,
-      maxitems:1000
-    });
-
-    var interface_meters = {};
-    var all_dropdown = {"0":["Please select",[["0","Please select"]]]};
-    top_intfs.keys= this.sort_hash(top_intfs,"key");
-    for(let i= 0 ; i <  top_intfs.keys.length  ; i++){
-      if (top_intfs.keys[i].key=="SYS:GROUP_TOTALS"){
-        continue;
-      }
-      let intf =top_intfs.keys[i].key;
-      let router_key=intf.split("_")[0];
-      if(interface_meters[router_key] == undefined){
-        interface_meters[router_key] = [];
-      }
-      interface_meters[router_key].push([top_intfs.keys[i].key,top_intfs.keys[i].label]);
-    }
-
-    for (var key in interface_meters) {
-      var meters = interface_meters[key];
-      meters.unshift(["0","Please select"]);
-      all_dropdown[key]=[router_key_map[key],meters];
-    }
-
-    let selected_router = null, selected_interface=null;
-    let incoming_key = this.dash_params.key || ""
-    let keyparts = incoming_key.split("_");
-    if (keyparts.length==2) {
-      selected_router = keyparts[0];
-      selected_interface = keyparts.join("_");
-    }
-
-    var js_params = {meter_details:all_dropdown,
-      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router"),
-      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface"),
-      update_dom_cg : "routers"+this.rand_id,
-      update_dom_st : "interfaces"+this.rand_id,
-      chosen:true
-    }
-    //Load meter combo for routers and interfaces
-    new CGMeterCombo(JSON.stringify(js_params));
+   
+    await this.load_routers_interfaces();
 
 
     this.cg_meters = {};
@@ -151,8 +93,30 @@ class ISPOverviewMapping{
     }    
   }
 
+  async callback_load_routers(s,e,args){
+    await args.load_routers_interfaces();
+  }
 
+  async load_routers_interfaces(){
+    this.tmint = this.mk_time_interval();
+    let selected_router = null, selected_interface=null;
+    let incoming_key = this.dash_params.key || ""
+    let keyparts = incoming_key.split("_");
+    if (keyparts.length==2) {
+      selected_router = keyparts[0];
+      selected_interface = keyparts.join("_");
+    }
 
+    let load_router_opts = {
+      tmint : this.tmint,
+      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router") || "",
+      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface")||"",
+      update_dom_cg : "routers",
+      update_dom_st : "interfaces",
+      chosen:true
+    }
+    await load_routers_interfaces_dropdown(load_router_opts);
+  }
   //make time interval to get toppers.
   mk_time_interval(){
     var selected_fromdate = $('#from_date'+this.rand_id).val();

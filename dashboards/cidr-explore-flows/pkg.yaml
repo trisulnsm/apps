@@ -1,0 +1,21 @@
+name: CIDR Tagger Explore Flows
+
+version: 0.0.2
+
+author: trisul
+
+
+description: 
+   short: View host,app,protocol topper for cidr tagger subnets
+   long:  |
+      A breakup of host,app,protocol toppers for given subents
+      This apps rquires cidr flow tagger LUA
+
+apptype: dashboard_js
+
+appresources: cidr_tagger_explore_flows.js app.css template.haml 
+
+dependencies: 
+
+jsparams:
+  counter_group: "{889900CC-0063-11A5-8380-FEBDBABBDBEA}"

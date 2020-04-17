@@ -89,50 +89,6 @@ class ASNPathAnalytics{
   async load_routers_interfaces(){
     this.mk_time_interval();
     //get routers from keyspace request
-    let top_routers=await fetch_trp(TRP.Message.Command.KEYSPACE_REQUEST, {
-      counter_group: GUID.GUID_CG_FLOWGENS(),
-      time_interval:this.tmint,
-      maxitems:1000
-    });
-
-    this.router_keymap ={}
-    _.each(top_routers.hits,function(keyt){
-      if(! _.has(this.router_keymap,keyt.key)){
-        this.router_keymap[keyt.key] = keyt.label || keyt.readable;
-      }
-    },this);
-
-
-    let top_intfs=await fetch_trp(TRP.Message.Command.KEYSPACE_REQUEST, {
-      counter_group: GUID.GUID_CG_FLOWINTERFACE(),
-      time_interval:this.tmint,
-      maxitems:1000
-    });
-
-    this.intf_keymap ={}
-    _.each(top_intfs.hits,function(keyt){
-      if(! _.has(this.intf_keymap,keyt.key)){
-        this.intf_keymap[keyt.key] = keyt.label || keyt.readable;
-      }
-    },this);
-
-    let drop_down_items = {"0":["Please select",[["0","Please select"]]]};
-
-    let interface_keys = _.sortBy(_.keys(this.intf_keymap),function(key) { return key })
-    for(let i=0;i<interface_keys.length; i++){
-      let intf_keyt = interface_keys[i];
-      let router_key=intf_keyt.split("_")[0];
-      let router_label = this.router_keymap[router_key];
-      let intf_dropdown = [];
-      if(_.has(drop_down_items,router_key)){
-        intf_dropdown= drop_down_items[router_key];
-      }else{
-        drop_down_items[router_key]=[router_label,[["0","Please Select"]]];
-        intf_dropdown = drop_down_items[router_key];
-      }
-      intf_dropdown[1].push([intf_keyt,this.intf_keymap[intf_keyt]]);
-    }
-    
     // if  already passed an interface filter
     let incoming_key = this.dash_params.key || ""
     incoming_key = incoming_key.split(/\\/);
@@ -156,15 +112,15 @@ class ASNPathAnalytics{
 
     $('#routers_'+this.rand_id).empty();
     $('#interfaces_'+this.rand_id).empty();
-
-    var js_params = {meter_details:drop_down_items,
+    let load_router_opts = {
+      tmint : this.tmint,
       selected_cg : selected_cg || localStorage.getItem("apps.pathanalytics.last-selected-router") || "",
       selected_st : selected_st || localStorage.getItem("apps.pathanalytics.last-selected-interface")||"",
       update_dom_cg : "routers_"+this.rand_id,
       update_dom_st : "interfaces_"+this.rand_id,
       chosen:true
     }
-    new CGMeterCombo(JSON.stringify(js_params));
+    await load_routers_interfaces_dropdown(load_router_opts);
     //if previous selected router and interface not availble please select the first one
     if($('#routers_'+this.rand_id).val()==null){
       $('#routers_'+this.rand_id).val($(`#routers_${this.rand_id} option:first`).val());

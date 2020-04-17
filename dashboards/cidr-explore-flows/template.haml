@@ -1,0 +1,112 @@
+.row.cidr_explore_flows
+  .col-xs-12
+    .widget
+      .widget-header
+        %h4 
+          %i.fa.fa-search.fa-fw
+          Search Criteria
+      .widget-body
+          %form.form-horizontal.cidr_explore_flows_form
+            .row
+              .col-xs-6
+                .from-group
+                   %label.control-label.col-xs-4 Subnet         
+                  .col-xs-8 
+                    %input{type:"text",class:"form-control",id:"cidr_subnet",style:"width:300px"}
+                    %span.help-block Example 192.168.1.5/27
+              .col-xs-6
+                .form-group
+                  .new_time_selector#new_time_selector
+            .row
+              .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+                %input#from_date{type:"hidden",name:"from_date"}
+                %input#to_date{type:"hidden",name:"to_date"}
+                %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Search"}
+
+.row.cidr_explore_flows_data
+  .col-xs-12
+    #cidr_progress_bar
+  .col-xs-12
+    .widget
+      .widget-header
+        %h4 
+          Matching 
+          %span.badge.badge-info.ips_count
+          IP(s) from the subnet
+          %span.cidr_subnet_text
+      .widget-body
+        %ul.list-inline.piped.key_spaces_ul
+  .col-xs-12
+    .widget
+      .widget-header
+        %h4 
+          Aggregated volumes based on matching flows
+          %small
+      .widget-body.clearfix
+        
+        %ul.nav.nav-tabs#agg_tabs
+          -agg=["source_port", "dest_port", "source_ip", "dest_ip","internal_ip", "external_ip", "internal_port", "protocol","flowtag"];
+          -for(let i=0;i<agg.length;i++){
+          -clsname=i==0? "active": "";
+          %li{class:`${clsname}`}
+            %a{href:`#${agg[i]}`,'data-toggle':"tab"} 
+              -let s=$.map(agg[i].split("_"),function(e){return e.charAt(0).toUpperCase() + e.slice(1)}).join(" ");
+              =`${s}`
+              %span{class:`${agg[i]}_count`}
+          -}
+      
+        .tab-content
+          -agg=["source_port", "dest_port", "source_ip", "dest_ip","internal_ip", "external_ip", "internal_port", "protocol","flowtag"];
+          -for(let i=0;i<agg.length;i++){
+          -clsname=i==0? "active": "";
+          %div.tab-pane{id:`${agg[i]}`,class:`${clsname}`,style:"padding-top:10px"}
+            .col-xs-12
+              .panel.panel-info
+                .panel-heading
+                  %h4
+                    -let s=$.map(agg[i].split("_"),function(e){return e.charAt(0).toUpperCase() + e.slice(1)}).join(" ");
+                    =`Aggregated by ${s}`
+                    %span{class:`${agg[i]}_count`} 
+                    .widget-tool.pull-right
+                      %ul.list-inline
+                .panel-body.clearfix
+                  %table.table.table-sysdata{id:`agg_${agg[i]}_tbl`,data-sheet-name:agg[i]}
+                    %thead
+                      %tr
+                        %th Item
+                        %th Label
+                        %th Flows
+                        %th{sort:"volume"} Volume
+                        %th.hide Raw Volume
+                    %tbody
+          -}
+  .col-xs-12
+    .widget
+      .widget-header 
+        %h4
+          Showing 0 matches 
+          %small Top matching flows(max=1000)
+      .widget-body
+        %table.table.table-sysdata.col_select.has_label_readable#explore_flows_tbl
+          %thead
+            %tr
+              %th Prot
+              %th IP
+              %th Port
+              %th IP
+              %th Port
+              %th.rout_intf Router
+              %th.rout_intf IF-In
+              %th.rout_intf IF-Out
+              %th{"sort"=>"volume"} Volume
+              %th.hide{"sort"=>"volume"} In
+              %th.hide{"sort"=>"volume"} Out
+              %th.hide{"sort"=>"volume"} RTT(us)
+              %th.hide{"sort"=>"volume"} Retrans
+              %th.date{sort:"date"}= "Start Time"
+              %th{"sort"=>"duration"} Duration
+              %th Probe
+              %th.nosort.tristagify Tags
+              %th.nosort
+          %tbody
+          
