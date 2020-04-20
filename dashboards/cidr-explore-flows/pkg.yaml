@@ -1,6 +1,6 @@
-name: CIDR Tagger Explore Flows
+name: CIDR Explore Flows
 
-version: 0.0.2
+version: 0.0.3
 
 author: trisul
 
@@ -13,7 +13,7 @@ description:
 
 apptype: dashboard_js
 
-appresources: cidr_tagger_explore_flows.js app.css template.haml 
+appresources: cidr_explore_flows.js app.css template.haml 
 
 dependencies: 
 

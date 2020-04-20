@@ -153,6 +153,8 @@ class CIDRExploreFlows{
         });
         for(let k=0; k<this.all_agg_groups.length;k++){
           this[this.all_agg_groups[k]].update_toppers(agg_resp[this.all_agg_groups[k]]);
+          this.redraw_table(this.all_agg_groups[i]);
+
         }
         //get raw flows
         let flows = await fetch_trp(TRP.Message.Command.QUERY_SESSIONS_REQUEST,
@@ -166,12 +168,9 @@ class CIDRExploreFlows{
                   },this);
         this.flowModel.proc_new_flows(incoming);
         this.tris_pg_bar.update_progress_bar();
+        this.flowUI.redraw_flow_table();
       }
-
-      for(let i=0; i<this.all_agg_groups.length;i++){
-        this.redraw_table(this.all_agg_groups[i]);
-      }
-      this.flowUI.redraw_flow_table();
+      //this.flowUI.redraw_flow_table();
       
     }
     
