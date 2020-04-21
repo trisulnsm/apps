@@ -731,8 +731,9 @@ class ISPOverviewMapping{
       table.append(tr);
     });
     let label = tr.data("label").split("\\")[0];
-    this.target_text = `${this.target_text}->${tr.data("key")}(${label})`;
-    shell_modal.find(".modal-body h4").html(this.target_text);
+    let ttext = `${this.target_text}->${tr.data("key")}(${label})`;
+
+    shell_modal.find(".modal-body h4").html(ttext);
     shell_modal.find(".modal-body").append(table);
     table.tablesorter()
   }
