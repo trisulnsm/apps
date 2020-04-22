@@ -110,7 +110,9 @@ class ISPPrefixExternalMapping{
       if(interface_meters[router_key] == undefined){
         interface_meters[router_key] = [];
       }
-      interface_meters[router_key].push([top_intfs.keys[i].key,top_intfs.keys[i].label]);
+      interface_meters[router_key].push([top_intfs.keys[i].key,
+                                          top_intfs.keys[i].label,
+                                          top_intfs.keys[i].description]);
     }
 
     for (var key in interface_meters) {

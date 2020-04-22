@@ -74,10 +74,70 @@ class ISPOverviewMapping{
     new ShowNewTimeSelector({divid:"#new_time_selector"+this.rand_id,
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
-                            },this.callback_load_routers,this);
+                            });
     this.mk_time_interval();
-   
-    await this.load_routers_interfaces();
+    //get router toppers for drowdown in form
+    var top_routers=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
+      counter_group: "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
+      time_interval: this.tmint ,
+      meter:0,
+      maxitems:500
+    });
+    var router_key_map ={}
+    for(let i= 0 ; i <  top_routers.keys.length  ; i++){
+      if (top_routers.keys[i].key=="SYS:GROUP_TOTALS"){
+        continue;
+      }
+      router_key_map[top_routers.keys[i].key] = top_routers.keys[i].label
+    }
+    //get interface toppers for dropdown in form
+    var top_intfs=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
+      counter_group: "{C0B04CA7-95FA-44EF-8475-3835F3314761}",
+      time_interval: this.tmint ,
+      meter:0,
+      maxitems:1000
+    });
+
+    var interface_meters = {};
+    var all_dropdown = {"0":["Please select",[["0","Please select"]]]};
+    top_intfs.keys= this.sort_hash(top_intfs,"key");
+    for(let i= 0 ; i <  top_intfs.keys.length  ; i++){
+      if (top_intfs.keys[i].key=="SYS:GROUP_TOTALS"){
+        continue;
+      }
+      let intf =top_intfs.keys[i].key;
+      let router_key=intf.split("_")[0];
+      if(interface_meters[router_key] == undefined){
+        interface_meters[router_key] = [];
+      }
+      interface_meters[router_key].push([top_intfs.keys[i].key,
+                                         top_intfs.keys[i].label,
+                                         top_intfs.keys[i].description]);
+    }
+
+    for (var key in interface_meters) {
+      var meters = interface_meters[key];
+      meters.unshift(["0","Please select"]);
+      all_dropdown[key]=[router_key_map[key],meters];
+    }
+
+    let selected_router = null, selected_interface=null;
+    let incoming_key = this.dash_params.key || ""
+    let keyparts = incoming_key.split("_");
+    if (keyparts.length==2) {
+      selected_router = keyparts[0];
+      selected_interface = keyparts.join("_");
+    }
+
+    var js_params = {meter_details:all_dropdown,
+      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router"),
+      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface"),
+      update_dom_cg : "routers"+this.rand_id,
+      update_dom_st : "interfaces"+this.rand_id,
+      chosen:true
+    }
+    //Load meter combo for routers and interfaces
+    new CGMeterCombo(JSON.stringify(js_params));
 
 
     this.cg_meters = {};
@@ -93,30 +153,8 @@ class ISPOverviewMapping{
     }    
   }
 
-  async callback_load_routers(s,e,args){
-    await args.load_routers_interfaces();
-  }
 
-  async load_routers_interfaces(){
-    this.tmint = this.mk_time_interval();
-    let selected_router = null, selected_interface=null;
-    let incoming_key = this.dash_params.key || ""
-    let keyparts = incoming_key.split("_");
-    if (keyparts.length==2) {
-      selected_router = keyparts[0];
-      selected_interface = keyparts.join("_");
-    }
 
-    let load_router_opts = {
-      tmint : this.tmint,
-      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router") || "",
-      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface")||"",
-      update_dom_cg : "routers",
-      update_dom_st : "interfaces",
-      chosen:true
-    }
-    await load_routers_interfaces_dropdown(load_router_opts);
-  }
   //make time interval to get toppers.
   mk_time_interval(){
     var selected_fromdate = $('#from_date'+this.rand_id).val();
@@ -315,7 +353,8 @@ class ISPOverviewMapping{
     this.table_id = `table_${this.meter}${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
-    table.find("thead").append(`<tr><th>Key</th><th style="width:400px">Label</th>
+    table.find("thead").append(`<tr><th>ASN</th><th style="width:200px">Name</th>
+                                <th>Full name</th>
                                 <th sort='volume' barspark='auto'>Volume</th>
                                 <th sort='volume'>Avg <br/>Bandwidth</th><th>Uniq <br/>ASPath</th><th>Uniq <br/>Prefix</th><th class='nosort'></th>
                                 </tr>`);
@@ -344,14 +383,17 @@ class ISPOverviewMapping{
         }
       let readable = topper.readable.split("\\").shift();
       let label = topper.label.split("\\").shift();
+      let desc = topper.description
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
+      
       let statids = Object.values(this.meter_details_in).slice(0,2)
       rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" 
                     data-readable="${topper.readable}" data-full_key="${full_key}"
                     data-statids="${statids}" data-statid-index=${this.meter_index}>
                       <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
                       <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
+                      <td>${desc}</td>
                       <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
                       <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
                       <td>${uniques[full_key][0]}</td>
@@ -719,23 +761,60 @@ class ISPOverviewMapping{
       return true;
     }
     let tag_metrics = prefix_toppers.tag_metrics.slice(0,100);
+
+    // resolve using the BGP prefix query 
+    let prefix_csv = _.chain(tag_metrics)
+                     .collect((a)=>{ 
+                        return a.key.key;})
+                     .join('\n')
+                     .value();
+
+    // bgp query prefix to ORG 
+    resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
+                                {
+                                  tool:5,
+                                  tool_input: `-t -B -d -n 0 -P TOOL_INPUT_FILE`,
+                                  destination_node:this.probe_id,
+                                  tool_input_file_data: prefix_csv
+                                });
+
+    let lkp_bgp_prefix={};
+    let lkp_aspath={};
+    let lkp_ascodes={};
+    let maparr = resp.tool_output.split("\n");
+    maparr.forEach((a) => {
+        let v=a.split('\t');
+        if (v.length>=3) {
+          lkp_bgp_prefix[v[0]]=v[1];
+          lkp_aspath[v[0]]=v[2];
+          if (v.length>=4) {
+            lkp_ascodes[v[0]]=v[3];
+          }
+        }
+    });
+
+    // UI update
     shell_modal.find(".modal-header h4 span.badge").html(tag_metrics.length);
     var table = $("<table>",{class:"table table-sysdata"});
-    table.append("<thead><tr><th>Prefix</th><th>Count </th><th sort='volume'>Volume</th></thead>");
+    table.append("<thead><tr><th>Prefix</th><th>Flow Count</th><th>ASPath</th><th>Org</th><th sort='volume'>Volume</th></thead>");
     table.append("<tbody></tbody>");
-    _.each(tag_metrics,function(keyt){
+    for (let i =0; i < tag_metrics.length; i++){
+      let keyt = tag_metrics[i];
       let tr = $("<tr>");
+      let asp = lkp_aspath[keyt.key.key];
       tr.append(`<td>${keyt.key.key}</td>`);
       tr.append(`<td>${keyt.count}</td>`);
+      tr.append(`<td>${asp}</td>`);
+      tr.append(`<td>0</td>`);
       tr.append(`<td>${h_fmtvol(keyt.metric.toNumber())}</td>`);
       table.append(tr);
-    });
-    let label = tr.data("label").split("\\")[0];
-    let ttext = `${this.target_text}->${tr.data("key")}(${label})`;
+    }
 
-    shell_modal.find(".modal-body h4").html(ttext);
+    let label = tr.data("label").split("\\")[0];
+    this.target_text = `${this.target_text}->${tr.data("key")}(${label})`;
+    shell_modal.find(".modal-body h4").html(this.target_text);
     shell_modal.find(".modal-body").append(table);
-    table.tablesorter()
+    table.tablesorter();
   }
 
 
