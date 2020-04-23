@@ -20,6 +20,10 @@ class ISPOverviewMapping{
       this.crosskey_interface = opts.jsparams.crosskey_interface;
       this.meter_details_in = opts.jsparams.meters || this.meter_details_in
     } 
+
+    if(opts.remove_ls_items==true || opts.remove_ls_items=="true"){
+      clear_localstorage_items({remove_keys:"apps.peeringanalytics.last-selected*"});
+    }
     this.probe_id = opts.probe_id;
     this.dash_params = opts.dash_params;
     this.add_form(opts);
@@ -470,12 +474,13 @@ class ISPOverviewMapping{
     let ref_model =[];
     if(this.filter_text==null || this.filter_text == undefined){
       cgguid = GUID.GUID_CG_AGGREGATE();
-      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter];
+      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter_index];
       meter=0;
     }else if(this.filter_text.match(/_/)){
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
       meter = [1,2][this.meter_index];
     }
+
     ref_model = [cgguid,key,meter,"Total"]
 
     var model_data = {cgguid:this.cgguid,

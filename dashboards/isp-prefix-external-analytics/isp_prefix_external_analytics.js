@@ -20,6 +20,10 @@ class ISPPrefixExternalMapping{
       this.crosskey_interface = opts.jsparams.crosskey_interface;
       this.meter_details_in = opts.jsparams.meters || this.meter_details_in
     } 
+
+    if(opts.remove_ls_items==true || opts.remove_ls_items=="true"){
+      clear_localstorage_items({remove_keys:"apps.prefix_external_analytics.last-selected*"});
+    }
     this.probe_id = opts.probe_id;
     this.dash_params = opts.dash_params;
     this.add_form(opts);

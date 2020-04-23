@@ -1,6 +1,6 @@
 name: Peering Analytics Drilldown
 
-version: 0.0.12
+version: 0.0.13
 
 author: trisul
 
@@ -16,3 +16,12 @@ apptype: dashboard_js
 appresources: peering_analytics_drilldown.js app.css  template.haml
 
 dependencies: 
+jsparams:
+  crosskey_router: "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}"
+  crosskey_interface: "{A6411875-1C9C-2C6C-4879-54C437223815}"
+  meters:
+    upload: 1
+    download: 2
+    uniq_aspath: 3
+    unit_prefix: 4
+

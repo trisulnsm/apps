@@ -8,6 +8,16 @@
       $('head').append(`<link rel="stylesheet" type="text/css" href="${css_file}">`);
       this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
       this.dash_params = opts.dash_params;
+      this.valid_input =  1;
+      if(this.dash_params.statids == undefined){
+        this.dash_params.cgguid = opts.jsparams.crosskey_router;
+        this.dash_params.ck_cgguid = opts.jsparams.crosskey_interface;
+        this.dash_params.statids=`${opts.jsparams.meters.upload},${opts.jsparams.meters.download}`;
+        this.dash_params.readable = "\\";
+        this.dash_params.label = "\\";
+        this.valid_input=0;
+      }
+
       this.dom = $(opts.divid);
       this.time_selector = opts.new_time_selector;
       this.rand_id=parseInt(Math.random()*100000);
@@ -44,15 +54,19 @@
     this.dom.find(".drilldown_data").remove();
     this.data_dom=$(this.html_str)
     this.dom.append(this.data_dom);
-
+    
     this.dom.find("#drilldown_asn").val(this.dash_params.readable.split("\\")[0])
     this.form = this.dom.find(".drilldown_asn_form")
        //new time selector 
+    this.form.submit($.proxy(this.submit_form,this));
     new ShowNewTimeSelector({divid:"#new_time_selector",
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
                             });
-    
+    if(this.valid_input == 0){
+      this.dom.find(".drilldown_data").remove();
+      return;
+    }
     this.mk_time_interval();
     this.form.submit($.proxy(this.submit_form,this));
     this.filter_text = this.dash_params.key;
