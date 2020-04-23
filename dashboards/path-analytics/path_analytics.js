@@ -10,6 +10,10 @@ class ASNPathAnalytics{
     if(opts.jsparams){
       this.cgguid = opts.jsparams.crosskey_interface || "{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}";
     }
+
+    if(opts.remove_ls_items==true || opts.remove_ls_items=="true"){
+      clear_localstorage_items({remove_keys:"apps.pathanalytics.last-selected*"});
+    }
     this.dash_params = opts.dash_params;
     this.remove_topper_count=0;
     this.max_crosskey_nodes=30;

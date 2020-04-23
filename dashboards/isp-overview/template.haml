@@ -2,7 +2,7 @@
 .col-xs-2
   .panel.panel-stat3.bg-success
     %h2.m-top-none#flowas
-      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitPeeringAnalytics"}
+      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitPeeringAnalytics&valid_input=1&remove_ls_items=true"}
     %h5 Active AS
     %i.fa.fa-arrow-circle-o-up.fa-lg
     %span.m-left-xs Currently active AS
@@ -12,27 +12,26 @@
 .col-xs-2
   .panel-stat3.bg-danger
     %h2.m-top-none#internal_prefix
-      %a.count{href:"javascript:;;"}
+      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitISPHomePrefixesAnalytics&valid_input=1&remove_ls_items=true"}
     %h5 Active Internal Prefixes
     %i.fa.fa-arrow-circle-o-up.fa-lg
     %span.m-left-xs Number of active prefixes (internal)
     %a.trends [trends]
 
-
 .col-xs-2
   .panel-stat3.bg-danger
     %h2.m-top-none#external_prefix
-      %a.count{href:"javascript:;;"}
+      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitISPExternalPrefixesAnalytics&valid_input=1&remove_ls_items=true"}
     %h5 Active External Prefixes
     %i.fa.fa-arrow-circle-o-up.fa-lg
     %span.m-left-xs Number of active prefixes (external)
-    %a.trends [trends]
+    %a.trends [trends]gitISPExternalPrefixesAnalytics
 
 
 .col-xs-2
   .panel-stat3.bg-primary
     %h2.m-top-none#aspath
-      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitPathAnalytics"}
+      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitPathAnalytics&valid_input=1&remove_ls_items=true"}
     %h5 Active Paths
     %i.fa.fa-arrow-circle-o-up.fa-lg
     %span.m-left-xs Active BGP AS Paths

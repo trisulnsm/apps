@@ -4,7 +4,6 @@ version: 0.0.6
 
 author: trisul
 
-
 description: 
    short: View external prefixes mappings for routers and interfaces
    long:  |
