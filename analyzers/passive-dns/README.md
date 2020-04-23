@@ -46,10 +46,10 @@ LevelDB is found in the libleveldb1 package (14.04) or libleveldb1v5 (16.04)
 ````
 sudo apt-get update 
 
-# for 14.04
-sudo apt-get install libleveldb1 
-
 # for 16.04
+sudo apt-get install libleveldb1v5 
+
+# for 18.04
 sudo apt-get install libleveldb1v5 
 ````
 ## Then restart the Trisul Probes. 
