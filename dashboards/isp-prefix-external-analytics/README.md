@@ -12,6 +12,7 @@ Included :
 
 
 ````
+0.0.6	23-Apr-2020   Show snmp.ifalias y
 0.0.4	06-Apr-2020   Updated version merges prefix analysis from BGP 
 
 ```

@@ -20,6 +20,10 @@ class ISPPrefixExternalMapping{
       this.crosskey_interface = opts.jsparams.crosskey_interface;
       this.meter_details_in = opts.jsparams.meters || this.meter_details_in
     } 
+
+    if(opts.remove_ls_items==true || opts.remove_ls_items=="true"){
+      clear_localstorage_items({remove_keys:"apps.prefix_external_analytics.last-selected*"});
+    }
     this.probe_id = opts.probe_id;
     this.dash_params = opts.dash_params;
     this.add_form(opts);
@@ -129,16 +133,16 @@ class ISPPrefixExternalMapping{
       selected_interface = keyparts.join("_");
     }
 
-    var js_params = {meter_details:all_dropdown,
+    var load_router_opts = {meter_details:all_dropdown,
       selected_cg : selected_router || localStorage.getItem("apps.prefix_external_analytics.last-selected-router"),
       selected_st : selected_interface || localStorage.getItem("apps.prefix_external_analytics.last-selected-interface"),
       update_dom_cg : "routers"+this.rand_id,
       update_dom_st : "interfaces"+this.rand_id,
       chosen:true
     }
-    //Load meter combo for routers and interfaces
-    new CGMeterCombo(JSON.stringify(js_params));
 
+
+    await load_routers_interfaces_dropdown(load_router_opts);
 
     this.cg_meters = {};
     await get_counters_and_meters_json(this.cg_meters);

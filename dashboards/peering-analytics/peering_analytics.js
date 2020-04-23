@@ -20,6 +20,10 @@ class ISPOverviewMapping{
       this.crosskey_interface = opts.jsparams.crosskey_interface;
       this.meter_details_in = opts.jsparams.meters || this.meter_details_in
     } 
+
+    if(opts.remove_ls_items==true || opts.remove_ls_items=="true"){
+      clear_localstorage_items({remove_keys:"apps.peeringanalytics.last-selected*"});
+    }
     this.probe_id = opts.probe_id;
     this.dash_params = opts.dash_params;
     this.add_form(opts);
@@ -129,15 +133,17 @@ class ISPOverviewMapping{
       selected_interface = keyparts.join("_");
     }
 
-    var js_params = {meter_details:all_dropdown,
+    var load_router_opts = {meter_details:all_dropdown,
       selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router"),
       selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface"),
       update_dom_cg : "routers"+this.rand_id,
       update_dom_st : "interfaces"+this.rand_id,
       chosen:true
     }
-    //Load meter combo for routers and interfaces
-    new CGMeterCombo(JSON.stringify(js_params));
+
+
+    await load_routers_interfaces_dropdown(load_router_opts);
+
 
 
     this.cg_meters = {};
@@ -512,12 +518,13 @@ class ISPOverviewMapping{
     let ref_model =[];
     if(this.filter_text==null || this.filter_text == undefined){
       cgguid = GUID.GUID_CG_AGGREGATE();
-      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter];
+      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter_index];
       meter=0;
     }else if(this.filter_text.match(/_/)){
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
       meter = [1,2][this.meter_index];
     }
+
     ref_model = [cgguid,key,meter,"Total"]
 
     var model_data = {cgguid:this.cgguid,
@@ -811,8 +818,7 @@ class ISPOverviewMapping{
     }
 
     let label = tr.data("label").split("\\")[0];
-    this.target_text = `${this.target_text}->${tr.data("key")}(${label})`;
-    shell_modal.find(".modal-body h4").html(this.target_text);
+    shell_modal.find(".modal-body h4").html(`For Router Interface: ${this.target_text}   ASN: ${tr.data("key")}(${label})`);
     shell_modal.find(".modal-body").append(table);
     table.tablesorter();
   }
@@ -823,7 +829,6 @@ async query_routes_for_as(event){
     let tr = target.closest("tr");
     let statid = tr.data("statid");
     var shell_modal = create_shell_modal();
-    shell_modal.find(".modal-header h4").html("Query Route Information<small>Shows routes in DB for this AS</small>");
     var message = "<h4><i class='fa fa-spin fa-spinner'></i> Please wait ... Getting data</h4>";
     shell_modal.find(".modal-body").html(message);
     $('#shortcut-div').html(shell_modal);
@@ -836,12 +841,13 @@ async query_routes_for_as(event){
     let router = this.target_text.split("->")[0];
     let asnumber = tr.data('key');
 
+    shell_modal.find(".modal-header h4").html(` AS ${asnumber} Query Route Information from BGP database`);
 
 
     let resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
                                 {
                                   tool:5,
-                                  tool_input: `${router} 0 'SELECT * FROM PREFIX_PATHS_V4 WHERE ASPATH LIKE "% ${asnumber}"'`,
+                                  tool_input: `-r ${router} -a ${asnumber}`,
                                   destination_node:this.probe_id
                                 });
 
