@@ -627,8 +627,8 @@ class ISPOverviewMapping{
       orientation: "h",
       valuesuffix: this.meter_types[this.meter].units.replace("ps",""),
       node: {
-        pad: 15,
-        thickness: 30,
+        pad: 12,
+        thickness: 20,
         line: {
           color: "black",
           width: 0.5
@@ -641,8 +641,8 @@ class ISPOverviewMapping{
 
     //width of div widht
     var width = this.data_dom.find(".sankey_chart").width();
-    width = parseInt(width)-50;
-    var height = labels.length *25;
+    width = parseInt(width)-20;
+    var height = labels.length *26;
     if(height < 250){
       height =250;
     }

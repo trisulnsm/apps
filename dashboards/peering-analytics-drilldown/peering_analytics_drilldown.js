@@ -55,8 +55,9 @@
     this.data_dom=$(this.html_str)
     this.dom.append(this.data_dom);
     
-    this.dom.find("#drilldown_asn").val(this.dash_params.readable.split("\\")[0])
-    this.form = this.dom.find(".drilldown_asn_form")
+    this.dom.find("#drilldown_asn").val(this.dash_params.readable.split("\\")[0]);
+    auto_complete('drilldown_asn',{cgguid:"{03E016FC-46AA-4340-90FC-0E278B93C677}"},{})
+    this.form = this.dom.find(".drilldown_asn_form");
        //new time selector 
     this.form.submit($.proxy(this.submit_form,this));
     new ShowNewTimeSelector({divid:"#new_time_selector",
@@ -170,7 +171,7 @@
 
     if(this.filter_text){
       this.cgtoppers_resp.keys = _.select(this.cgtoppers_resp.keys,function(topper){
-        return topper.key.match(this.filter_text)
+        return topper.key.match(this.filter_text) || topper.label.match(this.filter_text)
       },this);
     }
 

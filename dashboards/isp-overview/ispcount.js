@@ -128,6 +128,9 @@ async function draw_asn_traffic_chart(opts){
         models.push([cgguid,keyt.key,i,keyt.label])
       }
     });
+    let ref_mod = $.extend([],models[0]);
+    ref_mod[1]="SYS:GROUP_TOTALS";
+    ref_mod[3]="TOTAL"
 
     await $.ajax({
       url:"/trpjs/generate_chart",
@@ -135,7 +138,8 @@ async function draw_asn_traffic_chart(opts){
         valid_input:1,
         surface:"STACKEDAREA",
         show_legend:false,
-        chart_height:350
+        chart_height:350,
+        ref_model:ref_mod
       },
       context:this,
       success:function(resp){

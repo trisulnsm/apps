@@ -489,7 +489,7 @@ class ISPPrefixExternalMapping{
     let ref_model =[];
     if(this.filter_text==null || this.filter_text == undefined){
       cgguid = GUID.GUID_CG_AGGREGATE();
-      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter];
+      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter_index];
       meter=0;
     }else if(this.filter_text.match(/_/)){
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
