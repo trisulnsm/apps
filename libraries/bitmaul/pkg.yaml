@@ -1,0 +1,16 @@
+name: Bitmaul Protocol Dissection Library
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: Bitmaul stream aware protocol dissector 
+   long:  |
+      A library app to provide bit level protocol dissection capabilities to other Trisul Apps 
+
+apptype: library
+
+appresources: ip6.lua pdurecord.lua sweepbuf.lua 
+
+dependencies:  
