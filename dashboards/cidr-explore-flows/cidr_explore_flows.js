@@ -153,13 +153,14 @@ class CIDRExploreFlows{
         });
         for(let k=0; k<this.all_agg_groups.length;k++){
           this[this.all_agg_groups[k]].update_toppers(agg_resp[this.all_agg_groups[k]]);
-          this.redraw_table(this.all_agg_groups[i]);
+          this.redraw_table(this.all_agg_groups[k]);
 
         }
         //get raw flows
         let flows = await fetch_trp(TRP.Message.Command.QUERY_SESSIONS_REQUEST,
                                       {any_ip:TRP.KeyT.create({key:keyt.key}),
-                                       time_interval:this.tint_arr[i]
+                                       time_interval:this.tint_arr[i],
+                                       
         });
         let tint = this.tint_arr[i];
         let flow_arr = new MakeFlowArray({}).mk_flow_arr(flows.sessions);
@@ -205,6 +206,7 @@ class CIDRExploreFlows{
     let data = Object.values(this.ips);
     this.data_dom.find(".ips_count").html(data.length);
     this.data_dom.find(".cidr_subnet_text").html(this.form.find("#cidr_subnet").val());
+    this.data_dom.find(".tint_duration").html(h_fmtduration(this.tmint.to.tv_sec-this.tmint.from.tv_sec)+" Starting from "+this.form.find("#from_date").val());
 
     let cthis = this;
     let lis = d3.select(`ul.key_spaces_ul`).selectAll("li")

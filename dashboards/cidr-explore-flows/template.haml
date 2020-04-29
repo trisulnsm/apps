@@ -27,14 +27,17 @@
   .col-xs-12
     #cidr_progress_bar
   .col-xs-12
-    .widget
-      .widget-header
-        %h4 
+    .panel.panel-default
+      .panel-heading
+        %h4
           Matching 
           %span.badge.badge-info.ips_count
           IP(s) from the subnet
           %span.cidr_subnet_text
-      .widget-body
+          %small %i.fa.fa-clock-o.fa-fw
+          %small Duration
+          %small.tint_duration
+      .panel-body
         %ul.list-inline.piped.key_spaces_ul
   .col-xs-12
     .widget
