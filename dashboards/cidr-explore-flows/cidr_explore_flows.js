@@ -120,7 +120,7 @@ class CIDRExploreFlows{
   }
   async get_data(){
     //get time interval day by day
-    this.tint_arr = await new TimeInterval({default_selected_time:this.default_selected_time}).get_tint_array(true);
+    this.tint_arr = await new TimeInterval({default_selected_time:this.tmint}).get_tint_array(true);
     let cidr = this.form.find("#cidr_subnet").val();
     let cidr_range = calculateCidrRange(cidr);
     let from_key = TRP.KeyT.create({label:cidr_range[0]});
