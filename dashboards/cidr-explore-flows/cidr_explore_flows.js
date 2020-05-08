@@ -6,7 +6,8 @@
 class CIDRTaggerToppers{
   constructor(opts){
     this.name = opts.name;
-    this.max_count = 100;
+    this.maxitems = opts.maxitems || 50;
+    this.maxitems = parseInt(this.maxitems);
     this.toppers = {};
    
   }
@@ -29,7 +30,7 @@ class CIDRTaggerToppers{
            .sortBy(function(a){
               return -a.metric;
             })
-           .slice(0,this.max_count)
+           .slice(0,this.maxitems)
            .value();
   }
 }
@@ -41,8 +42,10 @@ class CIDRExploreFlows{
     this.default_selected_time = opts.new_time_selector;
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
     this.add_form(opts);
+    this.maxitems = 0;
     this.counter_group =opts.jsparams.counter_group || GUID.GUID_CG_INTERNAL_HOSTS();
     this.ips = {};
+    this.logo_tlhs = opts.logo_tlhs;
   }
   // load the frame 
   async load_assets(opts)
@@ -67,14 +70,14 @@ class CIDRExploreFlows{
   }
 
   submit_form(){
-    //this.form.find("#cidr_subnet").val("163.53.207.225/30");
-    let cidr = this.form.find("#cidr_subnet").val();
-    if($.trim(cidr).length==0){
+    //this.form.find("#cidr_subnet").val("163.53.207.226/32");
+    this.cidr = this.form.find("#cidr_subnet").val();
+    if($.trim(this.cidr).length==0){
       alert("Please enter a valid subnet.")
       return false;
     }
-    this.reset_ui();
     this.mk_time_interval();
+    this.reset_ui();
     this.get_data();
     return false;
   }
@@ -84,11 +87,12 @@ class CIDRExploreFlows{
     this.dom.find(".cidr_explore_flows_data").remove();
     this.data_dom = $(this.haml_dom[1]).clone();
     this.dom.append(this.data_dom);
+    this.maxitems = this.form.find("#toppers_maxcount").val();
     this.all_agg_groups =  ["source_port", "dest_port", "source_ip", "dest_ip",
                             "internal_ip", "external_ip", "internal_port", "protocol",
                             "flowtag"];
     for(let i=0; i<this.all_agg_groups.length;i++){
-      this[this.all_agg_groups[i]]= new CIDRTaggerToppers({name:this.all_agg_groups[i]});
+      this[this.all_agg_groups[i]]= new CIDRTaggerToppers({name:this.all_agg_groups[i],maxitems:this.maxitems});
     }
 
     this.key_spaces_mustache_tmpl = '{{readable}}';
@@ -105,11 +109,14 @@ class CIDRExploreFlows{
     });
     window.flowApp = new TFlowApp({});
     window.flowApp.flow_count=10000;
+   
     this.flowModel= new TFlowModel();
     this.flowUI = new TFlowUI(this.flowModel);
     this.tris_pg_bar = new TrisProgressBar({max:1,
                                             divid:'cidr_progress_bar'});
-     new ExportToCSV({table_id:"agg_internal_port_tbl",download_format:"xlsx",filename_prefix:"aggregate_flows"});
+    new ExportToCSV({table_id:"top_ips_cidr",filename_prefix:"aggregate_flows",report_heading:"Usage Report for CIDR "+this.cidr,
+                      tmint:this.tmint,logo_tlhs:this.logo_tlhs});
+
   }
    mk_time_interval(){
     var selected_fromdate = this.form.find('#from_date').val();
@@ -121,8 +128,7 @@ class CIDRExploreFlows{
   async get_data(){
     //get time interval day by day
     this.tint_arr = await new TimeInterval({default_selected_time:this.tmint}).get_tint_array(true);
-    let cidr = this.form.find("#cidr_subnet").val();
-    let cidr_range = calculateCidrRange(cidr);
+    let cidr_range = calculateCidrRange(this.cidr);
     let from_key = TRP.KeyT.create({label:cidr_range[0]});
     let to_key = TRP.KeyT.create({label:cidr_range[1]});
     let key_spaces = TRP.KeySpaceRequest.KeySpace.create({from_key:from_key,to_key:to_key})
@@ -205,7 +211,7 @@ class CIDRExploreFlows{
     this.data_dom.find("#ips_count")
     let data = Object.values(this.ips);
     this.data_dom.find(".ips_count").html(data.length);
-    this.data_dom.find(".cidr_subnet_text").html(this.form.find("#cidr_subnet").val());
+    this.data_dom.find(".cidr_subnet_text").html(this.cidr);
     this.data_dom.find(".tint_duration").html(h_fmtduration(this.tmint.to.tv_sec-this.tmint.from.tv_sec)+" Starting from "+this.form.find("#from_date").val());
 
     let cthis = this;

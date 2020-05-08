@@ -15,6 +15,12 @@
                     %input{type:"text",class:"form-control",id:"cidr_subnet",style:"width:300px"}
                     %span.help-block Example 192.168.1.5/27
               .col-xs-6
+                .from-group
+                   %label.control-label.col-xs-4 Maxitems         
+                  .col-xs-8 
+                    %input{type:"text",class:"form-control",id:"toppers_maxcount",style:"width:300px",value:50}
+                    %span.help-block Display these many top items
+              .col-xs-6
                 .form-group
                   .new_time_selector#new_time_selector
             .row
@@ -38,7 +44,12 @@
           %small Duration
           %small.tint_duration
       .panel-body
-        %ul.list-inline.piped.key_spaces_ul
+        %table.table.table-sysdata{data-sheet-name:"Top IPs in CIDR"}#top_ips_cidr
+          %tbody
+            %tr
+              %td
+                %ul.list-inline.piped.key_spaces_ul
+        
   .col-xs-12
     .widget
       .widget-header
@@ -73,7 +84,7 @@
                     .widget-tool.pull-right
                       %ul.list-inline
                 .panel-body.clearfix
-                  %table.table.table-sysdata{id:`agg_${agg[i]}_tbl`,data-sheet-name:agg[i]}
+                  %table.table.table-sysdata{id:`agg_${agg[i]}_tbl`,data-sheet-name:s}
                     %thead
                       %tr
                         %th Item
