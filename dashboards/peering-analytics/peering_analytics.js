@@ -7,6 +7,7 @@ class ISPOverviewMapping{
     this.dom = $(opts.divid);
     this.rand_id="";
     this.default_selected_time = opts.new_time_selector;
+    this.logo_tlhs = opts.logo_tlhs;
     //we need it for time zone conversion
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
     this.filter_cgguid = "{03E016FC-46AA-4340-90FC-0E278B93C677}";
@@ -20,6 +21,10 @@ class ISPOverviewMapping{
       this.crosskey_interface = opts.jsparams.crosskey_interface;
       this.meter_details_in = opts.jsparams.meters || this.meter_details_in
     } 
+
+    if(opts.remove_ls_items==true || opts.remove_ls_items=="true"){
+      clear_localstorage_items({remove_keys:"apps.peeringanalytics.last-selected*"});
+    }
     this.probe_id = opts.probe_id;
     this.dash_params = opts.dash_params;
     this.add_form(opts);
@@ -74,10 +79,28 @@ class ISPOverviewMapping{
     new ShowNewTimeSelector({divid:"#new_time_selector"+this.rand_id,
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
-                            },this.callback_load_routers,this);
+                            });
     this.mk_time_interval();
-   
-    await this.load_routers_interfaces();
+
+    let selected_router = null, selected_interface=null;
+    let incoming_key = this.dash_params.key || ""
+    let keyparts = incoming_key.split("_");
+    if (keyparts.length==2) {
+      selected_router = keyparts[0];
+      selected_interface = keyparts.join("_");
+    }
+
+    var load_router_opts = {
+      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router"),
+      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface"),
+      update_dom_cg : "routers"+this.rand_id,
+      update_dom_st : "interfaces"+this.rand_id,
+      chosen:true
+    }
+
+
+    await load_routers_interfaces_dropdown(load_router_opts);
+
 
 
     this.cg_meters = {};
@@ -93,30 +116,8 @@ class ISPOverviewMapping{
     }    
   }
 
-  async callback_load_routers(s,e,args){
-    await args.load_routers_interfaces();
-  }
 
-  async load_routers_interfaces(){
-    this.tmint = this.mk_time_interval();
-    let selected_router = null, selected_interface=null;
-    let incoming_key = this.dash_params.key || ""
-    let keyparts = incoming_key.split("_");
-    if (keyparts.length==2) {
-      selected_router = keyparts[0];
-      selected_interface = keyparts.join("_");
-    }
 
-    let load_router_opts = {
-      tmint : this.tmint,
-      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router") || "",
-      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface")||"",
-      update_dom_cg : "routers",
-      update_dom_st : "interfaces",
-      chosen:true
-    }
-    await load_routers_interfaces_dropdown(load_router_opts);
-  }
   //make time interval to get toppers.
   mk_time_interval(){
     var selected_fromdate = $('#from_date'+this.rand_id).val();
@@ -315,7 +316,8 @@ class ISPOverviewMapping{
     this.table_id = `table_${this.meter}${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
-    table.find("thead").append(`<tr><th>Key</th><th style="width:400px">Label</th>
+    table.find("thead").append(`<tr><th>ASN</th><th style="width:200px">Name</th>
+                                <th>Full name</th>
                                 <th sort='volume' barspark='auto'>Volume</th>
                                 <th sort='volume'>Avg <br/>Bandwidth</th><th>Uniq <br/>ASPath</th><th>Uniq <br/>Prefix</th><th class='nosort'></th>
                                 </tr>`);
@@ -333,8 +335,7 @@ class ISPOverviewMapping{
       dropdown_menu.append("<li><a href='javascript:;;'>ASN Path Analytics</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Top Prefixes</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Show Routes</a></li>");
-
-
+      dropdown_menu.append("<li><a href='javascript:;;'>ASN Lookup</a></li>");
       dropdown.append(dropdown_menu);
 
       let key = topper.key.split("\\").shift();
@@ -345,14 +346,17 @@ class ISPOverviewMapping{
         }
       let readable = topper.readable.split("\\").shift();
       let label = topper.label.split("\\").shift();
+      let desc = topper.description
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
+      
       let statids = Object.values(this.meter_details_in).slice(0,2)
       rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" 
                     data-readable="${topper.readable}" data-full_key="${full_key}"
                     data-statids="${statids}" data-statid-index=${this.meter_index}>
                       <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
                       <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
+                      <td>${desc}</td>
                       <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
                       <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
                       <td>${uniques[full_key][0]}</td>
@@ -360,8 +364,8 @@ class ISPOverviewMapping{
                       <td>${dropdown[0].outerHTML}</td>
                       </tr>`);
 
-
     }
+
     new TrisTablePagination(this.table_id,{no_of_rows:10,rows:rows,
                             sys_group_totals:this.sys_group_totals,
                             callback:$.proxy(function(){this.pagination_callback()},this)});
@@ -373,7 +377,29 @@ class ISPOverviewMapping{
     },this));
     table.tablesorter();
     table.closest('.panel').find(".badge").html(rows.length);
-    new ExportToCSV({table_id:this.table_id,filename_prefix:"top_upload_asn",append_to:"panel"});
+    let nodes = [];
+    _.each([this.meter_details_in.upload,this.meter_details_in.download],function(ai,idx){
+      nodes.push({type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:0,find_by:`#table_${ai}`});
+      nodes.push({type:"page_break"});
+      nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#traffic_chart_${idx}_`});
+      nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#dount_chart${idx}_`});
+      nodes.push({type:"page_break"});
+      nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#sankey_chart_${idx}`});
+      if(idx==0){
+        nodes.push({type:"page_break",add_header_footer:false});
+      }
+      
+    });
+    new ExportToPDF({add_button_to:".add_download_btn",
+                      tint:this.tmint,
+                      logo_tlhs:this.logo_tlhs,
+                      download_file_name:"Peering_analytics",
+                      report_opts:{
+                        header:{h1:"Peering Analytics Report"},
+                        report_title:{h1:this.target_text},
+                        nodes:nodes
+                      }
+                    });
   }
 
   pagination_callback(){
@@ -471,12 +497,13 @@ class ISPOverviewMapping{
     let ref_model =[];
     if(this.filter_text==null || this.filter_text == undefined){
       cgguid = GUID.GUID_CG_AGGREGATE();
-      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter];
+      key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter_index];
       meter=0;
     }else if(this.filter_text.match(/_/)){
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
       meter = [1,2][this.meter_index];
     }
+
     ref_model = [cgguid,key,meter,"Total"]
 
     var model_data = {cgguid:this.cgguid,
@@ -579,8 +606,8 @@ class ISPOverviewMapping{
       orientation: "h",
       valuesuffix: this.meter_types[this.meter].units.replace("ps",""),
       node: {
-        pad: 15,
-        thickness: 30,
+        pad: 12,
+        thickness: 20,
         line: {
           color: "black",
           width: 0.5
@@ -593,8 +620,8 @@ class ISPOverviewMapping{
 
     //width of div widht
     var width = this.data_dom.find(".sankey_chart").width();
-    width = parseInt(width)-50;
-    var height = labels.length *25;
+    width = parseInt(width)-20;
+    var height = labels.length *26;
     if(height < 250){
       height =250;
     }
@@ -676,6 +703,10 @@ class ISPOverviewMapping{
         this.query_routes_for_as(event)
         break;
 
+      case 6:
+        let asn=tr.data('full_key').match(/\w+/)[0]
+        window.open("https://bgpview.io/asn/"+asn,"_blank")
+        break;
     } 
   }
   async get_top_prefixes(event){
@@ -716,22 +747,59 @@ class ISPOverviewMapping{
       return true;
     }
     let tag_metrics = prefix_toppers.tag_metrics.slice(0,100);
+
+    // resolve using the BGP prefix query 
+    let prefix_csv = _.chain(tag_metrics)
+                     .collect((a)=>{ 
+                        return a.key.key;})
+                     .join('\n')
+                     .value();
+
+    // bgp query prefix to ORG 
+    resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
+                                {
+                                  tool:5,
+                                  tool_input: `-t -B -d -n 0 -P TOOL_INPUT_FILE`,
+                                  destination_node:this.probe_id,
+                                  tool_input_file_data: prefix_csv
+                                });
+
+    let lkp_bgp_prefix={};
+    let lkp_aspath={};
+    let lkp_ascodes={};
+    let maparr = resp.tool_output.split("\n");
+    maparr.forEach((a) => {
+        let v=a.split('\t');
+        if (v.length>=3) {
+          lkp_bgp_prefix[v[0]]=v[1];
+          lkp_aspath[v[0]]=v[2];
+          if (v.length>=4) {
+            lkp_ascodes[v[0]]=v[3];
+          }
+        }
+    });
+
+    // UI update
     shell_modal.find(".modal-header h4 span.badge").html(tag_metrics.length);
     var table = $("<table>",{class:"table table-sysdata"});
-    table.append("<thead><tr><th>Prefix</th><th>Count </th><th sort='volume'>Volume</th></thead>");
+    table.append("<thead><tr><th>Prefix</th><th>Flow Count</th><th>ASPath</th><th>Org</th><th sort='volume'>Volume</th></thead>");
     table.append("<tbody></tbody>");
-    _.each(tag_metrics,function(keyt){
+    for (let i =0; i < tag_metrics.length; i++){
+      let keyt = tag_metrics[i];
       let tr = $("<tr>");
+      let asp = lkp_aspath[keyt.key.key];
       tr.append(`<td>${keyt.key.key}</td>`);
       tr.append(`<td>${keyt.count}</td>`);
+      tr.append(`<td>${asp}</td>`);
+      tr.append(`<td>0</td>`);
       tr.append(`<td>${h_fmtvol(keyt.metric.toNumber())}</td>`);
       table.append(tr);
-    });
+    }
+
     let label = tr.data("label").split("\\")[0];
-    this.target_text = `${this.target_text}->${tr.data("key")}(${label})`;
-    shell_modal.find(".modal-body h4").html(this.target_text);
+    shell_modal.find(".modal-body h4").html(`For Router Interface: ${this.target_text}   ASN: ${tr.data("key")}(${label})`);
     shell_modal.find(".modal-body").append(table);
-    table.tablesorter()
+    table.tablesorter();
   }
 
 
@@ -740,7 +808,6 @@ async query_routes_for_as(event){
     let tr = target.closest("tr");
     let statid = tr.data("statid");
     var shell_modal = create_shell_modal();
-    shell_modal.find(".modal-header h4").html("Query Route Information<small>Shows routes in DB for this AS</small>");
     var message = "<h4><i class='fa fa-spin fa-spinner'></i> Please wait ... Getting data</h4>";
     shell_modal.find(".modal-body").html(message);
     $('#shortcut-div').html(shell_modal);
@@ -753,12 +820,13 @@ async query_routes_for_as(event){
     let router = this.target_text.split("->")[0];
     let asnumber = tr.data('key');
 
+    shell_modal.find(".modal-header h4").html(` AS ${asnumber} Query Route Information from BGP database`);
 
 
     let resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
                                 {
                                   tool:5,
-                                  tool_input: `${router} 0 'SELECT * FROM PREFIX_PATHS_V4 WHERE ASPATH LIKE "% ${asnumber}"'`,
+                                  tool_input: `-r ${router} -a ${asnumber}`,
                                   destination_node:this.probe_id
                                 });
 

@@ -2,13 +2,15 @@
     constructor(opts) {
       let js_file =opts.jsfile;
       let file_path = js_file.split("/")
-      file_path.pop()
+      file_path.pop();
       file_path = file_path.join("/");
       let css_file = `/plugins/${file_path}/app.css`;
       $('head').append(`<link rel="stylesheet" type="text/css" href="${css_file}">`);
       this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
       this.dash_params = opts.dash_params;
       this.valid_input =  1;
+      this.logo_tlhs = opts.logo_tlhs;
+
       if(this.dash_params.statids == undefined){
         this.dash_params.cgguid = opts.jsparams.crosskey_router;
         this.dash_params.ck_cgguid = opts.jsparams.crosskey_interface;
@@ -55,8 +57,9 @@
     this.data_dom=$(this.html_str)
     this.dom.append(this.data_dom);
     
-    this.dom.find("#drilldown_asn").val(this.dash_params.readable.split("\\")[0])
-    this.form = this.dom.find(".drilldown_asn_form")
+    this.dom.find("#drilldown_asn").val(this.dash_params.readable.split("\\")[0]);
+    auto_complete('drilldown_asn',{cgguid:"{03E016FC-46AA-4340-90FC-0E278B93C677}"},{})
+    this.form = this.dom.find(".drilldown_asn_form");
        //new time selector 
     this.form.submit($.proxy(this.submit_form,this));
     new ShowNewTimeSelector({divid:"#new_time_selector",
@@ -72,12 +75,28 @@
     this.filter_text = this.dash_params.key;
     this.agg_flows = [];
     this.update_description();
-    
+    let nodes = [];
+    let section_headers=[];
     for(let i=0;i<this.meters.length;i++){
       this.meter = this.meters[i];
       this.meter_name=["upload","download"][i]
-      await this.get_toppers()
-      
+      await this.get_toppers();
+      section_headers.push({h1:this.meter_name})
+      nodes.push({find_by:`#table_${this.meter_name}`,type:"table",header_text:"auto",h1:"h3",section_header:i,});
+      nodes.push({type:"page_break"});
+      nodes.push({find_by:`#peering_drilldown_${this.meter_name}_donut`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
+      nodes.push({find_by:`#peering_drilldown_${this.meter_name}_traffic_chart`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
+      nodes.push({type:"page_break"});
+      nodes.push({find_by:`#peering_drilldown_${this.meter_name}_sankey`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
+      nodes.push({type:"page_break",add_header_footer:false});
+    }
+    section_headers.push({h1:"Top Prefixes and Hosts"});
+    let prefixes = ['.tag_asnumber','.tag_prefixes','.internal_ip','.external_ip'];
+    for(let i=0; i<prefixes.length; i++ ){
+      nodes.push({type:"table",find_by:`${prefixes[i]} table`,header_text:"auto",h1:"h3"});
+      if(i!=prefixes.length-1){
+        nodes.push({type:"page_break",add_header_footer:false});
+      }
     }
     await this.get_aggregated_flows("in");
     await this.get_aggregated_flows("out");
@@ -85,6 +104,17 @@
     this.draw_aggregate_table('external_ip');
     this.draw_aggregate_table('tag_asnumber');
     this.draw_aggregate_table('tag_prefixes');
+    new ExportToPDF({add_button_to:".add_download_btn",
+                      tint:this.tmint,
+                      logo_tlhs:this.logo_tlhs,
+                      download_file_name:"peering_analytics_drilldown",
+                      report_opts:{
+                        section_headers:section_headers,
+                        header:{h1:"Peering Analytics Report Drilldown"},
+                        report_title:{h1:this.description},
+                        nodes:nodes
+                      }
+    });
   }
   mk_time_interval(){
     var selected_fromdate = $('#from_date').val();
@@ -95,16 +125,16 @@
 
   }
   update_description(){
-    let description = "Drilldown for"
+    this.description = "Drilldown for"
     let label = this.dash_params.label.split("\\");
     let readable = this.dash_params.readable.split("\\")
 
     if (readable.length > 1){
-      description = `${description}  interface ${label[1]} -> ASN ${readable[0]} `
+      this.description = `${this.description}  interface ${label[1]} -> ASN ${readable[0]} `
     }else{
-      description = `${description}   ASN ${label[0]}`
+      this.description = `${this.description}   ASN ${label[0]}`
     }
-    description = `${description} <i class='fa fa-clock-o fa-fw'></i> ${h_fmtduration(this.tmint.to.tv_sec- this.tmint.from.tv_sec)}`
+    let description = `${this.description} <i class='fa fa-clock-o fa-fw'></i> ${h_fmtduration(this.tmint.to.tv_sec- this.tmint.from.tv_sec)}`
     $('.show_description').html(description)
   }
   submit_form(){
@@ -170,12 +200,12 @@
 
     if(this.filter_text){
       this.cgtoppers_resp.keys = _.select(this.cgtoppers_resp.keys,function(topper){
-        return topper.key.match(this.filter_text)
+        return topper.key.match(this.filter_text) || topper.label.match(this.filter_text)
       },this);
     }
 
     this.draw_table()
-    await this.draw_dount_chart();
+    await this.draw_donut_chart();
     await this.draw_traffic_chart();
     await this.draw_sankey_chart();
 
@@ -197,6 +227,7 @@
 
   draw_table(){
     var table = this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(".toppers_table").find("table");
+    table.attr("id",`table_${this.meter_name}`);
     this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(".toppers_table").removeClass('animated-background');
     table.addClass('table table-hover table-sysdata');
     table.find("thead").append("<tr><th>Item</th><th>Label</th><th sort='volume' barspark='auto'>Volume </th>></tr>");
@@ -225,10 +256,10 @@
     
   }
 
-  async draw_dount_chart(){
-    this.dount_div_id = `peering_drilldown_${this.meter_name}_dount`;
+  async draw_donut_chart(){
+    this.donut_div_id = `peering_drilldown_${this.meter_name}_donut`;
     this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(".donut_chart").removeClass('animated-background');
-    this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
+    this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(".donut_chart").append($("<div>",{id:this.donut_div_id}));
     let cgtoppers =  this.cgtoppers_resp.keys.slice(0,this.maxitems);
     var values = [];
     var labels = [];
@@ -260,13 +291,13 @@
       ],
       height: 400,
       width:  $('#'+this.divid).find(".donut_chart").width(),
-      showlegend: false,
+      showlegend: true,
     };
     var ploty_options = { modeBarButtonsToRemove: ['hoverClosestCartesian','toggleSpikelines','hoverCompareCartesian',
                                'sendDataToCloud'],
                           showSendToCloud:false,
                           responsive: true };
-    Plotly.newPlot(this.dount_div_id, data, layout,ploty_options);
+    Plotly.newPlot(this.donut_div_id, data, layout,ploty_options);
 
     var keys = _.map(cgtoppers,function(ai){return ai.key});
     for(let i=0 ; i < keys.length;i++){
@@ -329,7 +360,6 @@
 
     new TrisTablePagination(table_id,{no_of_rows:10,rows:rows});
     table.tablesorter();
-    new ExportToCSV({table_id:table_id,filename_prefix:"top_asn_panel",append_to:"panel"});
 
   }
     
