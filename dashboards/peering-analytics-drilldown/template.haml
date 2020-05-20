@@ -4,13 +4,13 @@
         %form.form-horizontal.drilldown_asn_form
           .row
             .col-xs-6
+              .form-group
+                .new_time_selector#new_time_selector
+            .col-xs-6
               .from-group
                  %label.control-label.col-xs-4 ASNumber         
                 .col-xs-8 
                   %input{type:"text",class:"form-control",id:"drilldown_asn",style:"width:300px"}
-            .col-xs-6
-              .form-group
-                .new_time_selector#new_time_selector
           .row
             .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
               %input#from_date{type:"hidden",name:"from_date"}
@@ -39,8 +39,8 @@
       .tab-content{style:"padding-top:10px"}
         .tab-pane.active#peering_drilldown_upload{data-use-width:1}
           .row
-            .col-xs-6
-              .panel.panel-primary
+            .col-xs-12
+              .panel.panel-primary.add_download_btn
                 .panel-heading
                   %h3
                     %i.fa.fa-table.fa-fw
@@ -50,7 +50,7 @@
                     %table
                       %thead
                       %tbody
-            .col-xs-6
+            .col-xs-12
               .panel.panel-primary
                 .panel-heading
                   %h3
@@ -79,7 +79,7 @@
 
         .tab-pane#peering_drilldown_download{data-use-width:1}
           .row
-            .col-xs-6
+            .col-xs-12
               .panel.panel-success
                 .panel-heading
                   %h3
@@ -90,7 +90,7 @@
                     %table
                       %thead
                       %tbody
-            .col-xs-6
+            .col-xs-12
               .panel.panel-success
                 .panel-heading
                   %h3

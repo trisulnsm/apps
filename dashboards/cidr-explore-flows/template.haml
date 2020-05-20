@@ -33,7 +33,7 @@
   .col-xs-12
     #cidr_progress_bar
   .col-xs-12
-    .panel.panel-default
+    .panel.panel-default.add_download_btn
       .panel-heading
         %h4
           Matching 
@@ -44,7 +44,7 @@
           %small Duration
           %small.tint_duration
       .panel-body
-        %table.table.table-sysdata{data-sheet-name:"Top IPs in CIDR"}#top_ips_cidr
+        %table.table.table-sysdata#top_ips_cidr{data-sheet-name:"Top IPs in CIDR"}
           %tbody
             %tr
               %td

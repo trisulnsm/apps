@@ -67,6 +67,7 @@ class CIDRExploreFlows{
                               default_ts:this.default_selected_time
                             });
     this.form.submit($.proxy(this.submit_form,this));
+    //this.form.submit();
   }
 
   submit_form(){
@@ -83,6 +84,7 @@ class CIDRExploreFlows{
   }
 
   reset_ui(){
+    let nodes = [];
     $('#app_error_box').addClass('hidden');
     this.dom.find(".cidr_explore_flows_data").remove();
     this.data_dom = $(this.haml_dom[1]).clone();
@@ -91,10 +93,15 @@ class CIDRExploreFlows{
     this.all_agg_groups =  ["source_port", "dest_port", "source_ip", "dest_ip",
                             "internal_ip", "external_ip", "internal_port", "protocol",
                             "flowtag"];
+
+    nodes.push({type:"table",find_by:`#top_ips_cidr`,header_text:"auto",h1:"h4"});
+    nodes.push({type:"page_break",add_header_footer:false});
     for(let i=0; i<this.all_agg_groups.length;i++){
       this[this.all_agg_groups[i]]= new CIDRTaggerToppers({name:this.all_agg_groups[i],maxitems:this.maxitems});
+      nodes.push({type:"table",find_by:`#agg_${this.all_agg_groups[i]}_tbl`,header_text:"auto",h1:"h4"});
+      nodes.push({type:"page_break",add_header_footer:false});
     }
-
+    nodes.push({type:"table",find_by:`#explore_flows_tbl`,header_text:"auto",h1:"h4"});
     this.key_spaces_mustache_tmpl = '{{readable}}';
 
     this.mustache_tmpl ='<td>{{readable}}</td>'+
@@ -114,8 +121,14 @@ class CIDRExploreFlows{
     this.flowUI = new TFlowUI(this.flowModel);
     this.tris_pg_bar = new TrisProgressBar({max:1,
                                             divid:'cidr_progress_bar'});
-    new ExportToCSV({table_id:"top_ips_cidr",filename_prefix:"aggregate_flows",report_heading:"Usage Report for CIDR "+this.cidr,
-                      tmint:this.tmint,logo_tlhs:this.logo_tlhs});
+    
+
+    new ExportToPDF({add_button_to:".add_download_btn",tint:this.tmint,
+                     download_file_name:"cidr_usage_report",
+                     logo_tlhs:this.logo_tlhs,
+                     report_opts:{
+                      header:{h1:`Usage Report for CIDR ${this.cidr}`},
+                      nodes:nodes}});
 
   }
    mk_time_interval(){
