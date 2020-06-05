@@ -10,17 +10,21 @@
 .toppers_table_div,.donut_chart_div{
   min-height: 500px;
 }
-
 .panel h3 {
-	font-size: 20px;
-	margin-top:10px;
+  font-size: 20px;
+  margin-top:10px;
+}
+
+.panel-primary h3 small {
+  color:#fff;
 }
 
 h3 small{
-	font-size: 75%;
+  font-size: 75%;
+  margin-left: 5px
 }
 .panel-heading {
-	padding: 5px 15px;
+  padding: 5px 15px;
 }
 .widget-tool {
     float: right;

@@ -1,95 +1,107 @@
-  class ISPDrilldownMapping{
-    constructor(opts) {
-      let js_file =opts.jsfile;
-      let file_path = js_file.split("/")
-      file_path.pop();
-      file_path = file_path.join("/");
-      let css_file = `/plugins/${file_path}/app.css`;
-      $('head').append(`<link rel="stylesheet" type="text/css" href="${css_file}">`);
-      this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
-      this.dash_params = opts.dash_params;
-      this.valid_input =  1;
-      this.logo_tlhs = opts.logo_tlhs;
+/*
 
-      if(this.dash_params.statids == undefined){
-        this.dash_params.cgguid = opts.jsparams.crosskey_router;
-        this.dash_params.ck_cgguid = opts.jsparams.crosskey_interface;
-        this.dash_params.statids=`${opts.jsparams.meters.upload},${opts.jsparams.meters.download}`;
-        this.dash_params.readable = "\\";
-        this.dash_params.label = "\\";
-        this.valid_input=0;
-      }
-
-      this.dom = $(opts.divid);
-      this.time_selector = opts.new_time_selector;
-      this.rand_id=parseInt(Math.random()*100000);
-      this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
-      this.meters = this.dash_params.statids.split(",");
-      this.maxitems=10;
-      this.probe_id = opts.probe_id;
-      this.default_selected_time = opts.new_time_selector;
-      this.load_meters(opts);
-    }
-    
-
-    // load the frame 
-  
-  async load_meters(opts){
-    await this.load_assets(opts);
-    this.cg_meters = {};
-    await get_counters_and_meters_json(this.cg_meters);
-    var fromTS = this.time_selector.start_time_db
-    var toTS = this.time_selector.end_time_db
-    this.tmint = mk_time_interval([fromTS,toTS]);
-    this.reset_ui();
-
+  Drilldown for  Peering analytics app
+  View detailed usage for asn number across all interfaces
+*/
+class ISPDrilldownMapping{
+  constructor(opts){
+    //load app.css file 
+    load_css_file(opts);
+    this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
+    this.crosskey_router = opts.jsparams.crosskey_router;
+    this.crosskey_interface = opts.jsparams.crosskey_interface;
+    this.meters=opts.jsparams.meters;
+    this.dom = $(opts.divid);
+    this.probe_id=opts.probe_id; 
+    this.load_cg_meters(opts);
+    this.logo_tlhs=opts.logo_tlhs;
   }
-
+  async load_cg_meters(opts){
+    this.cg_meters={};
+    await get_counters_and_meters_json(this.cg_meters);
+    await this.load_assets(opts);
+  }
   async load_assets(opts)
   {
     // load app.css file
-    load_css_file(opts);
+    await load_css_file(opts);
     // load template.haml file 
-    this.html_str = await get_html_from_hamltemplate(opts);
-  }
-  async reset_ui(){
-    this.dom.find(".drilldown_data").remove();
-    this.data_dom=$(this.html_str)
-    this.dom.append(this.data_dom);
-    
-    this.dom.find("#drilldown_asn").val(this.dash_params.readable.split("\\")[0]);
-    auto_complete('drilldown_asn',{cgguid:"{03E016FC-46AA-4340-90FC-0E278B93C677}"},{})
-    this.form = this.dom.find(".drilldown_asn_form");
-       //new time selector 
-    this.form.submit($.proxy(this.submit_form,this));
+    let html_str = await get_html_from_hamltemplate(opts);
+    this.haml_dom =$(html_str)
+    //add the form
+    this.form=$(this.haml_dom[0]);
+    this.dom.append(this.form);
     new ShowNewTimeSelector({divid:"#new_time_selector",
                                update_input_ids:"#from_date,#to_date",
-                               default_ts:this.default_selected_time
+                               default_ts:opts.new_time_selector
                             });
-    if(this.valid_input == 0){
-      this.dom.find(".drilldown_data").remove();
-      return;
+    this.form.submit($.proxy(this.submit_form,this));
+    this.parent_cgguid = this.cg_meters.crosskey[this.crosskey_interface][1];
+    auto_complete('drilldown_asn',{update:'autocomplete_asn',cgguid:this.parent_cgguid},{});
+    if(opts.dash_params.valid_input=="1"){
+      this.form.find('#drilldown_asn').val(opts.dash_params.key);
+      this.submit_form();
+    }
+   
+  }
+  //reset ui for every form submit
+  reset_ui(){
+    this.maxitems=10;
+    this.agg_flows=[];
+    this.dom.find(".drilldown_data").remove();
+    this.dom.append($(this.haml_dom[1]).clone());
+  }
+  submit_form(){
+    //this.form.find('#drilldown_asn').val('9498');
+    this.key=this.form.find('#drilldown_asn').val();
+    if(this.key.length ==0 ){
+      alert("ASNumber filed can't be empty.");
+      return false;
     }
     this.mk_time_interval();
-    this.form.submit($.proxy(this.submit_form,this));
-    this.filter_text = this.dash_params.key;
-    this.agg_flows = [];
+    this.reset_ui();
+    this.get_keyt();//starting point for the request
+    return false;
+  }
+
+
+  //construct time interval for trp_request
+  mk_time_interval(){
+    var selected_fromdate = $('#from_date').val();
+    var selected_todate = $('#to_date').val();
+    var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
+    var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
+    this.tmint = mk_time_interval([fromTS,toTS]);
+  }
+  async get_keyt(){
+    let resp=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST, {
+      counter_group: GUID.GUID_CG_ASN(),
+      label:this.key,
+    });
+    this.keyt=resp.keys[0];
     this.update_description();
     let nodes = [];
     let section_headers=[];
-    for(let i=0;i<this.meters.length;i++){
-      this.meter = this.meters[i];
-      this.meter_name=["upload","download"][i]
-      await this.get_toppers();
-      section_headers.push({h1:this.meter_name})
-      nodes.push({find_by:`#table_${this.meter_name}`,type:"table",header_text:"auto",h1:"h3",section_header:i,});
+    for(let meter in this.meters){
+      await this.get_toppers(meter);
+      let idx = Object.keys(this.meters).findIndex(k=>k==meter);
+      section_headers.push({h1:meter});
+      nodes.push({find_by:`#table_${idx}`,type:"table",header_text:"auto",h1:"h3",section_header:idx});
       nodes.push({type:"page_break"});
-      nodes.push({find_by:`#peering_drilldown_${this.meter_name}_donut`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
-      nodes.push({find_by:`#peering_drilldown_${this.meter_name}_traffic_chart`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
+      nodes.push({find_by:`#peering_drilldown_${idx}_donut`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
+      nodes.push({find_by:`#peering_drilldown_${idx}_traffic_chart`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
       nodes.push({type:"page_break"});
-      nodes.push({find_by:`#peering_drilldown_${this.meter_name}_sankey`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
+      nodes.push({find_by:`#peering_drilldown_${idx}_sankey`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
       nodes.push({type:"page_break",add_header_footer:false});
     }
+    await this.get_aggregated_flows("in");
+    await this.get_aggregated_flows("out");
+    this.draw_aggregate_table('internal_ip');
+    this.draw_aggregate_table('external_ip');
+    this.draw_aggregate_table('tag_asnumber');
+    this.draw_aggregate_table('tag_prefixes');
+
+
     section_headers.push({h1:"Top Prefixes and Hosts"});
     let prefixes = ['.tag_asnumber','.tag_prefixes','.internal_ip','.external_ip'];
     for(let i=0; i<prefixes.length; i++ ){
@@ -98,12 +110,8 @@
         nodes.push({type:"page_break",add_header_footer:false});
       }
     }
-    await this.get_aggregated_flows("in");
-    await this.get_aggregated_flows("out");
-    this.draw_aggregate_table('internal_ip');
-    this.draw_aggregate_table('external_ip');
-    this.draw_aggregate_table('tag_asnumber');
-    this.draw_aggregate_table('tag_prefixes');
+
+
     new ExportToPDF({add_button_to:".add_download_btn",
                       tint:this.tmint,
                       logo_tlhs:this.logo_tlhs,
@@ -115,157 +123,91 @@
                         nodes:nodes
                       }
     });
-  }
-  mk_time_interval(){
-    var selected_fromdate = $('#from_date').val();
-    var selected_todate = $('#to_date').val();
-    var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
-    var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
-    this.tmint = mk_time_interval([fromTS,toTS]);
+
 
   }
-  update_description(){
-    this.description = "Drilldown for"
-    let label = this.dash_params.label.split("\\");
-    let readable = this.dash_params.readable.split("\\")
-
-    if (readable.length > 1){
-      this.description = `${this.description}  interface ${label[1]} -> ASN ${readable[0]} `
-    }else{
-      this.description = `${this.description}   ASN ${label[0]}`
+  async get_toppers(meter_name){
+    this.meter_types=this.cg_meters.all_meters_type[this.crosskey_interface];
+    let top_bucket_size=this.cg_meters.all_cg_bucketsize[this.crosskey_interface].top_bucket_size;
+    //if no meter found get it from the parent counter group
+    if(_.size(this.meter_types) == 0 ){
+      
+      this.meter_types = this.cg_meters.all_meters_type[this.parent_cgguid];
     }
-    let description = `${this.description} <i class='fa fa-clock-o fa-fw'></i> ${h_fmtduration(this.tmint.to.tv_sec- this.tmint.from.tv_sec)}`
-    $('.show_description').html(description)
-  }
-  submit_form(){
-    this.mk_time_interval();
-    var newasn = this.form.find("#drilldown_asn").val();
-    var readable = this.dash_params.readable.split("\\")
-
-    readable[0]=newasn
-    readable=readable.join("\\").replace(/\\/g,"\\\\")
-    window.open("/newdash/index?" + 
-                    $.param({
-                        key: newasn,
-                        statids:this.dash_params.statids,
-                        label:this.dash_params.label.replace(/\\/g,"\\\\"),
-                        readable:readable,                        
-                        cgguid:this.dash_params.cgguid,
-                        ck_cgguid:this.dash_params.ck_cgguid,
-                        filter_cgname:this.dash_params.filter_cgname,
-                        window_fromts:this.tmint.from.tv_sec,
-                        window_tots:this.tmint.to.tv_sec,
-                        "dash_key_regex":"gitPeeringAnalyticsDrilldown"
-                    }),"_self");
-    return false;
-  }
-  draw_drill_chart(){
-    let traf_chart_id = `drill_traffic_chart_${this.rand_id}`;
-   
-    $.ajax({
-      url:"/trpjs/generate_chart",
-      data:model_data,
-      context:this,
-      success:function(resp){
-        $('#'+traf_chart_id).html(resp);
-
-      }
-    });
-
-  }
-
-  async get_toppers(filter_cgbase){
-    this.crosskey_cgguid =  this.dash_params.ck_cgguid;
-    this.top_bucket_size =  300;
-    this.meter_types=this.cg_meters.all_meters_type[this.dash_params.cgguid];
-    if(this.crosskey_cgguid){
-      this.top_bucket_size=this.cg_meters.all_cg_bucketsize[this.crosskey_cgguid].top_bucket_size;
-      this.meter_types = this.cg_meters.all_meters_type[this.crosskey_cgguid];
-      if(_.size(this.meter_types) == 0 ){
-        let parent_cgguid = this.selected_crosskey[this.crosskey_cgguid][1];
-        this.meter_types = this.cg_meters.all_meters_type[parent_cgguid];
-      }
-    }
-    this.cgtoppers_resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: this.crosskey_cgguid,
+    let cgtoppers_resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
+      counter_group: this.crosskey_interface,
       time_interval: this.tmint ,
-      meter:this.meter,
-      maxitems:100000
+      key_filter:this.keyt.key, 
+      meter:this.meters[meter_name],
+      maxitems:100
     });
-    this.cgtoppers_resp.keys = this.sort_hash(this.cgtoppers_resp,"metric");
-    //reject sysgrup and xx
-    this.cgtoppers_resp.keys = _.reject(this.cgtoppers_resp.keys,function(topper){
-      return topper.key=="SYS:GROUP_TOTALS" || topper.key.includes("XX");
-    });
-
-    if(this.filter_text){
-      this.cgtoppers_resp.keys = _.select(this.cgtoppers_resp.keys,function(topper){
-        return topper.key.match(this.filter_text) || topper.label.match(this.filter_text)
-      },this);
-    }
-
-    this.draw_table()
-    await this.draw_donut_chart();
-    await this.draw_traffic_chart();
-    await this.draw_sankey_chart();
-
-  }
-  async get_aggregated_flows(intf){
-    let readable = this.dash_params.readable.split("\\");
-    
-    let opts = {flowtag:`[asn]${this.dash_params.key}`,time_interval:this.tmint,probe_id:this.probe_id};
-    if(readable.length > 1){
-      let interfaces = readable[1].split("_");
-      opts["nf_routerid"] = TRP.KeyT.create({label:interfaces[0]});
-      if(interfaces[1]){
-        opts[`nf_ifindex_${intf}`]= TRP.KeyT.create({label:interfaces[1]});
+    this.toppers_data = [];
+    for(let i=0;i<cgtoppers_resp.keys.length;i++)
+    {
+      let kt = cgtoppers_resp.keys[i];
+      if(kt.key=="SYS:GROUP_TOTALS"){
+        continue;
       }
+      this.toppers_data.push({keyt:kt,metric:kt.metric.toNumber()*top_bucket_size});
     }
+    this.toppers_data=this.toppers_data.sort((a, b) => (a.metric > b.metric) ? -1 : 1)
+    this.redraw_all(meter_name);
+  }
+   async get_aggregated_flows(intf){
+    let opts = {flowtag:`[asn]${this.keyt.key}`,time_interval:this.tmint,probe_id:this.probe_id};
     this.agg_flows.push(await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts));
     
   }
 
-  draw_table(){
-    var table = this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(".toppers_table").find("table");
-    table.attr("id",`table_${this.meter_name}`);
-    this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(".toppers_table").removeClass('animated-background');
+  redraw_all(meter_name){
+    let idx = Object.keys(this.meters).findIndex(k=>k==meter_name);
+    this.draw_toppers_table(meter_name,idx);
+    this.draw_donut_chart(meter_name,idx);
+    this.draw_traffic_chart(meter_name,idx);
+    this.draw_sankey_chart(meter_name,idx);
+  }
+
+  draw_toppers_table(meter_name,idx){
+    let meter = this.meters[meter_name];
+    var table = this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table").find("table");
+    table.attr("id",`table_${idx}`);
+    this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table").removeClass('animated-background');
     table.addClass('table table-hover table-sysdata');
     table.find("thead").append("<tr><th>Item</th><th>Label</th><th sort='volume' barspark='auto'>Volume </th>></tr>");
-    let cgtoppers =  this.cgtoppers_resp.keys.slice(0,this.maxitems);
+    let cgtoppers =  this.toppers_data.slice(0,this.maxitems);
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       let link_params =$.param({dash_key:"key",
-                         guid:this.crosskey_cgguid,
-                         key:topper.key,
-                         statid:this.meter});
-      let readable = topper.readable.split("\\").pop();
-      let label = topper.label.split("\\").pop();
+                         guid:this.crosskey_interface,
+                         key:topper.keyt.key,
+                         statid:meter});
+      let readable = topper.keyt.readable.split("\\").pop();
+      let label = topper.keyt.label.split("\\").pop();
       var anchor =  `<a href=/newdash?${link_params} target='_blank'>${readable}</a>`;
       var anchor1 =  `<a href=/newdash?${link_params} target='_blank'>${label}</a>`;
 
-      var key = topper.key.split("//").pop();
+      var key = topper.keyt.key.split("//").pop();
       table.find("tbody").append(`<tr>
                                 <td>${anchor}</td>
                                 <td>${anchor1}</td>
-                                <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
+                                <td>${h_fmtvol(topper.metric)}</td>
                                 </tr>`);
+
 
     }
     add_barspark(table);
     table.tablesorter();
-    
   }
-
-  async draw_donut_chart(){
-    this.donut_div_id = `peering_drilldown_${this.meter_name}_donut`;
-    this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(".donut_chart").removeClass('animated-background');
-    this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(".donut_chart").append($("<div>",{id:this.donut_div_id}));
-    let cgtoppers =  this.cgtoppers_resp.keys.slice(0,this.maxitems);
+  async draw_donut_chart(meter_name,idx){
+    this.donut_div_id = `peering_drilldown_${idx}_donut`;
+    this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart").removeClass('animated-background');
+    this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart").append($("<div>",{id:this.donut_div_id}));
+    let cgtoppers =  this.toppers_data.slice(0,this.maxitems);
     var values = [];
     var labels = [];
     for(let i= 0 ; i <  cgtoppers.length  ; i++){
-      values[i] =  cgtoppers[i].metric.toNumber()*this.top_bucket_size;
-      labels[i] =  cgtoppers[i].label.replace(/:0|:1|:2/g,"");
+      values[i] =  cgtoppers[i].metric;
+      labels[i] =  cgtoppers[i].keyt.label.replace(/:0|:1|:2/g,"");
     }
     var data = [{
       values:values,
@@ -298,18 +240,139 @@
                           showSendToCloud:false,
                           responsive: true };
     Plotly.newPlot(this.donut_div_id, data, layout,ploty_options);
-
-    var keys = _.map(cgtoppers,function(ai){return ai.key});
+  }
+  async draw_traffic_chart(meter_name,idx){
+    let cgtoppers =  this.toppers_data.slice(0,this.maxitems);
+    let keys = cgtoppers.map(x=>x.keyt.key);
     for(let i=0 ; i < keys.length;i++){
       if(keys[i].includes("\\")){
         keys[i]=keys[i].replace(/\\/g,"\\\\")
       }
     }
-  }
+    this.traf_chart_id = `peering_drilldown_${idx}_traffic_chart`
+    this.dom.find(`#peering_drilldown_${idx}`).find(`.interfaces_traffic_chart`).attr("id",this.traf_chart_id);
+    let ref_model = [this.parent_cgguid,this.keyt.key,this.meters[meter_name],"Total"];
+    var model_data = {cgguid:this.crosskey_interface,
+        meter:this.meters[meter_name],
+        key:keys.join(","),
+        from_date:this.form.find("from_date").val(),
+        to_date:this.form.find("to_date").val(),
+        valid_input:1,
+        ref_model:ref_model
+      };
+    if(keys.length==0){
+      $('#'+this.traf_chart_id).html("no data found");
+      return
+    }
+    $.ajax({
+      url:"/trpjs/generate_chart",
+      data:model_data,
+      context:this,
+      success:function(resp){
+        $('#'+this.traf_chart_id).html(resp);
 
+      }
+    });
+  }
+  async draw_sankey_chart(meter_name,midx){
+
+    this.sankey_div_id = `peering_drilldown_${midx}_sankey`;
+    this.dom.find(`#peering_drilldown_${midx}`).find(".interfaces_sankey_chart").append($("<div>",{id:this.sankey_div_id}));
+
+    // Get Bytes Toppers
+    let tdata = this.toppers_data.slice(0,30);
+    let keylookup = {};
+    let idx=0;
+    let links  = { source : [], target : [], value : [] };
+
+    for (let i =0 ; i < tdata.length; i++)
+    {   
+      //change label to :0,:1,:2
+      //http host and host has same lable 
+      let k=tdata[i].keyt.label;
+      let parts=k.split("\\");
+      let router = parts[1].split("_").shift()
+      parts = [parts[0],router,parts[1]];
+     
+
+      parts = _.map(parts,function(ai,ind){
+        return ai.replace(/:0|:1|:2/g,"")+":"+ind;
+      });
+      tdata[i].keyt.label=parts.join("\\")
+      keylookup[parts[0]] = keylookup[parts[0]]==undefined ? idx++ : keylookup[parts[0]];
+      keylookup[parts[1]] = keylookup[parts[1]] || idx++;
+      if (parts[2]) {
+        keylookup[parts[2]] = keylookup[parts[2]] || idx++;
+      }
+        
+    }
+
+    for (let i =0 ; i <tdata.length; i++)
+    {
+      let item=tdata[i];
+      let k=item.keyt.label;
+      let parts=k.split("\\");
+      if (parts[2]) {
+        links.source.push(keylookup[parts[0]])
+        links.target.push(keylookup[parts[1]])
+        links.value.push(parseInt(item.metric))
+        links.source.push(keylookup[parts[1]])
+        links.target.push(keylookup[parts[2]])
+        links.value.push(parseInt(item.metric))
+
+      } else {
+        links.source.push(keylookup[parts[0]])
+        links.target.push(keylookup[parts[1]])
+        links.value.push(parseInt(item.metric))
+      }
+    }
+    let labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2/g,"")).value()
+  
+    Plotly.purge(this.sankey_div_id);
+    var data = {
+      type: "sankey",
+      orientation: "h",
+      node: {
+        pad: 15,
+        thickness: 30,
+        line: {
+          color: "black",
+          width: 0.5
+        },
+        label: labels,
+      },
+
+      link: links
+    }
+
+    //width of div widht
+    var width = this.dom.find(`#${this.sankey_div_id}`).width();
+    width = parseInt(width)-50;
+    var height = labels.length *25;
+    if(height < 250){
+      height =250;
+    }
+    var layout = {
+      title: `${meter_name} Mappings`,
+      width:width,
+      height:height,
+      font: {
+        size: 10
+      },
+      
+    }
+
+    var data = [data]
+    var ploty_options = { modeBarButtonsToRemove: ['hoverClosestCartesian','toggleSpikelines','hoverCompareCartesian',
+                               'sendDataToCloud'],
+                          showSendToCloud:false,
+                          responsive: true };
+
+    Plotly.react(this.sankey_div_id, data, layout, ploty_options)
+  }
   draw_aggregate_table(group){
-    var table = this.data_dom.find(`.${group}`).find("table");
-    this.data_dom.find(`.${group}`).removeClass('animated-background');
+    var table = this.dom.find(`.${group}`).find("table");
+    this.dom.find(`.${group}`).removeClass('animated-background');
     var table_id = "agg_flows_tbl_"+Math.floor(Math.random()*100000);
     table.attr("id",table_id)
     table.addClass('table table-hover table-sysdata');
@@ -362,154 +425,19 @@
     table.tablesorter();
 
   }
-    
-  async draw_traffic_chart(){
-    let cgtoppers =  this.cgtoppers_resp.keys.slice(0,this.maxitems);
-    let keys = _.map(cgtoppers,function(ai){return ai.key});
-    for(let i=0 ; i < keys.length;i++){
-      if(keys[i].includes("\\")){
-        keys[i]=keys[i].replace(/\\/g,"\\\\")
-      }
+  update_description(){
+    let description = "Drilldown for ASN"
+    let label = this.keyt.label;
+    let readable = this.keyt.readable;
+
+    if (readable != label){
+      description = `${description}  ${readable} (${label})`;
+    }else{
+      description = `${description}   ${readable}`
     }
-    this.traf_chart_id = `peering_drilldown_${this.meter_name}_traffic_chart`
-    this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(`.interfaces_traffic_chart`).attr("id",this.traf_chart_id);
-    let ref_model = [this.dash_params.cgguid,this.dash_params.key,this.meter,"Total"]
-    var model_data = {cgguid:this.crosskey_cgguid,
-        meter:this.meter,
-        key:keys.join(","),
-        window_fromts:this.time_selector.start_time_db,
-        window_tots:this.time_selector.end_time_db,
-        valid_input:1,
-        ref_model:ref_model
-      };
-    if(keys.length==0){
-      $('#'+this.traf_chart_id).html("no data found");
-      return
-    }
-    $.ajax({
-      url:"/trpjs/generate_chart",
-      data:model_data,
-      context:this,
-      success:function(resp){
-        $('#'+this.traf_chart_id).html(resp);
-
-      }
-    });
-
-  }
-  async draw_sankey_chart(filter_cgbase){
-
-    this.sankey_div_id = `peering_drilldown_${this.meter_name}_sankey`;
-    this.data_dom.find(`#peering_drilldown_${this.meter_name}`).find(".interfaces_sankey_chart").append($("<div>",{id:this.sankey_div_id}));
-
-    // Get Bytes Toppers
-    this.cgtoppers_bytes = this.cgtoppers_resp.keys;
-    this.cgtoppers_bytes = this.cgtoppers_bytes.slice(0,30);
-    let keylookup = {};
-    let idx=0;
-    let links  = { source : [], target : [], value : [] };
-
-    for (let i =0 ; i < this.cgtoppers_bytes.length; i++)
-    {   
-      //change label to :0,:1,:2
-      //http host and host has same lable 
-      let k=this.cgtoppers_bytes[i].label;
-      let parts=k.split("\\");
-      if(filter_cgbase == "Interfaces"){
-        let router = parts[1].split("_").shift()
-        parts = [parts[0],router,parts[1]];
-      }
-
-      parts = _.map(parts,function(ai,ind){
-        return ai.replace(/:0|:1|:2/g,"")+":"+ind;
-      });
-      this.cgtoppers_bytes[i].label=parts.join("\\")
-      keylookup[parts[0]] = keylookup[parts[0]]==undefined ? idx++ : keylookup[parts[0]];
-      keylookup[parts[1]] = keylookup[parts[1]] || idx++;
-      if (parts[2]) {
-        keylookup[parts[2]] = keylookup[parts[2]] || idx++;
-      }
-        
-    }
-
-    for (let i =0 ; i < this.cgtoppers_bytes.length; i++)
-    {
-      let item=this.cgtoppers_bytes[i];
-      let k=item.label;
-      let parts=k.split("\\");
-      if (parts[2]) {
-        links.source.push(keylookup[parts[0]])
-        links.target.push(keylookup[parts[1]])
-        links.value.push(parseInt(item.metric*this.top_bucket_size))
-        links.source.push(keylookup[parts[1]])
-        links.target.push(keylookup[parts[2]])
-        links.value.push(parseInt(item.metric*this.top_bucket_size))
-
-      } else {
-        links.source.push(keylookup[parts[0]])
-        links.target.push(keylookup[parts[1]])
-        links.value.push(parseInt(item.metric*this.top_bucket_size))
-      }
-    }
-    let labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2/g,"")).value()
-  
-    Plotly.purge(this.sankey_div_id);
-    var data = {
-      type: "sankey",
-      orientation: "h",
-      valuesuffix: this.meter_types[this.meter].units.replace("ps",""),
-      node: {
-        pad: 15,
-        thickness: 30,
-        line: {
-          color: "black",
-          width: 0.5
-        },
-        label: labels,
-      },
-
-      link: links
-    }
-
-    //width of div widht
-    var width = this.data_dom.find(`#${this.sankey_div_id}`).width();
-    width = parseInt(width)-50;
-    var height = labels.length *25;
-    if(height < 250){
-      height =250;
-    }
-    var layout = {
-      title: `${this.meter_name} Mappings`,
-      width:width,
-      height:height,
-      font: {
-        size: 10
-      },
-      
-    }
-
-    var data = [data]
-    var ploty_options = { modeBarButtonsToRemove: ['hoverClosestCartesian','toggleSpikelines','hoverCompareCartesian',
-                               'sendDataToCloud'],
-                          showSendToCloud:false,
-                          responsive: true };
-
-    Plotly.react(this.sankey_div_id, data, layout, ploty_options)
-  }
-  sort_hash(data,key){
-    return data.keys.sort(function(a,b){
-      let v1 = a["key"];
-      let v2 = b["key"];
-      if(key=="metric"){
-        v1  = - a["metric"].toNumber();
-        v2 =  - b["metric"].toNumber();
-      }
-      if (v1 < v2)
-        return -1;
-      if (v1 > v2)
-        return 1;
-      return 0;
-    });
+    this.description = description;
+    description = `${description} <i class='fa fa-clock-o fa-fw'></i> ${h_fmtduration(this.tmint.to.tv_sec- this.tmint.from.tv_sec)}`
+    $('.show_description').html(description)
   }
 
 };
@@ -520,6 +448,6 @@ function run(opts) {
 }
 
 
-  //# sourceURL=ips_drilldown_mappings.js
+  //# sourceURL=isp_drilldown_mappings.js
 
   

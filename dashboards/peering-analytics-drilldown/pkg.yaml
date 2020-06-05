@@ -1,6 +1,6 @@
 name: Peering Analytics Drilldown
 
-version: 0.0.16
+version: 0.0.17
 
 author: trisul
 
@@ -24,6 +24,4 @@ jsparams:
   meters:
     upload: 1
     download: 2
-    uniq_aspath: 3
-    unit_prefix: 4
 

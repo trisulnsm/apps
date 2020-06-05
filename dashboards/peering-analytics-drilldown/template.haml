@@ -1,6 +1,10 @@
 .drilldown_data_form
-  .panel
-    .panel-body
+  .widget
+    .widget-header
+      %h4
+        %i.fa.fa-search
+         Search Criteria
+    .widget-body
         %form.form-horizontal.drilldown_asn_form
           .row
             .col-xs-6
@@ -23,21 +27,21 @@
       %h4.show_description.text-muted
       %ul.nav.nav-tabs#peering_drilldown_tabs
         %li.active
-          %a{href:"#peering_drilldown_upload",data-toggle:"tab",role:"tab"}
+          %a{href:"#peering_drilldown_0",data-toggle:"tab",role:"tab"}
             %i.fa.fa-upload.fa-fw
             Upload
             %span.upload_volume
         %li
-          %a{href:"#peering_drilldown_download",data-toggle:"tab",role:"tab"}
+          %a{href:"#peering_drilldown_1",data-toggle:"tab",role:"tab"}
             %i.fa.fa-download.fa-fw
             Download
             %span.download_volume
         %li
-          %a{href:"#peering_drilldown_hostprefix",data-toggle:"tab",role:"tab"}
+          %a{href:"#peering_drilldown_agg",data-toggle:"tab",role:"tab"}
             %i.fa.fa-table.fa-fw
             Prefixes and Hosts
       .tab-content{style:"padding-top:10px"}
-        .tab-pane.active#peering_drilldown_upload{data-use-width:1}
+        .tab-pane.active#peering_drilldown_0{data-use-width:1}
           .row
             .col-xs-12
               .panel.panel-primary.add_download_btn
@@ -45,6 +49,8 @@
                   %h3
                     %i.fa.fa-table.fa-fw
                     Interface Toppers
+                    %small
+                      Show top  interfaces which uploading data
                 .panel-body
                   .toppers_table.animated-background 
                     %table
@@ -55,7 +61,7 @@
                 .panel-heading
                   %h3
                     %i.fa.fa-pie-chart.fa-fw
-                    Toppers Chart
+                    Percent share of interfaces upload traffic
                 .panel-body
                   .donut_chart.animated-background 
             .col-xs-12
@@ -63,7 +69,9 @@
                 .panel-heading
                   %h3
                     %i.fa.fa-area-chart.fa-fw
-                    Traffic chart for interfaces
+                    Stacked area chart
+                    %small
+                      Showing top interfaces upload traffic over the selected time period
                 .panel-body
                   .interfaces_traffic_chart
             .col-xs-12
@@ -71,13 +79,15 @@
                 .panel-heading
                   %h3
                     %i.fa.fa-random.fa-fw
-                    Interfaces Sankey Chart
+                    Sankey Chart
+                    %small
+                      Shows upload traffic flows from the left side (AS) to the right (Interfaces). Thickness represents volume of traffic. Put your mouse over a node to show actual values.
                 .panel-body
                   .interfaces_sankey_chart
 
 
 
-        .tab-pane#peering_drilldown_download{data-use-width:1}
+        .tab-pane#peering_drilldown_1{data-use-width:1}
           .row
             .col-xs-12
               .panel.panel-success
@@ -85,6 +95,8 @@
                   %h3
                     %i.fa.fa-table.fa-fw
                     Interface Toppers
+                    %small
+                      Show top  interfaces which downloading data
                 .panel-body
                   .toppers_table.animated-background 
                     %table
@@ -95,7 +107,8 @@
                 .panel-heading
                   %h3
                     %i.fa.fa-pie-chart.fa-fw
-                    Toppers Chart
+                    Percent share of interfaces download traffic
+
                 .panel-body
                   .donut_chart.animated-background 
             .col-xs-12
@@ -103,7 +116,9 @@
                 .panel-heading
                   %h3
                     %i.fa.fa-area-chart.fa-fw
-                    Traffic chart for interfaces
+                    Stacked area chart
+                    %small
+                      Showing top interfaces download traffic over the selected time period
                 .panel-body
                   .interfaces_traffic_chart
             .col-xs-12
@@ -111,11 +126,13 @@
                 .panel-heading
                   %h3
                     %i.fa.fa-random.fa-fw
-                    Interfaces Sankey Chart
+                    Sankey Chart
+                    %small
+                      Shows download traffic flows from the left side (AS) to the right (Interfaces). Thickness represents volume of traffic. Put your mouse over a node to show actual values.
                 .panel-body
                   .interfaces_sankey_chart
 
-        .tab-pane#peering_drilldown_hostprefix{data-use-width:1}
+        .tab-pane#peering_drilldown_agg{data-use-width:1}
             .row
               .col-xs-6
                 .panel.panel-success

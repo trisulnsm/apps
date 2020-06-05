@@ -1,4 +1,10 @@
-/*
+/*- 
+  Peering Analytics(ASN)
+  Show detailed ASN Usage
+    // User selectes router and interfaces - Show ASNumber usage for crosskey interface ASN
+    // User selectes only router - Show ASNumber usage for crosskey routers ASN
+    // User selectes none show deafult ASNumber from default ASNumber couter group
+
   Explore router or interface usage details
 */
 class ISPOverviewMapping{
@@ -6,16 +12,17 @@ class ISPOverviewMapping{
 
     this.dom = $(opts.divid);
     this.rand_id="";
+   
     this.default_selected_time = opts.new_time_selector;
     this.logo_tlhs = opts.logo_tlhs;
     //we need it for time zone conversion
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
+    //if user doesn't select router and interfaces use this
     this.filter_cgguid = "{03E016FC-46AA-4340-90FC-0E278B93C677}";
     this.crosskey_router = null;
     this.crosskey_interface=null;
     this.meter_details_in = {upload:0,download:1,uniq_aspath:2,uniq_prefix:3}
     //filter by router and interface crosskey
-
     if(opts.jsparams &&  _.size(opts.jsparams)>0){
       this.crosskey_router = opts.jsparams.crosskey_router;
       this.crosskey_interface = opts.jsparams.crosskey_interface;
@@ -98,14 +105,13 @@ class ISPOverviewMapping{
       chosen:true
     }
 
-
     await load_routers_interfaces_dropdown(load_router_opts);
-
-
 
     this.cg_meters = {};
     await get_counters_and_meters_json(this.cg_meters);
-    //find crosskeyguid is present automatically find base counter group
+    //Default is ASNumber 
+    //If crosskey is created take the parent cgguid from counter group cross key(flow-asn)
+    
     if(this.crosskey_interface && this.cg_meters.crosskey[this.crosskey_interface]){
       this.filter_cgguid = this.cg_meters.crosskey[this.crosskey_interface][1];
     }
@@ -151,6 +157,16 @@ class ISPOverviewMapping{
       await this.get_data();
     };
     this.form.find("#btn_submit").prop('disabled', false);
+    new ExportToPDF({add_button_to:".add_download_btn",
+                      tint:this.tmint,
+                      logo_tlhs:this.logo_tlhs,
+                      download_file_name:"Peering_analytics",
+                      report_opts:{
+                        header:{h1:"Peering Analytics Report"},
+                        report_title:{h1:this.target_text},
+                        nodes:this.report_nodes 
+                      }
+                    });
   }
 
   // reset UI for every submit
@@ -166,6 +182,19 @@ class ISPOverviewMapping{
       e.preventDefault()
       $(this).tab('show')
     });
+    this.report_nodes = [];
+    _.each([this.meter_details_in.upload,this.meter_details_in.download],$.proxy(function(ai,idx){
+      this.report_nodes.push({type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:0,find_by:`#table_${ai}`});
+      this.report_nodes.push({type:"page_break"});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#traffic_chart_${idx}_`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#dount_chart${idx}_`});
+      this.report_nodes.push({type:"page_break"});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#sankey_chart_${idx}`});
+      if(idx==0){
+        this.report_nodes.push({type:"page_break",add_header_footer:false});
+      }
+      
+    },this));
     //this.data_dom.find('.toppers_table_div').append("<span class='notify'><i class='fa fa-spinner fa-spin'></i>Please wait...</span>");
     //title part
 
@@ -377,29 +406,7 @@ class ISPOverviewMapping{
     },this));
     table.tablesorter();
     table.closest('.panel').find(".badge").html(rows.length);
-    let nodes = [];
-    _.each([this.meter_details_in.upload,this.meter_details_in.download],function(ai,idx){
-      nodes.push({type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:0,find_by:`#table_${ai}`});
-      nodes.push({type:"page_break"});
-      nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#traffic_chart_${idx}_`});
-      nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#dount_chart${idx}_`});
-      nodes.push({type:"page_break"});
-      nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#sankey_chart_${idx}`});
-      if(idx==0){
-        nodes.push({type:"page_break",add_header_footer:false});
-      }
-      
-    });
-    new ExportToPDF({add_button_to:".add_download_btn",
-                      tint:this.tmint,
-                      logo_tlhs:this.logo_tlhs,
-                      download_file_name:"Peering_analytics",
-                      report_opts:{
-                        header:{h1:"Peering Analytics Report"},
-                        report_title:{h1:this.target_text},
-                        nodes:nodes
-                      }
-                    });
+   
   }
 
   pagination_callback(){
@@ -527,6 +534,10 @@ class ISPOverviewMapping{
 
   }
   async draw_sankey_chart(){
+    console.log(`filter_cgguid=${this.filter_cgguid}`);
+    console.log(`crosskeyguid=${this.crosskey_cgguid}`);
+    console.log(`cgguid=${this.cgguid}`);
+
     this.sankey_div_id = `sankey_chart_${this.meter_index}${this.rand_id}`;
     this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".sankey_chart").append($("<div>",{id:this.sankey_div_id}));
     if(this.crosskey_cgguid == this.filter_cgguid){
@@ -656,14 +667,9 @@ class ISPOverviewMapping{
         window.open("/newdash/index?" + 
                     $.param({
                         key: tr.data("key"),
-                        statids:tr.data("statids"),
-                        label:`${tr.data("label")}`.toString().replace(/\\/g,"\\\\"),
-                        readable:`${tr.data("readable")}`.toString().replace(/\\/g,"\\\\"),                        
-                        cgguid:this.filter_cgguid,
-                        ck_cgguid:ck_cgguid,
-                        filter_cgname:this.filter_cgname,
                         window_fromts:this.tmint.from.tv_sec,
                         window_tots:this.tmint.to.tv_sec,
+                        valid_input:1,
                         "dash_key_regex":"gitPeeringAnalyticsDrilldown"
                     }));
         break;
