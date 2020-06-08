@@ -261,6 +261,10 @@ class ASNPathAnalytics{
     }
     $('.tot_upload_vol').text(` (${h_fmtvol(tot_volume[0])})`);
     $('.tot_download_vol').text(` (${h_fmtvol(tot_volume[1])})`);
+    
+    this.data[0].keys.sort( (a,b) => a.metric > b.metric?-1:1)
+    this.data[1].keys.sort( (a,b) => a.metric > b.metric?-1:1)
+
     this.redraw_all();
   }
 
@@ -295,7 +299,7 @@ class ASNPathAnalytics{
     }
     new TrisTablePagination(table_id.replace("#",""),{no_of_rows:10,rows:rows});
     table.tablesorter();
-    new ExportToCSV({table_id:table_id.replace("#",""),filename_prefix:"top_asn_panel",append_to:"panel"});
+    new ExportToCSV({table_id:table_id.replace("#",""),filename_prefix:"top_paths",append_to:"panel"});
 
 
   }
