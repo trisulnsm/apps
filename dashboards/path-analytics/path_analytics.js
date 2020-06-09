@@ -299,7 +299,22 @@ class ASNPathAnalytics{
     }
     new TrisTablePagination(table_id.replace("#",""),{no_of_rows:10,rows:rows});
     table.tablesorter();
-    new ExportToCSV({table_id:table_id.replace("#",""),filename_prefix:"top_paths",append_to:"panel"});
+    new ExportToPDF({add_button_to:".add_download_btn",
+                      tint:this.tmint,
+                      logo_tlhs:this.logo_tlhs,
+                      download_file_name:"path_analytics",
+                      report_opts:{
+                        header:{h1:"Path Analytics"},
+                        section_headers:[{h1:"Upload"},{h1:"download"}],
+                        nodes:[{find_by:`#table_upload`,type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:0},
+                               {type:"page_break"},
+                               {find_by:`.sankey_chart_upload`,type:"svg",header_text:"auto",h1:"h3",h2:"h3 small"},
+                               {type:"page_break",add_header_footer:false},
+                               {find_by:`#table_download`,type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:1},
+                               {type:"page_break"},
+                               {find_by:`.sankey_chart_upload`,type:"svg",header_text:"auto",h1:"h3",h2:"h3 small"}]
+                      }
+    });
 
 
   }
