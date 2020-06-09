@@ -20,7 +20,7 @@
         "TopNCount": 30000,
         "BottomNCount": 0,
         "Name": "recv",
-        "Description": "Recv from AS",
+        "Description": "Recv from Upstream AS",
         "Units": "Bps"
       },
       {
@@ -31,13 +31,35 @@
         "TopNCount": 30000,
         "BottomNCount": 0,
         "Name": "xmit",
-        "Description": "Transmit to AS",
+        "Description": "Transmit to Upstream AS",
         "Units": "Bps"
       },
       {
         "id": 329,
         "ItemGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
         "SubItem": 3,
+        "VarType": 4,
+        "TopNCount": 30000,
+        "BottomNCount": 0,
+        "Name": "recv",
+        "Description": "Recv from Downstream AS",
+        "Units": "Bps"
+      },
+      {
+        "id": 330,
+        "ItemGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
+        "SubItem": 4,
+        "VarType": 4,
+        "TopNCount": 30000,
+        "BottomNCount": 0,
+        "Name": "xmit",
+        "Description": "Transmit to Downstream AS",
+        "Units": "Bps"
+      },
+      {
+        "id": 331,
+        "ItemGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
+        "SubItem": 5,
         "VarType": 5,
         "TopNCount": 30000,
         "BottomNCount": 20,
@@ -46,9 +68,9 @@
         "Units": "Uniques "
       },
       {
-        "id": 330,
+        "id": 332,
         "ItemGUID": "{A6411875-1C9C-2C6C-4879-54C437223815}",
-        "SubItem": 4,
+        "SubItem": 6,
         "VarType": 5,
         "TopNCount": 30000,
         "BottomNCount": 20,

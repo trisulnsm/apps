@@ -2,47 +2,80 @@
   "TrisulCtlCountervar": [
     [
       {
-        "id": 248,
+        "id": 365,
         "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
         "SubItem": 0,
         "VarType": 4,
         "TopNCount": 1000,
-        "BottomNCount": 20,
-        "Name": "Upload",
-        "Description": "Upload Bytes",
+        "BottomNCount": 0,
+        "Name": "total",
+        "Description": "Total",
         "Units": "Bps"
       },
       {
-        "id": 249,
+        "id": 366,
         "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
         "SubItem": 1,
         "VarType": 4,
         "TopNCount": 1000,
-        "BottomNCount": 20,
-        "Name": "Download",
-        "Description": "Download Bytes",
+        "BottomNCount": 0,
+        "Name": "recv-up",
+        "Description": "Recv from Upstream AS",
         "Units": "Bps"
       },
       {
-        "id": 250,
+        "id": 367,
         "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
         "SubItem": 2,
+        "VarType": 4,
+        "TopNCount": 1000,
+        "BottomNCount": 0,
+        "Name": "xmit-up",
+        "Description": "Transmit to Upstream AS",
+        "Units": "Bps"
+      },
+      {
+        "id": 368,
+        "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
+        "SubItem": 3,
+        "VarType": 4,
+        "TopNCount": 100,
+        "BottomNCount": 0,
+        "Name": "recv-down",
+        "Description": "Recv from Downstream AS",
+        "Units": "Bps"
+      },
+      {
+        "id": 369,
+        "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
+        "SubItem": 4,
+        "VarType": 4,
+        "TopNCount": 100,
+        "BottomNCount": 0,
+        "Name": "xmit-down",
+        "Description": "Transmit to Downstream AS",
+        "Units": "Bps"
+      },
+      {
+        "id": 370,
+        "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
+        "SubItem": 5,
         "VarType": 5,
         "TopNCount": 1000,
         "BottomNCount": 20,
         "Name": "uniqs",
-        "Description": "Unique Prefix per AS",
+        "Description": "Unused Cardinality counter",
         "Units": "Uniques "
       },
       {
-        "id": 251,
+        "id": 371,
         "ItemGUID": "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}",
-        "SubItem": 3,
+        "SubItem": 6,
         "VarType": 5,
         "TopNCount": 1000,
         "BottomNCount": 20,
         "Name": "uniqs",
-        "Description": "Unique ASPATH per ASN",
+        "Description": "Unused Cardinality counter",
         "Units": "Uniques "
       }
     ]
