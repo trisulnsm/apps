@@ -1,6 +1,6 @@
 name: Peering Analytics
 
-version: 1.0.16
+version: 1.0.17
 
 author: trisul
 
@@ -22,7 +22,9 @@ jsparams:
   crosskey_router: "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}"
   crosskey_interface: "{A6411875-1C9C-2C6C-4879-54C437223815}"
   meters:
-    upload: 1
-    download: 2
-    uniq_aspath: 3
-    unit_prefix: 4
+    upstream_receive: 1
+    upstream_transmit: 2
+    downstream_receive: 3
+    downstream_transmit: 4
+    uniq_aspath: 5
+    unit_prefix: 6

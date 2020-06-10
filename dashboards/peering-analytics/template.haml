@@ -35,14 +35,28 @@
       %ul.nav.nav-tabs#isp_overview_tabs
         %li.active
           %a{href:"#isp_overview_0",data-toggle:"tab",role:"tab"}
+            %i.fa.fa-cloud-upload.fa-fw
             %i.fa.fa-upload.fa-fw
-            Upload
+            Receive from Upstream
             %span.volume_0
         %li
           %a{href:"#isp_overview_1",data-toggle:"tab",role:"tab"} 
+            %i.fa.fa-cloud-upload.fa-fw
             %i.fa.fa-download.fa-fw
-            Download
+            Transmit to Upstream
             %span.volume_1
+        %li
+          %a{href:"#isp_overview_2",data-toggle:"tab",role:"tab"} 
+            %i.fa.fa-cloud-download.fa-fw
+            %i.fa.fa-download.fa-fw
+            Receive from Downstream
+            %span.volume_2
+        %li
+          %a{href:"#isp_overview_3",data-toggle:"tab",role:"tab"} 
+            %i.fa.fa-cloud-download.fa-fw
+            %i.fa.fa-download.fa-fw
+            Transmit to Downstream
+            %span.volume_3
       .tab-content{style:"padding-top:10px"}
         .tab-pane.active#isp_overview_0{data-use-width:1}
           .row
@@ -51,8 +65,8 @@
                 .panel-heading
                   %h3 
                     %i.fa.fa-table.fa-fw
-                    Top Upload AS 
-                    %small Show top 100 AS to which you are uploading data
+                    Top Upstream AS Receive 
+                    %small Show top 100 AS by Receive (Downloading) 
                     %span.badge.badge-info
                   %p.target
                 .panel-body
@@ -106,8 +120,8 @@
                 .panel-heading
                   %h3 
                     %i.fa.fa-table.fa-fw
-                    Top Download AS 
-                    %small Show top 100 AS to which you are downloading data
+                    Top Upstream Transmit AS 
+                    %small Show top 100 Upstream AS by Transmit (Upload)
                     %span.badge.badge-info
                   %p
                     %small.target
@@ -138,6 +152,118 @@
                   %h3
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of AS download traffic 
+                  %p
+                    %small.target
+                .panel-body
+                  .donut_chart
+                  .animated-background
+          .row
+            .col-xs-12.sankey_chart_div
+              .panel.panel-success
+                .panel-heading
+                  %h3 
+                    %i.fa.fa-random.fa-fw 
+                    Sankey Chart 
+                    %small
+                      Shows download traffic flows from the left side (AS) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
+                .panel-body
+                  .sankey_chart
+                  .animated-background
+        .tab-pane#isp_overview_2{data-use-width:1}
+          .row
+            .col-xs-12.toppers_table_div
+              .panel.panel-success
+                .panel-heading
+                  %h3 
+                    %i.fa.fa-table.fa-fw
+                    Top Downstream Receive AS 
+                    %small Show top Downstream AS by Receive (Downstream sending data)
+                    %span.badge.badge-info
+                  %p
+                    %small.target
+                .panel-body
+                  .toppers_table
+                    %table
+                      %thead
+                      %tbody
+                    .animated-background
+          .row
+            .col-xs-12.traffic_chart_div
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-area-chart.fa-fw 
+                    Stacked area chart  
+                    %small Showing top AS download traffic over the selected time period 
+                  %p
+                    %small.target
+                   
+                .panel-body
+                  .traffic_chart
+                  .animated-background
+          .row
+            .col-xs-12.donut_chart_div
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-pie-chart.fa-fw 
+                    Percent share of AS download traffic 
+                  %p
+                    %small.target
+                .panel-body
+                  .donut_chart
+                  .animated-background
+          .row
+            .col-xs-12.sankey_chart_div
+              .panel.panel-success
+                .panel-heading
+                  %h3 
+                    %i.fa.fa-random.fa-fw 
+                    Sankey Chart 
+                    %small
+                      Shows download traffic flows from the left side (AS) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
+                .panel-body
+                  .sankey_chart
+                  .animated-background
+        .tab-pane#isp_overview_3{data-use-width:1}
+          .row
+            .col-xs-12.toppers_table_div
+              .panel.panel-success
+                .panel-heading
+                  %h3 
+                    %i.fa.fa-table.fa-fw
+                    Top Downstream Transmit AS 
+                    %small Show top Downstream AS by Transmit (Transmit to downstream)
+                    %span.badge.badge-info
+                  %p
+                    %small.target
+                .panel-body
+                  .toppers_table
+                    %table
+                      %thead
+                      %tbody
+                    .animated-background
+          .row
+            .col-xs-12.traffic_chart_div
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-area-chart.fa-fw 
+                    Stacked area chart  
+                    %small Showing top AS download traffic over the selected time period 
+                  %p
+                    %small.target
+                   
+                .panel-body
+                  .traffic_chart
+                  .animated-background
+          .row
+            .col-xs-12.donut_chart_div
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-pie-chart.fa-fw 
+                    Percent share of downstream receive traffic 
                   %p
                     %small.target
                 .panel-body

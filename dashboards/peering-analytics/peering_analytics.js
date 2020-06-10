@@ -21,7 +21,9 @@ class ISPOverviewMapping{
     this.filter_cgguid = "{03E016FC-46AA-4340-90FC-0E278B93C677}";
     this.crosskey_router = null;
     this.crosskey_interface=null;
-    this.meter_details_in = {upload:0,download:1,uniq_aspath:2,uniq_prefix:3}
+    this.meter_details_in = {upstream_receive:1,upstream_transmit:2,
+                             downstream_receive:3,downstream_transmit:4,
+                             uniq_aspath:5,uniq_prefix:6}
     //filter by router and interface crosskey
     if(opts.jsparams &&  _.size(opts.jsparams)>0){
       this.crosskey_router = opts.jsparams.crosskey_router;
@@ -150,7 +152,7 @@ class ISPOverviewMapping{
   }
   async get_data_all_meters_data(){
     let keys = Object.keys(this.meter_details_in);
-    keys = keys.slice(0,2);
+    keys = keys.slice(0,);  
     for (const [i, key] of keys.entries()) {
       this.meter_index = i;
       this.meter = this.meter_details_in[key];
@@ -183,11 +185,11 @@ class ISPOverviewMapping{
       $(this).tab('show')
     });
     this.report_nodes = [];
-    _.each([this.meter_details_in.upload,this.meter_details_in.download],$.proxy(function(ai,idx){
+    _.each([this.meter_details_in.upstream_receive,this.meter_details_in.upstream_transmit,this.meter_details_in.downstream_receive,this.meter_details_in.downstream_transmit],$.proxy(function(idx,ai){
       this.report_nodes.push({type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:0,find_by:`#table_${ai}`});
       this.report_nodes.push({type:"page_break"});
       this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#traffic_chart_${idx}_`});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#dount_chart${idx}_`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#donut_chart${idx}_`});
       this.report_nodes.push({type:"page_break"});
       this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#sankey_chart_${idx}`});
       if(idx==0){
@@ -195,9 +197,7 @@ class ISPOverviewMapping{
       }
       
     },this));
-    //this.data_dom.find('.toppers_table_div').append("<span class='notify'><i class='fa fa-spinner fa-spin'></i>Please wait...</span>");
-    //title part
-
+   
   }
 
   
@@ -298,8 +298,7 @@ class ISPOverviewMapping{
       this.sys_group_totals = this.sys_group_totals + topper.metric.toNumber(); 
     },this);
     this.sys_group_totals = this.sys_group_totals*this.top_bucket_size;
-   
-    
+
     await this.draw_table();
     await this.draw_chart();
     await this.draw_sankey_chart();
@@ -311,7 +310,7 @@ class ISPOverviewMapping{
     // get uniq prefix and interfaces
     let uniques = {};
     let keys = Object.keys(this.meter_details_in);
-    keys = keys.slice(2,4);
+    keys = keys.slice(4,6);
     if(keys.length==0){
       this.meter_details_in["uniq_aspath"] = 2
       this.meter_details_in["uniq_prefix"] = 3
@@ -375,7 +374,7 @@ class ISPOverviewMapping{
         }
       let readable = topper.readable.split("\\").shift();
       let label = topper.label.split("\\").shift();
-      let desc = topper.description
+      let desc = topper.description.replace("\\\\","")
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
       
@@ -436,8 +435,8 @@ class ISPOverviewMapping{
   }
 
   async draw_chart(){
-    this.dount_div_id = `dount_chart${this.meter_index}_${this.rand_id}`;
-    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
+    this.donut_div_id = `donut_chart${this.meter_index}_${this.rand_id}`;
+    this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.donut_div_id}));
     this.trfchart_div_id = `traffic_chart_${this.meter_index}_${this.rand_id}`;
     this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".traffic_chart").append($("<div>",{id:this.trfchart_div_id}));
     this.data_dom.find(`#isp_overview_${this.meter_index}`).find(".traffic_chart_div").find(".animated-background").remove();
@@ -482,10 +481,10 @@ class ISPOverviewMapping{
                                'sendDataToCloud'],
                           showSendToCloud:false,
                           responsive: true };
-    Plotly.newPlot(this.dount_div_id, data, layout,ploty_options);
+    Plotly.newPlot(this.donut_div_id, data, layout,ploty_options);
 
     if(cgtoppers.length==0){
-      $('#'+this.dount_div_id).html("<div class='alert alert-info'>No data found.</div>"); 
+      $('#'+this.donut_div_id).html("<div class='alert alert-info'>No data found.</div>"); 
     }
 
     var keys = _.map(cgtoppers,function(ai){return ai.key});
@@ -732,27 +731,37 @@ class ISPOverviewMapping{
                   probe_id:this.probe_id,
                   group_by_fields:["flowtag"]};
 
-    if(this.filter_text && this.filter_text.split("_").length >=1){
-      let interfaces = this.filter_text.split("_");
-      opts["nf_routerid"] = TRP.KeyT.create({key:interfaces[0]});
-      if(interfaces[1]){
-        if (statid == 0){
-          shell_modal.find(".modal-header h4 span.badge").addClass('badge-success');
-          opts[`nf_ifindex_out`]= TRP.KeyT.create({key:interfaces[1]});
-        }else{
-          shell_modal.find(".modal-header h4 span.badge").addClass('badge-warning');
-          opts[`nf_ifindex_in`]= TRP.KeyT.create({key:interfaces[1]});
-        }
-      }
+    if(!this.filter_text || this.filter_text.split("_").length < 1){
+      shell_modal.find(".modal-body h4").html("<div class='alert alert-info'>You have to select an interface </div>");
+      return true;
     }
-    let resp = await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts);
 
-    let prefix_toppers =resp.tag_group.find(x=>x.group_name=="prf")
-    if(! prefix_toppers){
+    let interfaces = this.filter_text.split("_");
+      
+    opts["nf_routerid"] = TRP.KeyT.create({key:interfaces[0]});
+    opts[`nf_ifindex_out`]= TRP.KeyT.create({key:interfaces[1]});
+    
+    let resp_out = await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts);
+    
+    opts[`nf_ifindex_out`]= null;
+    opts[`nf_ifindex_in`]= TRP.KeyT.create({key:interfaces[1]});
+    let resp_in = await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts);
+    
+    let tag_metrics=[]
+    let prefix_toppers =resp_out.tag_group.find(x=>x.group_name=="prf");
+    if(prefix_toppers){
+      tag_metrics = prefix_toppers.tag_metrics.slice(0,100);
+    }
+    prefix_toppers =resp_in.tag_group.find(x=>x.group_name=="prf");
+    if(prefix_toppers){
+      tag_metrics=tag_metrics.concat(prefix_toppers.tag_metrics.slice(0,100));
+    }
+
+
+    if(!prefix_toppers){
       shell_modal.find(".modal-body h4").html("<div class='alert alert-info'>No data found</div>");
       return true;
     }
-    let tag_metrics = prefix_toppers.tag_metrics.slice(0,100);
 
     // resolve using the BGP prefix query 
     let prefix_csv = _.chain(tag_metrics)
@@ -762,7 +771,7 @@ class ISPOverviewMapping{
                      .value();
 
     // bgp query prefix to ORG 
-    resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
+    let resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
                                 {
                                   tool:5,
                                   tool_input: `-t -B -d -n 0 -P TOOL_INPUT_FILE`,
