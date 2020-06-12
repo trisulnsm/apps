@@ -12,8 +12,8 @@ class ISPPrefixExternalMapping{
     this.filter_cgguid = "{00990011-44BD-4C55-891A-77823D59161B}";
     this.crosskey_router = null;
     this.crosskey_interface=null;
-    this.meter_details_in = {upload:0,download:1,uniq_aspath:2,uniq_prefix:3}
-    //filter by router and interface crosskey
+    this.meter_details_in = {upstream_receive:1,upstream_transmit:2,downstream_receive:4,downstream_transmit:5}
+    //filter by router and interface crosskeye
 
     if(opts.jsparams &&  _.size(opts.jsparams)>0){
       this.crosskey_router = opts.jsparams.crosskey_router;
@@ -51,8 +51,8 @@ class ISPPrefixExternalMapping{
 
     try {
       opts= { 
-          crosskey_router:    cginfo.group_details.find( (item) => item.name=="Auto_Routers_ASN").guid ,
-          crosskey_interface: cginfo.group_details.find( (item) => item.name=="Auto_Interfaces_ASN").guid
+          crosskey_router:    cginfo.group_details.find( (item) => item.name=="Auto_Routers_Prefix").guid ,
+          crosskey_interface: cginfo.group_details.find( (item) => item.name=="Auto_Interfaces_Prefix").guid
       }
     } catch(err) {
       console.log("Unable to find counter group Auto_Routers_ASN needed for this app");
@@ -185,7 +185,7 @@ class ISPPrefixExternalMapping{
   }
   async get_data_all_meters_data(){
     let keys = Object.keys(this.meter_details_in);
-    keys = keys.slice(0,2);
+    keys = keys.slice(0,4);
     for (const [i, key] of keys.entries()) {
       this.meter_index = i;
       this.meter = this.meter_details_in[key];
@@ -363,7 +363,7 @@ class ISPPrefixExternalMapping{
       let label = topper.label.split("\\").shift();
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
-      let statids = Object.values(this.meter_details_in).slice(0,2)
+      let statids = Object.values(this.meter_details_in).slice(0,4)
 
       rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" 
                     data-readable="${topper.readable}" data-full_key="${full_key}"
