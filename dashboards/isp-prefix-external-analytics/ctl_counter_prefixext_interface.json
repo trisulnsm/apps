@@ -38,7 +38,7 @@
         "id": 334,
         "ItemGUID": "{DB9CC485-B983-4BF9-1031-BB49131E891C}",
         "SubItem": 3,
-        "VarType": 4,
+        "VarType": 2,
         "TopNCount": 50,
         "BottomNCount": 0,
         "Name": "flows",
