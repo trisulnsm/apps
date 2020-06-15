@@ -88,26 +88,10 @@ class ISPOverviewMapping{
     new ShowNewTimeSelector({divid:"#new_time_selector"+this.rand_id,
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
-                            });
+                            },this.callback_load_routers,this);
     this.mk_time_interval();
 
-    let selected_router = null, selected_interface=null;
-    let incoming_key = this.dash_params.key || ""
-    let keyparts = incoming_key.split("_");
-    if (keyparts.length==2) {
-      selected_router = keyparts[0];
-      selected_interface = keyparts.join("_");
-    }
-
-    var load_router_opts = {
-      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router"),
-      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface"),
-      update_dom_cg : "routers"+this.rand_id,
-      update_dom_st : "interfaces"+this.rand_id,
-      chosen:true
-    }
-
-    await load_routers_interfaces_dropdown(load_router_opts);
+    this.load_routers_interfaces();
 
     this.cg_meters = {};
     await get_counters_and_meters_json(this.cg_meters);
@@ -122,6 +106,32 @@ class ISPOverviewMapping{
     if(this.dash_params.valid_input == "1" || this.dash_params.valid_input==1){
       this.form.submit();
     }    
+  }
+
+  async callback_load_routers(s,e,args){
+    await args.load_routers_interfaces();
+  }
+
+  async load_routers_interfaces(){
+    this.mk_time_interval();
+    let selected_router = null, selected_interface=null;
+    let incoming_key = this.dash_params.key || ""
+    let keyparts = incoming_key.split("_");
+    if (keyparts.length==2) {
+      selected_router = keyparts[0];
+      selected_interface = keyparts.join("_");
+    }
+
+    var load_router_opts = {
+      tmint : this.tmint,
+      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router"),
+      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface"),
+      update_dom_cg : "routers"+this.rand_id,
+      update_dom_st : "interfaces"+this.rand_id,
+      chosen:true
+    }
+
+    await load_routers_interfaces_dropdown(load_router_opts);
   }
 
 
@@ -158,7 +168,6 @@ class ISPOverviewMapping{
       this.meter = this.meter_details_in[key];
       await this.get_data();
     };
-    console.log(this.report_nodes)
     this.form.find("#btn_submit").prop('disabled', false);
     new ExportToPDF({add_button_to:".add_download_btn",
                       tint:this.tmint,
@@ -330,7 +339,6 @@ class ISPOverviewMapping{
       }
       let resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, req_opts);
       _.each(resp.keys,function(keyt){
-        console.log
         if(! uniques.hasOwnProperty(keyt.key)){
           uniques[keyt.key]=[0,0]
         }
