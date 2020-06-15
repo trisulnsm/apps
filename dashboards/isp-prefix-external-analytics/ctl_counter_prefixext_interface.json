@@ -20,7 +20,7 @@
         "TopNCount": 30000,
         "BottomNCount": 0,
         "Name": "recv",
-        "Description": "Prefixes Recv",
+        "Description": "Upstream Recv",
         "Units": "Bps"
       },
       {
@@ -31,24 +31,46 @@
         "TopNCount": 30000,
         "BottomNCount": 0,
         "Name": "xmit",
-        "Description": "Prefixes Xmit",
+        "Description": "Upstream Xmit",
         "Units": "Bps"
       },
       {
         "id": 334,
         "ItemGUID": "{DB9CC485-B983-4BF9-1031-BB49131E891C}",
         "SubItem": 3,
-        "VarType": 4,
+        "VarType": 2,
         "TopNCount": 50,
         "BottomNCount": 0,
         "Name": "flows",
-        "Description": "Prefixes Flows",
+        "Description": "Flows",
         "Units": "Flws"
       },
       {
         "id": 335,
         "ItemGUID": "{DB9CC485-B983-4BF9-1031-BB49131E891C}",
         "SubItem": 4,
+        "VarType": 4,
+        "TopNCount": 30000,
+        "BottomNCount": 0,
+        "Name": "recv",
+        "Description": "Downstream Recv",
+        "Units": "Bps"
+      },
+      {
+        "id": 336,
+        "ItemGUID": "{DB9CC485-B983-4BF9-1031-BB49131E891C}",
+        "SubItem": 5,
+        "VarType": 4,
+        "TopNCount": 30000,
+        "BottomNCount": 0,
+        "Name": "xmit",
+        "Description": "Downstream Xmit",
+        "Units": "Bps"
+      },
+      {
+        "id": 337,
+        "ItemGUID": "{DB9CC485-B983-4BF9-1031-BB49131E891C}",
+        "SubItem": 6,
         "VarType": 5,
         "TopNCount": 20,
         "BottomNCount": 20,
@@ -57,9 +79,9 @@
         "Units": "Uniques "
       },
       {
-        "id": 336,
+        "id": 338,
         "ItemGUID": "{DB9CC485-B983-4BF9-1031-BB49131E891C}",
-        "SubItem": 5,
+        "SubItem": 7,
         "VarType": 5,
         "TopNCount": 20,
         "BottomNCount": 20,
