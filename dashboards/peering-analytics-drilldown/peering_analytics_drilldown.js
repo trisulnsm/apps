@@ -15,6 +15,7 @@ class ISPDrilldownMapping{
     this.probe_id=opts.probe_id; 
     this.load_cg_meters(opts);
     this.logo_tlhs=opts.logo_tlhs;
+    this.toppers_table=100;
   }
   async load_cg_meters(opts){
     this.cg_meters={};
@@ -169,6 +170,8 @@ class ISPDrilldownMapping{
 
   async draw_toppers_table(meter_name,idx){
     let meter = this.meters[meter_name];
+    let rows = [];
+
     var table = this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table").find("table");
     table.attr("id",`table_${idx}`);
     this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table").removeClass('animated-background');
@@ -176,7 +179,7 @@ class ISPDrilldownMapping{
     table.find("thead").append("<tr><th>Router</th><th>Interface</th><th sort='volume' barspark='auto'>Volume </th>></tr>");
     let cgtoppers =  this.toppers_data.slice(0,this.maxitems);
     let totvol = 0;
-    totvol=this.toppers_data.reduce((a,b)=>a +parseInt(b.metric),0);
+    totvol=cgtoppers.reduce((a,b)=>a +parseInt(b.metric),0);
     $('.volume_'+idx).text(` (${h_fmtvol(totvol)}) `);
     this.routers_keymap={};
     let routers=[];
@@ -244,16 +247,20 @@ class ISPDrilldownMapping{
       var anchor1 =  `<a href=/newdash?${link_params} target='_blank'>${this.interfaces_ifalias[intfkey]}</a>`;
 
       var key = topper.keyt.key.split("//").pop();
-      table.find("tbody").append(`<tr>
+
+      rows.push(`<tr>
                                 <td>${anchor}</td>
                                 <td>${anchor1}</td>
                                 <td>${h_fmtvol(topper.metric)}</td>
                                 </tr>`);
-
+      
 
     }
     add_barspark(table);
     table.tablesorter();
+    new TrisTablePagination(`table_${idx}`,{no_of_rows:10,rows:rows,
+                            sys_group_totals:totvol});
+
 
   }
   async draw_donut_chart(meter_name,idx){
