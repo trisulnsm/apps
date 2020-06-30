@@ -189,9 +189,33 @@ class ISPPrefixExternalMapping{
     for (const [i, key] of keys.entries()) {
       this.meter_index = i;
       this.meter = this.meter_details_in[key];
+      let sec_hed = $('#isp_prefix_external_overview_tabs li')[this.meter_index];
+      this.section_headers.push({h1:$(sec_hed).text()});
       await this.get_data();
-    };
+
+      this.report_nodes.push({type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:this.meter_index,find_by:`#table_${this.meter_index}`});
+      this.report_nodes.push({type:"page_break"});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#traffic_chart_${this.meter_index}_`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#donut_chart_${this.meter_index}_`});
+      this.report_nodes.push({type:"page_break"});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#sankey_chart_${this.meter_index}`});
+      if(this.meter_index!=3){
+        this.report_nodes.push({type:"page_break",add_header_footer:false});
+      }
+    }
+
     this.form.find("#btn_submit").prop('disabled', false);
+    new ExportToPDF({add_button_to:".add_download_btn",
+                  tint:this.tmint,
+                  logo_tlhs:this.logo_tlhs,
+                  download_file_name:"external_prefix_analytics",
+                  report_opts:{
+                    section_headers:this.section_headers,
+                    header:{h1:"ISP External Prefix analytics"},
+                    report_title:{h1:this.target_text},
+                    nodes:this.report_nodes 
+                  }
+                });
   }
 
   // reset UI for every submit
@@ -203,6 +227,8 @@ class ISPPrefixExternalMapping{
     this.cgguid = null;
     this.crosskey_cgguid = null;
     this.filter_text=null;
+    this.report_nodes=[];
+    this.section_headers=[];
       $('#isp_prefix_external_overview_tabs a').click(function (e) {
       e.preventDefault()
       $(this).tab('show')
@@ -328,7 +354,7 @@ class ISPPrefixExternalMapping{
     let rows = [];
     this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".toppers_table_div").find('.animated-background').remove();
     var table = this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".toppers_table").find("table");
-    this.table_id = `table_${this.meter}${this.rand_id}`;
+    this.table_id = `table_${this.meter_index}${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
     table.find("thead").append(`<tr><th>Routed Prefix</th><th>BGP Prefix</th>
@@ -391,7 +417,6 @@ class ISPPrefixExternalMapping{
     },this));
     table.tablesorter();
     table.closest('.panel').find(".badge").html(rows.length);
-    new ExportToCSV({table_id:this.table_id,filename_prefix:"top_upload_asn",append_to:"panel"});
   }
 
   pagination_callback(){
@@ -421,7 +446,7 @@ class ISPPrefixExternalMapping{
   }
 
   async draw_chart(){
-    this.dount_div_id = `dount_chart${this.meter_index}_${this.rand_id}`;
+    this.dount_div_id = `donut_chart_${this.meter_index}_${this.rand_id}`;
     this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
     this.trfchart_div_id = `traffic_chart_${this.meter_index}_${this.rand_id}`;
     this.data_dom.find(`#prefix_external_overview_${this.meter_index}`).find(".traffic_chart").append($("<div>",{id:this.trfchart_div_id}));
@@ -493,7 +518,7 @@ class ISPPrefixExternalMapping{
       meter=0;
     }else if(this.filter_text.match(/_/)){
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
-      meter = [2,1][this.meter_index];
+      //meter = [2,1][this.meter_index];
     }
     ref_model = [cgguid,key,meter,"Total"]
 

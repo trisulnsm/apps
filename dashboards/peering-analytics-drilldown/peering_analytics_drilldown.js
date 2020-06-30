@@ -15,6 +15,7 @@ class ISPDrilldownMapping{
     this.probe_id=opts.probe_id; 
     this.load_cg_meters(opts);
     this.logo_tlhs=opts.logo_tlhs;
+    this.toppers_table=100;
   }
   async load_cg_meters(opts){
     this.cg_meters={};
@@ -150,8 +151,8 @@ class ISPDrilldownMapping{
       }
       this.toppers_data.push({keyt:kt,metric:kt.metric.toNumber()*top_bucket_size});
     }
-    this.toppers_data=this.toppers_data.sort((a, b) => (a.metric > b.metric) ? -1 : 1)
-    this.redraw_all(meter_name);
+    this.toppers_data=this.toppers_data.sort((a, b) => (a.metric > b.metric) ? -1 : 1);
+    await this.redraw_all(meter_name);
   }
    async get_aggregated_flows(intf){
     let opts = {flowtag:`[asn]${this.keyt.key}`,time_interval:this.tmint,probe_id:this.probe_id};
@@ -159,44 +160,108 @@ class ISPDrilldownMapping{
     
   }
 
-  redraw_all(meter_name){
+  async redraw_all(meter_name){
     let idx = Object.keys(this.meters).findIndex(k=>k==meter_name);
-    this.draw_toppers_table(meter_name,idx);
+    await this.draw_toppers_table(meter_name,idx);
     this.draw_donut_chart(meter_name,idx);
-    this.draw_traffic_chart(meter_name,idx);
+    await this.draw_traffic_chart(meter_name,idx);
     this.draw_sankey_chart(meter_name,idx);
   }
 
-  draw_toppers_table(meter_name,idx){
+  async draw_toppers_table(meter_name,idx){
     let meter = this.meters[meter_name];
+    let rows = [];
+
     var table = this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table").find("table");
     table.attr("id",`table_${idx}`);
     this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table").removeClass('animated-background');
     table.addClass('table table-hover table-sysdata');
-    table.find("thead").append("<tr><th>Item</th><th>Label</th><th sort='volume' barspark='auto'>Volume </th>></tr>");
+    table.find("thead").append("<tr><th>Router</th><th>Interface</th><th sort='volume' barspark='auto'>Volume </th>></tr>");
     let cgtoppers =  this.toppers_data.slice(0,this.maxitems);
+    let totvol = 0;
+    totvol=cgtoppers.reduce((a,b)=>a +parseInt(b.metric),0);
+    $('.volume_'+idx).text(` (${h_fmtvol(totvol)}) `);
+    this.routers_keymap={};
+    let routers=[];
+    let interfaces=[];
+    for (let i =0 ; i < cgtoppers.length; i++)
+    {   
+      
+      let r = cgtoppers[i].keyt.key;
+      let intf_key=r.split('\\').slice(-1)[0]
+      r=intf_key.split("_")[0];
+      if(! routers.includes(r)){
+        routers.push(r)
+      }
+      if(! interfaces.includes(intf_key)){
+        interfaces.push(intf_key)
+      }
+      
+    }
+
+    let rkeyts = await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,{
+      counter_group:GUID.GUID_CG_FLOWGENS(),
+      keys:routers
+    });
+
+    let ikeyts = await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,{
+      counter_group:GUID.GUID_CG_FLOWINTERFACE(),
+      get_attributes:true,
+      keys:interfaces
+    });
+    for(let i=0 ; i < rkeyts.keys.length; i++){
+      let r = rkeyts.keys[i];
+      this.routers_keymap[r.key]=r;
+    }
+    this.interfaces_ifalias = {};
+    for(let i=0 ; i < ikeyts.keys.length; i++){
+      let keyt = ikeyts.keys[i];
+      let intf_label = keyt.label || keyt.readable;
+      let alias = intf_label;
+      let attr =_.select(keyt.attributes,function(e){return e.attr_name=='snmp.ifalias'})[0];
+      if (attr && attr.attr_value.length > 0){
+        alias = attr.attr_value;
+      }
+      if(keyt.description.length > 0){
+        alias = keyt.description;
+      }
+      if (alias != intf_label){
+        intf_label = `${intf_label}(${alias})`;
+      }
+      this.interfaces_ifalias[keyt.key]=intf_label;
+    }
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       let link_params =$.param({dash_key:"key",
                          guid:this.crosskey_interface,
                          key:topper.keyt.key,
                          statid:meter});
-      let readable = topper.keyt.readable.split("\\").pop();
-      let label = topper.keyt.label.split("\\").pop();
-      var anchor =  `<a href=/newdash?${link_params} target='_blank'>${readable}</a>`;
-      var anchor1 =  `<a href=/newdash?${link_params} target='_blank'>${label}</a>`;
+      let intfkey = topper.keyt.key.split("\\").pop();
+      let rkey = intfkey.split("_")[0];
+      let router_label = this.routers_keymap[rkey].label;
+      if(router_label != this.routers_keymap[rkey].readable){
+        router_label = `${router_label}(${this.routers_keymap[rkey].label})`;
+      }
+      let interface_label = topper.keyt.label.split("\\").pop();
+      var anchor =  `<a href=/newdash?${link_params} target='_blank'>${router_label}</a>`;
+      var anchor1 =  `<a href=/newdash?${link_params} target='_blank'>${this.interfaces_ifalias[intfkey]}</a>`;
 
       var key = topper.keyt.key.split("//").pop();
-      table.find("tbody").append(`<tr>
+
+      rows.push(`<tr>
                                 <td>${anchor}</td>
                                 <td>${anchor1}</td>
                                 <td>${h_fmtvol(topper.metric)}</td>
                                 </tr>`);
-
+      
 
     }
     add_barspark(table);
     table.tablesorter();
+    new TrisTablePagination(`table_${idx}`,{no_of_rows:10,rows:rows,
+                            sys_group_totals:totvol});
+
+
   }
   async draw_donut_chart(meter_name,idx){
     this.donut_div_id = `peering_drilldown_${idx}_donut`;
@@ -255,8 +320,8 @@ class ISPDrilldownMapping{
     var model_data = {cgguid:this.crosskey_interface,
         meter:this.meters[meter_name],
         key:keys.join(","),
-        from_date:this.form.find("from_date").val(),
-        to_date:this.form.find("to_date").val(),
+        from_date:this.form.find("#from_date").val(),
+        to_date:this.form.find("#to_date").val(),
         valid_input:1,
         ref_model:ref_model
       };
@@ -274,7 +339,7 @@ class ISPDrilldownMapping{
       }
     });
   }
-  async draw_sankey_chart(meter_name,midx){
+   async draw_sankey_chart(meter_name,midx){
 
     this.sankey_div_id = `peering_drilldown_${midx}_sankey`;
     this.dom.find(`#peering_drilldown_${midx}`).find(".interfaces_sankey_chart").append($("<div>",{id:this.sankey_div_id}));
@@ -284,17 +349,16 @@ class ISPDrilldownMapping{
     let keylookup = {};
     let idx=0;
     let links  = { source : [], target : [], value : [] };
-
     for (let i =0 ; i < tdata.length; i++)
     {   
       //change label to :0,:1,:2
-      //http host and host has same lable 
+      //http host and host has same label 
+      
       let k=tdata[i].keyt.label;
       let parts=k.split("\\");
-      let router = parts[1].split("_").shift()
-      parts = [parts[0],router,parts[1]];
-     
-
+      let r = tdata[i].keyt.key;
+      r=r.split('\\').slice(-1)[0].split("_")[0];
+      parts = [parts[0],this.routers_keymap[r].label,parts[1]];
       parts = _.map(parts,function(ai,ind){
         return ai.replace(/:0|:1|:2/g,"")+":"+ind;
       });
@@ -351,6 +415,9 @@ class ISPDrilldownMapping{
     var height = labels.length *25;
     if(height < 250){
       height =250;
+    }
+    if(width<1000){
+      width =1000;
     }
     var layout = {
       title: `${meter_name} Mappings`,

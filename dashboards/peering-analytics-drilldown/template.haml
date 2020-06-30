@@ -28,14 +28,29 @@
       %ul.nav.nav-tabs#peering_drilldown_tabs
         %li.active
           %a{href:"#peering_drilldown_0",data-toggle:"tab",role:"tab"}
+            %i.fa.fa-cloud-upload.fa-fw
             %i.fa.fa-upload.fa-fw
-            Upload
-            %span.upload_volume
+            Recv from Upstream
+            %span.volume_0
         %li
           %a{href:"#peering_drilldown_1",data-toggle:"tab",role:"tab"}
+            %i.fa.fa-cloud-download.fa-fw
             %i.fa.fa-download.fa-fw
-            Download
-            %span.download_volume
+            Trans to Upstream
+            %span.volume_1
+        %li
+          %a{href:"#peering_drilldown_2",data-toggle:"tab",role:"tab"} 
+            %i.fa.fa-cloud-download.fa-fw
+            %i.fa.fa-download.fa-fw
+            Recv from Downstream
+            %span.volume_2
+         
+        %li
+          %a{href:"#peering_drilldown_3",data-toggle:"tab",role:"tab"} 
+            %i.fa.fa-cloud-download.fa-fw
+            %i.fa.fa-download.fa-fw
+            Trans to Downstream
+            %span.volume_3
         %li
           %a{href:"#peering_drilldown_agg",data-toggle:"tab",role:"tab"}
             %i.fa.fa-table.fa-fw
@@ -48,9 +63,9 @@
                 .panel-heading
                   %h3
                     %i.fa.fa-table.fa-fw
-                    Interface Toppers
+                    Top Upstream Interface Receive
                     %small
-                      Show top  interfaces which uploading data
+                      Show top  interfaces by receive
                 .panel-body
                   .toppers_table.animated-background 
                     %table
@@ -61,7 +76,7 @@
                 .panel-heading
                   %h3
                     %i.fa.fa-pie-chart.fa-fw
-                    Percent share of interfaces upload traffic
+                    Percent share of interfaces receive traffic
                 .panel-body
                   .donut_chart.animated-background 
             .col-xs-12
@@ -71,7 +86,7 @@
                     %i.fa.fa-area-chart.fa-fw
                     Stacked area chart
                     %small
-                      Showing top interfaces upload traffic over the selected time period
+                      Showing top interfaces receive traffic over the selected time period
                 .panel-body
                   .interfaces_traffic_chart
             .col-xs-12
@@ -81,7 +96,7 @@
                     %i.fa.fa-random.fa-fw
                     Sankey Chart
                     %small
-                      Shows upload traffic flows from the left side (AS) to the right (Interfaces). Thickness represents volume of traffic. Put your mouse over a node to show actual values.
+                      Shows receive traffic flows from the left side (AS) to the right (Interfaces). Thickness represents volume of traffic. Put your mouse over a node to show actual values.
                 .panel-body
                   .interfaces_sankey_chart
 
@@ -94,9 +109,9 @@
                 .panel-heading
                   %h3
                     %i.fa.fa-table.fa-fw
-                    Interface Toppers
+                    Top Upstream Interface Transmit
                     %small
-                      Show top  interfaces which downloading data
+                      Show top  interfaces which uploading data
                 .panel-body
                   .toppers_table.animated-background 
                     %table
@@ -129,6 +144,93 @@
                     Sankey Chart
                     %small
                       Shows download traffic flows from the left side (AS) to the right (Interfaces). Thickness represents volume of traffic. Put your mouse over a node to show actual values.
+                .panel-body
+                  .interfaces_sankey_chart
+
+        .tab-pane#peering_drilldown_2{data-use-width:1}
+          .row
+            .col-xs-12
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-table.fa-fw
+                    Top Downstream Interface Receive
+                    %small
+                      Show top interfaces by receive
+                .panel-body
+                  .toppers_table.animated-background 
+                    %table
+                      %thead
+                      %tbody
+            .col-xs-12
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-pie-chart.fa-fw
+                    Percent share of interfaces receive traffic
+                .panel-body
+                  .donut_chart.animated-background 
+            .col-xs-12
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-area-chart.fa-fw
+                    Stacked area chart
+                    %small
+                      Showing top interfaces receive traffic over the selected time period
+                .panel-body
+                  .interfaces_traffic_chart
+            .col-xs-12
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-random.fa-fw
+                    Sankey Chart
+                    %small
+                      Shows receive traffic flows from the left side (AS) to the right (Interfaces). Thickness represents volume of traffic. Put your mouse over a node to show actual values.
+                .panel-body
+                  .interfaces_sankey_chart
+        .tab-pane#peering_drilldown_3{data-use-width:1}
+          .row
+            .col-xs-12
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-table.fa-fw
+                    Top Downstream Interface Transmit
+                    %small
+                      Show top  interfaces by receive
+                .panel-body
+                  .toppers_table.animated-background 
+                    %table
+                      %thead
+                      %tbody
+            .col-xs-12
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-pie-chart.fa-fw
+                    Percent share of interfaces receive traffic
+                .panel-body
+                  .donut_chart.animated-background 
+            .col-xs-12
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-area-chart.fa-fw
+                    Stacked area chart
+                    %small
+                      Showing top interfaces receive traffic over the selected time period
+                .panel-body
+                  .interfaces_traffic_chart
+            .col-xs-12
+              .panel.panel-primary
+                .panel-heading
+                  %h3
+                    %i.fa.fa-random.fa-fw
+                    Sankey Chart
+                    %small
+                      Shows receive traffic flows from the left side (AS) to the right (Interfaces). Thickness represents volume of traffic. Put your mouse over a node to show actual values.
                 .panel-body
                   .interfaces_sankey_chart
 
