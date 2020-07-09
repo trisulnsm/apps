@@ -67,11 +67,11 @@ class CIDRExploreFlows{
                               default_ts:this.default_selected_time
                             });
     this.form.submit($.proxy(this.submit_form,this));
-    this.form.submit();
+    //this.form.submit();
   }
 
   submit_form(){
-    this.form.find("#cidr_subnet").val("103.225.125.42/32");
+   //this.form.find("#cidr_subnet").val("103.225.125.42/32");
     this.cidr = this.form.find("#cidr_subnet").val();
     if($.trim(this.cidr).length==0){
       alert("Please enter a valid subnet.")
