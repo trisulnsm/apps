@@ -18,11 +18,17 @@
                 .from-group
                    %label.control-label.col-xs-4 Maxitems         
                   .col-xs-8 
-                    %input{type:"text",class:"form-control",id:"toppers_maxcount",style:"width:300px",value:50}
+                    %input{type:"text",class:"form-control",id:"toppers_maxcount",style:"width:300px",value:2}
                     %span.help-block Display these many top items
               .col-xs-6
                 .form-group
                   .new_time_selector#new_time_selector
+              .col-xs-6
+                .form-group
+                  %label.control-label.col-xs-4 Hide IP Label
+                  .col-xs-8
+                    %input{type:"checkbox"}
+
             .row
               .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
                 %input#from_date{type:"hidden",name:"from_date"}
@@ -88,7 +94,7 @@
                     %thead
                       %tr
                         %th Item
-                        %th Label
+                        %th.key_label Label
                         %th Flows
                         %th{sort:"volume"} Volume
                         %th.hide Raw Volume

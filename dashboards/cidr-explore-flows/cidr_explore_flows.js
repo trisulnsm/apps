@@ -67,11 +67,11 @@ class CIDRExploreFlows{
                               default_ts:this.default_selected_time
                             });
     this.form.submit($.proxy(this.submit_form,this));
-    //this.form.submit();
+    this.form.submit();
   }
 
   submit_form(){
-    //this.form.find("#cidr_subnet").val("163.53.207.226/32");
+    this.form.find("#cidr_subnet").val("103.225.125.42/32");
     this.cidr = this.form.find("#cidr_subnet").val();
     if($.trim(this.cidr).length==0){
       alert("Please enter a valid subnet.")
@@ -97,15 +97,18 @@ class CIDRExploreFlows{
     nodes.push({type:"table",find_by:`#top_ips_cidr`,header_text:"auto",h1:"h4"});
     nodes.push({type:"page_break",add_header_footer:false});
     for(let i=0; i<this.all_agg_groups.length;i++){
+
       this[this.all_agg_groups[i]]= new CIDRTaggerToppers({name:this.all_agg_groups[i],maxitems:this.maxitems});
       nodes.push({type:"table",find_by:`#agg_${this.all_agg_groups[i]}_tbl`,header_text:"auto",h1:"h4"});
+
       nodes.push({type:"page_break",add_header_footer:false});
     }
+
     nodes.push({type:"table",find_by:`#explore_flows_tbl`,header_text:"auto",h1:"h4"});
     this.key_spaces_mustache_tmpl = '{{readable}}';
 
     this.mustache_tmpl ='<td>{{readable}}</td>'+
-                        '<td>{{label}}</td>'+
+                        '<td class="key_label">{{label}}</td>'+
                         '<td>{{count}}</td>'+
                         '<td>{{volume}}</td>'+
                         '<td class="hide">{{metric}}</td>';
@@ -218,8 +221,13 @@ class CIDRExploreFlows{
         });
 
     trs.exit().remove();
-
+    if(this.form.find("input[type='checkbox']").prop('checked')==true){
+      if(id.match(/_ip$/)){
+        $(`table#${table_id}`).find('.key_label').remove();
+      }
     }
+
+  }
   redraw_ip_list(){
     this.data_dom.find("#ips_count")
     let data = Object.values(this.ips);
