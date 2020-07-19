@@ -130,7 +130,7 @@ class ISPOverviewMapping{
       update_dom_st : "interfaces"+this.rand_id,
       chosen:true
     }
-
+    $(`#routers${this.rand_id}`).find("option").remove();
     await load_routers_interfaces_dropdown(load_router_opts);
   }
 
