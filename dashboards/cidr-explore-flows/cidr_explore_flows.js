@@ -85,6 +85,7 @@ class CIDRExploreFlows{
 
   reset_ui(){
     let nodes = [];
+    this.ips={};
     $('#app_error_box').addClass('hidden');
     this.dom.find(".cidr_explore_flows_data").remove();
     this.data_dom = $(this.haml_dom[1]).clone();
