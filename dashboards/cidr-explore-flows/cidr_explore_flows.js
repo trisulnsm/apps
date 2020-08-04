@@ -46,6 +46,11 @@ class CIDRExploreFlows{
     this.counter_group =opts.jsparams.counter_group || GUID.GUID_CG_INTERNAL_HOSTS();
     this.ips = {};
     this.logo_tlhs = opts.logo_tlhs;
+    this.user=opts.user;
+    this.subscriber_user=false;
+    if(this.user.webtrisul_role_id==4 ){
+      this.subscriber_user=true;
+    }
   }
   // load the frame 
   async load_assets(opts)
@@ -67,6 +72,10 @@ class CIDRExploreFlows{
                               default_ts:this.default_selected_time
                             });
     this.form.submit($.proxy(this.submit_form,this));
+    if(this.subscriber_user){
+      this.form.find("#cidr_subnet").val(this.user.subscriber_keys);
+      this.form.find("#cidr_subnet").attr("readonly",true)
+    }
     //this.form.submit();
   }
 
@@ -75,6 +84,10 @@ class CIDRExploreFlows{
     this.cidr = this.form.find("#cidr_subnet").val();
     if($.trim(this.cidr).length==0){
       alert("Please enter a valid subnet.")
+      return false;
+    }
+    if(this.subscriber_user && this.user.subscriber_keys!=this.cidr){
+      alert("You are not allowed to access this CIDR");
       return false;
     }
     this.mk_time_interval();
@@ -119,10 +132,13 @@ class CIDRExploreFlows{
       $(this).tab('show');
     });
     window.flowApp = new TFlowApp({});
+
     window.flowApp.flow_count=10000;
    
     this.flowModel= new TFlowModel();
     this.flowUI = new TFlowUI(this.flowModel);
+    window.flowApp.subscriber_user=this.subscriber_user;
+
     this.tris_pg_bar = new TrisProgressBar({max:1,
                                             divid:'cidr_progress_bar'});
     
@@ -150,7 +166,7 @@ class CIDRExploreFlows{
     let to_key = TRP.KeyT.create({label:cidr_range[1]});
     let key_spaces = TRP.KeySpaceRequest.KeySpace.create({from_key:from_key,to_key:to_key})
     //do search key space for ean day 
-    window.flowApp = new TFlowApp({});
+    //window.flowApp = new TFlowApp({});
     for(let i=0;i<this.tint_arr.length;i++){
       let resp = await fetch_trp(TRP.Message.Command.KEYSPACE_REQUEST, 
                                   {counter_group:this.counter_group,
@@ -192,9 +208,10 @@ class CIDRExploreFlows{
                   },this);
         this.flowModel.proc_new_flows(incoming);
         this.tris_pg_bar.update_progress_bar();
-        this.flowUI.redraw_flow_table();
+        //this.flowUI.redraw_flow_table();
       }
-      //this.flowUI.redraw_flow_table();
+      window.flowApp.show_routerintf=true
+      this.flowUI.redraw_flow_table();
       
     }
     

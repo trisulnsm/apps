@@ -240,7 +240,7 @@ class ISPDrilldownMapping{
       let rkey = intfkey.split("_")[0];
       let router_label = this.routers_keymap[rkey].label;
       if(router_label != this.routers_keymap[rkey].readable){
-        router_label = `${router_label}(${this.routers_keymap[rkey].label})`;
+        router_label = `${router_label}(${this.routers_keymap[rkey].readable})`;
       }
       let interface_label = topper.keyt.label.split("\\").pop();
       var anchor =  `<a href=/newdash?${link_params} target='_blank'>${router_label}</a>`;
