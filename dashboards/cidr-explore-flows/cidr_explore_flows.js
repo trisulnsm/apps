@@ -72,21 +72,19 @@ class CIDRExploreFlows{
                               default_ts:this.default_selected_time
                             });
     this.form.submit($.proxy(this.submit_form,this));
-    if(this.subscriber_user){
-      this.form.find("#cidr_subnet").val(this.user.subscriber_keys);
-      this.form.find("#cidr_subnet").attr("readonly",true)
-    }
+    
     //this.form.submit();
   }
 
   submit_form(){
-   //this.form.find("#cidr_subnet").val("103.225.125.42/32");
+    //this.form.find("#cidr_subnet").val("103.225.125.42/32");
     this.cidr = this.form.find("#cidr_subnet").val();
     if($.trim(this.cidr).length==0){
       alert("Please enter a valid subnet.")
       return false;
     }
-    if(this.subscriber_user && this.user.subscriber_keys!=this.cidr){
+    let keys=this.user.subscriber_keys.split(",")
+    if(this.subscriber_user && ! keys.includes(this.cidr)){
       alert("You are not allowed to access this CIDR");
       return false;
     }
