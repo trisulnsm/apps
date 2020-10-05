@@ -53,10 +53,13 @@ class ISPDrilldownMapping{
     this.dom.append($(this.haml_dom[1]).clone());
   }
   submit_form(){
+    this.form.find(".btn-submit").attr("disabled",true);
     //this.form.find('#drilldown_asn').val('9498');
     this.key=this.form.find('#drilldown_asn').val();
     if(this.key.length ==0 ){
       alert("ASNumber filed can't be empty.");
+      this.form.find(".btn-submit").removeAttr("disabled");
+
       return false;
     }
     this.mk_time_interval();
@@ -124,6 +127,7 @@ class ISPDrilldownMapping{
                         nodes:nodes
                       }
     });
+    this.form.find(".btn-submit").removeAttr("disabled");
 
 
   }
