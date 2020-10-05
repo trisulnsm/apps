@@ -142,7 +142,7 @@ class ISPDrilldownMapping{
     let cgtoppers_resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
       counter_group: this.crosskey_interface,
       time_interval: this.tmint ,
-      key_filter:this.keyt.key, 
+      key_filter:`^${this.keyt.key}\\\\`, 
       meter:this.meters[meter_name],
       maxitems:100
     });
