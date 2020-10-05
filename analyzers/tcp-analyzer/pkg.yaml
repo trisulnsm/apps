@@ -1,18 +1,18 @@
 name: TCP Analyzer
 
-version: 0.0.2
+version: 0.0.3
 
 author: trisul
 
 description: 
    short: TCP Analysis  
    long:  |
-      Identify hosts experiencing TCP performance issues by 
+      Identify hosts and apps experiencing TCP performance issues by 
       tracking retransmissions,connection setup latency, and timeouts.
       Marks flows experiencing high retransmissions with flow TAG
 
 apptype: lua
 
-appresources: tcp_analyzer.lua  poorquality.lua
+appresources: tcp_analyzer.lua  poorquality.lua appcg.lua
 
 dependencies:  
