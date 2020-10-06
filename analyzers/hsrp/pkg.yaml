@@ -1,0 +1,16 @@
+name: HSRP Analyzer
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: HSRP Protocol decoder
+   long:  |
+      Install this plugin to check active/standby roters
+
+apptype: lua
+
+appresources: hsrp.lua hsrp-counter.lua sweepbuf.lua
+
+dependencies:  
