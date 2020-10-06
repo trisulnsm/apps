@@ -29,6 +29,7 @@ HISTORY
 =======
 
 ````
+0.0.3		Oct 4 2020			Added APPS and Unidirectional detection 
 0.0.1		Feb 7 2018			Initial release 
 ````
 
