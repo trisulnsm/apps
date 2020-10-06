@@ -66,7 +66,7 @@ TrisulPlugin = {
   	    local ip=hsrp_sb:next_ipv4()
   	    local key=ip.."|"..smac
         TrisulPlugin.simplecounter.count = TrisulPlugin.simplecounter.count +1
-  	    engine:update_counter( TrisulPlugin.countergroup.control.guid, key, 0, tonumber(mode))
+  	    engine:update_counter_raw( TrisulPlugin.countergroup.control.guid, key, 0, tonumber(mode))
       end
     end,
 
