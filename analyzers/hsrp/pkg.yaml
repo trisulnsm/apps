@@ -1,6 +1,6 @@
 name: HSRP Analyzer
 
-version: 0.0.4
+version: 0.0.5
 
 author: trisul
 
@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: hsrp.lua hsrp-counter.lua sweepbuf.lua
+appresources: hsrp.lua hsrp-counter.lua  hsrp-routers.lua sweepbuf.lua
 
 dependencies:  
