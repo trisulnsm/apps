@@ -41,7 +41,6 @@ TrisulPlugin = {
     --attach to HSRP protocol
     protocol_guid = "{169D45A5-F304-434A-820F-C44C3956BA0B}",
 
-    count=0,
     -- WHEN CALLED: when the Trisul platform detects a packet at the protocol_guid layer
     --              above. In this case, every DNS packet
     -- 
@@ -75,14 +74,13 @@ TrisulPlugin = {
   	    hsrp_sb:skip(13) --skip priotity, group etc
   	    local ip=hsrp_sb:next_ipv4()
   	    local key=ip.."|"..smac
-        TrisulPlugin.simplecounter.count = TrisulPlugin.simplecounter.count +1
         if mode==16 then --active
           mode = 1
         else  -- standby
           mode = 2
         end
-        engine:update_counter("{47FB78D7-76F6-4AF0-D45A-7D9BA6E83762}",router_ip,0,1)
-  	    engine:update_counter( TrisulPlugin.countergroup.control.guid, key, 0, tonumber(mode))
+        engine:update_counter_raw("{47FB78D7-76F6-4AF0-D45A-7D9BA6E83762}",router_ip,0,1)
+  	    engine:update_counter_raw( TrisulPlugin.countergroup.control.guid, key, 0, tonumber(mode))
       end
     end,
 
