@@ -373,6 +373,8 @@ class ISPOverviewMapping{
       dropdown_menu.append("<li><a href='javascript:;;'>Top Prefixes</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Show Routes</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>ASN Lookup</a></li>");
+      dropdown_menu.append("<li><a href='javascript:;;'>Explore Flows</a></li>");
+
       dropdown.append(dropdown_menu);
 
       let key = topper.key.split("\\").shift();
@@ -717,6 +719,15 @@ class ISPOverviewMapping{
         let asn=tr.data('full_key').match(/\w+/)[0]
         window.open("https://bgpview.io/asn/"+asn,"_blank")
         break;
+      case 7:
+        let arg = tr.data('readable').split(/\\/);
+        let qp = {flow_tagger:`[asn]${arg[0]}`,ifany:arg[1],interface:arg[1],valid_input:1,
+                         window_fromts:this.tmint.from.tv_sec,
+                         window_tots:this.tmint.to.tv_sec}
+        window.open("/sessions/explore?"+$.param(qp));
+        break;
+
+
     } 
   }
   async get_top_prefixes(event){
@@ -744,25 +755,16 @@ class ISPOverviewMapping{
     let interfaces = this.filter_text.split("_");
       
     opts["nf_routerid"] = TRP.KeyT.create({key:interfaces[0]});
-    opts[`nf_ifindex_out`]= TRP.KeyT.create({key:interfaces[1]});
+    opts["any_nf_ifindex"]= TRP.KeyT.create({key:interfaces[1]});
+    let aggresp = await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts);
     
-    let resp_out = await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts);
-    
-    opts[`nf_ifindex_out`]= null;
-    opts[`nf_ifindex_in`]= TRP.KeyT.create({key:interfaces[1]});
-    let resp_in = await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts);
     
     let tag_metrics=[]
-    let prefix_toppers =resp_out.tag_group.find(x=>x.group_name=="prf");
+    let prefix_toppers =aggresp.tag_group.find(x=>x.group_name=="prf");
     if(prefix_toppers){
-      tag_metrics = prefix_toppers.tag_metrics.slice(0,100);
+      tag_metrics = prefix_toppers.tag_metrics.slice(0,99);
     }
-    prefix_toppers =resp_in.tag_group.find(x=>x.group_name=="prf");
-    if(prefix_toppers){
-      tag_metrics=tag_metrics.concat(prefix_toppers.tag_metrics.slice(0,100));
-    }
-
-
+  
     if(!prefix_toppers){
       shell_modal.find(".modal-body h4").html("<div class='alert alert-info'>No data found</div>");
       return true;
