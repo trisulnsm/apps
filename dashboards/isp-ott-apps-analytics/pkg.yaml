@@ -1,0 +1,25 @@
+name: ISP OTT App Analytics
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: View OTT Apps mappings for routers and interfaces
+   long:  |
+      A breakup of OTP Apps to router mappings in table and chart format
+      This plugin is a visualization of that. 
+
+apptype: dashboard_js
+
+appresources: isp_ott_apps_analytics.js app.css template.haml
+
+dependencies: 
+
+jsparams:
+  crosskey_router: "{10CF1400-DD68-5986-B7A0-D89B6E0675FF}"
+  crosskey_interface: "{ADE664B1-799C-96E1-1705-D933CB9A9A30}"
+  meters:
+    upload: 0
+    download: 1
