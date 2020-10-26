@@ -142,6 +142,7 @@ local sleveldb = {
   toaddr=function(tbl)
   	if not tbl.owner then
 		  error("Cannot to toaddr() from databases that do not own the _db pointer")
+		  return
     end 
     return string.format("%X",tonumber(ffi.cast("intptr_t",tbl._db)));
   end,
@@ -159,9 +160,11 @@ local sleveldb = {
 
   -- close 
   close=function(tbl)
-  	if tbl.owner then
-		L.leveldb_close(tbl._db)
+  	if not tbl.owner then
+		  error("Cannot close() leveldb database when  you are not an owner. Did you use fromaddr() to create it ?")
+		  return
     end
+    L.leveldb_close(tbl._db)
     tbl._db=nil 
   end, 
 

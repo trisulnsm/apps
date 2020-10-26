@@ -342,11 +342,14 @@ class ISPOverviewMapping{
       let key = topper.key.split("\\").shift();
       let full_key= topper.key;
 
-      let readable = topper.readable.split("\\").shift();
-      let label = topper.label.split("\\").shift();
+      // let readable = topper.readable.split("\\").shift();
+      // let label = topper.label.split("\\").shift();
+      let readable = topper.readable.split("\\")[1];
+      let label = topper.label.split("\\")[1];
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
       let statids = Object.values(this.meter_details_in).slice(0,2)
+
 
       rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" 
                     data-readable="${topper.readable}" data-full_key="${full_key}"
@@ -415,7 +418,8 @@ class ISPOverviewMapping{
     let width =this.dom.find(".donut_chart").width();
     for(let i= 0 ; i <  cgtoppers.length  ; i++){
       values[i] =  cgtoppers[i].metric.toNumber()*this.top_bucket_size;
-      labels[i] =  cgtoppers[i].label.replace(/:0|:1|:2/g,"").split("\\").shift();
+      //labels[i] =  cgtoppers[i].label.replace(/:0|:1|:2/g,"").split("\\").shift();
+      labels[i] =  cgtoppers[i].label.replace(/:0|:1|:2/g,"").split("\\")[1];
       labels[i] = labels[i].substr(0,parseInt((width/100)*6))+"("+h_fmtvol(values[i])+")";
     }
     var data = [{

@@ -35,6 +35,17 @@ TrisulPlugin = {
   -- open the LevelDB database  & create the reader/writer 
   onload = function() 
     T.LevelDB=nil 
+
+	-- do you want to log every JA3 hash - default OFF to save disk space 
+	T.active_config = make_config(
+		  T.env.get_config("App>DBRoot").."/config/trisulnsm_passive-dns.lua",
+		  {
+			-- only stores a basic IPv4 -> name mapping 
+			-- default is false, override if you dont need other name to IP 
+			-- /usr/local/var/lib/trisul-probe/d0/p0/cX/config/trisulnsm_passive-dns.lua  config file 
+			SimpleIPv4LookupOnly=false,
+		  } )
+
   end,
 
   -- close 
@@ -72,6 +83,17 @@ TrisulPlugin = {
           return 
         end
       end
+
+
+	  -- if simple mode insert one record and bail ..
+	  if T.active_config.SimpleIPv4LookupOnly then
+		  -- push all the A  IPv4 
+		  for ip in  resource:label():gmatch("A%s+([%d%.]+)") do
+			T.LevelDB:put(ip,resource:uri())
+		  end
+
+		return 
+	  end
 
 	  -- reverse 
 	  local rev_fqdn = fqdn_reverse(resource:uri())
