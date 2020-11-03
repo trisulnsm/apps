@@ -112,7 +112,7 @@ TrisulPlugin = {
       ok, stepret = pcall(stmt.step, stmt) 
     end
     for ipkey,snmp in pairs(snmp_attributes) do
-      if T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id) then 
+      if snmp["snmp.ip"] ~=nil and T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id) then 
 	  	if snmp['snmp.community'] ~= nil and #snmp['snmp.community'] > 0  then 
 			targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"] } 
 			T.log(T.K.loglevel.INFO, "LOADED  ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
@@ -121,7 +121,7 @@ TrisulPlugin = {
 			T.log(T.K.loglevel.INFO, "NULL community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
 			print("NULL    community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
 		end
-      else
+      elseif  snmp["snmp.ip"] ~=nil and snmp['snmp.community'] ~= nil then
         T.log(T.K.loglevel.INFO, "SKIPPED ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
         print("SKIPPED ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
       end 
