@@ -2,6 +2,12 @@
 
 Install this Trisul APP to add SNMP Polling functionality to Trisul.
 
+>> UPDATE NOTICE: This app has been updated completely in version 0.2. Updating from the older version
+>> should be seamless. If some users experience issues please reach out to Trisul Network Analytics Support
+
+>> DISTRIBUTED TRISUL COMPATIBILITY: This app does not work with distributed license of Trisul. 
+>> Please contact Trisul Network Analytics support. 
+
 This APP uses the Trisul LUA API to poll SNMP interface usage along with their names and aliases. These metrics are fed back into the Trisul pipelines.
 
 1. Interface In/Out octets  from ifXTable or ifTable
@@ -26,6 +32,7 @@ UPDATES
 =======
 
 ````
+0.0.2		Nov 03 2020			Updated completely to use ASYNC polling 
 0.0.1		Feb 03 2018			Initial release as an App. This was in 
                                 production earlier as standalone script 
 ````
