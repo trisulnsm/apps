@@ -32,7 +32,7 @@ UPDATES
 =======
 
 ````
-0.0.2		Nov 03 2020			Updated completely to use ASYNC polling 
+0.0.3		Nov 03 2020			Updated completely to use ASYNC polling 
 0.0.1		Feb 03 2018			Initial release as an App. This was in 
                                 production earlier as standalone script 
 ````
