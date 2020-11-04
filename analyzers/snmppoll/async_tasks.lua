@@ -9,7 +9,6 @@ AsyncTasks.onexecute = function(in_data)
 	local BW=require'bulkwalk_cmd'
 
 	local agent=JSON:decode(in_data);
-
 	local async_results   =  { 
 	  update_counters = {},
 	  update_key_info = {},
@@ -30,6 +29,7 @@ AsyncTasks.onexecute = function(in_data)
 	local has_varbinds = false
 	for k,v in pairs( bw_in) do 
 	  v = tonumber(v) or 0
+    v = v/agent.poll_interval
 	  table.insert(async_results.update_counters, {  "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}", k, 1, tonumber(v)}   );
 	  has_varbinds=true
 	end
@@ -45,6 +45,7 @@ AsyncTasks.onexecute = function(in_data)
 	  local bw_in =  do_bulk_walk( agent.agent_ip, agent.agent_version, agent.agent_community, oid)
 	  for k,v in pairs( bw_in) do 
 		v = tonumber(v) or 0
+    v = v/agent.poll_interval
 		table.insert(async_results.update_counters, {  "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}", k, 2, tonumber(v)}   );
 	  end
 
