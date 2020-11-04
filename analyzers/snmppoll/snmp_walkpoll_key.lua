@@ -42,19 +42,12 @@ TrisulPlugin = {
   onload = function()
     T.poll_targets =  nil
     T.last_poll_secs=0
-    T.poll_interval=300
   end,
 
   engine_monitor = {
 
     -- every interval reload the map -
     onendflush = function(engine,tv)
-
-    if tv - T.last_poll_secs < T.poll_interval then
-      return
-    else
-      T.last_poll_secs = tv
-    end
 
 	  print("---- ENDFLUSH FROM PAST CYCLE    --"..T.async:pending_items())
       local new_targets =  TrisulPlugin.load_poll_targets(engine:instanceid(), SNMP_DATABASE)
@@ -122,7 +115,7 @@ TrisulPlugin = {
     for ipkey,snmp in pairs(snmp_attributes) do
       if snmp["snmp.ip"] ~=nil and T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id) then 
 	  	if snmp['snmp.community'] ~= nil and #snmp['snmp.community'] > 0  then 
-			targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"], poll_interval = T.poll_interval } 
+			targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"]}
 			T.log(T.K.loglevel.INFO, "LOADED  ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
 			--print("LOADED  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
 		else
