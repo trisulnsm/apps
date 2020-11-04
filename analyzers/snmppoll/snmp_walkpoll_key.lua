@@ -29,7 +29,7 @@ TrisulPlugin = {
       guid = "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}",
       name = "SNMP-Interface",
       description = "Traffic using SNMP input ",
-      bucketsize = 300,
+      bucketsize = 60,
     },
     meters = {
       {  0, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes", "Total BW",   "Bps" },
