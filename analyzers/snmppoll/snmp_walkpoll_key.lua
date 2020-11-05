@@ -29,7 +29,7 @@ TrisulPlugin = {
       guid = "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}",
       name = "SNMP-Interface",
       description = "Traffic using SNMP input ",
-      bucketsize = 60,
+      bucketsize = 300,
     },
     meters = {
       {  0, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes", "Total BW",   "Bps" },
@@ -48,6 +48,11 @@ TrisulPlugin = {
 
     -- every interval reload the map -
     onendflush = function(engine,tv)
+    if tv - T.last_poll_secs < tonumber(TrisulPlugin.countergroup.control.bucketsize) then
+      return
+    else
+      T.last_poll_secs = tv
+    end
 
 	  print("---- ENDFLUSH FROM PAST CYCLE    --"..T.async:pending_items())
       local new_targets =  TrisulPlugin.load_poll_targets(engine:instanceid(), SNMP_DATABASE)
