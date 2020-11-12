@@ -1,7 +1,5 @@
-.toppers_table_div,.donut_chart_div,.traffic_chart_div,.sankey_chart_div
+.donut_chart_div,.traffic_chart_div,.sankey_chart_div
 {
-  border:2px solid #eee;
-  box-shadow: 1px 1px #eee;
   min-height: 300px;
 }
 .ui_data{

@@ -364,7 +364,7 @@ class ISPOverviewMapping{
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       
-      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;;'><small>Options<i class='fa fa-caret-down fa-fw'></i></small></a></span>");
+      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;; data-toggle='tooltip' title='Click to get more options'><i class='fa fa-fw fa-ellipsis-h fa-lg'></i></a></span>");
       let dropdown_menu = $("<ul class='dropdown-menu  pull-right'></ul>");
       dropdown_menu.append("<li><a href='javascript:;;'>Drilldown</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
@@ -530,7 +530,9 @@ class ISPOverviewMapping{
         to_date:this.form.find("#to_date"+this.rand_id).val(),
         valid_input:1,
         surface:"STACKEDAREA",
-        ref_model:ref_model
+        ref_model:ref_model,
+        show_title:false,
+        legend_position:"bottom"
     };
     await $.ajax({
       url:"/trpjs/generate_chart",
@@ -680,12 +682,16 @@ class ISPOverviewMapping{
                     }));
         break;
       case 1:
+        let desc = this.form.find("#routers option:selected").text();
+        desc = `${desc} / ${this.form.find("#interfaces option:selected").text()}`
+        desc = `${desc} / ${tr.data("label")}`;
         let params = {
           key: tr.data("full_key").toString().replace(/\\/g,"\\\\"),
           statids:tr.data("statid"),
           cgguid:this.cgguid,
           window_fromts:this.tmint.from.tv_sec,
           window_tots:this.tmint.to.tv_sec,
+          description:desc
         }
         let url = "/trpjs/generate_chart_lb?"+$.param(params);
         load_modal(url);

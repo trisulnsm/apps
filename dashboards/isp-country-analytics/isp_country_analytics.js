@@ -70,73 +70,14 @@ class ISPOverviewMapping{
       this.crosskey_interface=opts.crosskey_interface;
     }
 
-    //new time selector 
+       //new time selector 
     new ShowNewTimeSelector({divid:"#new_time_selector"+this.rand_id,
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
-                            });
+                            },this.callback_load_routers,this);
     this.mk_time_interval();
-    //get router toppers for drowdown in form
-    var top_routers=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
-      time_interval: this.tmint ,
-      meter:0,
-      maxitems:500
-    });
-    var router_key_map ={}
-    for(let i= 0 ; i <  top_routers.keys.length  ; i++){
-      if (top_routers.keys[i].key=="SYS:GROUP_TOTALS"){
-        continue;
-      }
-      router_key_map[top_routers.keys[i].key] = top_routers.keys[i].label
-    }
-    //get interface toppers for dropdown in form
-    var top_intfs=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: "{C0B04CA7-95FA-44EF-8475-3835F3314761}",
-      time_interval: this.tmint ,
-      meter:0,
-      maxitems:1000
-    });
 
-    var interface_meters = {};
-    var all_dropdown = {"0":["Please select",[["0","Please select"]]]};
-    top_intfs.keys= this.sort_hash(top_intfs,"key");
-    for(let i= 0 ; i <  top_intfs.keys.length  ; i++){
-      if (top_intfs.keys[i].key=="SYS:GROUP_TOTALS"){
-        continue;
-      }
-      let intf =top_intfs.keys[i].key;
-      let router_key=intf.split("_")[0];
-      if(interface_meters[router_key] == undefined){
-        interface_meters[router_key] = [];
-      }
-      interface_meters[router_key].push([top_intfs.keys[i].key,top_intfs.keys[i].label]);
-    }
-
-    for (var key in interface_meters) {
-      var meters = interface_meters[key];
-      meters.unshift(["0","Please select"]);
-      all_dropdown[key]=[router_key_map[key],meters];
-    }
-
-    let selected_router = null, selected_interface=null;
-    let incoming_key = this.dash_params.key || ""
-    let keyparts = incoming_key.split("_");
-    if (keyparts.length==2) {
-      selected_router = keyparts[0];
-      selected_interface = keyparts.join("_");
-    }
-
-    var js_params = {meter_details:all_dropdown,
-      selected_cg : selected_router || localStorage.getItem("apps.countryanalytics.last-selected-router"),
-      selected_st : selected_interface || localStorage.getItem("apps.countryanalytics.last-selected-interface"),
-      update_dom_cg : "routers"+this.rand_id,
-      update_dom_st : "interfaces"+this.rand_id,
-      chosen:true
-    }
-    //Load meter combo for routers and interfaces
-    new CGMeterCombo(JSON.stringify(js_params));
-
+    this.load_routers_interfaces();
 
     this.cg_meters = {};
     await get_counters_and_meters_json(this.cg_meters);
@@ -150,6 +91,34 @@ class ISPOverviewMapping{
       this.form.submit();
     }    
   }
+
+
+   async callback_load_routers(s,e,args){
+    await args.load_routers_interfaces();
+  }
+
+  async load_routers_interfaces(){
+    this.mk_time_interval();
+    let selected_router = null, selected_interface=null;
+    let incoming_key = this.dash_params.key || ""
+    let keyparts = incoming_key.split("_");
+    if (keyparts.length==2) {
+      selected_router = keyparts[0];
+      selected_interface = keyparts.join("_");
+    }
+
+    var load_router_opts = {
+      tmint : this.tmint,
+      selected_cg : selected_router || localStorage.getItem("apps.peeringanalytics.last-selected-router"),
+      selected_st : selected_interface || localStorage.getItem("apps.peeringanalytics.last-selected-interface"),
+      update_dom_cg : "routers"+this.rand_id,
+      update_dom_st : "interfaces"+this.rand_id,
+      chosen:true
+    }
+    $(`#routers${this.rand_id}`).find("option").remove();
+    await load_routers_interfaces_dropdown(load_router_opts);
+  }
+
 
 
 
@@ -186,6 +155,16 @@ class ISPOverviewMapping{
       await this.get_data();
     };
     this.form.find("#btn_submit").prop('disabled', false);
+    new ExportToPDF({add_button_to:".add_download_btn",
+                      tint:this.tmint,
+                      logo_tlhs:this.logo_tlhs,
+                      download_file_name:"Country Analytics",
+                      report_opts:{
+                        header:{h1:"Country Analytics Report"},
+                        report_title:{h1:this.target_text},
+                        nodes:this.report_nodes
+                      }
+                    });
   }
 
   // reset UI for every submit
@@ -201,6 +180,19 @@ class ISPOverviewMapping{
       e.preventDefault()
       $(this).tab('show')
     });
+    this.report_nodes = [];
+    _.each([this.meter_details_in.upload,this.meter_details_in.download],$.proxy(function(idx,ai){
+      this.report_nodes.push({type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:ai,find_by:`#table_${ai}`});
+      this.report_nodes.push({type:"page_break"});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#traffic_chart_${ai}_`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#donut_chart${ai}_`});
+      this.report_nodes.push({type:"page_break"});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#sankey_chart_${ai}`});
+      if(ai!=1){
+        this.report_nodes.push({type:"page_break",add_header_footer:false});
+      }
+
+    },this));
     //this.data_dom.find('.toppers_table_div').append("<span class='notify'><i class='fa fa-spinner fa-spin'></i>Please wait...</span>");
     //title part
 
@@ -331,7 +323,7 @@ class ISPOverviewMapping{
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       
-      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;;'><small>Options<i class='fa fa-caret-down fa-fw'></i></small></a></span>");
+      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;;'><small><i class='fa fa-fw fa-ellipsis-h fa-lg'></i></small></a></span>");
       let dropdown_menu = $("<ul class='dropdown-menu  pull-right'></ul>");
       dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
       dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
@@ -371,7 +363,6 @@ class ISPOverviewMapping{
     },this));
     table.tablesorter();
     table.closest('.panel').find(".badge").html(rows.length);
-    new ExportToCSV({table_id:this.table_id,filename_prefix:"top_upload_asn",append_to:"panel"});
   }
 
   pagination_callback(){
@@ -401,8 +392,8 @@ class ISPOverviewMapping{
   }
 
   async draw_chart(){
-    this.dount_div_id = `dount_chart${this.meter_index}_${this.rand_id}`;
-    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.dount_div_id}));
+    this.donut_div_id = `donut_chart${this.meter_index}_${this.rand_id}`;
+    this.data_dom.find(`#country_overview_${this.meter_index}`).find(".donut_chart").append($("<div>",{id:this.donut_div_id}));
     this.trfchart_div_id = `traffic_chart_${this.meter_index}_${this.rand_id}`;
     this.data_dom.find(`#country_overview_${this.meter_index}`).find(".traffic_chart").append($("<div>",{id:this.trfchart_div_id}));
     this.data_dom.find(`#country_overview_${this.meter_index}`).find(".traffic_chart_div").find(".animated-background").remove();
@@ -447,10 +438,10 @@ class ISPOverviewMapping{
                                'sendDataToCloud'],
                           showSendToCloud:false,
                           responsive: true };
-    Plotly.newPlot(this.dount_div_id, data, layout,ploty_options);
+    Plotly.newPlot(this.donut_div_id, data, layout,ploty_options);
 
     if(cgtoppers.length==0){
-      $('#'+this.dount_div_id).html("<div class='alert alert-info'>No data found.</div>"); 
+      $('#'+this.donut_div_id).html("<div class='alert alert-info'>No data found.</div>"); 
     }
 
     var keys = _.map(cgtoppers,function(ai){return ai.key});
@@ -484,8 +475,8 @@ class ISPOverviewMapping{
         to_date:this.form.find("#to_date"+this.rand_id).val(),
         valid_input:1,
         surface:"STACKEDAREA",
-        ref_model:ref_model
-    };
+        ref_model:ref_model,
+    };``
     await $.ajax({
       url:"/trpjs/generate_chart",
       data:model_data,
@@ -620,12 +611,16 @@ class ISPOverviewMapping{
     switch($.inArray(target.parent()[0],target.closest("td").find("li:not(.divider)"))){
       case 0:
       case -1:
+        let desc = this.form.find("#routers option:selected").text();
+        desc = `${desc} / ${this.form.find("#interfaces option:selected").text()}`
+        desc = `${desc} / ${tr.data("label")}`;
         let params = {
           key: tr.data("full_key").toString().replace(/\\/g,"\\\\"),
           statids:tr.data("statid"),
           cgguid:this.cgguid,
           window_fromts:this.tmint.from.tv_sec,
           window_tots:this.tmint.to.tv_sec,
+          description:desc
         }
         let url = "/trpjs/generate_chart_lb?"+$.param(params);
         load_modal(url);

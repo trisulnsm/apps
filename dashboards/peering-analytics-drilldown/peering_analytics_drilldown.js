@@ -167,8 +167,8 @@ class ISPDrilldownMapping{
   async redraw_all(meter_name){
     let idx = Object.keys(this.meters).findIndex(k=>k==meter_name);
     await this.draw_toppers_table(meter_name,idx);
-    this.draw_donut_chart(meter_name,idx);
     await this.draw_traffic_chart(meter_name,idx);
+    this.draw_donut_chart(meter_name,idx);
     this.draw_sankey_chart(meter_name,idx);
   }
 
@@ -178,7 +178,7 @@ class ISPDrilldownMapping{
 
     var table = this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table").find("table");
     table.attr("id",`table_${idx}`);
-    this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table").removeClass('animated-background');
+    this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table_div").find('.animated-background').remove();
     table.addClass('table table-hover table-sysdata');
     table.find("thead").append("<tr><th>Router</th><th>Interface</th><th sort='volume' barspark='auto'>Volume </th>></tr>");
     let cgtoppers =  this.toppers_data.slice(0,this.maxitems);
@@ -269,7 +269,7 @@ class ISPDrilldownMapping{
   }
   async draw_donut_chart(meter_name,idx){
     this.donut_div_id = `peering_drilldown_${idx}_donut`;
-    this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart").removeClass('animated-background');
+    this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart_div").find('.animated-background').remove();
     this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart").append($("<div>",{id:this.donut_div_id}));
     let cgtoppers =  this.toppers_data.slice(0,this.maxitems);
     var values = [];
@@ -319,7 +319,7 @@ class ISPDrilldownMapping{
       }
     }
     this.traf_chart_id = `peering_drilldown_${idx}_traffic_chart`
-    this.dom.find(`#peering_drilldown_${idx}`).find(`.interfaces_traffic_chart`).attr("id",this.traf_chart_id);
+    this.dom.find(`#peering_drilldown_${idx}`).find(`.traffic_chart`).attr("id",this.traf_chart_id);
     let ref_model = [this.parent_cgguid,this.keyt.key,this.meters[meter_name],"Total"];
     var model_data = {cgguid:this.crosskey_interface,
         meter:this.meters[meter_name],
@@ -327,8 +327,12 @@ class ISPDrilldownMapping{
         from_date:this.form.find("#from_date").val(),
         to_date:this.form.find("#to_date").val(),
         valid_input:1,
-        ref_model:ref_model
+        ref_model:ref_model,
+        show_title:false,
+        legend_position:"bottom"
       };
+    this.dom.find(`#peering_drilldown_${idx}`).find(`.traffic_chart_div`).find(".animated-background").remove();
+
     if(keys.length==0){
       $('#'+this.traf_chart_id).html("no data found");
       return
@@ -347,7 +351,7 @@ class ISPDrilldownMapping{
 
     this.sankey_div_id = `peering_drilldown_${midx}_sankey`;
     this.dom.find(`#peering_drilldown_${midx}`).find(".interfaces_sankey_chart").append($("<div>",{id:this.sankey_div_id}));
-
+    this.dom.find(`#peering_drilldown_${midx}`).find('.sankey_chart_div').find(".animated-background").remove();
     // Get Bytes Toppers
     let tdata = this.toppers_data.slice(0,30);
     let keylookup = {};
@@ -508,7 +512,7 @@ class ISPDrilldownMapping{
     }
     this.description = description;
     description = `${description} <i class='fa fa-clock-o fa-fw'></i> ${h_fmtduration(this.tmint.to.tv_sec- this.tmint.from.tv_sec)}`
-    $('.show_description').html(description)
+    $('.target').html(description)
   }
 
 };
