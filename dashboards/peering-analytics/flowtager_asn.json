@@ -5,7 +5,7 @@
         "id": 4,
         "SessionGroupID": "{99A78737-4B41-4387-8F31-8077DB917336}",
         "TaggerName": "Auto asn",
-        "TaggerRule": "{120A3124-E2BB-47BD-6C64-71BBB861C428=*",
+        "TaggerRule": "{120A3124-E2BB-47BD-6C64-71BBB861C428}=*",
         "TaggerTag": "AUTO:ASN",
         "CheckContent": null,
         "RowStatus": "Active",
