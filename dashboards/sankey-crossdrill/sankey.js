@@ -105,6 +105,10 @@ class SankeyCrossDrill  {
     var selected_todate = this.form.find('#to_date_sk').val();
     var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
     var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
+    let duration  = `   <i class='fa fa-clock-o fa-fw '></i>
+                     from ${selected_fromdate} to ${selected_todate}
+                     (${h_fmtduration(toTS-fromTS)})`
+    this.dom.find(".target").html(duration)
     this.tmint = mk_time_interval([fromTS,toTS]);
     this.cgguid = this.form.find('#cg_id').val();
     this.meter = this.form.find('#meter_id').val();
@@ -122,7 +126,6 @@ class SankeyCrossDrill  {
   }
 
   async run() {
-
     //find volume for selected meter ids
     //need to multiply by bucket_size to get volume
     var bucket_size = 1;
@@ -148,7 +151,7 @@ class SankeyCrossDrill  {
       counter_group: this.cgguid,
       time_interval: this.tmint ,
       meter:parseInt(this.meter),
-      maxitems:10000
+      maxitems:1000
     }); 
 
     this.cgtoppers_bytes = _.each(this.cgtoppers_bytes.keys, (k)=> { k.metric = parseInt(k.metric)*bucket_size; return k})
@@ -188,6 +191,7 @@ class SankeyCrossDrill  {
     //always show top 30 
     cgtoppers_bytes = cgtoppers_bytes.slice(0,this.max_nodes)
     
+    this.dom.find(".badge-count").text(cgtoppers_bytes.length)
 
     // convert this into this.
     this.repaint_sankey(cgtoppers_bytes);
@@ -224,7 +228,7 @@ class SankeyCrossDrill  {
             keylookup[parts[i]] = keylookup[parts[i]] || idx++;
           }
         }
-        
+      $()
     }
 
 
@@ -292,20 +296,104 @@ class SankeyCrossDrill  {
 
   // table : show filtered toppers in a table 
   repaint_table(cgtoppers_bytes) {
+    let table_header = $("<tr>");
+    let ck_parents = this.cg_meters.crosskey[this.cgguid].slice(1,4);
+    for(let i=0 ;i < ck_parents.length;i++){
+      
+      if(this.cg_meters.all_cg_meters[ck_parents[i]]){
+        let header = this.cg_meters.all_cg_meters[ck_parents[i]][0] || "";
+        table_header.append($("<th>").text(header));
+      }
+    }
+
+    table_header.append("<th sort='volume'> Volume </th>");
+    table_header.append("<th sort='nosort'> </th>");
     let tbl=this.data_dom.find('.toppers_table');
+    tbl.find("thead").append(table_header)
     tbl.addClass('table table-sysdata');
-    _.each(cgtoppers_bytes, function(kt) {
+    tbl.tablesorter();
+
+    _.each(cgtoppers_bytes, $.proxy(function(kt) {
         let r = $('<tr>')
+        r.data("cgguid",this.cgguid);
+        r.data("meter",this.meter);
+        r.data("key",kt.key);
+        r.data("label",kt.label.replace(/:0|:1|:2|:3|:4|:5|:6/g,""));
         _.each(kt.label.split("\\"),function(ai){
            let l = ai.replace(/:0|:1|:2|:3|:4|:5|:6/g,"");
            r.append(`<td>${l}</td>`)
         });
         r.append(`<td>${h_fmtvol(kt.metric)}</td>`)
+        r.append('<td><a class="sk_opts" href="javascript:;;"><i class="fa fa-fw fa-ellipsis-h fa-lg"></i></a></td>')
         tbl.find("tbody").append(r)
-    });
+    },this));
     this.data_dom.find('.toppers_table').siblings('.animated-background').remove();
+    tbl.find(".sk_opts").click($.proxy(function(){
+      this.add_dropdown_menu(event);
+    },this));
   }
 
+  add_dropdown_menu(event){
+
+    let target= $(event.target);
+    let anchor = target.closest("a");
+    if(anchor.attr("data-toggle") == "dropdown"){
+      return;
+    }
+    anchor.attr("data-toggle","dropdown");
+    anchor.wrap("<span class='dropdown'>");
+    let omenu=`<ul class="dropdown-menu pull-right">
+                <li id='key_dash'><a tabindex="-1" href="javascript:;">Key Dashboard</a></li>
+                <li id='traffic_chart'><a tabindex="-1" href="javascript:;">Traffic Chart</a></li>
+                <li id='longterm_traffic'><a tabindex="-1" href="javascript:;">Long Term Traffic</a></li>
+              </ul>`
+    anchor.after(omenu);
+    anchor.closest("td").find("ul.dropdown-menu li a").click($.proxy(function(event){
+      this.option_click(event,this.tmint)
+    },this));
+           
+
+  }
+  option_click(event,tmint){
+    let target=$(event.target);
+    let tr = target.closest("tr");
+    var h = {
+      cgguid:tr.data("cgguid"),
+      key: tr.data("key"),
+      readable:tr.data("label"),
+      day:1,
+      drawchart:true,
+      meter:tr.data("meter"),
+      hide_search_bar:1
+    }
+    
+    switch(target.parent().attr("id")){
+      case "key_dash":
+        window.open("/newdash/index?" + 
+          $.param({
+              guid:tr.data("cgguid"),
+              key: tr.data("key"),
+              statid:tr.data("meter"),
+              "dash_key":"key"
+          }));
+         break; 
+      case "longterm_traffic":
+        
+        window.open("/manage_keys/business_hour_chart?" + 
+                  $.param(h));
+        break;
+
+      case "traffic_chart":
+        let p =_.extend({},h)
+        p["key"]= p["key"].replace(/\\/g,"\\\\");
+        p["description"]=tr.data("label").replace(/\\/g,"\\\\");
+        p["name"] = $('#cg_id').find('option:selected').text();
+        p["window_fromts"]=tmint.from.tv_sec;
+        p["window_tots"]=tmint.to.tv_sec;
+        load_modal("/trpjs/generate_chart_lb?" + $.param(p));
+        break;
+    }
+  }
 
 }
 

@@ -48,34 +48,40 @@
 
   .row
     .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
-      %input#form_date_sk{type:"hidden",name:"from_date"}
+      %input#from_date_sk{type:"hidden",name:"from_date"}
       %input#to_date_sk{type:"hidden",name:"to_date"}
       %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Show Chart"}
 
 
-.ui_data
+.ui_data{style:"padding-top:10px"}
   .row
     .col-xs-12
-      .panel.panel-info.sankey_chart_div
+      .panel.panel-primary.sankey_chart_div
         .panel-heading
           %h3 
             %i.fa.fa-random.fa-fw
-            Sankey Chart
+            Sankey Chart 
             %small
               Thickness represents volume of traffic. Put your mouse over a node to show actual values
+            %span.badge.badge-info.badge-count
+            %p
+              %small.target
         .panel-body
           .animated-background
           #sankey_chart
   .row
     .col-xs-12
-      .panel.panel-info.table_div
+      .panel.panel-primary.table_div
         .panel-heading
           %h3 
             %i.fa.fa-table.fa-fw
             Table Toppers
             %small
+            %span.badge.badge-info.badge-count
+            %p
+              %small.target
         .panel-body
-          %table.table.table-sysdata.toppers_table
+          %table.table.table-sysdata.toppers_table.table-hover
             %thead
             %tbody
           .animated-background    
