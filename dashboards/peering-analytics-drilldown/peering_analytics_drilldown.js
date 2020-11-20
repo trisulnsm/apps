@@ -181,7 +181,7 @@ class ISPDrilldownMapping{
     this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table_div").find('.animated-background').remove();
     table.addClass('table table-hover table-sysdata');
     table.find("thead").append("<tr><th>Router</th><th>Interface</th><th sort='volume' barspark='auto'>Volume </th>></tr>");
-    let cgtoppers =  this.toppers_data.slice(0,this.maxitems);
+    let cgtoppers =  this.toppers_data;
     let totvol = 0;
     totvol=cgtoppers.reduce((a,b)=>a +parseInt(b.metric),0);
     $('.volume_'+idx).text(` (${h_fmtvol(totvol)}) `);
@@ -202,7 +202,7 @@ class ISPDrilldownMapping{
       }
       
     }
-
+    cgtoppers =  cgtoppers.slice(0,this.maxitems)
     let rkeyts = await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,{
       counter_group:GUID.GUID_CG_FLOWGENS(),
       keys:routers
