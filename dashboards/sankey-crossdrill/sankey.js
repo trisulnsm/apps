@@ -83,8 +83,15 @@ class SankeyCrossDrill  {
 
 
     let selectcgguid = _.findKey(this.cg_meters.all_cg_meters, (v,k) => { return v[0] == this.select_cgname  } ) 
-
-    var js_params = {meter_details:this.cg_meters.all_cg_meters,
+    //only only crosskey guid
+    let all_crosskey_cgguids = Object.keys(this.cg_meters.crosskey)
+    let guid_with_meters ={}
+    _.select(this.cg_meters.all_cg_meters,function(v,k){
+      if(all_crosskey_cgguids.includes(k)){
+        guid_with_meters[k] = v;
+      }
+    });
+    var js_params = {meter_details:guid_with_meters,
       selected_cg : selectcgguid,
       selected_st : "0",
       update_dom_cg :"cg_id",
@@ -178,12 +185,11 @@ class SankeyCrossDrill  {
     if(this.filter_text){
       var reg_exp = new RegExp(this.filter_text,"i")
       cgtoppers_bytes = _.select(cgtoppers_bytes,function(item){
-        let k=item.label;
         if($("input[name*='invertfilter']").prop('checked')==true){
-          return !k.match(reg_exp)
+          return !item.label.match(reg_exp) && ! item.readable.match(reg_exp)
         }
         else{
-          return k.match(reg_exp)
+          return item.label.match(reg_exp) || item.readable.match(reg_exp)
         }
       });
     }
@@ -319,9 +325,14 @@ class SankeyCrossDrill  {
         r.data("meter",this.meter);
         r.data("key",kt.key);
         r.data("label",kt.label.replace(/:0|:1|:2|:3|:4|:5|:6/g,""));
-        _.each(kt.label.split("\\"),function(ai){
-           let l = ai.replace(/:0|:1|:2|:3|:4|:5|:6/g,"");
-           r.append(`<td>${l}</td>`)
+        let readable = kt.readable.split("\\");
+        _.each(kt.label.split("\\"),function(ai,idx){
+          let t = ai.replace(/:0|:1|:2|:3|:4|:5|:6/g,"");
+          if(t != readable[idx])
+          {
+            t = `${t}(${readable[idx]})`
+          }
+          r.append(`<td>${t}</td>`)
         });
         r.append(`<td>${h_fmtvol(kt.metric)}</td>`)
         r.append('<td><a class="sk_opts" href="javascript:;;"><i class="fa fa-fw fa-ellipsis-h fa-lg"></i></a></td>')

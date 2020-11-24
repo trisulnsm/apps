@@ -355,6 +355,7 @@ class ISPDrilldownMapping{
     // Get Bytes Toppers
     let tdata = this.toppers_data.slice(0,30);
     let keylookup = {};
+
     let idx=0;
     let links  = { source : [], target : [], value : [] };
     for (let i =0 ; i < tdata.length; i++)
@@ -364,8 +365,10 @@ class ISPDrilldownMapping{
       
       let k=tdata[i].keyt.label;
       let parts=k.split("\\");
-      let r = tdata[i].keyt.key;
-      r=r.split('\\').slice(-1)[0].split("_")[0];
+      let key = tdata[i].keyt.key;
+      key=key.split('\\').slice(-1)[0];
+      let r = key.split("_")[0];
+      parts[1] = this.interfaces_ifalias[key]
       parts = [parts[0],this.routers_keymap[r].label,parts[1]];
       parts = _.map(parts,function(ai,ind){
         return ai.replace(/:0|:1|:2/g,"")+":"+ind;
@@ -399,7 +402,6 @@ class ISPDrilldownMapping{
       }
     }
     let labels=_.chain(keylookup).pairs().sortBy( (ai) => ai[1]).map( (ai) => ai[0].replace(/:0|:1|:2/g,"")).value()
-  
     Plotly.purge(this.sankey_div_id);
     var data = {
       type: "sankey",
