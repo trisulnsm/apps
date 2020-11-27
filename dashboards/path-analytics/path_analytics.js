@@ -233,6 +233,12 @@ class ASNPathAnalytics{
     _.each(asn_keys.hits,function(keyt){
       asn_keymap[keyt.key] = keyt.label || keyt.readable;
     },this);
+
+    let interfaces_keymap = {}
+    $(`#interfaces_${this.rand_id} option`).each(function(i,ele){
+      interfaces_keymap[$(ele).val()]=$(ele).text();
+    })
+
     let tot_volume =[0,0]
     for(let meterid in this.data){
       this.data[meterid].keys = _.chain(this.data[meterid].keys)
@@ -244,17 +250,21 @@ class ASNPathAnalytics{
                                 })
                                 .each(function(keyt){
                                   //remove repated asn in single path
+                                  let key = keyt.key.split(/\/|\\/);
                                   let readable = keyt.readable.split(/\/|\\/);
-                                  let intf = _.last(readable);
+                                  let intf = _.last(key);
+                                  let intf_readable = _.last(readable)
                                   if(intf.match(/^[0-9]*$/)){
-                                    intf=readable.shift();
+                                    intf=key.shift();
+                                    intf_readable = readable.shift();
                                   }else{
-                                    intf=readable.pop();
+                                    intf=key.pop();
+                                    intf_readable = readable.pop();
                                   }
                                   let asn_path = _.unique(readable);
                                   let asn_resolved = asn_path.map(x=> this.fix_asname(asn_keymap[x] || x)).join("\\")
-                                  keyt.label=[intf,asn_resolved].join("\\");
-                                  keyt.readable=[intf,asn_path.join("\\")].join("\\");
+                                  keyt.label=[interfaces_keymap[intf]||intf,asn_resolved].join("\\");
+                                  keyt.readable=[intf_readable,asn_path.join("\\")].join("\\");
                                   tot_volume[meterid] +=parseInt(keyt.metric);
                                 },this)
                               .value();
