@@ -189,9 +189,8 @@ class ASNPathAnalytics{
       req_opts["key_filter"]= selected_router;
     }
     if(filter_asn.length > 0){
-      req_opts["key_filter"] = "[^0-9a-fA-F]"+filter_asn+"[^0-9a-fA-F]\|^"+filter_asn+"\\\\"+"\|\\\\"+filter_asn+"[^0-9a-fA-F]";
+      req_opts["key_filter"] = "[^0-9a-fA-F]"+filter_asn+"[^0-9a-fA-F]\|^"+filter_asn+"/"+"\|/"+filter_asn+"[^0-9a-fA-F]";
     }
-    console.log(req_opts["key_filter"])
     req_opts["meter"] = 0;
     this.data[0]=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts );
     req_opts["meter"] = 1;
