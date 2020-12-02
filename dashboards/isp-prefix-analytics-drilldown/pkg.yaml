@@ -1,6 +1,6 @@
 name: Prefix Analytics Drilldown
 
-version: 0.0.13
+version: 0.1.14
 
 author: trisul
 
@@ -18,9 +18,10 @@ appresources: prefix_analytics_drilldown.js app.css  template.haml
 dependencies: 
 
 jsparams:
-  crosskey_router: "{649E1E48-FADF-E8D8-D8F7-120D29C30E6E}"
-  crosskey_interface: "{97D3FB96-0389-A6AB-532E-90FAF3E4EECE}"
-  meters:
-    upload: 2
-    download: 1
-
+  crosskey_router: "{0B6149B2-2D5E-412E-4F5B-462DB552EB0E}",
+  crosskey_interface: "{DB9CC485-B983-4BF9-1031-BB49131E891C}",
+  meters": 
+    upstream_receive: 1,
+    upstream_transmit: 2,
+    downstream_receive: 4,
+    downstream_transmit: 5

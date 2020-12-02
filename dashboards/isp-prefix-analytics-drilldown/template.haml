@@ -1,168 +1,297 @@
 .drilldown_data_form
-  .panel
-    .panel-body
+  .widget
+    .widget-header
+      %h4
+        %i.fa.fa-search
+         Search Criteria
+    .widget-body
         %form.form-horizontal.drilldown_prefix_form
           .row
+            .col-xs-6
+              .form-group
+                .new_time_selector#new_time_selector
             .col-xs-6
               .from-group
                  %label.control-label.col-xs-4 Prefix         
                 .col-xs-8 
                   %input{type:"text",class:"form-control",id:"drilldown_prefix",style:"width:300px"}
-            .col-xs-6
-              .form-group
-                .new_time_selector#new_time_selector
           .row
             .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
               %input#from_date{type:"hidden",name:"from_date"}
               %input#to_date{type:"hidden",name:"to_date"}
               %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Drilldown"}
+              
 .drilldown_data
   .row
     .col-xs-12
-      %h4.show_description.text-muted
+      %h4.target
       %ul.nav.nav-tabs#prefix_drilldown_tabs
         %li.active
-          %a{href:"#prefix_drilldown_upload",data-toggle:"tab",role:"tab"}
-            %i.fa.fa-upload.fa-fw
-            Upload
-            %span.upload_volume
-        %li
-          %a{href:"#prefix_drilldown_download",data-toggle:"tab",role:"tab"}
+          %a{href:"#prefix_drilldown_0",data-toggle:"tab",role:"tab"}
+            %i.fa.fa-cloud-upload.fa-fw
             %i.fa.fa-download.fa-fw
-            Download
-            %span.download_volume
+            Recv from Upstream
+            %span.volume_0
         %li
-          %a{href:"#prefix_drilldown_hostprefix",data-toggle:"tab",role:"tab"}
+          %a{href:"#prefix_drilldown_1",data-toggle:"tab",role:"tab"}
+            %i.fa.fa-cloud-upload.fa-fw
+            %i.fa.fa-upload.fa-fw
+            Trans to Upstream
+            %span.volume_1
+        %li
+          %a{href:"#prefix_drilldown_2",data-toggle:"tab",role:"tab"} 
+            %i.fa.fa-cloud-download.fa-fw
+            %i.fa.fa-download.fa-fw
+            Recv from Downstream
+            %span.volume_2
+         
+        %li
+          %a{href:"#prefix_drilldown_3",data-toggle:"tab",role:"tab"} 
+            %i.fa.fa-cloud-download.fa-fw
+            %i.fa.fa-upload.fa-fw
+            Trans to Downstream
+            %span.volume_3
+        %li
+          %a{href:"#prefix_drilldown_agg",data-toggle:"tab",role:"tab"}
             %i.fa.fa-table.fa-fw
             Prefixes and Hosts
-       
       .tab-content{style:"padding-top:10px"}
-        .tab-pane.active#prefix_drilldown_upload{data-use-width:1}
+        .tab-pane.active#prefix_drilldown_0{data-use-width:1}
           .row
-            .col-xs-6
-              .panel.panel-primary
+            .col-xs-12.toppers_table_div
+              .panel.panel-primary.add_download_btn
                 .panel-heading
-                  %h3
+                  %h3 
                     %i.fa.fa-table.fa-fw
-                    Interface Toppers
+                    Top Interfaces Prefix Receive
+                    %small Show top 100 interfaces by Receive (Downloading from upstream) 
+                    %span.badge.badge-info
+                  %p
+                    %small.target
                 .panel-body
-                  .toppers_table.animated-background 
+                  .toppers_table
                     %table
                       %thead
                       %tbody
-            .col-xs-6
+                  .animated-background
+            .row
+            .col-xs-12.traffic_chart_div
               .panel.panel-primary
                 .panel-heading
                   %h3
-                    %i.fa.fa-pie-chart.fa-fw
-                    Toppers Chart
+                    %i.fa.fa-area-chart.fa-fw 
+                    Stacked area chart  
+                    %small Showing top Interface traffic receive from upstream over the selected time period 
+                  %p
+                    %small.target
                 .panel-body
-                  .donut_chart.animated-background 
-            .col-xs-12
+                  .traffic_chart
+                  .animated-background
+            .row
+            .col-xs-12.donut_chart_div
               .panel.panel-primary
                 .panel-heading
                   %h3
-                    %i.fa.fa-area-chart.fa-fw
-                    Traffic chart for interfaces
+                    %i.fa.fa-pie-chart.fa-fw 
+                    Percent share of Interface traffic receive from upstream
+                  %p
+                    %small.target
                 .panel-body
-                  .interfaces_traffic_chart
-            .col-xs-12
+                  .donut_chart
+                  .animated-background
+            .col-xs-12.sankey_chart_div
               .panel.panel-primary
                 .panel-heading
                   %h3
                     %i.fa.fa-random.fa-fw
-                    Interfaces Sankey Chart
+                    Sankey Chart
+                    %small
+                      Shows receive traffic flows from the left side (Prefix) to the right (Interfaces). Thickness represents volume of traffic. Put your mouse over a node to show actual values.
                 .panel-body
                   .interfaces_sankey_chart
+                  .animated-background
 
 
-
-        .tab-pane#prefix_drilldown_download{data-use-width:1}
+        .tab-pane#prefix_drilldown_1{data-use-width:1}
           .row
-            .col-xs-6
-              .panel.panel-success
+            .col-xs-12.toppers_table_div
+              .panel.panel-primary
                 .panel-heading
-                  %h3
+                  %h3 
                     %i.fa.fa-table.fa-fw
-                    Interface Toppers
+                    Top Upstream Transmit  
+                    %small Show top 100 Upstream Interace by Transmit (Upload to upstream)
+                    %span.badge.badge-info
+                  %p
+                    %small.target
                 .panel-body
-                  .toppers_table.animated-background 
+                  .toppers_table
                     %table
                       %thead
                       %tbody
-            .col-xs-6
-              .panel.panel-success
+                    .animated-background
+          .row
+            .col-xs-12.traffic_chart_div
+              .panel.panel-primary
                 .panel-heading
                   %h3
-                    %i.fa.fa-pie-chart.fa-fw
-                    Toppers Chart
+                    %i.fa.fa-area-chart.fa-fw 
+                    Stacked area chart  
+                    %small Showing top interfaces upload to upstream traffic over the selected time period 
+                  %p
+                    %small.target
+                   
                 .panel-body
-                  .donut_chart.animated-background 
-            .col-xs-12
-              .panel.panel-success
+                  .traffic_chart
+                  .animated-background
+          .row
+            .col-xs-12.donut_chart_div
+              .panel.panel-primary
                 .panel-heading
                   %h3
-                    %i.fa.fa-area-chart.fa-fw
-                    Traffic chart for interfaces
+                    %i.fa.fa-pie-chart.fa-fw 
+                    Percent share of interfaces upload traffic to upstream 
+                  %p
+                    %small.target
                 .panel-body
-                  .interfaces_traffic_chart
-            .col-xs-12
-              .panel.panel-success
+                  .donut_chart
+                  .animated-background
+          .row
+            .col-xs-12.sankey_chart_div
+              .panel.panel-primary
                 .panel-heading
-                  %h3
-                    %i.fa.fa-random.fa-fw
-                    Interfaces Sankey Chart
+                  %h3 
+                    %i.fa.fa-random.fa-fw 
+                    Sankey Chart 
+                    %small
+                      Shows download traffic flows from the left side (Prefix) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
                 .panel-body
                   .interfaces_sankey_chart
-      
-        .tab-pane#prefix_drilldown_download{data-use-width:1}
+                  .animated-background
+
+        .tab-pane#prefix_drilldown_2{data-use-width:1}
           .row
-            .col-xs-6
+            .col-xs-12.toppers_table_div
               .panel.panel-success
                 .panel-heading
-                  %h3
+                  %h3 
                     %i.fa.fa-table.fa-fw
-                    Interface Toppers
+                    Top Interfaces receive from downstream  
+                    %small Show top 100 interfaces receive from downstream (Receive form downstrem)
+                    %span.badge.badge-info
+                  %p
+                    %small.target
                 .panel-body
-                  .toppers_table.animated-background 
+                  .toppers_table
                     %table
                       %thead
                       %tbody
-            .col-xs-6
+                    .animated-background
+          .row
+            .col-xs-12.traffic_chart_div
               .panel.panel-success
                 .panel-heading
                   %h3
-                    %i.fa.fa-pie-chart.fa-fw
-                    Toppers Chart
+                    %i.fa.fa-area-chart.fa-fw 
+                    Stacked area chart  
+                    %small Showing top interfaces download from downstream traffic over the selected time period 
+                  %p
+                    %small.target
+                   
                 .panel-body
-                  .donut_chart.animated-background 
-            .col-xs-12
+                  .traffic_chart
+                  .animated-background
+          .row
+            .col-xs-12.donut_chart_div
               .panel.panel-success
                 .panel-heading
                   %h3
-                    %i.fa.fa-area-chart.fa-fw
-                    Traffic chart for interfaces
+                    %i.fa.fa-pie-chart.fa-fw 
+                    Percent share of interfaces download traffic from downstream
+                  %p
+                    %small.target
                 .panel-body
-                  .interfaces_traffic_chart
-            .col-xs-12
+                  .donut_chart
+                  .animated-background
+          .row
+            .col-xs-12.sankey_chart_div
               .panel.panel-success
                 .panel-heading
-                  %h3
-                    %i.fa.fa-random.fa-fw
-                    Interfaces Sankey Chart
+                  %h3 
+                    %i.fa.fa-random.fa-fw 
+                    Sankey Chart 
+                    %small
+                      Shows download traffic flows from the left side (Prefix) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
                 .panel-body
                   .interfaces_sankey_chart
+                  .animated-background
+        .tab-pane#prefix_drilldown_3{data-use-width:1}
+          .row
+            .col-xs-12.toppers_table_div
+              .panel.panel-success
+                .panel-heading
+                  %h3 
+                    %i.fa.fa-table.fa-fw
+                    Top Interfaces transmit to downstream  
+                    %small Show top 100 interfaces transmit to downstream 
+                    %span.badge.badge-info
+                  %p
+                    %small.target
+                .panel-body
+                  .toppers_table
+                    %table
+                      %thead
+                      %tbody
+                    .animated-background
+          .row
+            .col-xs-12.traffic_chart_div
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-area-chart.fa-fw 
+                    Stacked area chart  
+                    %small Showing top interfaces transmit to downstream  traffic over the selected time period 
+                  %p
+                    %small.target
+                   
+                .panel-body
+                  .traffic_chart
+                  .animated-background
+          .row
+            .col-xs-12.donut_chart_div
+              .panel.panel-success
+                .panel-heading
+                  %h3
+                    %i.fa.fa-pie-chart.fa-fw 
+                    Percent share of interfaces download transmit to downstream 
+                  %p
+                    %small.target
+                .panel-body
+                  .donut_chart
+                  .animated-background
+          .row
+            .col-xs-12.sankey_chart_div
+              .panel.panel-success
+                .panel-heading
+                  %h3 
+                    %i.fa.fa-random.fa-fw 
+                    Sankey Chart 
+                    %small
+                      Shows download traffic flows from the left side (Prefix) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
+                .panel-body
+                  .interfaces_sankey_chart
+                  .animated-background
 
-         .tab-pane#prefix_drilldown_hostprefix{data-use-width:1}
+        .tab-pane#prefix_drilldown_agg{data-use-width:1}
             .row
               .col-xs-6
                 .panel.panel-success
                   .panel-heading
                     %h3
                       %i.fa.fa-table.fa-fw
-                      Top Country
+                      Top ASNumbers
                   .panel-body
-                    .tag_country.animated-background 
+                    .tag_asnumber.animated-background 
                       %table
                         %thead
                           %tr
@@ -220,7 +349,5 @@
                             %th Flows
                             %th{sort:"volume"} Volume
                         %tbody
-
-
 
 
