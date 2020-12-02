@@ -18,10 +18,10 @@ appresources: prefix_analytics_drilldown.js app.css  template.haml
 dependencies: 
 
 jsparams:
-  crosskey_router: "{0B6149B2-2D5E-412E-4F5B-462DB552EB0E}",
-  crosskey_interface: "{DB9CC485-B983-4BF9-1031-BB49131E891C}",
-  meters": 
-    upstream_receive: 1,
-    upstream_transmit: 2,
-    downstream_receive: 4,
+  crosskey_router: "{0B6149B2-2D5E-412E-4F5B-462DB552EB0E}"
+  crosskey_interface: "{DB9CC485-B983-4BF9-1031-BB49131E891C}"
+  meters:
+    upstream_receive: 1
+    upstream_transmit: 2
+    downstream_receive: 4
     downstream_transmit: 5
