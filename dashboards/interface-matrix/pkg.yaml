@@ -1,0 +1,24 @@
+name: Interface Traffic Matrix
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: View interface to interface traffic flows
+   long:  |
+      A complete and long term accurate view of interface to 
+      interface transmit and receive traffic flows within a router. 
+
+apptype: dashboard_js
+
+appresources: interface_matrix.js app.css crosskey_flowintfx.json template.haml  
+
+dependencies: 
+  webtrisul: 6.5.2228
+
+jsparams:
+  crosskey_interface: "{CD8F3FB3-A3DA-8A58-25E0-E0A6F8ED6854}"
+  meters:
+    upload: 0
+    download: 1
