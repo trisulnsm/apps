@@ -19,8 +19,18 @@
         .panel-heading
           %h3
             %i.fa.fa-table.fa-fw 
-            IP lookup   
+            Geo lookup   
             %small Showing ASNumber path,country,prefix etc..
-        .panel-body
+        .panel-body#geo_lookup
           .animated-background
-          %pre.query_output
+          %pre.query_geo_output
+    .col-xs-12
+      .panel.panel-primary
+        .panel-heading
+          %h3
+            %i.fa.fa-table.fa-fw 
+            BGP lookup   
+            %small Showing ASpath,Prefix,AS
+        .panel-body#bgp_lookup
+          .animated-background
+          %pre.query_bgp_output
