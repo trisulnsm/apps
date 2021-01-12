@@ -50,14 +50,23 @@ class IPGeoAsnPath{
       this.data[this.ips[i]] = {}
     }
     let query_text = this.ips.join(" ");
-    let data=await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST, {
+    let geo_data=await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST, {
       tool:3,
-      tool_input :query_text,
+      tool_input :`-d ${query_text}`,
       destination_node:this.probe
     });
-    this.data_dom.find(".animated-background").remove();
-    this.dom.find(".ui_data").find(".query_output").html(data.tool_output)
+    this.data_dom.find("#geo_lookup").find(".animated-background").remove();
+    this.dom.find(".ui_data").find(".query_geo_output").html(geo_data.tool_output)
+
+    let bgp_data=await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST, {
+      tool:5,
+      tool_input :`-d -B -p ${query_text}`,
+      destination_node:this.probe
+    });
+    this.data_dom.find("#bgp_lookup").find(".animated-background").remove();
+    this.dom.find(".ui_data").find(".query_bgp_output").html(bgp_data.tool_output)
   }
+
 
   
  
