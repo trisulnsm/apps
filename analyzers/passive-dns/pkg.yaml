@@ -1,6 +1,6 @@
 name: Passive DNS Extractor
 
-version: 0.0.10
+version: 0.0.11
 
 author: trisul
 
@@ -14,6 +14,6 @@ description:
 
 apptype: lua
 
-appresources: passive-dns-creator.lua   tris_leveldb.lua  dump.lua  api.lua 
+appresources: passive-dns-creator.lua   tris_leveldb.lua  dump.lua  api.lua  mkconfig.lua 
 
 dependencies:  LevelDB 

@@ -12,6 +12,7 @@
 -- 
 
 local leveldb=require'tris_leveldb'
+require 'mkconfig' 
 
 TrisulPlugin = { 
 
