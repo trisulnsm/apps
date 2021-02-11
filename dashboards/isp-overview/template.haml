@@ -11,22 +11,12 @@
 
 .col-xs-2
   .panel-stat3.bg-danger
-    %h2.m-top-none#internal_prefix
+    %h2.m-top-none#prefix
       %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitISPHomePrefixesAnalytics&valid_input=1&remove_ls_items=true"}
-    %h5 Active Internal Prefixes
+    %h5 Active  Prefixes
     %i.fa.fa-arrow-circle-o-up.fa-lg
-    %span.m-left-xs Number of active prefixes (internal)
+    %span.m-left-xs Number of active prefixes 
     %a.trends [trends]
-
-.col-xs-2
-  .panel-stat3.bg-danger
-    %h2.m-top-none#external_prefix
-      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitISPExternalPrefixesAnalytics&valid_input=1&remove_ls_items=true"}
-    %h5 Active External Prefixes
-    %i.fa.fa-arrow-circle-o-up.fa-lg
-    %span.m-left-xs Number of active prefixes (external)
-    %a.trends [trends]
-
 
 .col-xs-2
   .panel-stat3.bg-primary
@@ -54,7 +44,17 @@
     %h5 Interfaces
     %i.fa.fa-arrow-circle-o-up.fa-lg
     %span.m-left-xs Number of interfaces
-    %a#trends [trends]
+    %a.trends [trends]
+
+.col-xs-2
+  .panel-stat3.bg-info
+    %h2.m-top-none#countries
+      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitCountryAnalytics&valid_input=1&remove_ls_items=true"}
+    %h5 Countries
+    %i.fa.fa-arrow-circle-o-up.fa-lg
+    %span.m-left-xs Active Geo countries
+    %a.trends [trends]
+
 .row
   .col-xs-12
     .panel.panel-info

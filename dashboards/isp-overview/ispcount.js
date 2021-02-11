@@ -2,10 +2,10 @@
 const kGUIDS  = [
   [ 'aspath',             '{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}'],
   [ 'flowas',             '{120A3124-E2BB-47BD-6C64-71BBB861C428}'],
-  [ 'external_prefix',    '{C26520C4-DB9D-49EC-5D8B-35AD39951E36}'],
-  [ 'internal_prefix',    '{C6D9D91D-7020-404D-C99E-7032455E6244}'],
+  [ 'prefix',             '{2BE2A3B6-613D-4216-0737-3684E824EA33}'],
   [ 'routers',            '{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}'],
   [ 'interfaces',         '{C0B04CA7-95FA-44EF-8475-3835F3314761}'],
+  [ 'countries',          '{00990011-44BD-4C55-891A-77823D59161B}'],  
 ];
 
 // enter 
@@ -69,11 +69,11 @@ async function load_assets(opts)
 function repaint(datamodel,opts)
 {
   $('#flowas').find('a').html( parseInt(datamodel.flowas));
-  $('#external_prefix').find('a').html( parseInt(datamodel.external_prefix));
-  $('#internal_prefix').find('a').html( parseInt(datamodel.internal_prefix));
+  $('#prefix').find('a').html( parseInt(datamodel.prefix));
   $('#aspath').find('a').html( parseInt(datamodel.aspath));
   $('#routers').find('a').html( parseInt(datamodel.routers));
   $('#interfaces').find('a').html( parseInt(datamodel.interfaces));
+  $('#countries').find('a').html( parseInt(datamodel.countries));
 
   $('a.trends').bind('click', function(evt) {
     clicktrends( evt, datamodel);
