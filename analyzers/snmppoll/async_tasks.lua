@@ -5,6 +5,9 @@ AsyncTasks.data = ""
 -- execute ASYNC - dont worry about when and where this is called. Trisul will take care of it 
 AsyncTasks.onexecute = function(in_data) 
 
+	local thispath=debug.getinfo(1).source:match("@?(.*/)")
+	package.path=package.path..";"..thispath.."/?.lua"
+
 	local JSON=require'JSON'
 	local BW=require'bulkwalk_cmd'
 
