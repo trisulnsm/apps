@@ -1,0 +1,20 @@
+name: Meta App for snmp
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: Automatically install snmppoller and snmpvsnetflow app
+   long:  |
+     Install snmp poller and snmp vs netflow app 
+
+apptype: meta
+
+appresources: analyzers/snmppoll dashboards/snmp-vs-netflow
+
+dependencies: 
+  webtrisul: 6.5.2289
+
+jsparams:

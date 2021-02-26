@@ -1,0 +1,29 @@
+name: SNMPVsNetflow
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: Compare SNMP traffic with netflow traffic
+   long:  |
+      Compare netflow traffic with snmp traffic from interfaces
+
+apptype: dashboard_js
+
+appresources: snmpvsnetflow.js 
+
+dependencies: 
+  webtrisul: 6.5.2289
+
+jsparams:
+  netflow_guid: "{C0B04CA7-95FA-44EF-8475-3835F3314761}"
+  snmp_guid: "{9781DB2C-F78A-4F7F-A7E8-2B1A9A7BE71A}"
+  meters:
+    netflow:
+      Receive: 1
+      Transmit: 2
+    snmp:
+      Receive: 1
+      Transmit: 2
