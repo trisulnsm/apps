@@ -1,0 +1,17 @@
+.panel h3 {
+	font-size: 20px;
+	margin-top:10px;
+}
+
+.panel-primary h3 small {
+  color:#fff;
+}
+
+h3 small{
+	font-size: 75%;
+}
+.panel-heading {
+	padding: 5px 15px;
+}
+
+}
