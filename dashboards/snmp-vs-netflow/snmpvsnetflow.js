@@ -149,6 +149,8 @@ class SNMPVSNetflow{
         valid_input:1,
         mrtg:true,
         show_title:false,
+        auto_label:false,
+        chart_legend_names:Object.keys(this.jsparams.meters[ai])
       };
       await $.ajax({
         url:"/trpjs/generate_chart",

@@ -22,6 +22,7 @@
                 %label.control-label.col-xs-4 Interfaces 
                 .col-xs-8 
                   %select.select#interfaces{name:'interfaces',multiple:true}
+                  %span.text-danger.chosen_message
           .row
             .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
               %input#from_date{type:"hidden",name:"from_date"}
@@ -30,15 +31,15 @@
 .ui_data.clearfix
 .netvssnmp
   .col-xs-12.nopadding
-    .col-xs-6{style:"padding-left:0px"}
-      .panel.panel-info.netflow
+    .col-xs-6{style:"padding-left:0px;padding-right:2px;"}
+      .panel.panel-primary.netflow
         .panel-heading
           %h3 
             Netflow
             %small{style:"padding-left:5px"}
         .panel-body
           .netflow_chart
-    .col-xs-6{style:"padding-right:0px"}
+    .col-xs-6{style:"padding-right:0px;padding-left:2px"}
       .panel.panel-success.snmp
         .panel-heading
             %h3
