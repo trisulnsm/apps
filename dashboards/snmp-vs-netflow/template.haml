@@ -1,4 +1,4 @@
-.row.peeringanalytics_form
+.row.snmpvsnetflow_form
   .col-xs-12
     .widget
       .widget-header
@@ -9,26 +9,37 @@
         %form.form-horizontal
           .row
             .col-xs-6
-              .form-group
-                .new_time_selector#new_time_selector
-          .row
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Routers         
-                .col-xs-8 
-                  %select#routers{name:'routers'} 
+              .col-xs-12.nopadding
+                .col-xs-12
+                  .form-group
+                    .new_time_selector#new_time_selector
+                .col-xs-12
+                  .form-group 
+                    %label.control-label.col-xs-4 Routers         
+                    .col-xs-8 
+                      %select#routers{name:'routers'} 
             .col-xs-6
               .form-group 
                 %label.control-label.col-xs-4 Interfaces 
                 .col-xs-8 
                   %select.select#interfaces{name:'interfaces',multiple:true}
                   %span.text-danger.chosen_message
+
+            
+            
           .row
             .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
               %input#from_date{type:"hidden",name:"from_date"}
               %input#to_date{type:"hidden",name:"to_date"}
               %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
 .ui_data.clearfix
+.router_details
+  .panel.panel-info.add_download_btn
+    .panel-heading
+      %h3
+    .panel-body
+      %dl.dl-horizontal
+
 .netvssnmp
   .col-xs-12.nopadding
     .col-xs-6{style:"padding-left:0px;padding-right:2px;"}

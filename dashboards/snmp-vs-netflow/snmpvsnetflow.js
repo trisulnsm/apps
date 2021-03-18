@@ -54,20 +54,23 @@ class SNMPVSNetflow{
       selected_st : "",
       update_dom_cg : "routers",
       update_dom_st : "interfaces",
-      chosen:true
+      chosen:true,
+      chosen_args:{height:{'interfaces':"100px"}}
     }
     $(`#routers`).find("option").remove();
     await load_routers_interfaces_dropdown(load_router_opts);
   }
   submit_form(){
-    //get selected router and interfaces
     this.reset_ui();
     this.get_router_and_interface_keyts();
+    //get selected router and interfaces
     return false;
   }
   reset_ui(){
     this.dom.find(".ui_data").remove();
     this.dom.append($(this.haml_dom[1]).clone());
+    this.report_nodes=[];
+   
   }
   async get_router_and_interface_keyts(){
     let selected_router_key = this.form.find("#routers").val();
@@ -76,23 +79,44 @@ class SNMPVSNetflow{
       this.show_alert_box();
       return true;
     }
-    
+    this.tris_pg_bar=new TrisProgressBar({max:selected_interface_keys.length*2,divclass:'ui_data'});
     this.cg_meters = {};
     await get_counters_and_meters_json(this.cg_meters);
     //get selected router and interfaces details
     this.router_keyt=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST, 
                     {counter_group:GUID.GUID_CG_FLOWGENS(),
-                     label:"182.75.240.102",
+                     keys:[selected_router_key],
                       get_attributes:true});
+    this.show_router_details()
     this.intf_keyts=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST, 
                     {counter_group:this.jsparams.netflow_guid,
                      keys:selected_interface_keys,
                       get_attributes:true});
     //for each interface show snmp and netflow traffic start
     for(let i =0; i<this.intf_keyts.keys.length;i++){
-      this.draw_traffic_charts(this.intf_keyts.keys[i],i)
+      await this.draw_traffic_charts(this.intf_keyts.keys[i],i);
+      if(i < this.intf_keyts.keys.length-1 ){
+        this.report_nodes.push({type:"page_break"}); 
+      }
     }
-    
+    this.add_download_pdf();
+  }
+  show_router_details(){
+    let base_div = $(this.haml_dom[2]).clone();
+    let keyt = this.router_keyt.keys[0];
+    base_div.find(".panel-heading h3").text(`Router Details -${keyt.readable}`);
+    let dl=base_div.find("dl")
+    dl.append(`<dt> IP </dt>
+              <dd>${keyt.readable}</dd>`);
+    if(keyt.label != keyt.readable){
+      dl.append(`<dt> Name </dt> <dd>${keyt.label}</dd>`);
+    }
+    let sysdesc = keyt.attributes.find(x=> x.attr_name=="snmp.sys_descr");
+    if(sysdesc){
+      dl.append(`<dt> Desc </dt> <dd>${sysdesc.attr_value}</dd>`);
+    }
+    base_div.find("dl").append(dl)
+    $('.ui_data').append(base_div);
   }
   async draw_traffic_charts(keyt,i){
     let desc = "";
@@ -105,7 +129,7 @@ class SNMPVSNetflow{
       {
         desc = desc + ifname.attr_value;
       }
-      if(ifalias && ifalias.attr_value != desc){
+      if(ifalias && ifalias.attr_value != desc && ifalias.attr_value.trim().length > 0 ){
         desc = desc + `(${ifalias.attr_value})`
       }
       //Huwai has diffent port for snmp
@@ -118,9 +142,10 @@ class SNMPVSNetflow{
       desc = keyt.readable;
     }
     let meters = this.jsparams.meters;
-    let base_div = $(this.haml_dom[2]).clone();
+    let base_div = $(this.haml_dom[3]).clone();
     $('.ui_data').append(base_div);
     ["netflow","snmp"].forEach(async function(ai){
+      this.report_nodes.push({type:"svg",header_text:"auto",find_by:`#${ai}_chart_${i}`,parent:"panel",h1:"h3",h2:"h3 small"});
       let div = $(`.${ai}`);
       base_div.find(`.${ai} .panel-heading h3 small`).text(desc);
       base_div.find(`.${ai}_chart`).attr("id",`${ai}_chart_${i}`);
@@ -140,6 +165,7 @@ class SNMPVSNetflow{
           $(`#${ai}_chart_${i}`).html(alert_msg)
           return;
         }
+
       }
       let model_data = {cgguid:this.jsparams[`${ai}_guid`],
         key:intfkey,
@@ -158,10 +184,28 @@ class SNMPVSNetflow{
         context:this,
         success:function(resp){
           $(`#${ai}_chart_${i}`).html(resp);
+          this.tris_pg_bar.update_progress_bar(); 
         }
       });
 
     },this);
+    
+  }
+  add_download_pdf(){
+    let keyt = this.router_keyt.keys[0];
+    let h1 = keyt.readable;
+    if(keyt.label != keyt.readable){
+      h1 =`${h1}(${keyt.label})`
+    }
+    new ExportToPDF({add_button_to:".add_download_btn",
+                      tint:this.tmint,
+                      download_file_name:"snmpvsnetflow",
+                      report_opts:{
+                        header:{h1:"SNMP Vs Netflow"},
+                        report_title:{h1:h1},
+                        nodes:this.report_nodes
+                      }
+                    });
   }
   show_alert_box(){
     $('.ui_data').html("<div class='alert alert-danger'>Please select atleast a interface to continue.</div>")
