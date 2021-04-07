@@ -1,0 +1,21 @@
+name: Bandwidth Capacity Planning
+
+version: 0.0.1
+
+author: trisul
+
+
+description: 
+   short: Network In and Out bandith with average rates
+   long:  |
+      A breakup of In and out traffic banwidth with average rates 
+
+apptype: dashboard_js
+
+appresources: bandwidth_capacity_planning.js app.css template.haml 
+
+dependencies: 
+  webtrisul: 6.5.2304
+
+jsparams:
+  counter_group: "{C0B04CA7-95FA-44EF-8475-3835F3314761}"
