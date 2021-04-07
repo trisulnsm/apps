@@ -173,15 +173,15 @@ class  BandwidthCapacityPlannig {
                 volumes_only:1};
       let invol = 0,inavg = 0,outvol=0,outavg=0;
       let resp=await fetch_trp(TRP.Message.Command.COUNTER_ITEM_REQUEST,req_opts);
-      if(resp.totals){
+      if(resp.totals && resp.totals.values.length > 1){
         
         invol = resp.totals.values[1].toNumber();
-        invol=invol*bucket_size;
-        inavg = invol/(this.tmint.to.tv_sec-this.tmint.from.tv_sec);
+        //invol=invol*bucket_size;
+        inavg = invol/resp.samples.values[1].toNumber();
 
         outvol = resp.totals.values[2].toNumber();
-        outvol=outvol*bucket_size;
-        outavg = outvol/(this.tmint.to.tv_sec-this.tmint.from.tv_sec);
+        //outvol=outvol*bucket_size;
+        outavg = outvol/(resp.samples.values[2].toNumber());
 
 
       }
