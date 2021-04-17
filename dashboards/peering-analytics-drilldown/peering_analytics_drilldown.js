@@ -48,7 +48,7 @@ class ISPDrilldownMapping{
   //reset ui for every form submit
   reset_ui(){
     this.maxitems=10;
-    this.agg_flows=[];
+    this.agg_flows={};
     this.dom.find(".drilldown_data").remove();
     this.dom.append($(this.haml_dom[1]).clone());
   }
@@ -158,9 +158,9 @@ class ISPDrilldownMapping{
     this.toppers_data=this.toppers_data.sort((a, b) => (a.metric > b.metric) ? -1 : 1);
     await this.redraw_all(meter_name);
   }
-   async get_aggregated_flows(intf){
-    let opts = {flowtag:`[asn]${this.keyt.key}`,time_interval:this.tmint,probe_id:this.probe_id};
-    this.agg_flows.push(await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts));
+   async get_aggregated_flows(){
+    let opts = {flowtag:`[asn]${this.keyt.key}`,time_interval:this.tmint,probe_id:this.probe_id,maxcount:100};
+    this.agg_flows=await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts);
     
   }
 
@@ -447,7 +447,7 @@ class ISPDrilldownMapping{
 
     Plotly.react(this.sankey_div_id, data, layout, ploty_options)
   }
-  draw_aggregate_table(group){
+  async draw_aggregate_table(group){
     var table = this.dom.find(`.${group}`).find("table");
     this.dom.find(`.${group}`).removeClass('animated-background');
     var table_id = "agg_flows_tbl_"+Math.floor(Math.random()*100000);
@@ -455,23 +455,13 @@ class ISPDrilldownMapping{
     table.addClass('table table-hover table-sysdata');
     let toppers = [];
     if(group=="internal_ip" || group == "external_ip"){
-      toppers.push(this.agg_flows[0][group]);
-      toppers.push(this.agg_flows[1][group]);
+      toppers.push(this.agg_flows[group]);
+      toppers.push(this.agg_flows[group]);
     }else if(group=="tag_asnumber"){
-      if(this.agg_flows[0].tag_group.find(x=>x.group_name=="asn")){
-        toppers.push(this.agg_flows[0].tag_group.find(x=>x.group_name=="asn").tag_metrics)
-      }
-      if(this.agg_flows[1].tag_group.find(x=>x.group_name=="asn")){
-        toppers.push(this.agg_flows[1].tag_group.find(x=>x.group_name=="asn").tag_metrics)
-      }
+      toppers.push(this.agg_flows.tag_group.find(x=>x.group_name=="asn").tag_metrics)
     }
     else if(group=="tag_prefixes"){
-      if(  this.agg_flows[0].tag_group.find(x=>x.group_name=="prf")){
-        toppers.push(this.agg_flows[0].tag_group.find(x=>x.group_name=="prf").tag_metrics);
-      }
-      if(  this.agg_flows[1].tag_group.find(x=>x.group_name=="prf")){
-        toppers.push(this.agg_flows[1].tag_group.find(x=>x.group_name=="prf").tag_metrics);
-      }
+      toppers.push(this.agg_flows.tag_group.find(x=>x.group_name=="prf").tag_metrics)
     }
     toppers =_.flatten(toppers).slice(0,50);
     let toppers_obj = {};
@@ -487,12 +477,27 @@ class ISPDrilldownMapping{
       }
     }
     toppers = _.sortBy(_.values(toppers_obj),function(k){return -k.metric;});
-    let rows = []
+    let rows = [];
+    let all_keys = toppers.map(ai=>ai.key.key);
+    let key_label_mappings = {};
+    if (all_keys.length > 0 && group=="tag_asnumber"){
+      let req_opts = {counter_group:this.parent_cgguid,keys:all_keys}
+      let resp=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,req_opts);
+      for(let i=0 ; i < resp.keys.length; i++){
+        let kt = resp.keys[i];
+        let label = kt.label;
+        key_label_mappings[kt.key] = kt.label;
+      }
+    }
     for(let i=0; i< toppers.length;i++){
       var t = toppers[i];
+      let label = key_label_mappings[t.key.key] || t.key.label;
+      if(label == t.key.readable){
+        label = "";
+      }
       rows.push(`<tr>
                 <td>${t.key.readable||t.key.key}</td>
-                <td>${t.key.label}</td>
+                <td>${label}</td>
                 <td>${t.count}</td>
                 <td>${h_fmtvol(t.metric)}</td>
                 </tr>`);
