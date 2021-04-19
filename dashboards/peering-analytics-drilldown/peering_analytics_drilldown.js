@@ -270,6 +270,11 @@ class ISPDrilldownMapping{
     this.donut_div_id = `peering_drilldown_${idx}_donut`;
     this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart_div").find('.animated-background').remove();
     this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart").append($("<div>",{id:this.donut_div_id}));
+    let width = this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart_div").width()
+    if($(`#${this.donut_div_id}`).is(":hidden")){
+      let tab_pane = $(`#${this.donut_div_id}`).closest('.tab-pane');
+      width = tab_pane.width()-50;
+    }
     let cgtoppers =  this.toppers_data.slice(0,this.maxitems);
     var values = [];
     var labels = [];
@@ -300,7 +305,7 @@ class ISPDrilldownMapping{
         }
       ],
       height: 400,
-      width:  $('#'+this.divid).find(".donut_chart").width(),
+      width:  width,
       showlegend: true,
     };
     var ploty_options = { modeBarButtonsToRemove: ['hoverClosestCartesian','toggleSpikelines','hoverCompareCartesian',
