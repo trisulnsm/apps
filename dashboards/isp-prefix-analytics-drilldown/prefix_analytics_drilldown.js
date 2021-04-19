@@ -48,7 +48,7 @@ class ISPPrefixDrilldownMapping{
   //reset ui for every form submit
   reset_ui(){
     this.maxitems=10;
-    this.agg_flows=[];
+    this.agg_flows={};
     this.dom.find(".drilldown_data").remove();
     this.dom.append($(this.haml_dom[1]).clone());
   }
@@ -98,8 +98,7 @@ class ISPPrefixDrilldownMapping{
       nodes.push({find_by:`#prefix_drilldown_${idx}_sankey`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
       nodes.push({type:"page_break",add_header_footer:false});
     }
-    await this.get_aggregated_flows("in");
-    await this.get_aggregated_flows("out");
+    await this.get_aggregated_flows();
     this.draw_aggregate_table('internal_ip');
     this.draw_aggregate_table('external_ip');
     this.draw_aggregate_table('tag_asnumber');
@@ -160,7 +159,7 @@ class ISPPrefixDrilldownMapping{
   }
    async get_aggregated_flows(intf){
     let opts = {flowtag:`[prf]${this.keyt.key}`,time_interval:this.tmint,probe_id:this.probe_id};
-    this.agg_flows.push(await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts));
+    this.agg_flows=await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts);
     
   }
 
@@ -447,7 +446,7 @@ class ISPPrefixDrilldownMapping{
 
     Plotly.react(this.sankey_div_id, data, layout, ploty_options)
   }
-  draw_aggregate_table(group){
+  async draw_aggregate_table(group){
     var table = this.dom.find(`.${group}`).find("table");
     this.dom.find(`.${group}`).removeClass('animated-background');
     var table_id = "agg_flows_tbl_"+Math.floor(Math.random()*100000);
@@ -455,23 +454,13 @@ class ISPPrefixDrilldownMapping{
     table.addClass('table table-hover table-sysdata');
     let toppers = [];
     if(group=="internal_ip" || group == "external_ip"){
-      toppers.push(this.agg_flows[0][group]);
-      toppers.push(this.agg_flows[1][group]);
+      toppers.push(this.agg_flows[group]);
+      toppers.push(this.agg_flows[group]);
     }else if(group=="tag_asnumber"){
-      if(this.agg_flows[0].tag_group.find(x=>x.group_name=="asn")){
-        toppers.push(this.agg_flows[0].tag_group.find(x=>x.group_name=="asn").tag_metrics)
-      }
-      if(this.agg_flows[1].tag_group.find(x=>x.group_name=="asn")){
-        toppers.push(this.agg_flows[1].tag_group.find(x=>x.group_name=="asn").tag_metrics)
-      }
+      toppers.push(this.agg_flows.tag_group.find(x=>x.group_name=="asn").tag_metrics)
     }
     else if(group=="tag_prefixes"){
-      if(  this.agg_flows[0].tag_group.find(x=>x.group_name=="prf")){
-        toppers.push(this.agg_flows[0].tag_group.find(x=>x.group_name=="prf").tag_metrics);
-      }
-      if(  this.agg_flows[1].tag_group.find(x=>x.group_name=="prf")){
-        toppers.push(this.agg_flows[1].tag_group.find(x=>x.group_name=="prf").tag_metrics);
-      }
+      toppers.push(this.agg_flows.tag_group.find(x=>x.group_name=="prf").tag_metrics)
     }
     toppers =_.flatten(toppers).slice(0,50);
     let toppers_obj = {};
@@ -487,12 +476,27 @@ class ISPPrefixDrilldownMapping{
       }
     }
     toppers = _.sortBy(_.values(toppers_obj),function(k){return -k.metric;});
-    let rows = []
+    let rows = [];
+    let key_label_mappings = {};
+    let all_keys = toppers.map(ai=>ai.key.key);
+    if (all_keys.length > 0 && group=="tag_asnumber"){
+      let req_opts = {counter_group:GUID.GUID_CG_ASN(),keys:all_keys}
+      let resp=await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,req_opts);
+      for(let i=0 ; i < resp.keys.length; i++){
+        let kt = resp.keys[i];
+        let label = kt.label;
+        key_label_mappings[kt.key] = kt.label;
+      }
+    }
     for(let i=0; i< toppers.length;i++){
       var t = toppers[i];
+      let label = key_label_mappings[t.key.key] || t.key.label;
+      if(label == t.key.readable){
+        label = "";
+      }
       rows.push(`<tr>
                 <td>${t.key.readable||t.key.key}</td>
-                <td>${t.key.label}</td>
+                <td>${label}</td>
                 <td>${t.count}</td>
                 <td>${h_fmtvol(t.metric)}</td>
                 </tr>`);
