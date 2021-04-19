@@ -98,8 +98,7 @@ class ISPDrilldownMapping{
       nodes.push({find_by:`#peering_drilldown_${idx}_sankey`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
       nodes.push({type:"page_break",add_header_footer:false});
     }
-    await this.get_aggregated_flows("in");
-    await this.get_aggregated_flows("out");
+    await this.get_aggregated_flows();
     this.draw_aggregate_table('internal_ip');
     this.draw_aggregate_table('external_ip');
     this.draw_aggregate_table('tag_asnumber');
