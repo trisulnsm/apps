@@ -639,17 +639,12 @@ class ISPOverviewMapping{
         if(this.selected_router=="0"){
           ck_cgguid=this.crosskey_interface;
         }
-       window.open("/newdash/index?" + 
+        window.open("/newdash/index?" + 
                     $.param({
                         key: tr.data("key"),
-                        statids:tr.data("statids"),
-                        label:`${tr.data("label")}`.toString().replace(/\\/g,"\\\\"),
-                        readable:`${tr.data("readable")}`.toString().replace(/\\/g,"\\\\"),                        
-                        cgguid:this.filter_cgguid,
-                        ck_cgguid:ck_cgguid,
-                        filter_cgname:this.filter_cgname,
                         window_fromts:this.tmint.from.tv_sec,
                         window_tots:this.tmint.to.tv_sec,
+                        valid_input:1,
                         "dash_key_regex":"gitCountryAnalyticsDrilldown"
                     }));
         break;
