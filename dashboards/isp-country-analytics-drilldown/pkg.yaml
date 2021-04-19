@@ -1,6 +1,6 @@
 name: Country Analytics Drilldown
 
-version: 0.0.3
+version: 0.0.4
 
 author: trisul
 
@@ -16,3 +16,11 @@ apptype: dashboard_js
 appresources: country_analytics_drilldown.js app.css  template.haml
 
 dependencies: 
+
+jsparams:
+  crosskey_router: "{10CF1400-DD68-5986-B7A0-D89B6E0675FF}"
+  crosskey_interface: "{ADE664B1-799C-96E1-1705-D933CB9A9A30}"
+  meters:
+    upload: 0
+    download: 1
+
