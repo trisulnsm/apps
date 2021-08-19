@@ -1,0 +1,37 @@
+{
+  "TrisulCounterGroupCrosskey": [
+    [
+      {
+        "id": 1,
+        "CounterGUID": "{074E78B6-E032-4B22-B085-12A2E72E1BB7}",
+        "ParentCounterGUID": "{51177E0A-7535-46B7-1477-9F0E0E0F9808}",
+        "CrosskeyCounterGUID": "{2792D434-496E-40C9-5E2D-73B60623A631}",
+        "CrosskeyThirdCounterGUID": null,
+        "KeyLength1": null,
+        "KeyLength2": null,
+        "KeyLength3": null
+      }
+    ],
+    [
+      {
+        "id": 61,
+        "CounterGUID": "{074E78B6-E032-4B22-B085-12A2E72E1BB7}",
+        "Name": "IP X Multicast",
+        "Description": "IP X multicast",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 60000,
+        "TrackHiWater": 1000,
+        "TrackLoWater": 200,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Active",
+        "CardinalityEstimateBits": null,
+        "TopperTrafficOnly": null,
+        "EnableSliceKeys": null,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1628869342,
+        "ResolverCounterGUID": null
+      }
+    ]
+  ]
+}

@@ -1,0 +1,16 @@
+name: IGMP Multicast
+
+version: 0.0.0
+
+author: trisul
+
+description: 
+   short: Extract IGMP group members
+   long:  |
+      Extract IGMP group members and account multicast traffic to each of the group members
+
+apptype: lua
+
+appresources: cg_monitor_hosts.lua igmp-ip-multicast-port.lua ip_x_multicast.json newcg-multicast-member.lua sweepbuf.lua igmp-counter.lua igmp-protocol.lua newcg-ip-multicast.lua  pkg.yaml
+
+dependencies:  
