@@ -44,7 +44,10 @@ TrisulPlugin = {
 			swb:skip(1)
 			swb:skip(2)
 			local mip = swb:next_ipv4()
+			print("Mapping ".. source_ip.. " member of multicast group " .. mip ) 
+
 			engine:post_message_backend("{18D4B77A-AA86-4924-2201-6ABE892F2937}", mip.."="..source_ip)
+			engine:post_message_frontend("{18D4B77A-AA86-4924-2201-6ABE892F2937}", mip.."="..source_ip)
 
 		end 
 

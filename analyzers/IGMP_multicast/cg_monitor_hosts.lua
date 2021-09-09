@@ -18,7 +18,7 @@ TrisulPlugin = {
 
   -- id block 
   id =  {
-    name = "Multicast Hosts",
+    name = "Multicast Host",
     description = "Listen and process events in 'Hosts' counter group",   -- optional
     author = "Unleash",                       -- optional
     version_major = 1,                        -- optional
@@ -70,25 +70,26 @@ TrisulPlugin = {
     onflush = function(engine, timestamp,key, metrics) 
 
 		local mmap = T.multicast_mapping[key]
-		if mmap then
-    
-				engine:update_counter("{2792D434-496E-40C9-5E2D-73B60623A631}", key, 0, tonumber(metrics[1])*60 ) 
-				engine:update_counter("{2792D434-496E-40C9-5E2D-73B60623A631}", key, 1, tonumber(metrics[2])*60 ) 
-				engine:update_counter("{2792D434-496E-40C9-5E2D-73B60623A631}", key, 2, tonumber(metrics[3])*60 ) 
+    if mmap then
 
-			for k,v in pairs(mmap) do
+        engine:update_counter("{2792D434-496E-40C9-5E2D-73B60623A631}", key, 0, tonumber(metrics[1])*60 )
+        engine:update_counter("{2792D434-496E-40C9-5E2D-73B60623A631}", key, 1, tonumber(metrics[2])*60 )
+        engine:update_counter("{2792D434-496E-40C9-5E2D-73B60623A631}", key, 2, tonumber(metrics[3])*60 )
 
-				engine:update_counter("{51177E0A-7535-46B7-1477-9F0E0E0F9808}", k, 0, tonumber(metrics[1])*60 ) 
-				engine:update_counter("{51177E0A-7535-46B7-1477-9F0E0E0F9808}", k, 1, tonumber(metrics[2])*60 ) 
-				engine:update_counter("{51177E0A-7535-46B7-1477-9F0E0E0F9808}", k, 2, tonumber(metrics[3])*60 ) 
+       for k,v in pairs(mmap) do
+
+         engine:update_counter("{51177E0A-7535-46B7-1477-9F0E0E0F9808}", k, 0, tonumber(metrics[1])*60 )
+         engine:update_counter("{51177E0A-7535-46B7-1477-9F0E0E0F9808}", k, 1, tonumber(metrics[2])*60 )
+         engine:update_counter("{51177E0A-7535-46B7-1477-9F0E0E0F9808}", k, 2, tonumber(metrics[3])*60 )
 
 
-				engine:update_counter("{074E78B6-E032-4B22-B085-12A2E72E1BB7}", k.."\\\\"..key, 0, tonumber(metrics[1])*60 ) 
-				engine:update_counter("{074E78B6-E032-4B22-B085-12A2E72E1BB7}", k.."\\\\"..key, 1, tonumber(metrics[2])*60 ) 
-				engine:update_counter("{074E78B6-E032-4B22-B085-12A2E72E1BB7}", k.."\\\\"..key, 2, tonumber(metrics[3])*60 ) 
-			end 
+         engine:update_counter("{074E78B6-E032-4B22-B085-12A2E72E1BB7}", k.."\\\\"..key, 0, tonumber(metrics[1])*60 )
+         engine:update_counter("{074E78B6-E032-4B22-B085-12A2E72E1BB7}", k.."\\\\"..key, 1, tonumber(metrics[2])*60 )
+         engine:update_counter("{074E78B6-E032-4B22-B085-12A2E72E1BB7}", k.."\\\\"..key, 2, tonumber(metrics[3])*60 )
+       end
 
-		end 
+    end
+
     end,
 
   },
