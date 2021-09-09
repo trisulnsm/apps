@@ -11,7 +11,7 @@ description:
 
 apptype: lua
 
-appresources: cg_monitor_hosts.lua igmp-ip-multicast-port.lua ip_x_multicast.json newcg-multicast-member.lua sweepbuf.lua igmp-counter.lua igmp-protocol.lua newcg-ip-multicast.lua	newcg-crosskey.lua tcp-counter.lua udp-counter.lua
+appresources: cg_monitor_hosts.lua ip_x_multicast.json newcg-multicast-member.lua sweepbuf.lua igmp-counter.lua igmp-protocol.lua newcg-ip-multicast.lua	newcg-crosskey.lua tcp-counter.lua udp-counter.lua
 
 
 dependencies:  
