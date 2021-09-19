@@ -1,0 +1,35 @@
+{
+  "TrisulCounterGroupFilter": [
+    [
+      {
+        "id": 20,
+        "CounterGUID": "{C9BBF614-BD13-CE4F-C406-DA2783012B93}",
+        "ParentCounterGUID": "{889900CC-0063-11A5-8380-FEBDBABBDBEA}",
+        "FilterCounterGUID": "{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}",
+        "FilterKeyList": "p-0050",
+        "FilterKeyInvList": null
+      }
+    ],
+    [
+      {
+        "id": 100,
+        "CounterGUID": "{C9BBF614-BD13-CE4F-C406-DA2783012B93}",
+        "Name": "CIDR Subnet ",
+        "Description": "Disabled counter group for assign subnet to users for CIDR Explore flows",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 300000,
+        "TrackHiWater": 20000,
+        "TrackLoWater": 10000,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Inactive",
+        "CardinalityEstimateBits": null,
+        "TopperTrafficOnly": "False",
+        "EnableSliceKeys": null,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1632028955,
+        "ResolverCounterGUID": null
+      }
+    ]
+  ]
+}
