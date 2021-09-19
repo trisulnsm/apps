@@ -1,6 +1,6 @@
 name: CIDR Explore Flows
 
-version: 0.0.15
+version: 0.0.16
 
 author: trisul
 
@@ -19,4 +19,5 @@ dependencies:
   webtrisul: 6.5.2228
 
 jsparams:
-  counter_group: "{C9BBF614-BD13-CE4F-C406-DA2783012B93}"
+  counter_group: "{889900CC-0063-11A5-8380-FEBDBABBDBEA}"
+  subnet_group: "{C9BBF614-BD13-CE4F-C406-DA2783012B93}"
