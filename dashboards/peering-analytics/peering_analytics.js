@@ -388,11 +388,14 @@ class ISPOverviewMapping{
       let desc = topper.description.replace("\\\\","")
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
-      
+      let intf_readable = topper.readable.split("\\").pop();
+      let router_ip = intf_readable.split("_")[0];
+
       let statids = Object.values(this.meter_details_in).slice(0,2)
       rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" 
                     data-readable="${topper.readable}" data-full_key="${full_key}"
-                    data-statids="${statids}" data-statid-index=${this.meter_index}>
+                    data-statids="${statids}" data-statid-index=${this.meter_index}
+                    data-router_ip="${router_ip}">
                       <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
                       <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
                       <td>${desc}</td>
@@ -854,7 +857,7 @@ async query_routes_for_as(event){
     let resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,
                                 {
                                   tool:5,
-                                  tool_input: `-r ${router} -a ${asnumber}`,
+                                  tool_input: `-r ${tr.data("router_ip")} -a ${asnumber}`,
                                   destination_node:this.probe_id
                                 });
 
