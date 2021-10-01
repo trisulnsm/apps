@@ -44,13 +44,10 @@ class CIDRExploreFlows{
     this.add_form(opts);
     this.maxitems = 0;
     this.counter_group =opts.jsparams.counter_group || GUID.GUID_CG_INTERNAL_HOSTS();
+    this.subnet_group = "{C9BBF614-BD13-CE4F-C406-DA2783012B93}";
     this.ips = {};
     this.logo_tlhs = opts.logo_tlhs;
     this.user=opts.user;
-    this.subscriber_user=false;
-    if(this.user.webtrisul_role_id==4 ){
-      this.subscriber_user=true;
-    }
   }
   // load the frame 
   async load_assets(opts)
@@ -71,11 +68,21 @@ class CIDRExploreFlows{
                               update_input_ids:update_ids,
                               default_ts:this.default_selected_time
                             });
+   
+    await this.get_user_resources();
     this.form.submit($.proxy(this.submit_form,this));
-    
+
     //this.form.submit();
   }
 
+  async get_user_resources(){
+    this.user_resouces=[];
+    await $.getJSON("/trisul_web_user/get_resources", 
+                    {filter_cguid:this.subnet_group}, $.proxy(function (resouces) {
+      this.user_resouces = resouces[this.subnet_group] || [];
+            
+    },this));
+  }
   submit_form(){
     //this.form.find("#cidr_subnet").val("103.225.125.42/32");
     this.cidr = this.form.find("#cidr_subnet").val();
@@ -83,8 +90,8 @@ class CIDRExploreFlows{
       alert("Please enter a valid subnet.")
       return false;
     }
-    let keys=this.user.subscriber_keys.split(",")
-    if(this.subscriber_user && ! keys.includes(this.cidr)){
+   
+    if(this.user_resouces.length > 0 && ! this.user_resouces.includes(this.cidr)){
       alert("You are not allowed to access this CIDR");
       return false;
     }
