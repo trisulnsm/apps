@@ -136,7 +136,7 @@ class CIDRExploreFlows{
       e.preventDefault()
       $(this).tab('show');
     });
-    window.flowApp = new TFlowApp({});
+    window.flowApp = new TFlowApp("",{flow_legs_correlation:0});
 
     window.flowApp.flow_count=10000;
    
