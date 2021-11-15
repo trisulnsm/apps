@@ -5,9 +5,10 @@ AsyncTasks.data = ""
 -- execute ASYNC - dont worry about when and where this is called. Trisul will take care of it 
 AsyncTasks.onexecute = function(in_data) 
 
-	local thispath=debug.getinfo(1).source:match("@?(.*/)")
-	package.path=package.path..";"..thispath.."/?.lua"
-
+  local ipstr_tokey=function(ipstr)
+    local pmatch,_, b1,b2,b3,b4= ipstr:find("(%d+)%.(%d+)%.(%d+)%.(%d+)")
+    return  string.format("%02X.%02X.%02X.%02X", b1,b2,b3,b4)
+  end
 	local JSON=require'JSON'
 	local BW=require'bulkwalk_cmd'
 
@@ -15,6 +16,7 @@ AsyncTasks.onexecute = function(in_data)
 	local async_results   =  { 
 	  update_counters = {},
 	  update_key_info = {},
+    add_alerts ={},
 	} 
   print(os.date("%c"))
   local s=os.date("%S")
@@ -37,7 +39,11 @@ AsyncTasks.onexecute = function(in_data)
 	end
 
 	if not has_varbinds then
-	  T.logerror("SNMP Poll Failed for "..agent.agent_ip.." with v"..agent.agent_version.." comm = "..agent.agent_community)
+    local logmsg = "SNMP Poll Failed for "..agent.agent_ip.." with v"..agent.agent_version.." comm = "..agent.agent_community
+	  T.logerror(logmsg)
+    local dest_ip = ipstr_tokey(agent.agent_ip)
+    local flow_key = "11A:00.00.00.00:p-804D_"..dest_ip..":p-00A1"
+    table.insert(async_results.add_alerts,{ "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",flow_key,"SNMP Poll Failed",1,logmsg} );
 	end 
 	  -- update OUT 
 	local oid = ".1.3.6.1.2.1.31.1.1.1.10"
@@ -74,6 +80,10 @@ AsyncTasks.onresult = function(engine,req,response)
 
 	for _,v in ipairs(async_results.update_key_info)  do
 	  engine:update_key_info(v[1],v[2],v[3])
+		--print("iupdate key "..table.concat(v,' '))
+	end
+	for _,v in ipairs(async_results.add_alerts)  do
+	  engine:add_alert(v[1],v[2],v[3],v[4],v[5])
 		--print("iupdate key "..table.concat(v,' '))
 	end
 end
