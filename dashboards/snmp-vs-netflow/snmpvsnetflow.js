@@ -20,6 +20,8 @@ class SNMPVSNetflow{
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
                             },this.callback_load_routers,this);
+    $('#from_date').val(this.default_selected_time.start_date);
+    $('#to_date').val(this.default_selected_time.end_date);
     this.mk_time_interval();
     this.load_routers_interfaces();
     this.form.submit($.proxy(this.submit_form,this));
@@ -79,7 +81,11 @@ class SNMPVSNetflow{
       this.show_alert_box();
       return true;
     }
-    this.tris_pg_bar=new TrisProgressBar({max:selected_interface_keys.length*2,divclass:'ui_data'});
+    let no_of_keys = selected_interface_keys.length*2;
+    if($('#show_netflow_only').prop('checked')){
+      no_of_keys = selected_interface_keys.length
+    }
+    this.tris_pg_bar=new TrisProgressBar({max:no_of_keys,divclass:'ui_data'});
     this.cg_meters = {};
     await get_counters_and_meters_json(this.cg_meters);
     //get selected router and interfaces details
@@ -143,8 +149,15 @@ class SNMPVSNetflow{
     }
     let meters = this.jsparams.meters;
     let base_div = $(this.haml_dom[3]).clone();
+    debugger
+    let chart_to_show=["netflow","snmp"];
+    if($('#show_netflow_only').prop('checked')){
+      chart_to_show=["netflow"];
+      base_div.find(".snmp").remove();
+      base_div.find(".netflow").closest('.col-xs-6').removeClass('col-xs-6');
+    }
     $('.ui_data').append(base_div);
-    ["netflow","snmp"].forEach(async function(ai){
+    chart_to_show.forEach(async function(ai){
       this.report_nodes.push({type:"svg",header_text:"auto",find_by:`#${ai}_chart_${i}`,parent:"panel",h1:"h3",h2:"h3 small"});
       let div = $(`.${ai}`);
       base_div.find(`.${ai} .panel-heading h3 small`).text(desc);
