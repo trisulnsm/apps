@@ -89,6 +89,8 @@ class ISPOverviewMapping{
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
                             },this.callback_load_routers,this);
+    $('#from_date').val(this.default_selected_time.start_date);
+    $('#to_date').val(this.default_selected_time.end_date);
     this.mk_time_interval();
 
     this.load_routers_interfaces();
