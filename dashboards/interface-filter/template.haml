@@ -1,0 +1,22 @@
+.row#interface-filter-form
+  .col-xs-12
+    .widget
+      .widget-header
+        %h4 
+          %i.fa.fa-filter.fa-fw
+          Filter criteria select timewindow
+      .widget-body
+        %form.form-horizontal
+          .row
+            .col-xs-6
+              .form-group
+                .new_time_selector#new_time_selector
+          .row
+            .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+              %input#from_date{type:"hidden",name:"from_date"}
+              %input#to_date{type:"hidden",name:"to_date"}
+              %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
+
+  .col-xs-12
+    %h3 Top utilized interfaces 
+    #results
