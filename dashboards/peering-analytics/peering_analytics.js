@@ -199,12 +199,12 @@ class ISPOverviewMapping{
     this.report_nodes = [];
     this.section_headers=[];
     _.each([this.meter_details_in.upstream_receive,this.meter_details_in.upstream_transmit,this.meter_details_in.downstream_receive,this.meter_details_in.downstream_transmit],$.proxy(function(idx,ai){
-      this.report_nodes.push({type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:ai,find_by:`#table_${ai}`});
+      this.report_nodes.push({type:"table",header_text:"auto",h1:"h4",h2:"h4 small",section_header:ai,find_by:`#table_${ai}`});
       this.report_nodes.push({type:"page_break"});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#traffic_chart_${ai}_`});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#donut_chart${ai}_`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h4",h2:"h4 small",find_by:`#traffic_chart_${ai}_`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h4",h2:"h4 small",find_by:`#donut_chart${ai}_`});
       this.report_nodes.push({type:"page_break"});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#sankey_chart_${ai}`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h4",h2:"h4 small",find_by:`#sankey_chart_${ai}`});
       if(ai!=3){
         this.report_nodes.push({type:"page_break",add_header_footer:false});
       }
@@ -366,16 +366,16 @@ class ISPOverviewMapping{
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       
-      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;; data-toggle='tooltip' title='Click to get more options'><i class='fa fa-fw fa-ellipsis-h fa-lg'></i></a></span>");
-      let dropdown_menu = $("<ul class='dropdown-menu  pull-right'></ul>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Drilldown</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>ASN Path Analytics</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Top Prefixes</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Show Routes</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>ASN Lookup</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Explore Flows</a></li>");
+      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-bs-toggle='dropdown' href='javascript:;; data-bs-toggle='tooltip' title='Click to get more options'><i class='fa fa-fw fa-server'></i></a></span>");
+      let dropdown_menu = $("<ul class='dropdown-menu'></ul>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Drilldown</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Traffic Chart</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Key Dashboard</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>ASN Path Analytics</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Top Prefixes</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Show Routes</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>ASN Lookup</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Explore Flows</a></li>");
 
       dropdown.append(dropdown_menu);
 
@@ -420,7 +420,7 @@ class ISPOverviewMapping{
       this.dropdown_click(event);
     },this));
     table.tablesorter();
-    table.closest('.panel').find(".badge").html(rows.length);
+    table.closest('.card').find(".badge").html(rows.length);
    
   }
 
@@ -746,13 +746,13 @@ class ISPOverviewMapping{
     let tr = target.closest("tr");
     let statid = tr.data("statid-index");
     var shell_modal = create_shell_modal();
-    shell_modal.find(".modal-header h4").html("Top prefixes <small>Show top 100 prefixes </small><span class='badge'></span>");
+    shell_modal.attr("id","get_top_prefixes")
+    shell_modal.find(".modal-header .modal-title").html("Top prefixes <small>Show top 100 prefixes </small><span class='badge bg-secondary'></span>");
     var message = "<h4><i class='fa fa-spin fa-spinner'></i> Please wait ... Getting data</h4>";
     shell_modal.find(".modal-body").html(message);
     $('#shortcut-div').html(shell_modal);
-    $(shell_modal).modal({
-      keyboard:true
-    });
+    show_bs5_modal('get_top_prefixes')
+
     let opts = {flowtag:`[asn]${tr.data("key")}`,
                   time_interval:this.tmint,
                   probe_id:this.probe_id,
@@ -813,7 +813,7 @@ class ISPOverviewMapping{
     });
 
     // UI update
-    shell_modal.find(".modal-header h4 span.badge").html(tag_metrics.length);
+    shell_modal.find(".modal-header .modal-title span.badge").html(tag_metrics.length);
     var table = $("<table>",{class:"table table-sysdata"});
     table.append("<thead><tr><th>Prefix</th><th>Flow Count</th><th>ASPath</th><th>Org</th><th sort='volume'>Volume</th></thead>");
     table.append("<tbody></tbody>");
@@ -841,19 +841,16 @@ async query_routes_for_as(event){
     let tr = target.closest("tr");
     let statid = tr.data("statid");
     var shell_modal = create_shell_modal();
+    shell_modal.attr("id","routers_for_as")
     var message = "<h4><i class='fa fa-spin fa-spinner'></i> Please wait ... Getting data</h4>";
     shell_modal.find(".modal-body").html(message);
     $('#shortcut-div').html(shell_modal);
-    
-
-    $(shell_modal).modal({
-      keyboard:true
-    });
+    show_bs5_modal("routers_for_as")
 
     let router = this.target_text.split("->")[0];
     let asnumber = tr.data('key');
 
-    shell_modal.find(".modal-header h4").html(` AS ${asnumber} Query Route Information from BGP database`);
+    shell_modal.find(".modal-header .modal-title").html(` AS ${asnumber} Query Route Information from BGP database`);
 
 
     let resp = await fetch_trp(TRP.Message.Command.RUNTOOL_REQUEST,

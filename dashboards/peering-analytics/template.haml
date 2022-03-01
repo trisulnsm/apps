@@ -1,285 +1,307 @@
 .row.peeringanalytics_form
-  .col-xs-12
-    .widget
-      .widget-header
+  .col-12
+    .card
+      .card-header
         %h4 
           %i.fa.fa-filter.fa-fw
           Filter criteria
-      .widget-body
-        %form.form-horizontal
+      .card-body.form-dots
+        %form
           .row
-            .col-xs-6
-              .form-group
+            .col-6
+              .row
                 .new_time_selector#new_time_selector
           .row
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Routers         
-                .col-xs-8 
-                  %select#routers{name:'routers'} 
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Interfaces 
-                .col-xs-8 
-                  %select#interfaces{name:'interfaces'}
-          .row
-            .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+            .col-6
+              .row
+                %label.col-form-label.col-4 Routers         
+                .col-8 
+                  %select#routers.form-select{name:'routers'} 
+            .col-6
+              .row
+                %label.col-form-label.col-4 Interfaces 
+                .col-8 
+                  %select.form-select#interfaces{name:'interfaces'}
+          .row.justify-content-center.mt-3
+            .col-auto
               %input#from_date{type:"hidden",name:"from_date"}
               %input#to_date{type:"hidden",name:"to_date"}
               %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
 
 
-.ui_data
+.ui_data.mt-3
   .row
-    .col-xs-12
+    .col-12
       %ul.nav.nav-tabs#isp_overview_tabs
-        %li.active
-          %a{href:"#isp_overview_0",data-toggle:"tab",role:"tab"}
+        %li.nav-item
+          %a.nav-link.active{data-bs-target:"#isp_overview_0",data-toggle:"tab",role:"tab",href:"javascript:;;"}
             %i.fa.fa-cloud-upload.fa-fw
             %i.fa.fa-download.fa-fw
             Receive from Upstream
             %span.volume_0
-        %li
-          %a{href:"#isp_overview_1",data-toggle:"tab",role:"tab"} 
+        %li.nav-item
+          %a.nav-link{data-bs-target:"#isp_overview_1",data-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-cloud-upload.fa-fw
             %i.fa.fa-upload.fa-fw
             Transmit to Upstream
             %span.volume_1
-        %li
-          %a{href:"#isp_overview_2",data-toggle:"tab",role:"tab"} 
+        %li.nav-item
+          %a.nav-link{data-bs-target:"#isp_overview_2",data-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-cloud-download.fa-fw
             %i.fa.fa-download.fa-fw
             Receive from Downstream
             %span.volume_2
-        %li
-          %a{href:"#isp_overview_3",data-toggle:"tab",role:"tab"} 
+        %li.nav-item
+          %a.nav-link{data-bs-target:"#isp_overview_3",data-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-cloud-download.fa-fw
             %i.fa.fa-upload.fa-fw
             Transmit to Downstream
             %span.volume_3
       .tab-content{style:"padding-top:10px"}
         .tab-pane.active#isp_overview_0{data-use-width:1}
-          .row
-            .col-xs-12.toppers_table_div
-              .panel.panel-primary.add_download_btn
-                .panel-heading
-                  %h3 
-                    %i.fa.fa-table.fa-fw
-                    Top Upstream AS Receive 
-                    %small Show top 100 AS by Receive (Downloading from upstream) 
-                    %span.badge.badge-info
-                  %p
-                    %small.target
-                .panel-body
+          .row.mt-3
+            .col-12.toppers_table_div
+              .card.border-primary.add_download_btn
+                .card-header.bg-primary.text-white
+                  .row
+                    .col-auto.me-auto
+                      %h4
+                        %i.fa.fa-table.fa-fw
+                        Top Upstream AS Receive 
+                        %small Show top 100 AS by Receive (Downloading from upstream) 
+                        %span.badge.bg-info.text-primary.bg-white.rounded-pill.fs-6.ms-2
+                    .col-auto.card-options
+                      %ul.list-inline
+                  .row
+                    %p
+                      %small.target
+                    
+                .card-body
                   .toppers_table
                     %table
                       %thead
                       %tbody
                   .animated-background
-          .row
-            .col-xs-12.traffic_chart_div
-              .panel.panel-primary
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.traffic_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
                     %small Showing top AS traffic receive from upstream over the selected time period 
                   %p
                     %small.target
                    
-                .panel-body
+                .card-body
                   .traffic_chart
                   .animated-background
-          .row
-            .col-xs-12.donut_chart_div
-              .panel.panel-primary
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.donut_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of AS traffic receive from upstream
                   %p
                     %small.target
-                .panel-body
+                .card-body
                   .donut_chart
                   .animated-background
-          .row
-            .col-xs-12.sankey_chart_div
-              .panel.panel-primary
-                .panel-heading
-                  %h3 
+          .row.mt-3
+            .col-12.sankey_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
                     %small
                       Shows upload traffic flows from the left side (AS) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
-                .panel-body
+                .card-body
                   .sankey_chart
                   .animated-background
         .tab-pane#isp_overview_1{data-use-width:1}
-          .row
-            .col-xs-12.toppers_table_div
-              .panel.panel-primary
-                .panel-heading
-                  %h3 
-                    %i.fa.fa-table.fa-fw
-                    Top Upstream Transmit AS 
-                    %small Show top 100 Upstream AS by Transmit (Upload to upstream)
-                    %span.badge.badge-info
-                  %p
-                    %small.target
-                .panel-body
+          .row.mt-3
+            .col-12.toppers_table_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  .row
+                    .col-auto.me-auto
+                      %h4
+                        %i.fa.fa-table.fa-fw
+                        Top Upstream Transmit AS 
+                        %small Show top 100 Upstream AS by Transmit (Upload to upstream)
+                        %span.badge.bg-white.text-primary.rounded-pill.fs-6.ms-2
+                    .col-auto.card-options
+                      %ul.list-inline
+                  .row
+                    %p
+                      %small.target
+                .card-body
                   .toppers_table
                     %table
                       %thead
                       %tbody
                     .animated-background
-          .row
-            .col-xs-12.traffic_chart_div
-              .panel.panel-primary
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.traffic_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
                     %small Showing top AS upload to upstream traffic over the selected time period 
                   %p
                     %small.target
                    
-                .panel-body
+                .card-body
                   .traffic_chart
                   .animated-background
-          .row
-            .col-xs-12.donut_chart_div
-              .panel.panel-primary
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.donut_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of AS upload traffic to upstream 
                   %p
                     %small.target
-                .panel-body
+                .card-body
                   .donut_chart
                   .animated-background
-          .row
-            .col-xs-12.sankey_chart_div
-              .panel.panel-primary
-                .panel-heading
-                  %h3 
+          .row.mt-3
+            .col-12.sankey_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4 
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
                     %small
                       Shows download traffic flows from the left side (AS) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
-                .panel-body
+                .card-body
                   .sankey_chart
                   .animated-background
         .tab-pane#isp_overview_2{data-use-width:1}
-          .row
-            .col-xs-12.toppers_table_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
-                    %i.fa.fa-table.fa-fw
-                    Top Downstream Receive AS 
-                    %small Show top Downstream AS by Receive (Downstream sending data)
-                    %span.badge.badge-info
-                  %p
-                    %small.target
-                .panel-body
+          .row.mt-3
+            .col-12.toppers_table_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  .row
+                    .col-auto.me-auto
+                      %h4
+                        %i.fa.fa-table.fa-fw
+                        Top Downstream Receive AS 
+                        %small Show top Downstream AS by Receive (Downstream sending data)
+                        %span.badge.bg-white.text-success.rounded-pill.fs-6.ms-2
+                    .col-auto.card-options
+                      %ul.list-inline
+                  .row
+                    %p
+                      %small.target
+                .card-body
                   .toppers_table
                     %table
                       %thead
                       %tbody
                     .animated-background
-          .row
-            .col-xs-12.traffic_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.traffic_chart_div
+              .card.card-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
                     %small Showing top AS download traffic from downstream over the selected time period 
                   %p
                     %small.target
                    
-                .panel-body
+                .card-body
                   .traffic_chart
                   .animated-background
-          .row
-            .col-xs-12.donut_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.donut_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of AS receive traffic from downstream 
                   %p
                     %small.target
-                .panel-body
+                .card-body
                   .donut_chart
                   .animated-background
-          .row
-            .col-xs-12.sankey_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
+          .row.mt-3
+            .col-12.sankey_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
                     %small
                       Shows download traffic flows from the left side (AS) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
-                .panel-body
+                .card-body
                   .sankey_chart
                   .animated-background
+
         .tab-pane#isp_overview_3{data-use-width:1}
-          .row
-            .col-xs-12.toppers_table_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
-                    %i.fa.fa-table.fa-fw
-                    Top Downstream Transmit AS 
-                    %small Show top Downstream AS by Transmit (Transmit to downstream)
-                    %span.badge.badge-info
+          .row.mt-2
+            .col-12.toppers_table_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  .row
+                    .col-auto.me-auto
+                      %h4
+                        %i.fa.fa-table.fa-fw
+                        Top Downstream Transmit AS 
+                        %small Show top Downstream AS by Transmit (Transmit to downstream)
+                        %span.badge.bg-white.text-success.rounded-pill.fs-6.ms-2
+                    .col-auto.card-options
+                      %ul.list-inline
+                  .row
                   %p
                     %small.target
-                .panel-body
+                .card-body
                   .toppers_table
                     %table
                       %thead
                       %tbody
                     .animated-background
-          .row
-            .col-xs-12.traffic_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3
+          .row.mt-2
+            .col-12.traffic_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
                     %small Showing top AS download traffic over the selected time period 
                   %p
                     %small.target
                    
-                .panel-body
+                .card-body
                   .traffic_chart
                   .animated-background
-          .row
-            .col-xs-12.donut_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.donut_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of downstream transmit traffic 
                   %p
                     %small.target
-                .panel-body
+                .card-body
                   .donut_chart
                   .animated-background
-          .row
-            .col-xs-12.sankey_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
+          .row.mt-3
+            .col-12.sankey_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
                     %small
                       Shows download traffic flows from the left side (AS) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
-                .panel-body
+                .card-body
                   .sankey_chart
                   .animated-background
 
