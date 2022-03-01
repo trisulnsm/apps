@@ -91,7 +91,7 @@ class InterfaceUtilizationFilter{
       counter_group: '{C0B04CA7-95FA-44EF-8475-3835F3314761}',
       time_interval: this.tmint ,
       meter:0,
-      maxitems:5,
+      maxitems:20,
       get_key_attributes:true
     });
 
@@ -99,19 +99,25 @@ class InterfaceUtilizationFilter{
       counter_group: '{C0B04CA7-95FA-44EF-8475-3835F3314761}',
       time_interval: this.tmint ,
       meter:1,
-      maxitems:5,
+      maxitems:20,
       get_key_attributes:true
     });
 
     let merged = new Map(); // k => [recv,xmit]
 
     for (let k of iftoppers_recv.keys ) {
+      if(k.key=="SYS:GROUP_TOTALS"){
+        continue;
+      }
       let m  = new Map();
       m.set('recv',k)
       merged.set(k.key, m);
     }
 
     for (let k of iftoppers_xmit.keys ) {
+       if(k.key=="SYS:GROUP_TOTALS"){
+        continue;
+      }
       let m = merged[k.key];
       if (m) {
         m.set('xmit',k)
@@ -135,10 +141,27 @@ class InterfaceUtilizationFilter{
   table.classList.add("table")
   table.classList.add("table-condensed")
   table.classList.add("small")
-
+  table.classList.add("add_table_filter")
+ 
   let thead = document.createElement('thead');
   let tbody = document.createElement('tbody');
+  thead.innerHTML=`<tr>
+                    <th></th>
+                    <th class='filter' > Router </th>
+                    <th class='filter'> Ifindex</th>
+                    <th class='filter'> Ifname</th>
+                    <th class='filter'> Ifalias </th>
+                    <th> Speed </th>
+                    <th>Max<br/>Recv</th>
+                    <th>Avg<br/> Recv</th>
+                    <th>Max<br/> Recv<br/> Util</th>
+                    <th>Avg<br/> Recv<br/> Util</th>
+                    <th>Max<br/> Xmit</th>
+                    <th>Avg<br/> Xmit</th>
+                    <th>Max<br/> Xmit<br/> Util</th>
+                    <th>Avg<br/> Xmit <br/>Util</th>
 
+                  <tr>`
   table.appendChild(thead);
   table.appendChild(tbody);
 
@@ -160,7 +183,6 @@ class InterfaceUtilizationFilter{
     if (speed) {
       speed_val = parseInt(speed.attr_value);
     }
-
     if (speed_val != 0 && recvk) {
       util_recv_max = 100  * parseInt(recvk.metric_max)*8 / speed_val;
       util_recv_avg = 100  * parseInt(recvk.metric_avg)*8 / speed_val;
@@ -171,8 +193,16 @@ class InterfaceUtilizationFilter{
     }
 
     let templ = document.createElement('template');
+    let fa = document.createElement("i");
+    if((util_recv_avg && util_recv_avg > 75) || (util_xmit_avg && util_xmit_avg > 75)){
+      fa.classList.add('fa', 'fa-circle','text-danger');
+    }
+    else if((util_recv_avg && util_recv_avg > 50) || (util_xmit_avg && util_xmit_avg > 50)){
+      fa.classList.add('fa', 'fa-circle','text-warning');
+    }
     templ.innerHTML = 
     `<tr> 
+        <td>${fa.outerHTML}</td>
         <td>${router_ip}</td>
         <td>${ifindex}</td>
         <td>${name? name.attr_value: ""}</td>
@@ -180,13 +210,18 @@ class InterfaceUtilizationFilter{
         <td>${speed? formatBW(parseInt(speed.attr_value),1,"bps"): 0}</td>
         <td>${recvk? formatBW(parseInt(recvk.metric_max)*8,1,"bps"): ""}</td>
         <td>${recvk? formatBW(parseInt(recvk.metric_avg)*8,1,"bps"): ""}</td>
+        <td>${util_recv_max? Math.round(util_recv_max): ""}</td>
+        <td>${util_recv_avg? Math.round(util_recv_avg): ""}</td>
         <td>${xmitk? formatBW(parseInt(xmitk.metric_max)*8,1,"bps"): ""}</td>
         <td>${xmitk? formatBW(parseInt(xmitk.metric_avg)*8,1,"bps"): ""}</td>
+         <td>${util_xmit_max? Math.round(util_xmit_max): ""}</td>
+        <td>${util_xmit_avg? Math.round(util_xmit_avg): ""}</td>
     </tr>`;
      tbody.appendChild(templ.content);
   }
 
   document.getElementById('results').appendChild(table);
+  enable_table_filter();
 
  }
  
