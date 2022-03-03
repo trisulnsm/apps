@@ -27,8 +27,41 @@ var EdgeVertexMonitor= $.klass({
   },
   //add the form to the dom
   add_form:function(){
-    this.form=$("<form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select class='cg_id' id='cgguid' name='cgguid'></select> </div> </div> <div class='form-group'> <label class='control-label col-xs-4'>Keys</label> <div class='col-xs-8'> <textarea id='keys' name='keys'></textarea> <span class='help-block'>comma seperated</span> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Meter</label> <div class='col-xs-8'> <select class='meter_id' id='meters' multiple name='meter'></select> </div> </div> <div class='form-group'> <div id='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='form-group'> <div class='col-xs-10 col-md-offset-4'> <input id='from_date' name='from_date' type='hidden'> <input id='to_date' name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Get Usage'></input> </div> </div> </div> </form>");
+    this.form=$(Haml.render(`
+    .card
+      .card-header
+        %h4
+          %i.fa.fa-search.fa-fw
+          Search Criteria
+      .card-body.form-dots
+        %form
+          .row
+            .col-6
+              .row.mb-3
+                %label.col-form-label.col-4 Counter Group
+                .col-8
+                  %select#cgguid.cg_id{name:"cgguid"}
+              .row.mb-3
+                %label.col-form-label.col-4 Keys
+                .col-8
+                  %textarea#keys{name:"keys"}
+                  %span.form-text comma seperated
+            .col-6
+              .row.mb-3
+                %label.col-form-label.col-4 Meter
+                .col-8
+                  %select#meters.meter_id{multiple:"multiple",name:"meter"}
+              .form-group
+                #new_time_selector
+          .row
+            .col-10.offset-md-4
+              %input#from_date{name:"from_date", type:"hidden"}
+              %input#to_date{name:"to_date", type:"hidden"}
+              %input#btn_submit.btn-submit{name:"commit", type:"submit", value:"Get Usage"}
+            `));
     $(this.domid).append(this.form);
+    auto_complete("keys",{"update":"autocomplete_key","top_count":20},{"txt_id":"keys","cg_id":"cgguid"});
+
 
     //defaults from local storage
     var default_meters="0";
@@ -118,7 +151,7 @@ var EdgeVertexMonitor= $.klass({
     table.append("<thead><tr>"+ths+"</tr></thead>");
     table.append("<tbody></tbody>");
 
-    var panel = get_panel_shell({});
+    var card = $(get_card_shell());
     var text="Usage report for "+this.cg_meter_json[this.cgguid][0];
 
     var from_date = new Date(this.form.find('#from_date').val());
@@ -126,9 +159,9 @@ var EdgeVertexMonitor= $.klass({
     text = text + " ( " + this.keys.split(",").length + " ) " ;
     text = text + "<span class='text-info'>"+h_fmtduration(duration/1000,true)+" Ending " + from_date.toString()+"</span>";
 
-    panel.find('.panel-heading').html(text)
-    panel.find('.panel-body').append(table);
-    $('#show_key_usage').append(panel);
+    card.find('.card-header h4').html(text)
+    card.find('.card-body').append(table);
+    $('#show_key_usage').append(card);
     this.get_usage();
     table.tablesorter();
 
@@ -231,29 +264,29 @@ function run(opts){
 /*
 %form.form-horizontal
   .row
-    .col-xs-6
+    .col-6
       .form-group 
-        %label.control-label.col-xs-4 Counter Group         
-        .col-xs-8 
+        %label.col-form-label.col-4 Counter Group         
+        .col-8 
           %select.cg_id#cgguid{name:'cgguid'}
 
       .form-group
-        %label.control-label.col-xs-4 Keys
-        .col-xs-8
+        %label.col-form-label.col-4 Keys
+        .col-8
           %textarea{name:'keys',id:'keys'}
           %span.help-block comma seperated
 
-    .col-xs-6
+    .col-6
       .form-group 
-        %label.control-label.col-xs-4 Meter 
-        .col-xs-8 
+        %label.col-form-label.col-4 Meter 
+        .col-8 
           %select.meter_id#meters{multiple:true,name:'meter'}
   
       .form-group
         #new_time_selector
   .row
     .form-group 
-      .col-xs-10.col-md-offset-4
+      .col-10.col-md-offset-4
         %input{type:"hidden",name:"from_date",id:"from_date"}
         %input{type:"hidden",name:"to_date",id:"to_date"}
         %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Get Usage"}

@@ -1,6 +1,6 @@
 name: Usage Activity Heatmap
 
-version: 0.0.5
+version: 2.0.6
 
 author: trisul
 
@@ -13,6 +13,6 @@ description:
 
 apptype: dashboard_js
 
-appresources: key_usage_heatmap.js key_usage_heatmap.css
+appresources: key_usage_heatmap.js template.haml app.css
 
 dependencies: 

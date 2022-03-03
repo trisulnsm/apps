@@ -1,29 +1,29 @@
 .row.pathanalytics_form
-  .col-xs-12
-    .widget
-      .widget-header
+  .col-12
+    .card
+      .card-header
         %h4 
           %i.fa.fa-search.fa-fw
           Search criteria - select a time intervalsdfs
-      .widget-body
-        %form.form-horizontal
+      .card-body.form-dots
+        %form
           .row
-            .col-xs-12
-              .form-group
+            .col-12
+              .row
                 #new_time_selector
 
-          .row
-            .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+          .row.justify-content-center.mt-5
+            .col-auto
               %input#from_date{type:"hidden",name:"from_date"}
               %input#to_date{type:"hidden",name:"to_date"}
               %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
-  .col-xs-12#ixp-matrix
-    .panel.panel-success
-      .panel-heading
-        %h3
+  .col-12#ixp-matrix.mt-3
+    .card.border-success
+      .card-header.bg-success.text-white
+        %h4
           %i.fa.fa-table.fa-fw
           IXP Crossconnect Traffic Matrix 
           %small  Shows TX and RX traffic between IXP members
-      .panel-body
+      .card-body
         Select a time interval above..
         %table.table.table-hover.table-bordered.table-condensed

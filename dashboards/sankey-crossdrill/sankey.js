@@ -40,35 +40,21 @@ class SankeyCrossDrill  {
 
 
     //handle slider to remove toppers
-    var cthis = this;
-    $( "#slider-remove-topn" ).slider({
-      min: 0, max: 10, value:0, step:1,
-      create: function() {
-         $( "#remove-top-n" ).text( $( this ).slider( "value" ) );
-      },
-      slide: function( event, ui ) {
-         $( "#remove-top-n" ).text( ui.value );
-        cthis.remove_topper_count=ui.value;
-        cthis.prase_toppers();
 
-      }
-    });
+     let cthis = this;
+    document.getElementById('remove-top-n').oninput=function(){
+      document.getElementById('value-remove-top-n').innerHTML=this.value;
+      cthis.remove_topper_count=parseInt(this.value);
+      cthis.prase_toppers();
+    }
 
-   
-    $( "#slider-max-nodes" ).slider({
-      min: 20, max: 100, value:30, step:10,
-      create: function() {
-        $( "#max-nodes" ).text( $( this ).slider( "value" ) );
-      },
-      slide: function( event, ui ) {
-        $( "#max-nodes" ).text( ui.value );
-        cthis.max_nodes=ui.value;
-        cthis.prase_toppers();
-
-      }
-    });
-
-
+    document.getElementById('max-nodes').oninput=function(){
+      cthis.max_crosskey_nodes=parseInt(this.value);
+      document.getElementById('value-max-nodes').innerHTML=this.value;
+      cthis.max_nodes=parseInt(this.value);
+      cthis.prase_toppers();
+    }
+    
     //loadonly crosskey counter groups
     this.cg_meters={};
     await get_counters_and_meters_json(this.cg_meters);
@@ -197,7 +183,7 @@ class SankeyCrossDrill  {
     //always show top 30 
     cgtoppers_bytes = cgtoppers_bytes.slice(0,this.max_nodes)
     
-    this.dom.find(".badge-count").text(cgtoppers_bytes.length)
+    this.dom.find(".badge").text(cgtoppers_bytes.length)
 
     // convert this into this.
     this.repaint_sankey(cgtoppers_bytes);
@@ -315,6 +301,8 @@ class SankeyCrossDrill  {
     table_header.append("<th sort='volume'> Volume </th>");
     table_header.append("<th sort='nosort'> </th>");
     let tbl=this.data_dom.find('.toppers_table');
+    tbl.find("thead").empty();
+    tbl.find("tbody").empty();
     tbl.find("thead").append(table_header)
     tbl.addClass('table table-sysdata');
     tbl.tablesorter();
@@ -335,7 +323,7 @@ class SankeyCrossDrill  {
           r.append(`<td>${t}</td>`)
         });
         r.append(`<td>${h_fmtvol(kt.metric)}</td>`)
-        r.append('<td><a class="sk_opts" href="javascript:;;"><i class="fa fa-fw fa-ellipsis-h fa-lg"></i></a></td>')
+        r.append('<td><a class="sk_opts dropdown-toggle" href="javascript:;;"><i class="fa fa-fw fa-server"></i></a></td>')
         tbl.find("tbody").append(r)
     },this));
     this.data_dom.find('.toppers_table').siblings('.animated-background').remove();
@@ -348,20 +336,21 @@ class SankeyCrossDrill  {
 
     let target= $(event.target);
     let anchor = target.closest("a");
-    if(anchor.attr("data-toggle") == "dropdown"){
+    if(anchor.attr("data-bs-toggle") == "dropdown"){
       return;
     }
-    anchor.attr("data-toggle","dropdown");
+    anchor.attr("data-bs-toggle","dropdown");
     anchor.wrap("<span class='dropdown'>");
-    let omenu=`<ul class="dropdown-menu pull-right">
-                <li id='key_dash'><a tabindex="-1" href="javascript:;">Key Dashboard</a></li>
-                <li id='traffic_chart'><a tabindex="-1" href="javascript:;">Traffic Chart</a></li>
-                <li id='longterm_traffic'><a tabindex="-1" href="javascript:;">Long Term Traffic</a></li>
+    let omenu=`<ul class="dropdown-menu">
+                <li id='key_dash'><a class='dropdown-item' tabindex="-1" href="javascript:;">Key Dashboard</a></li>
+                <li id='traffic_chart'><a class='dropdown-item' tabindex="-1" href="javascript:;">Traffic Chart</a></li>
+                <li id='longterm_traffic'><a class='dropdown-item' tabindex="-1" href="javascript:;">Long Term Traffic</a></li>
               </ul>`
     anchor.after(omenu);
     anchor.closest("td").find("ul.dropdown-menu li a").click($.proxy(function(event){
       this.option_click(event,this.tmint)
     },this));
+    show_bs5_dropdown(".sk_opts",{})
            
 
   }

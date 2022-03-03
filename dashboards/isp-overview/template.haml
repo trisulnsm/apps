@@ -1,98 +1,113 @@
--# HTML template for the app age 
-.col-xs-2
-  .panel.panel-stat3.bg-success
-    %h2.m-top-none#flowas
-      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitPeeringAnalytics&valid_input=1&remove_ls_items=true"}
-    %h5 Active AS
-    %i.fa.fa-arrow-circle-o-up.fa-lg
-    %span.m-left-xs Currently active AS
-    %a.trends [trends]
-
-
-.col-xs-2
-  .panel-stat3.bg-danger
-    %h2.m-top-none#prefix
-      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitISPHomePrefixesAnalytics&valid_input=1&remove_ls_items=true"}
-    %h5 Active  Prefixes
-    %i.fa.fa-arrow-circle-o-up.fa-lg
-    %span.m-left-xs Number of active prefixes 
-    %a.trends [trends]
-
-.col-xs-2
-  .panel-stat3.bg-primary
-    %h2.m-top-none#aspath
-      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitPathAnalytics&valid_input=1&remove_ls_items=true"}
-    %h5 Active Paths
-    %i.fa.fa-arrow-circle-o-up.fa-lg
-    %span.m-left-xs Active BGP AS Paths
-    %a.trends [trends]
-
-.col-xs-2
-  .panel-stat3.bg-info
-    %h2.m-top-none#routers
-      %a.count{href:"javascript:;;",data-url:"/nflow/gen_drilldown?resolve_key=true"}  
-    %h5 Routers
-    %i.fa.fa-arrow-circle-o-up.fa-lg
-    %span.m-left-xs ISP Gateways being monitored
-    %a.trends [trends]
-
-
-.col-xs-2
-  .panel-stat3.bg-warning
-    %h2.m-top-none#interfaces
-      %a.count{href:"javascript:;;",data-url:"/nflow/gen_drilldown?resolve_key=true"} 
-    %h5 Interfaces
-    %i.fa.fa-arrow-circle-o-up.fa-lg
-    %span.m-left-xs Number of interfaces
-    %a.trends [trends]
-
-.col-xs-2
-  .panel-stat3.bg-info
-    %h2.m-top-none#countries
-      %a.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitCountryAnalytics&valid_input=1&remove_ls_items=true"}
-    %h5 Countries
-    %i.fa.fa-arrow-circle-o-up.fa-lg
-    %span.m-left-xs Active Geo countries
-    %a.trends [trends]
-
+-# HTML template for the app age
 .row
-  .col-xs-12
-    .panel.panel-info
-      .panel-heading
+  .col-2
+    .card.bg-success.border-success.text-white
+      .card-body
+        %h2.m-top-none#flowas
+          %a.text-white.count.text-white{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitPeeringAnalytics&valid_input=1&remove_ls_items=true"}
+        %h6 Active AS
+        %i.fa.fa-arrow-circle-o-up.fa-lg
+        %span.m-left-xs Currently active AS
+        .row
+          %a.text-white.trends [trends]
+
+
+  .col-2
+    .card.bg-danger.border-danger.text-white
+      .card-body
+        %h2.m-top-none#prefix
+          %a.text-white.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitISPHomePrefixesAnalytics&valid_input=1&remove_ls_items=true"}
+        %h6 Active  Prefixes
+        %i.fa.fa-arrow-circle-o-up.fa-lg
+        %span.m-left-xs Number of active prefixes 
+        .row
+          %a.text-white.trends [trends]
+
+  .col-2
+    .card.bg-primary.border-primary.text-white
+      .card-body
+        %h2.m-top-none#aspath
+          %a.text-white.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitPathAnalytics&valid_input=1&remove_ls_items=true"}
+        %h6 Active Paths
+        %i.fa.fa-arrow-circle-o-up.fa-lg
+        %span.m-left-xs Active BGP AS Paths
+        .row
+          %a.text-white.trends [trends]
+
+  .col-2
+    .card.bg-info.border-info.text-white
+      .card-body
+        %h2.m-top-none#routers
+          %a.text-white.count{href:"javascript:;;",data-url:"/nflow/gen_drilldown?resolve_key=true"}  
+        %h6 Routers
+        %i.fa.fa-arrow-circle-o-up.fa-lg
+        %span.m-left-xs ISP Gateways being monitored
+        .row
+          %a.text-white.trends [trends]
+
+
+  .col-2
+    .card.bg-warning.border-warning.text-white
+      .card-body
+        %h2.m-top-none#interfaces
+          %a.text-white.count{href:"javascript:;;",data-url:"/nflow/gen_drilldown?resolve_key=true"} 
+        %h6 Interfaces
+        %i.fa.fa-arrow-circle-o-up.fa-lg
+        %span.m-left-xs Number of interfaces
+        .row
+          %a.text-white.trends [trends]
+
+  .col-2
+    .card.bg-secondary.border-secondary.text-white
+      .card-body
+        %h2.m-top-none#countries
+          %a.text-white.count{href:"javascript:;;",data-url:"/newdash/index?dash_key_regex=gitCountryAnalytics&valid_input=1&remove_ls_items=true"}
+        %h6 Countries
+        %i.fa.fa-arrow-circle-o-up.fa-lg
+        %span.m-left-xs Active Geo countries
+        .row
+          %a.text-white.trends [trends]
+
+.row.mt-3
+  .col-12
+    .card.border-info
+      .card-header.bg-info
         %h3
           %i.fa.fa-upload.fa-fw 
           Upload to AS Traffic Chart 
           %small Shows total upload volume in selected time interval
-      .panel-body
-        .col-xs-8    
-          #asn_traffic_chart_0
-        .col-xs-4
-          #asn_toppers_table_0
-            %table.table.table-bordered{style:"font-size:13px"}
-              %thead
-                %tr
-                  %th ASNumber
-                  %th Volume
-                %tbody
-.row
-  .col-xs-12
-    .panel.panel-warning
-      .panel-heading
+      .card-body
+        .row
+          .col-8    
+            #asn_traffic_chart_0
+          .col-4
+            #asn_toppers_table_0
+              %table.table.table-bordered{style:"font-size:13px"}
+                %thead
+                  %tr
+                    %th ASNumber
+                    %th Volume
+                  %tbody
+.row.mt-3
+  .col-12
+    .card.border-success
+      .card-header.bg-success.text-white
         %h3
           %i.fa.fa-download.fa-fw 
           Download from AS Traffic Chart 
           %small Shows total download volume in selected time interval
-      .panel-body
-        .col-xs-8    
-          #asn_traffic_chart_1
-        .col-xs-4
-          #asn_toppers_table_1
-            %table.table.table-bordered{style:"font-size:13px"}
-              %thead
-                %tr
-                  %th ASNumber
-                  %th Volume
-              %tbody
+      .card-body
+        .row
+          .col-8  
+            #asn_traffic_chart_1
+          .col-4
+            #asn_toppers_table_1
+              %table.table.table-bordered{style:"font-size:13px"}
+                %thead
+                  %tr
+                    %th ASNumber
+                    %th Volume
+                %tbody
 
 
 

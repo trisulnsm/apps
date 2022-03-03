@@ -2,17 +2,3 @@
 	min-height: 500px;
 }
 
-.panel h3 {
-	font-size: 20px;
-	margin-top:10px;
-}
-
-h3 small{
-	font-size: 75%;
-}
-.panel-heading {
-	padding: 5px 15px;
-}
-.widget-tool {
-    float: right;
-}

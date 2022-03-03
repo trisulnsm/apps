@@ -36,14 +36,23 @@ var KeyActivityUsage = $.klass({
       cthis.cg_meter_json=opts["all_cg_meters"];
       cthis.all_meters_type = opts["all_meters_type"];
       cthis.all_cg_bucketsize = opts["all_cg_bucketsize"]
-      cthis.add_form();
+      cthis.add_form(opts);
     });
     deferq.resolve();
   },
-  //add the from for user to select guid and meter
-  add_form:function(){
-    var form = $("<form class='form-horizontal'> <div class='row'> <div class='col-xs-4'> <div class='form-group'> <label class='control-label col-xs-4'> Counter Group </label> <div class='col-xs-8'> <select name='cgguid' id='hm_cg_id'></select> </div> </div> </div> <div class='col-xs-4'> <div class='form-group'> <label class='control-label col-xs-4'> Meter</label> <div class='col-xs-8'> <select name='meter' id='hm_meter_id'></select> </div> </div> </div> <div class='col-xs-4'> <div class='form-group'> <label class='control-label col-xs-4'> Key </label> <div class='col-xs-8'> <input type='text' name='key1' id='hm_key'> </div> </div> </div> </div> <div class='form-group'> <div class='col-xs-10 col-md-offset-4'> <input type='submit' name='commit' value='Show heatmap' class='btn-submit'> </div> </div> </form> <div id='hm_trp_data'> <div id='hm_status_bar'> <i class='fa fa-spin fa-spinner fa-fw hide'></i> <span id='hm_status_bar_text'></span> </div> </div>");
+  load_assets:async function(opts)
+  {
+    // load app.css file
+    load_css_file(opts);
 
+    // load template.haml file 
+    let html_str = await get_html_from_hamltemplate(opts);
+    this.haml_dom =$(html_str)
+  },
+  //add the from for user to select guid and meter
+  add_form:async function(opts){
+    await this.load_assets(opts)
+    var form = $(this.haml_dom[0]);
     $(this.domid).append(form);
     var js_params = {meter_details:this.cg_meter_json,
       selected_cg : "",
@@ -133,6 +142,8 @@ var KeyActivityUsage = $.klass({
   },
   //reset ui for keys
   reset_ui:function(){
+    $('#hm_trp_data').remove();
+    $(this.domid).append($(this.haml_dom[1]).clone());
     this.data = [];
     this.days = [];
     $(this.domid).find('#hm_trp_data').find('svg').remove();
@@ -140,11 +151,6 @@ var KeyActivityUsage = $.klass({
   //drawing heatmap
   draw_heatmap:function(){
     // d3 heat map has come css
-    $("<link/>", {
-       rel: "stylesheet",
-       type: "text/css",
-       href: "/plugins/"+this.dirname +"/key_usage_heatmap.css"
-    }).appendTo("head");
     var cthis = this;
     const margin = { top: 50, right: 0, bottom: 100, left: 30 },
       width = $('#hm_trp_data').width() - margin.left - margin.right,

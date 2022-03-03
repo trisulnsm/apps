@@ -1,36 +1,36 @@
 .row.ui_form
-  .col-xs-12
+  .col-12
     %form.form-horizontal
       .row
-        .col-xs-12
-          .from-group
-            %label.control-label.col-xs-2 IPs
-            .col-xs-10
+        .col-12
+          .row
+            %label.col-form-label.col-2 IPs
+            .col-10
               %textarea{name:"searchipasn",rows:10}
-              %span.help-block.text-left Please enter comma(,) seperated ips or one key per line.
-      .row
-        .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+              %span.form-help Please enter comma(,) seperated ips or one key per line.
+      .row.justify-content-center
+        .col-auto.align-self-center{style:"padding-top:10px"}
           %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Search"}
 
 .ui_data{style:"padding-top:10px"}
   .row
-    .col-xs-12
-      .panel.panel-primary
-        .panel-heading
-          %h3
+    .col-12.mt-3
+      .card.border-primary
+        .card-header.bg-primary.text-white
+          %h4
             %i.fa.fa-table.fa-fw 
             Geo lookup   
             %small Showing ASNumber path,country,prefix etc..
-        .panel-body#geo_lookup
+        .card-body#geo_lookup
           .animated-background
           %pre.query_geo_output
-    .col-xs-12
-      .panel.panel-primary
-        .panel-heading
-          %h3
+    .col-12.mt-3
+      .card.border-primary
+        .card-header.bg-primary.text-white
+          %h4
             %i.fa.fa-table.fa-fw 
             BGP lookup   
             %small Showing ASpath,Prefix,AS
-        .panel-body#bgp_lookup
+        .card-body#bgp_lookup
           .animated-background
           %pre.query_bgp_output

@@ -1,0 +1,71 @@
+#sec_ip_overview
+  #sec_top_header.row
+    .col-12
+      %small#sec_tint_duration.pull-right.text-muted
+  .row.total_alerts.mt-3
+    .col-3
+      .card.border-danger
+        .card-body
+          %small.text-danger High Priority IDS
+          %h2
+            %span
+              %i.fa.fa-snowflake-o.fa-lg.text-danger
+            %span#total_ids_p1.float-end
+    .col-3
+      .card.border-info
+        .card-body
+          %small.text-info Medium Priority IDS
+          %h2
+            %span
+              %i.fa.fa-snowflake-o.fa-lg.text-info
+            %span#total_ids_p2.float-end
+    .col-3
+      .card.border-secondary
+        .card-body
+          %small.text-secondary Low Priority IDS
+          %h2
+            %span
+              %i.fa.fa-snowflake-o.fa-lg
+            %span#total_ids_p3.float-end
+    .col-3
+      .card.border-primary
+        .card-body
+          %small.text-primary Badfellas
+          %h2
+            %span
+              %i.fa.fa-bug.fa-lg
+            %span#total_badfellas_p0.float-end
+  .col-4.breakup_ip.mt-3
+    .card.border-info
+      .card-header.bg-info.text-white
+        .row
+          .col-auto.me-auto
+            %h4
+              %span.ip_readable
+          .col-auto.card-options
+              %span.ip_score.badge.bg-white.text-info.fs-5
+        .row
+          %small.clearfix.ip_label.text-muted
+
+      .card-body
+        %table.table.table-bordered
+          %tbody
+            %tr.justify-content-center
+              %td.priority_count
+                %h4.text-center
+                  %span.ids_p1.badge.bg-danger
+              %td.priority_count
+                %h4.text-center
+                  %span.ids_p2.badge.bg-warning
+              %td.priority_count
+                %h4.text-center
+                  %span.ids_p3.badge.bg-info
+              %td.priority_count
+                %h4.text-center
+                  %span.badfellas_p0.badge.bg-primary
+            %tr
+              %td{colspan:"5"}
+                %ul.sigids_ids.list-unstyled.border-bottom
+                  %li.info_text.text-center TOP IDS
+                %ul.sigids_badfellas.list-unstyled
+                  %li.info_text.text-center TOP Badfellas

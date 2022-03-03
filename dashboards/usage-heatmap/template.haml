@@ -1,0 +1,32 @@
+.search_for
+  .card
+    .card-header
+      %h4
+        %i.fa.fa-search
+        Search Criteria
+    .card-body.form-dots
+      %form
+        .row.mb-3
+          .col-4
+            .form-group
+              %label.col-form-label.col-4 Counter Group
+              .col-8
+                %select.form-select#hm_cg_id{name:"cgguid"}
+          .col-4
+            .form-group
+              %label.col-form-label.col-4 Meter
+              .col-8
+                %select.form-select#hm_meter_id{name:"meter"}
+          .col-4
+            .form-group
+              %label.col-form-label.col-4 Key
+              .col-8
+                %input#hm_key{name:"key1",type:"text"}/
+        .row.justify-content-center
+          .col-auto
+            %input.btn-submit{name:"commit", type:"submit", value:"Show heatmap"}
+.row.mt-3
+  #hm_trp_data
+    #hm_status_bar
+      %i.fa.fa-spin.fa-spinner.fa-fw.hide
+      %span#hm_status_bar_text

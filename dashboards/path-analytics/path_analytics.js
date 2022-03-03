@@ -42,6 +42,9 @@ class ASNPathAnalytics{
     this.form.find("input[name*='to_date']").attr("id","to_date_"+this.rand_id);
     this.form.find(".new_time_selector").attr("id","new_time_selector_"+this.rand_id);
     this.dom.append(this.form);
+
+    this.form.find("#from_date_"+this.rand_id).val(opts.new_time_selector.start_date);
+    this.form.find("#to_date_"+this.rand_id).val(opts.new_time_selector.end_date);
     //new time selector 
     let update_ids = "#from_date_"+this.rand_id+","+"#to_date_"+this.rand_id;
     new ShowNewTimeSelector({divid:"#new_time_selector_"+this.rand_id,
@@ -57,31 +60,19 @@ class ASNPathAnalytics{
     await this.get_cgmeters();
 
     let cthis = this;
-    $( "#slider-remove-topn" ).slider({
-      min: 0, max: 10, value:0, step:1,
-      create: function() {
-         $( "#remove-top-n" ).text( $( this ).slider( "value" ) );
-      },
-      slide: function( event, ui ) {
-        $( "#remove-top-n" ).text( ui.value );
-        cthis.remove_topper_count=ui.value;
-        cthis.redraw_all();
-      }
-    });
+    document.getElementById('remove-top-n').oninput=function(){
+      document.getElementById('value-remove-top-n').innerHTML=this.value;
+      cthis.remove_topper_count=parseInt(this.value);
+      cthis.redraw_all();
+    }
 
-   
-    $( "#slider-max-nodes" ).slider({
-      min: 20, max: 100, value:30, step:10,
-      create: function() {
-        $( "#max-nodes" ).text( $( this ).slider( "value" ) );
-      },
-      slide: function( event, ui ) {
-        $( "#max-nodes" ).text( ui.value );
-        cthis.max_crosskey_nodes=ui.value;
-        cthis.draw_sankey_chart(cthis.data[0],"upload");
-        cthis.draw_sankey_chart(cthis.data[1],"download");
-      }
-    });
+    document.getElementById('max-nodes').oninput=function(){
+      cthis.max_crosskey_nodes=parseInt(this.value);
+      document.getElementById('value-max-nodes').innerHTML=this.value;
+      cthis.draw_sankey_chart(cthis.data[0],"upload");
+      cthis.draw_sankey_chart(cthis.data[1],"download");
+    }
+    
     this.form.submit($.proxy(this.submit_form,this));
     if(this.dash_params.valid_input == "1" || this.dash_params.valid_input==1){
       this.form.submit();
@@ -295,7 +286,7 @@ class ASNPathAnalytics{
     table.find("tbody").html("");
     table.siblings("ul.pagination").remove();
     let cgtoppers =  data.keys.slice(this.remove_topper_count,100+this.remove_topper_count);
-    table.closest('.panel').find("span.badge").html(cgtoppers.length);
+    table.closest('.card').find("span.badge").html(cgtoppers.length);
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       rows.push(`<tr data-key="${topper.label}"  data-label="${topper.label}" data-readable="${topper.readble}">
@@ -315,13 +306,13 @@ class ASNPathAnalytics{
                       report_opts:{
                         header:{h1:"Path Analytics"},
                         section_headers:[{h1:"Upload"},{h1:"download"}],
-                        nodes:[{find_by:`#table_upload`,type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:0},
+                        nodes:[{find_by:`#table_upload`,type:"table",header_text:"auto",h1:"h4",h2:"h4 small",section_header:0},
                                {type:"page_break"},
-                               {find_by:`.sankey_chart_upload`,type:"svg",header_text:"auto",h1:"h3",h2:"h3 small"},
+                               {find_by:`.sankey_chart_upload`,type:"svg",header_text:"auto",h1:"h4",h2:"h4 small"},
                                {type:"page_break",add_header_footer:false},
-                               {find_by:`#table_download`,type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:1},
+                               {find_by:`#table_download`,type:"table",header_text:"auto",h1:"h4",h2:"h4 small",section_header:1},
                                {type:"page_break"},
-                               {find_by:`.sankey_chart_upload`,type:"svg",header_text:"auto",h1:"h3",h2:"h3 small"}]
+                               {find_by:`.sankey_chart_upload`,type:"svg",header_text:"auto",h1:"h4",h2:"h4 small"}]
                       }
     });
 

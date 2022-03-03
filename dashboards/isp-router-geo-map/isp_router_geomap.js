@@ -47,7 +47,7 @@ class RouterGeoMap{
     this.dom.html("");
     this.data_dom = $(this.haml_dom[0]).clone();
     this.dom.append(this.data_dom);
-    this.dom.find('.badge-info').html(routerkeys.keys.length);
+    this.dom.find('.badge').html(routerkeys.keys.length);
     let markers = [];
     let palette = [].concat.apply([], [d3.schemeCategory10,d3.schemeCategory20,d3.schemeCategory20b,d3.schemeCategory20c]);
     let colors = {};

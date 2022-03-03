@@ -47,6 +47,8 @@ class ISPOverviewMapping{
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
                             },this.callback_load_routers,this);
+    $('#from_date').val(opts.new_time_selector.start_date);
+    $('#to_date').val(opts.new_time_selector.end_date);
     this.mk_time_interval();
 
     this.load_routers_interfaces();
@@ -266,11 +268,11 @@ class ISPOverviewMapping{
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       
-      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;;'><small><i class='fa fa-fw fa-ellipsis-h fa-lg'></i></small></a></span>");
+      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-bs-toggle='dropdown' href='javascript:;;'><i class='fa fa-fw fa-server'></i></a></span>");
       let dropdown_menu = $("<ul class='dropdown-menu  pull-right'></ul>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Explore Flows</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Traffic Chart</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Key Dashboard</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Explore Flows</a></li>");
       dropdown.append(dropdown_menu);
 
       let statids = [0];
@@ -306,7 +308,7 @@ class ISPOverviewMapping{
       this.dropdown_click(event);
     },this));
     table.tablesorter();
-    table.closest('.panel').find(".badge").html(rows.length);
+    table.closest('.card').find(".badge").html(rows.length);
   }
 
   pagination_callback(){

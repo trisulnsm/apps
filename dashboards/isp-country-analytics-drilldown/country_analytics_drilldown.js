@@ -39,7 +39,10 @@ class ISPCountryrilldownMapping{
     this.form.submit($.proxy(this.submit_form,this));
     this.parent_cgguid = this.cg_meters.crosskey[this.crosskey_interface][1];
     auto_complete('drilldown_country',{update:'autocomplete_country',cgguid:this.parent_cgguid},{});
+    console.log(opts)
     if(opts.dash_params.valid_input=="1"){
+      $('#from_date').val(opts.new_time_selector.start_date);
+      $('#to_date').val(opts.new_time_selector.end_date);
       this.form.find('#drilldown_country').val(opts.dash_params.key);
       this.submit_form();
     }
@@ -90,12 +93,12 @@ class ISPCountryrilldownMapping{
       await this.get_toppers(meter);
       let idx = Object.keys(this.meters).findIndex(k=>k==meter);
       section_headers.push({h1:meter});
-      nodes.push({find_by:`#table_${idx}`,type:"table",header_text:"auto",h1:"h3",section_header:idx});
+      nodes.push({find_by:`#table_${idx}`,type:"table",header_text:"auto",h1:"h4",section_header:idx});
       nodes.push({type:"page_break"});
-      nodes.push({find_by:`#country_drilldown_${idx}_donut`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
-      nodes.push({find_by:`#country_drilldown_${idx}_traffic_chart`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
+      nodes.push({find_by:`#country_drilldown_${idx}_donut`,type:"svg",header_text:"auto",h1:"h4",float:"right"});
+      nodes.push({find_by:`#country_drilldown_${idx}_traffic_chart`,type:"svg",header_text:"auto",h1:"h4",float:"right"});
       nodes.push({type:"page_break"});
-      nodes.push({find_by:`#country_drilldown_${idx}_sankey`,type:"svg",header_text:"auto",h1:"h3",float:"right"});
+      nodes.push({find_by:`#country_drilldown_${idx}_sankey`,type:"svg",header_text:"auto",h1:"h4",float:"right"});
       nodes.push({type:"page_break",add_header_footer:false});
     }
     await this.get_aggregated_flows();
@@ -108,7 +111,7 @@ class ISPCountryrilldownMapping{
     section_headers.push({h1:"Top Prefixes and Hosts"});
     let prefixes = ['.tag_asnumber','.tag_prefixes','.internal_ip','.external_ip'];
     for(let i=0; i<prefixes.length; i++ ){
-      nodes.push({type:"table",find_by:`${prefixes[i]} table`,header_text:"auto",h1:"h3"});
+      nodes.push({type:"table",find_by:`${prefixes[i]} table`,header_text:"auto",h1:"h4"});
       if(i!=prefixes.length-1){
         nodes.push({type:"page_break",add_header_footer:false});
       }

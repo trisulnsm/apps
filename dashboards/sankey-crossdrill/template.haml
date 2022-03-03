@@ -1,86 +1,93 @@
-%form.form-horizontal
+.card
+  .card-header
+    %h4 
+      %i.fa.fa-search
+      Search Criteria
+  .card-body.form-dots
+    %form
+      .row.mb-3
+        .col-6 
+          .row 
+            %label.col-form-label.col-4 Counter Group         
+            .col-8 
+              %select.form-select#cg_id{name:'cgguid'} 
+        .col-6 
+          .row 
+            %label.col-form-label.col-4 Meter 
+            .col-8 
+              %select.form-select#meter_id{name:'meter'}
+      .row.mb-3
+        .col-6
+          .row
+            .new_time_selector#new_time_selector_sk
+
+        .col-6
+          .row
+            %label.col-form-label.col-4 Remove Toppers
+            .col-8
+              %input#remove-top-n.form-range{type:"range",min: 0, max: 10, value:0, step:1}
+              %span#value-remove-top-n 0
+              %p.form-text Remove the top N flows from view to reveal the smaller flows
+
+      .row.mb-3
+        .col-6
+          .row
+            %label.col-form-label.col-4 Filter Item
+            .col-8
+              %input#fltr_crs{type:"text",name:"fltr_crs_items"}
+              %span.form-text Type text to filter crosskey items
+
+        .col-6
+          .row
+            %label.col-form-label.col-4 Show max nodes
+            .col-8
+              %input#max-nodes.form-range{type:"range",min: 20, max: 100, value:30, step:10}
+              %span#value-max-nodes 30
+              %p.form-text Show approximately these many nodes on the sankey (default 30)
+
+      .row.mb-3
+        .col-6
+          .row
+            %label.col-form-label.col-4 Invert Filter
+            .col-8
+              %input#invert_filter{type:"checkbox",name:"invertfilter",value:1}
+
+
+      .row.justify-content-center
+        .col-auto
+          %input#from_date_sk{type:"hidden",name:"from_date"}
+          %input#to_date_sk{type:"hidden",name:"to_date"}
+          %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Show Chart"}
+
+
+.ui_data.mt-3
   .row
-    .col-xs-6 
-      .form-group 
-        %label.control-label.col-xs-4 Counter Group         
-        .col-xs-8 
-          %select#cg_id{name:'cgguid'} 
-    .col-xs-6 
-      .form-group 
-        %label.control-label.col-xs-4 Meter 
-        .col-xs-8 
-          %select#meter_id{name:'meter'}
-  .row
-    .col-xs-6
-      .form-group
-        .new_time_selector#new_time_selector_sk
-
-    .col-xs-6
-      .form-group
-        %label.control-label.col-xs-4 Remove Toppers
-        .col-xs-8{style:"padding-top:10px"}
-          #slider-remove-topn
-            %div#remove-top-n.ui-slider-handle
-          %span.help-block.text-left Remove the top N flows from view to reveal the smaller flows
-
-  .row 
-    .col-xs-6
-      .form-group
-        %label.control-label.col-xs-4 Filter Item
-        .col-xs-8
-          %input#fltr_crs{type:"text",name:"fltr_crs_items"}
-          %span.help-block.text-left Type text to filter crosskey items
-
-    .col-xs-6
-      .form-group
-        %label.control-label.col-xs-4 Show max nodes
-        .col-xs-8{style:"padding-top:10px"}
-          #slider-max-nodes
-            %div#max-nodes.ui-slider-handle
-          %span.help-block.text-left Show approximately these many nodes on the sankey (default 30)
-    .row 
-      .col-xs-6
-        .form-group
-          %label.control-label.col-xs-4 Invert Filter
-          .col-xs-8
-          %input#invert_filter{type:"checkbox",name:"invertfilter",value:1}
-
-
-  .row
-    .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
-      %input#from_date_sk{type:"hidden",name:"from_date"}
-      %input#to_date_sk{type:"hidden",name:"to_date"}
-      %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Show Chart"}
-
-
-.ui_data{style:"padding-top:10px"}
-  .row
-    .col-xs-12
-      .panel.panel-primary.sankey_chart_div
-        .panel-heading
-          %h3 
+    .col-12
+      .card.border-primary.sankey_chart_div
+        .card-header.bg-primary.text-white
+          %h4
             %i.fa.fa-random.fa-fw
             Sankey Chart 
             %small
               Thickness represents volume of traffic. Put your mouse over a node to show actual values
-            %span.badge.badge-info.badge-count
-            %p
-              %small.target
-        .panel-body
+            %span.badge.bg-info.text-primary.bg-white.rounded-pill.fs-6.ms-2
+          .row
+            %small.target
+        .card-body
           .animated-background
           #sankey_chart
-  .row
-    .col-xs-12
-      .panel.panel-primary.table_div
-        .panel-heading
-          %h3 
+  .row.mt-3
+    .col-12
+      .card.border-primary.table_div
+        .card-header.bg-primary.text-white
+          %h4
             %i.fa.fa-table.fa-fw
             Table Toppers
             %small
-            %span.badge.badge-info.badge-count
-            %p
-              %small.target
-        .panel-body
+            %span.badge.bg-info.text-primary.bg-white.rounded-pill.fs-6.ms-2
+          .row
+            %small.target
+        .card-body
           %table.table.table-sysdata.toppers_table.table-hover
             %thead
             %tbody

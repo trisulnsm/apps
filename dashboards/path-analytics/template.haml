@@ -1,94 +1,96 @@
 .row.pathanalytics_form
-  .col-xs-12
-    .alert.alert-danger.hidden#app_error_box
+  .col-12
+    .alert.alert-danger.hide#app_error_box
       %h5
         %i.fa.fa-exclamation-triangle.fa-fw
-        %span asd
+        %span
         
 
-    .widget
-      .widget-header
+    .card
+      .card-header
         %h4 
           %i.fa.fa-search.fa-fw
           Search criteria
-      .widget-body
-        %form.form-horizontal
+      .card-body.form-dots
+        %form
           .row
-            .col-xs-6 
-              .form-group 
-                %label.control-label.col-xs-4 Routers          
-                .col-xs-8 
-                  %select{name:'routers'} 
-            .col-xs-6
-              .form-group
+            .col-6 
+              .row
+                %label.col-form-label.col-4 Routers          
+                .col-8 
+                  %select{name:'routers',class:"form-select"} 
+            .col-6
+              .row
                 .new_time_selector
        
               
           .row
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Interfaces          
-                .col-xs-8 
-                  %select{name:'interfaces'} 
-            .col-xs-6
-              .from-group
-                %label.control-label.col-xs-4 Filter ASN
-                .col-xs-8
+            .col-6
+              .row 
+                %label.col-form-label.col-4 Interfaces          
+                .col-8 
+                  %select{name:'interfaces',class:"form-select"} 
+            .col-6
+              .row
+                %label.col-form-label.col-4 Filter ASN
+                .col-8
                   %input{type:"text",class:"filter_asn"}
-                  %span.help-block.text-left Please enter AS Number to filter the result
+                  %span.form-text Please enter AS Number to filter the result
           .row
-            .col-xs-6
-              .form-group
-                %label.control-label.col-xs-4 Remove Toppers
-                .col-xs-8{style:"padding-top:10px"}
-                  #slider-remove-topn
-                    %div#remove-top-n.ui-slider-handle
-                  %span.help-block.text-left Remove the top N flows from view to reveal the smaller flows
-            .col-xs-6
-              .form-group
-                %label.control-label.col-xs-4 Show max nodes
-                .col-xs-8{style:"padding-top:10px"}
-                  #slider-max-nodes
-                    %div#max-nodes.ui-slider-handle
-                  %span.help-block.text-left Show approximately these many nodes on the sankey (default 30)
+            .col-6
+              .row
+                %label.col-form-label.col-4 Remove Toppers
+                .col-8{style:"padding-top:10px"}
+                  %input#remove-top-n{type:"range",class:"form-range",min: 0, max: 10, value:0, step:1}
+                  %span#value-remove-top-n 0
+                  %p.form-text Remove the top N flows from view to reveal the smaller flows
+            .col-6
+              .row
+                %label.col-form-label.col-4 Show max nodes
+                .col-8{style:"padding-top:10px"}
+                  %input#max-nodes{type:"range",class:"form-range",min: 20, max: 100, value:30, step:10}
+                  %span#value-max-nodes 30
 
-          .row
-            .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+                  %p.form-text Show approximately these many nodes on the sankey (default 30)
+
+          .row.justify-content-center.mt-3
+            .col-auto
               %input{type:"hidden",name:"from_date"}
               %input{type:"hidden",name:"to_date"}
               %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
 
-.path_data
+.path_data.mt-3
   .row
-    .row
-    .col-xs-12
+    .col-12
       %ul.nav.nav-tabs#isp_overview_tabs
-        %li.active
-          %a.text-primary{href:"#path_analytics_upload",data-toggle:"tab",role:"tab"}
+        %li.nav-item
+          %a.nav-link.active.text-primary{data-bs-target:"#path_analytics_upload",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"}
             %i.fa.fa-upload.fa-fw
             Upload
             %span.tot_upload_vol
-        %li
-          %a.text-warning{href:"#path_analytics_download",data-toggle:"tab",role:"tab"} 
+        %li.nav-item
+          %a.nav-link.text-success{data-bs-target:"#path_analytics_download",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-download.fa-fw
             Download
             %span.tot_download_vol
       .tab-content{style:"padding-top:10px"}
         .tab-pane.active#path_analytics_upload{data-use-width:1}
           .row
-            .col-xs-12
-              .panel.panel-primary.add_download_btn
-                .panel-heading
-                  %h3
-                    %i.fa.fa-table.fa-fw
-                    Busiest Routes 
-                    %small Shows  top 100 used AS PATHS 
-                    %span.badge.badge-success
-                    .widget-tool
-                      %ul.list-inline
+            .col-12
+              .card.border-primary.add_download_btn
+                .card-header.bg-primary.text-white
+                  .row
+                    .col-auto.me-auto
+                      %h4
+                        %i.fa.fa-table.fa-fw
+                        Busiest Routes 
+                        %small Shows  top 100 used AS PATHS 
+                        %span.badge.bg-white.text-primary.rounded-pill.ms-1.fs-6
+                    .col-auto.card-options.d-flex.gap-2.justify-content-end
+                  .row
                     %p
                       %small.target
-                .panel-body
+                .card-body
                   %h3.noitify
                     %i.fa.fa-spinner.fa-spin
                     Please wait .... Getting data .....
@@ -100,41 +102,44 @@
                           %th{style:"width:450px"} Label
                           %th{sort:"volume"} Volume
                       %tbody
-            .col-xs-12#nested-upload
-              .panel.panel-primary
-                .panel-heading
-                  %h3
+            .col-12#nested-upload.mt-3
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-table.fa-fw
                     Per Hop Path Analytics  : Transmit 
                     %small Shows volume transfer on entire path 
-                .panel-body
+                .card-body
                   %table.table.table-hover.table-bordered.table-condensed
 
-            .col-xs-12.sankey_asn_upload.sankey_chart
-              .panel.panel-primary
-                .panel-heading
-                  %h3
+            .col-12.sankey_asn_upload.sankey_chart.mt-3
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-random.fa-fw
                     Route Per Hop Analytics - Transmit 
                     %small Usage of busiest route segments
-                .panel-body
+                .card-body
                   .sankey_chart_upload
 
         .tab-pane#path_analytics_download{data-use-width:1}
           .row
-            .col-xs-12
-              .panel.panel-success
-                .panel-heading
-                  %h3
-                    %i.fa.fa-table.fa-fw
-                    Busiest Routes 
-                    %small Shows  top 100 used AS PATHS 
-                    %span.badge.badge-success
-                    .widget-tool
-                      %ul.list-inline
+            .col-12
+              .card.border-success
+                .card-header.bg-success.text-white
+                  .row
+                    .col-auto.me-auto
+                      %h4
+                        %i.fa.fa-table.fa-fw
+                        Busiest Routes 
+                        %small Shows  top 100 used AS PATHS 
+                        %span.badge.bg-white.text-success.rounded-pill.ms-1.fs-6
+                    .col-auto.card-options.d-flex.gap-2.justify-content-end
+                          
+                  .row
                     %p
                       %small.target
-                .panel-body
+                .card-body
                   %h3.noitify
                     %i.fa.fa-spinner.fa-spin
                     Please wait .... Getting data .....
@@ -147,24 +152,24 @@
                           %th{sort:"volume"} Volume
                       %tbody
 
-            .col-xs-12#nested-download
-              .panel.panel-success
-                .panel-heading
-                  %h3
+            .col-12#nested-download.mt-3
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-table.fa-fw
                     Per Hop Path Analytics  : Download 
                     %small Shows volume transfer on entire path 
-                .panel-body
+                .card-body
                   %table.table.table-hover.table-bordered.table-condensed
 
-            .col-xs-12.sankey_asn_download.sankey_chart
-              .panel.panel-success
-                .panel-heading
-                  %h3
+            .col-12.sankey_asn_download.sankey_chart.mt-3
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-random.fa-fw
                     Route Per Hop Analytics - Download  
                     %small Usage of busiest route segments
-                .panel-body
+                .card-body
                   .sankey_chart_download
 
            

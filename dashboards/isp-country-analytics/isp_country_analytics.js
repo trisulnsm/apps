@@ -75,6 +75,8 @@ class ISPOverviewMapping{
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
                             },this.callback_load_routers,this);
+    $('#from_date').val(this.default_selected_time.start_date);
+    $('#to_date').val(this.default_selected_time.end_date);
     this.mk_time_interval();
 
     this.load_routers_interfaces();
@@ -182,12 +184,12 @@ class ISPOverviewMapping{
     });
     this.report_nodes = [];
     _.each([this.meter_details_in.upload,this.meter_details_in.download],$.proxy(function(idx,ai){
-      this.report_nodes.push({type:"table",header_text:"auto",h1:"h3",h2:"h3 small",section_header:ai,find_by:`#table_${ai}`});
+      this.report_nodes.push({type:"table",header_text:"auto",h1:"h4",h2:"h4 small",section_header:ai,find_by:`#table_${ai}`});
       this.report_nodes.push({type:"page_break"});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#traffic_chart_${ai}_`});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#donut_chart${ai}_`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h4",h2:"h4 small",find_by:`#traffic_chart_${ai}_`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h4",h2:"h4 small",find_by:`#donut_chart${ai}_`});
       this.report_nodes.push({type:"page_break"});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h3",h2:"h3 small",find_by:`#sankey_chart_${ai}`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h4",h2:"h4 small",find_by:`#sankey_chart_${ai}`});
       if(ai!=1){
         this.report_nodes.push({type:"page_break",add_header_footer:false});
       }
@@ -323,11 +325,11 @@ class ISPOverviewMapping{
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       
-      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;;'><small><i class='fa fa-fw fa-ellipsis-h fa-lg'></i></small></a></span>");
-      let dropdown_menu = $("<ul class='dropdown-menu  pull-right'></ul>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Drilldown</a></li>");
+      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-bs-toggle='dropdown' href='javascript:;;'><small><i class='fa fa-fw fa-server'></i></small></a></span>");
+      let dropdown_menu = $("<ul class='dropdown-menu'></ul>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Traffic Chart</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Key Dashboard</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Drilldown</a></li>");
 
       dropdown.append(dropdown_menu);
 
@@ -362,7 +364,7 @@ class ISPOverviewMapping{
       this.dropdown_click(event);
     },this));
     table.tablesorter();
-    table.closest('.panel').find(".badge").html(rows.length);
+    table.closest('.card').find(".badge").html(rows.length);
   }
 
   pagination_callback(){

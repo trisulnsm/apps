@@ -4,9 +4,25 @@
 
 //TEMPLATE
 
-const HTML_TEMPLATE_O = "<div class='widget'> <div class='widget-header'> <h4> Totals <small>Click the counts to see data</small> </h4> </div> <div class='widget-body clearfix' id='overall_totals'> <div id='statusline'></div> <div class='row'> <div id='chart_data'></div> </div> <div class='row'> <div id='badge_data'></div> </div> </div> </div>";
-const CHART_TEMPLATE = "<div class='col-xs-6'><div class='panel'><div class='panel-body'></div></div></div>";
-const PANEL_TEMPLATE = "<div class='col-xs-2'><div class='panel' style='min-height:110px'><div class='panel-body' style='padding:10px'></div></div></div>";
+const HTML_TEMPLATE_O =Haml.render(`
+  .card
+    .card-header
+      %h4
+        Totals
+        %small Click the counts to see data
+    #overall_totals.card-body
+      #statusline
+      .row#chart_data.mb-3
+      .row#badge_data`);
+const CHART_TEMPLATE = Haml.render(`
+    .col-6
+      .card
+        .card-body`);
+const CARD_TEMPLATE = Haml.render(`
+  .col-2.mb-3
+    .card{style:"min-height:110px"}
+      .card-body{style:"padding:10px"}
+  `)
 var TotalsModel = $.klass({
   init : function() {
     this.time_duration = {title:"Total Duration",from_ts:0,to_ts:0,duration:0};
@@ -89,7 +105,7 @@ function load_cg_uniques(mod, opts) {
         kMod.status_updater("Unique "+kCGName);
         if(resp.total_hits != undefined  && resp.total_hits.toNumber() !=0){
           var url = "/newdash?dash_key=retrousage&selected_cgguid="+guid;
-          update_totals(kMod,{ title: "Unique " + kCGName,data: resp.total_hits.toNumber(),class:"default",url:url})
+          update_totals(kMod,{ title: "Unique " + kCGName,data: resp.total_hits.toNumber(),class:"secondary",url:url})
         }
         
       });
@@ -185,13 +201,13 @@ function update_duration(mod,opts)
 {
   var cls = "info"
   var kMod = mod;
-  var pt = $(PANEL_TEMPLATE);
-  pt.addClass('col-xs-4').removeClass('col-xs-2');
-  pt.find('.panel').addClass('panel-info');
-  var header = $("<h4>",{class:"text-"+cls}).text(kMod.time_duration.title)
+  var pt = $(CARD_TEMPLATE);
+  pt.addClass('col-4').removeClass('col-2');
+  pt.find('.card').addClass('border-info');
+  var header = $("<h4>",{class:"card-title text-"+cls}).text(kMod.time_duration.title)
   var t = $("<span>",{class:"text-"+cls}).text(kMod.time_duration.duration + " Starting from " + fmt_ts(kMod.time_duration.from_ts));
-  pt.find('.panel-body').append(header);
-  pt.find('.panel-body').append(t);
+  pt.find('.card-body').append(header);
+  pt.find('.card-body').append(t);
   $('#badge_data').append(pt);
 
 
@@ -207,20 +223,20 @@ function update_totals(mod,k)
     cls = k.class;
   }
 
-  var pt = $(PANEL_TEMPLATE);
-  pt.find('.panel').addClass('panel-'+cls);
-  var header = $("<h4>",{class:"text-"+cls}).text(k.title);
+  var pt = $(CARD_TEMPLATE);
+  pt.find('.card').addClass('border-'+cls);
+  var header = $("<h4>",{class:"card-title text-"+cls}).text(k.title);
   var data = h_fmtvol(k.data)
   if(_.has(k,"url")){
-    var t = $("<a>",{class:"label label-"+cls,style:"font-size:130%",href:k.url,target:"_blank"}).text(data);
+    var t = $("<a>",{class:"badge bg-"+cls,style:"font-size:130%",href:k.url,target:"_blank"}).text(data);
 	t.attr('title',k.data);
   }
   else{
-    var t = $("<span>",{class:"label label-"+cls,style:"font-size:130%"}).text(fmt_number(data));
+    var t = $("<span>",{class:"badge bg-"+cls,style:"font-size:130%"}).text(fmt_number(data));
 	t.attr('title',k.data);
   }
-  pt.find('.panel-body').append(header);
-  pt.find('.panel-body').append(t);
+  pt.find('.card-body').append(header);
+  pt.find('.card-body').append(t);
   $('#badge_data').append(pt);
 }
 
@@ -246,7 +262,7 @@ function update_chart(mod,k,i){
   var kMod = mod;
   var kUp = k;
   var pt = $(CHART_TEMPLATE);
-  pt.find('.panel').addClass('panel-default');
+  pt.find('.card').addClass('card-secondary');
   $('#chart_data').append(pt);
 
 
@@ -257,7 +273,7 @@ function update_chart(mod,k,i){
   chart_width = parseInt(chart_width);
   var canvas = $("<canvas>",{width:chart_width,height:chart_height,id:'canvas_'+i});
 
-  pt.find('.panel-body').append(canvas)
+  pt.find('.card-body').append(canvas)
 
   var zoom = {
     // Boolean to enable zooming

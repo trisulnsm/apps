@@ -1,10 +1,10 @@
-.row.interfacematrix_form
+.row#interface-filter-form
   .col-xs-12
     .widget
       .widget-header
         %h4 
           %i.fa.fa-filter.fa-fw
-          Filter criteria
+          Filter criteria select timewindow
       .widget-body
         %form.form-horizontal
           .row
@@ -12,71 +12,11 @@
               .form-group
                 .new_time_selector#new_time_selector
           .row
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Select a router         
-                .col-xs-8 
-                  %select#routers{name:'routers'} 
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Select an interface
-                .col-xs-8 
-                  %select#interfaces{name:'interfaces'}
-          .row
             .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
               %input#from_date{type:"hidden",name:"from_date"}
               %input#to_date{type:"hidden",name:"to_date"}
               %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
 
-
-.ui_data
-  .row
-    .col-xs-12
-      %ul.nav.nav-tabs#ifmatrix_overview_tabs
-        %li.active
-          %a{href:"#ifmatrix_overview_0",data-toggle:"tab",role:"tab"}
-            %i.fa.fa-upload.fa-fw
-            Transmitting to interface 
-            %span.volume_0
-        %li
-          %a{href:"#ifmatrix_overview_1",data-toggle:"tab",role:"tab"} 
-            %i.fa.fa-download.fa-fw
-            Receiving from interface
-            %span.volume_1
-      .tab-content{style:"padding-top:10px"}
-        .tab-pane.active#ifmatrix_overview_0{data-use-width:1}
-          .row
-            .col-xs-12.toppers_table_div
-              .panel.panel-primary.add_download_btn
-                .panel-heading
-                  %h3 
-                    %i.fa.fa-table.fa-fw
-                    %span#target_interface 
-                    is transmitting to these interfaces 
-                    %span.badge.badge-info
-                  %p#target_timewindow
-                .panel-body
-                  .toppers_table
-                    %table
-                      %thead
-                      %tbody
-                  .animated-background
-        .tab-pane#ifmatrix_overview_1{data-use-width:1}
-          .row
-            .col-xs-12.toppers_table_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
-                    %i.fa.fa-table.fa-fw
-                    %span#target_interface
-                    is receiving from these interfaces 
-                    %span.badge.badge-info
-                  %p#target_timewindow
-                .panel-body
-                  .toppers_table
-                    %table
-                      %thead
-                      %tbody
-                    .animated-background
-
-
+  .col-xs-12
+    %h3 Top utilized interfaces 
+    #results

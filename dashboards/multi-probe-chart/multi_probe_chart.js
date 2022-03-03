@@ -7,10 +7,10 @@ class ProbesChart {
     this.randomid = parseInt(Math.random()*100000);
     //fulldiv 
     var timerowdiv =  document.createElement('DIV');
-    this.set_attributes(timerowdiv,{class:"col-xs-12 form-horizontal"});
+    this.set_attributes(timerowdiv,{class:"col-12 form-dots"});
 
     var timeselctor = document.createElement('DIV');
-    this.set_attributes(timeselctor,{id:`new_time_selector_${this.randomid}`,class:"col-xs-8"});
+    this.set_attributes(timeselctor,{id:`new_time_selector_${this.randomid}`,class:"col-8"});
 
     var default_node = document.getElementById(this.divid.replace("#",''));
     timerowdiv.appendChild(timeselctor);
@@ -92,17 +92,16 @@ class ProbesChart {
             rowdiv = $(`#chart_data_${this.randomid}`).find('.row:last');
             
           }
-          var coldiv = $("<div>",{class:"col-xs-6"});
+          var coldiv = $("<div>",{class:"col-6"});
 
-          var paneldiv = get_panel_shell({});
-          paneldiv.addClass('panel-info');
-          paneldiv.find(".panel-heading").remove();
-          paneldiv.find(".panel-body").attr({style:"padding:2px"});
-          paneldiv.append(`<h4 class='text-center'>${probe.probe_id}</h4>`);
-          paneldiv.append($("<div>",{id:`${probe.probe_id}_${this.randomid}`}));
+          var carddiv = $(get_card_shell());
+          carddiv.addClass('border-info mt-3');
+          carddiv.find(".card-header").remove();
+          carddiv.append(`<h4 class='text-center'>${probe.probe_id}</h4>`);
+          carddiv.append($("<div>",{id:`${probe.probe_id}_${this.randomid}`}));
 
 
-          coldiv.append(paneldiv);
+          coldiv.append(carddiv);
           rowdiv.append(coldiv);
           $(`#chart_data_${this.randomid}`).append(rowdiv);
 

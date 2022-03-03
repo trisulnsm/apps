@@ -75,7 +75,10 @@ class ISPOverviewMapping{
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
                             });
+     $('#from_date').val(opts.new_time_selector.start_date);
+      $('#to_date').val(opts.new_time_selector.end_date);
     this.mk_time_interval();
+
     //get router toppers for drowdown in form
     var top_routers=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
       counter_group: "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
@@ -373,7 +376,7 @@ class ISPOverviewMapping{
       this.dropdown_click(event);
     },this));
     table.tablesorter();
-    table.closest('.panel').find(".badge").html(rows.length);
+    table.closest('.card').find(".badge").html(rows.length);
     new ExportToCSV({table_id:this.table_id,filename_prefix:"top_upload_asn",append_to:"panel"});
   }
 

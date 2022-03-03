@@ -10,57 +10,6 @@
 .toppers_table_div,.donut_chart_div{
   min-height: 500px;
 }
-.panel-stat3 {
-  position: relative;
-  overflow: hidden;
-  padding: 25px 20px;
-  margin-bottom: 20px;
-  color: #fff;
-  cursor: pointer;
-  border-radius: 10px;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  min-height: 210px;
-}
-.panel-stat3 a {
-  display: block;
-  color: #fff;
-}
-
-.bg-danger {
-  background-color: #fc8675!important;
-  color: #fff!important;
-}
-.bg-info {
-  background-color: #6bafbd;
-  color: #fff;
-}
-.bg-warning {
-  background-color: #f3ce85;
-  color: #fff;
-}
-.bg-success {
-  background-color: #65cea7;
-  color: #fff;
-}
-.bg-white {
-    background-color: #fff;
-}
-.bg-light {
-    background-color: #f1f5fc;
-}
-.bg-dark {
-    background-color: #222;
-}
-.bg-grey {
-    background-color: #eee;
-    text-shadow: 0 1px #fff;
-}
-.bg-primary {
-    background-color: #424f63;
-    color: #BECFDF;
-}
-
 .m-top-none {
   margin-top: 0;
 }
@@ -69,24 +18,6 @@
   margin-left: 5px;
 }
 
-.panel-stat3 .stat-icon {
-  position: absolute;
-  top: 20px;
-  right: 10px;
-  font-size: 30px;
-  opacity: .3;
-}
-.panel-stat3 .refresh-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  transition: all .2s ease;
-  -webkit-transition: all .2s ease;
-  -moz-transition: all .2s ease;
-  -ms-transition: all .2s ease;
-  -o-transition: all .2s ease;
-  color: rgba(0,0,0,.3);
-}
 
 .loading-overlay {
     position: absolute;

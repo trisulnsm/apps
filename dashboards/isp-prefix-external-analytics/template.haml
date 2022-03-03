@@ -1,276 +1,292 @@
 .row.prefix_external_analytics_form
-  .col-xs-12
-    .widget
-      .widget-header
+  .col-12
+    .card
+      .card-header
         %h4 
           %i.fa.fa-filter.fa-fw
           Filter criteria
-      .widget-body
-        %form.form-horizontal
+      .card-body.form-dots
+        %form
           .row
-            .col-xs-6
-              .form-group
+            .col-6
+              .row
                 .new_time_selector#new_time_selector
           .row
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Select a router         
-                .col-xs-8 
-                  %select#routers{name:'routers'} 
-            .col-xs-6
-              .form-group 
-                %label.control-label.col-xs-4 Select an interface 
-                .col-xs-8 
-                  %select#interfaces{name:'interfaces'}
-          .row
-            .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+            .col-6
+              .row 
+                %label.col-form-label.col-4 Select a router         
+                .col-8 
+                  %select.form-select#routers{name:'routers'} 
+            .col-6
+              .row 
+                %label.col-form-label.col-4 Select an interface 
+                .col-8 
+                  %select.form-select#interfaces{name:'interfaces'}
+          .row.justify-content-center.mt-3
+            .col-auto
               %input#from_date{type:"hidden",name:"from_date"}
               %input#to_date{type:"hidden",name:"to_date"}
               %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
 
 
-.ui_data
+.ui_data.mt-3
   .row
-    .col-xs-12
+    .col-12
       %ul.nav.nav-tabs#isp_prefix_external_overview_tabs
-        %li.active
-          %a{href:"#prefix_external_overview_0",data-toggle:"tab",role:"tab"}
+        %li.nav-item
+          %a.nav-link.active{data-bs-target:"#prefix_external_overview_0",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"}
             %i.fa.fa-upload.fa-fw
             Receive from Upstream
             %span.volume_0
-        %li
-          %a{href:"#prefix_external_overview_1",data-toggle:"tab",role:"tab"} 
+        %li.nav-item
+          %a.nav-link{data-bs-target:"#prefix_external_overview_1",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-download.fa-fw
             Transmit to Upstream
             %span.volume_1
-        %li
-          %a{href:"#prefix_external_overview_2",data-toggle:"tab",role:"tab"} 
+        %li.nav-item
+          %a.nav-link{data-bs-target:"#prefix_external_overview_2",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-download.fa-fw
             Receive from Downstream
             %span.volume_2
-        %li
-          %a{href:"#prefix_external_overview_3",data-toggle:"tab",role:"tab"} 
+        %li.nav-item
+          %a.nav-link{data-bs-target:"#prefix_external_overview_3",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-download.fa-fw
             Transmit to Downstream
             %span.volume_3                        
       .tab-content{style:"padding-top:10px"}
         .tab-pane.active#prefix_external_overview_0{data-use-width:1}.add_download_btn
-          .row
-            .col-xs-12.toppers_table_div
-              .panel.panel-primary.add_download_btn
-                .panel-heading
-                  %h3 
-                    %i.fa.fa-table.fa-fw
-                    Top prefixes to which you are UPLOADING data &nbsp; 
-                    %span.badge.badge-info
-                  %p
+          .row.mt-3
+            .col-12.toppers_table_div
+              .card.border-primary.add_download_btn
+                .card-header.bg-primary.text-white
+                  .row
+                    .col-auto.me-auto
+                      %h4
+                        %i.fa.fa-table.fa-fw
+                        Top prefixes to which you are UPLOADING data &nbsp; 
+                        %span.badge.bg-white.text-primary.rounded-pill.fs-6.ms-1
+                    .col-auto.card-options.d-flex.gap-2.justify-content-center
+                  .row
                     %small.target
-                .panel-body
+                .card-body
                   .toppers_table
                     %table
                       %thead
                       %tbody
                   .animated-background
-          .row
-            .col-xs-12.traffic_chart_div
-              .panel.panel-primary
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.traffic_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart showing traffic history of top prefixes   
                   %p
                     %small.target
                    
-                .panel-body
+                .card-body
                   .traffic_chart
                   .animated-background
-          .row
-            .col-xs-12.donut_chart_div
-              .panel.panel-primary
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.donut_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of prefixes upload traffic 
                   %p
                     %small.target
-                .panel-body
+                .card-body
                   .donut_chart
                   .animated-background
-          .row
-            .col-xs-12.sankey_chart_div
-              .panel.panel-primary
-                .panel-heading
+          .row.mt-3
+            .col-12.sankey_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
                   %h3 
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
-                .panel-body
-                    %p
+                
+                  .row
+                    %small
                       Shows upload traffic flows from the left side (External Prefixes) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
+                .card-body
                   .sankey_chart
                   .animated-background
         .tab-pane#prefix_external_overview_1{data-use-width:1}
-          .row
-            .col-xs-12.toppers_table_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
-                    %i.fa.fa-table.fa-fw
-                    Top prefixes from which you are DOWNLOAD-ing data
-                    %span.badge.badge-info
-                  %p
+          .row.mt-3
+            .col-12.toppers_table_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  .row
+                    .col-auto.me-auto
+                      %h4
+                        %i.fa.fa-table.fa-fw
+                        Top prefixes from which you are DOWNLOAD-ing data
+                        %span.badge.bg-white.text-success.rounded-pill.fs-6.ms-1
+                    .col-auto.card-options.d-flex.gap-2.justify-content-end
+                  .row
                     %small.target
-                .panel-body
+                .card-body
                   .toppers_table
                     %table
                       %thead
                       %tbody
                     .animated-background
-          .row
-            .col-xs-12.traffic_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.traffic_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
                     %small Showing top prefixes download traffic over the selected time period 
-                  %p
+                  .row
                     %small.target
                    
-                .panel-body
+                .card-body
                   .traffic_chart
                   .animated-background
-          .row
-            .col-xs-12.donut_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.donut_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of prefixes download traffic 
-                  %p
+                  .rpw
                     %small.target
-                .panel-body
+                .card-body
                   .donut_chart
                   .animated-background
-          .row
-            .col-xs-12.sankey_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
+          .row.mt-3
+            .col-12.sankey_chart_div
+              .card.border-primary
+                .card-header.bg-primary.text-white
+                  %h4
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
+                  .row
                     %small
                       Shows download traffic flows from the left side (External Prefixes) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
-                .panel-body
+                .card-body
                   .sankey_chart
                   .animated-background
         .tab-pane#prefix_external_overview_2{data-use-width:1}
-          .row
-            .col-xs-12.toppers_table_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
-                    %i.fa.fa-table.fa-fw
-                    Top prefixes from which you are DOWNLOAD-ing data
-                    %span.badge.badge-info
-                  %p
+          .row.mt-3
+            .col-12.toppers_table_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  .row
+                    .col-auto.me-auto
+                      %h4
+                        %i.fa.fa-table.fa-fw
+                        Top prefixes from which you are UPLOADING-ing data
+                        %span.badge.bg-white.text-success.rounded-pill.fs-6.ms-1
+                    .col-auto.card-options.d-flex.gap-2.justify-content-center
+                  .row
                     %small.target
-                .panel-body
+                .card-body
                   .toppers_table
                     %table
                       %thead
                       %tbody
                     .animated-background
-          .row
-            .col-xs-12.traffic_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.traffic_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
                     %small Showing top prefixes download traffic over the selected time period 
-                  %p
+                  .row
                     %small.target
                    
-                .panel-body
+                .card-body
                   .traffic_chart
                   .animated-background
-          .row
-            .col-xs-12.donut_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.donut_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of prefixes download traffic 
-                  %p
+                  .row
                     %small.target
-                .panel-body
+                .card-body
                   .donut_chart
                   .animated-background
-          .row
-            .col-xs-12.sankey_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
+          .row.mt-3
+            .col-12.sankey_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
                     %small
                       Shows download traffic flows from the left side (External Prefixes) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
-                .panel-body
+                .card-body
                   .sankey_chart
                   .animated-background
         .tab-pane#prefix_external_overview_3{data-use-width:1}
-          .row
-            .col-xs-12.toppers_table_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
-                    %i.fa.fa-table.fa-fw
-                    Top prefixes from which you are DOWNLOAD-ing data
-                    %span.badge.badge-info
-                  %p
+          .row.mt-3
+            .col-12.toppers_table_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  .row
+                    .col-auto.me-auto
+                      %h4
+                        %i.fa.fa-table.fa-fw
+                        Top prefixes from which you are DOWNLOAD-ing data
+                        %span.badge.bg-white.text-success.rounded-pill.fs-6.ms-1
+                    .col-auto.card-options.d-flex.gap-2.justify-content-end
+
+                  .row
                     %small.target
-                .panel-body
+                .card-body
                   .toppers_table
                     %table
                       %thead
                       %tbody
                     .animated-background
-          .row
-            .col-xs-12.traffic_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.traffic_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
                     %small Showing top prefixes download traffic over the selected time period 
-                  %p
+                  .row
                     %small.target
                    
-                .panel-body
+                .card-body
                   .traffic_chart
                   .animated-background
-          .row
-            .col-xs-12.donut_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3
+          .row.mt-3
+            .col-12.donut_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of prefixes download traffic 
-                  %p
+                  .row
                     %small.target
-                .panel-body
+                .card-body
                   .donut_chart
                   .animated-background
-          .row
-            .col-xs-12.sankey_chart_div
-              .panel.panel-success
-                .panel-heading
-                  %h3 
+          .row.mt-3
+            .col-12.sankey_chart_div
+              .card.border-success
+                .card-header.bg-success.text-white
+                  %h4
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
                     %small
                       Shows download traffic flows from the left side (External Prefixes) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
-                .panel-body
+                .card-body
                   .sankey_chart
                   .animated-background
 

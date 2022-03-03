@@ -10,12 +10,23 @@ class KeySpaceExplorer{
     this.dom = $(opts.divid);
     this.rand_id=parseInt(Math.random()*100000);
     this.default_selected_time = opts.new_time_selector;
-    this.add_form();
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
+    this.add_form(opts);
 
   }
-  async add_form(){
-    this.form = $("<div class='row ui_form'> <div class='col-xs-12'> <form class='form-horizontal'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select name='countergroup'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <div class='new_time_selector'></div> </div> </div> </div> <div class='row'> <div class='col-xs-12'> <div class='from-group'> <label class='control-label col-xs-2'>Keys</label> <div class='col-xs-10'> <textarea name='searchkey' rows='10'></textarea> <span class='help-block text-left'>Please enter comma(,) seperated keys or one key per line.You can also use range . Ex 192.168.1.10~192.168.1.20</span> </div> </div> </div> </div> <div class='row'> <div class='col-xs-10 col-md-offset-4' style='padding-top:10px'> <input name='from_date' type='hidden'> <input name='to_date' type='hidden'> <input class='btn-submit' id='btn_submit' name='commit' type='submit' value='Search'> </div> </div> </form> </div> </div>");
+   // load the frame 
+  async load_assets(opts)
+  {
+    // load app.css file
+    load_css_file(opts);
+    // load template.haml file 
+    let html_str = await get_html_from_hamltemplate(opts);
+    this.haml_dom =$(html_str)
+  }
+  async add_form(opts){
+
+    await this.load_assets(opts)
+    this.form = $(this.haml_dom[0]);
     this.form.find("select[name*='countergroup']").attr("id","cg_"+this.rand_id);
     this.form.find("textarea[name*='searchkey']").attr("id","keys_"+this.rand_id);
     this.form.find(".new_time_selector").attr("id","new_time_selector_"+this.rand_id);
@@ -42,7 +53,7 @@ class KeySpaceExplorer{
   }
   reset_ui(){
     this.dom.find(".ui_data").remove();
-    this.data_dom = $("<div class='ui_data'> <div class='row'> <div class='col-xs-12'> <div class='panel panel-info'> <div class='panel-body'> <div class='progress_bar'></div> <h3> <i class='fa fa-table'></i> Matching keys seen per day</h3> <table class='table table-sysdata'> <thead> <tr> <th>Date</th> <th>Seen keys</th> <th>Count</th> </tr> </thead> <tbody></tbody> </table> </div> </div> </div> </div> </div>");
+    this.data_dom =$(this.haml_dom[1]).clone();
     this.data_dom.find(".progress_bar").attr("id","pg_bar_"+this.rand_id);
     this.dom.append(this.data_dom);
     this.tint_arr = [];
@@ -133,51 +144,4 @@ function run(opts){
   new KeySpaceExplorer(opts)
 }
 
-
-/*
-.row.ui_form
-  .col-xs-12
-    %form.form-horizontal
-      .row
-        .col-xs-6 
-          .form-group 
-            %label.control-label.col-xs-4 Counter Group         
-            .col-xs-8 
-              %select{name:'countergroup'} 
-        .col-xs-6
-          .form-group
-            .new_time_selector
-        
-      .row
-        .col-xs-12
-          .from-group
-            %label.control-label.col-xs-2 Keys
-            .col-xs-10
-              %textarea{name:"searchkey",rows:10}
-              %span.help-block.text-left Please enter comma(,) seperated keys or one key per line.You can also use range . Ex 192.168.1.10~192.168.1.20
-      .row
-        .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
-          %input{type:"hidden",name:"from_date"}
-          %input{type:"hidden",name:"to_date"}
-          %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Search"}
-
-.ui_data
-  .row
-    .col-xs-12
-      .panel.panel-info
-        .panel-body
-          .progress_bar
-          %h3
-            %i.fa.fa-table 
-            List of seen keys by day wise
-          %table.table.table-sysdata
-            %thead
-              %tr
-                %th Date
-                %th Seen keys
-                %th Count
-            %tbody
-
-
-*/
 //# sourceURL=key_space_explorer.js

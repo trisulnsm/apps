@@ -1,0 +1,47 @@
+.ui_form
+  .card
+    .card-header
+      %i.fa.fa-search
+      Search Criteria
+    .card-body.form-dots
+      %form
+        .row.mb-3
+          .col-6 
+            .row
+              %label.col-form-label.col-4 Counter Group         
+              .col-8 
+                %select.form-select{name:'countergroup'} 
+          .col-6
+            .form-group
+              .new_time_selector
+          
+        .row.mb-3
+          .col-12
+            .row
+              %label.col-form-label.col-2 Keys
+              .col-10
+                %textarea{name:"searchkey",rows:10}
+                %span.form-text Please enter comma(,) seperated keys or one key per line.You can also use range . Ex 192.168.1.10~192.168.1.20
+        .row.justify-content-center
+          .col-auto
+            %input{type:"hidden",name:"from_date"}
+            %input{type:"hidden",name:"to_date"}
+            %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Search"}
+
+.ui_data
+  .row.mt-3
+    .col-12
+      .card.border-primary  
+        .card-header.bg-primary.text-white
+          %h4
+            %i.fa.fa-table 
+            List of seen keys by day wise
+        .card-body
+          .progress_bar
+          %table.table.table-sysdata
+            %thead
+              %tr
+                %th Date
+                %th Seen keys
+                %th Count
+            %tbody

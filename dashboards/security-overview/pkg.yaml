@@ -1,6 +1,6 @@
 name: Security Overview - Internal Hosts
 
-version: 0.0.4
+version: 2.0.5
 
 author: trisul
 
@@ -13,6 +13,6 @@ description:
 
 apptype: dashboard_js
 
-appresources: security_overview.js
+appresources: security_overview.js template.haml app.css
 
 dependencies: 

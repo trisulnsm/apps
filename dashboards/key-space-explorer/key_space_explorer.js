@@ -33,7 +33,39 @@ var InKeysMagicMap   =  $.klass({
   // Add a text box to filter the host
   // add table to show keys
   add_form:function(){
-    var form = $("<div id='inkey_search_form'> <form class='form-horizontal' id='fkeymatch'> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Counter Group</label> <div class='col-xs-8'> <select id='inkeys_counter_guid' name='counter[guid]'></select> </div> </div> </div> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Meters</label> <div class='col-xs-8'> <select id='inkeys_meter_id' multiple='multiple' name='meter[]' size='5'></select> </div> </div> </div> </div> <div class='row'> <div class='col-xs-6'> <div class='form-group'> <label class='control-label col-xs-4'>Key spaces</label> <div class='col-xs-8'> <textarea id='in_keys' name='keys'></textarea> <span class='help-block'>Enter one key range per line Ex.(192.168.1.10~192.168.1.20) (Port-10~Port-50) etc</span> </div> </div> </div> <div class='col-xs-6'> <div class='form_group'> <div id='new_time_selector_ks'></div> </div> </div> </div> <div class='row'> <div class='form-group'> <div class='col-xs-2 col-md-offset-4'> <input id='from_date_ks' name='from_date' type='hidden'> <input id='to_date_ks' name='to_date' type='hidden'> <input class='btn-submit' name='commit' type='submit' value='Search'> </div> </div> </div> </form> </div> <div id='in_keys_status'></div>");
+    var form = $(Haml.render(`
+      #inkey_search_form
+        %form#fkeymatch.form-horizontal
+          .row
+            .col-6
+              .row.mb-3
+                %label.col-form-label.col-4 Counter Group
+                .col-8
+                  %select#inkeys_counter_guid{name:"counter[guid]"}
+            .col-6
+              .row.mb-3
+                %label.col-form-label.col-4 Meters
+                .col-8
+                  %select#inkeys_meter_id{multiple:"multiple", name:"meter[]",size:"5"}
+          .row
+            .col-6
+              .row.mb-3
+                %label.col-form-label.col-4 Key spaces
+                .col-8
+                  %textarea#in_keys{name:"keys"}
+                  %span.form-help Enter one key range per line Ex.(192.168.1.10~192.168.1.20) (Port-10~Port-50) etc
+            .col-6
+              .row.mb-2
+                #new_time_selector_ks
+            
+          .row
+            .row
+              .col-2.offset-md-4
+                %input#from_date_ks{type:"hidden",name:"from_date"}
+                %input#to_date_ks{type:"hidden",name:"to_date"}
+                %input.btn-submit{name:"commit", type:"submit", value:"Search"}
+    #in_keys_status
+      `))
     $(this.domid).append(form);
     new ShowNewTimeSelector({divid:"#new_time_selector_ks",
                                update_input_ids:"#from_date_ks,#to_date_ks",
@@ -41,7 +73,7 @@ var InKeysMagicMap   =  $.klass({
                                default_ts:this.default_selected_time
                             });
     //auto_complete('in_keys',{cgguid:GUID.GUID_CG_HOSTS()},{});
-    $(this.domid).append("<div id='inkey_treemap' class='col-xs-12' style='padding-top:10px'></div>");
+    $(this.domid).append("<div id='inkey_treemap' class='row mt-2'></div>");
     $(this.domid).append("<div id='trp_data_inkeys'></div>");
 
     var js_params = {meter_details:this.cg_meter_json,
@@ -195,7 +227,6 @@ var InKeysMagicMap   =  $.klass({
   },
   //Get total usage for each hosts
   load_total:function(){
-    console.log(this.all_inkeys)
     var cthis = this;
     if(this.all_inkeys.length <= 0){
       this.tris_pg_bar.update_progress_bar();
@@ -236,7 +267,7 @@ var InKeysMagicMap   =  $.klass({
 
 
   reset_ui:function(){
-    var classname = 'col-xs-'+Math.floor(12/_.size(this.meters))
+    var classname = 'col-'+Math.floor(12/_.size(this.meters))
     $('#trp_data_inkeys').html(" ");
     $('#in_keys_status').html('');
     this.available_inkeys={};
@@ -265,7 +296,7 @@ var InKeysMagicMap   =  $.klass({
     container_div.children().remove();
     container_div.append( '<svg width=250 height=200></svg>');
     container_div.find("svg").attr('width', container_div.width());
-    container_div.find("svg").attr('height', container_div.height()+20);
+    container_div.find("svg").attr('height', 200);
     container_div.find("svg").css('font-size', "0.8em");
 
 
@@ -296,7 +327,7 @@ var InKeysMagicMap   =  $.klass({
       });
     });
 
-    total = "<strong class='badge'>"+h_fmtvol(total)+this.units[key]+"</strong>";
+    total = "<strong class='badge bg-secondary'>"+h_fmtvol(total)+this.units[key]+"</strong>";
     container_div.prepend('<h5>MagicMap click on '+ this.cg_meter_json[this.cgguid][0] +  ' by '+this.meters[key]+' for past '+h_fmtduration(this.recentsecs,true) + ' - '+ total +'</h5>');
 
     var root = d3.hierarchy(cthis.available_inkeys, function(ai) {
@@ -428,37 +459,7 @@ function run(opts)
 
 /*
 
-#inkey_search_form
-  %form#fkeymatch.form-horizontal
-    .row
-      .col-xs-6
-        .form-group
-          %label.control-label.col-xs-4 Counter Group
-          .col-xs-8
-            %select#inkeys_counter_guid{:name => "counter[guid]"}
-      .col-xs-6
-        .form-group
-          %label.control-label.col-xs-4 Meters
-          .col-xs-8
-            %select#inkeys_meter_id{:multiple => "multiple", :name => "meter[]", :size => "5"}
-    .row
-      .col-xs-6
-        .form-group
-          %label.control-label.col-xs-4 Key spaces
-          .col-xs-8
-            %textarea#in_keys{:name => "keys"}
-            %span.help-block Enter one key range per line Ex.(192.168.1.10~192.168.1.20) (Port-10~Port-50) etc
-      .col-xs-6
-        .form_group
-          #new_time_selector_ks
-      
-    .row
-      .form-group
-        .col-xs-2.col-md-offset-4
-          %input#from_date_ks{type:"hidden",name:"from_date"}
-          %input#to_date_ks{type:"hidden",name:"to_date"}
-          %input.btn-submit{:name => "commit", :type => "submit", :value => "Search"}
-#in_keys_status
+
       
 
 

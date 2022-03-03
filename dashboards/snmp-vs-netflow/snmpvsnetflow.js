@@ -110,16 +110,16 @@ class SNMPVSNetflow{
   show_router_details(){
     let base_div = $(this.haml_dom[2]).clone();
     let keyt = this.router_keyt.keys[0];
-    base_div.find(".panel-heading h3").text(`Router Details -${keyt.readable}`);
+    base_div.find(".card-header h4").text(`Router Details -${keyt.readable}`);
     let dl=base_div.find("dl")
-    dl.append(`<dt> IP </dt>
-              <dd>${keyt.readable}</dd>`);
+    dl.append(`<dt class='col-3'> IP </dt>
+              <dd class='col-9'>${keyt.readable}</dd>`);
     if(keyt.label != keyt.readable){
-      dl.append(`<dt> Name </dt> <dd>${keyt.label}</dd>`);
+      dl.append(`<dt class='col-3'> Name </dt> <dd class='col-9'>${keyt.label}</dd>`);
     }
     let sysdesc = keyt.attributes.find(x=> x.attr_name=="snmp.sys_descr");
     if(sysdesc){
-      dl.append(`<dt> Desc </dt> <dd>${sysdesc.attr_value}</dd>`);
+      dl.append(`<dt class='col-3'> Desc </dt> <dd class='col-9'>${sysdesc.attr_value}</dd>`);
     }
     base_div.find("dl").append(dl)
     $('.ui_data').append(base_div);
@@ -158,9 +158,9 @@ class SNMPVSNetflow{
     }
     $('.ui_data').append(base_div);
     chart_to_show.forEach(async function(ai){
-      this.report_nodes.push({type:"svg",header_text:"auto",find_by:`#${ai}_chart_${i}`,parent:"panel",h1:"h3",h2:"h3 small"});
+      this.report_nodes.push({type:"svg",header_text:"auto",find_by:`#${ai}_chart_${i}`,parent:"panel",h1:"h4",h2:"h4 small"});
       let div = $(`.${ai}`);
-      base_div.find(`.${ai} .panel-heading h3 small`).text(desc);
+      base_div.find(`.${ai} .card-header h4 small`).text(desc);
       base_div.find(`.${ai}_chart`).attr("id",`${ai}_chart_${i}`);
       let intfkey = keyt.key;
 

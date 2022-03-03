@@ -1,0 +1,30 @@
+#host_search_form.col-12
+  .card
+    .card-header
+      %h4
+        %i.fa.fa-search.fa-fw
+        Search Criteria
+    .card-body.form-dots
+      %form
+        .row.mb-3
+          .col-8
+            .row
+              #new_time_selector
+        .row.mb-3
+          .col-8
+            .row
+              %label.col-from-lable.col-4 Enter Host
+              .col-8
+                %input#search_host{placeholder:"Enter host name",type:"text"}
+        .row.justify-content-center
+          .col-auto
+            %input#from_date{name: "from_date", type:"hidden"}
+            %input#to_date{name:"to_date", type:"hidden"}
+            %input#btn_submit.btn-submit{name:"commit", type:"submit",value:"Search"}
+
+#search_host_staus.mt-3
+  .card.border-primary
+    .card-body
+      %span#process_status
+      %span#total_usage.text-success
+      #trp_data_hosts

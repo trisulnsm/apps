@@ -1,75 +1,79 @@
 .row.cidr_explore_flows
-  .col-xs-12
-    .widget
-      .widget-header
+  .col-12
+    .card
+      .card-header
         %h4 
           %i.fa.fa-search.fa-fw
           Search Criteria
-      .widget-body
-          %form.form-horizontal.cidr_explore_flows_form
+      .card-body.form-dots
+          %form.cidr_explore_flows_form
             .row
-              .col-xs-6
-                .from-group
-                   %label.control-label.col-xs-4 Subnet         
-                  .col-xs-8 
+              .col-6
+                .row.mb-3
+                   %label.col-form-label.col-4 Subnet         
+                  .col-8 
                     %input{type:"text",class:"form-control",id:"cidr_subnet",style:"width:300px"}
-                    %span.help-block Example 192.168.1.5/27
-              .col-xs-6
-                .from-group
-                   %label.control-label.col-xs-4 Maxitems         
-                  .col-xs-8 
+                    %span.form-text Example 192.168.1.5/27
+              .col-6
+                .row.mb-3
+                   %label.col-form-label.col-4 Maxitems         
+                  .col-8 
                     %input{type:"text",class:"form-control",id:"toppers_maxcount",style:"width:300px",value:50}
-                    %span.help-block Display these many top items
-              .col-xs-6
-                .form-group
+                    %span.form-text Display these many top items
+              .col-6
+                .row
                   .new_time_selector#new_time_selector
-              .col-xs-6
-                .form-group
-                  %label.control-label.col-xs-4 Hide IP Label
-                  .col-xs-8
+              .col-6
+                .row
+                  %label.col-form-label-label.col-4 Hide IP Label
+                  .col-8
                     %input{type:"checkbox"}
 
-            .row
-              .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+            .row.justify-content-center.mt-2
+              .col-auto
                 %input#from_date{type:"hidden",name:"from_date"}
                 %input#to_date{type:"hidden",name:"to_date"}
                 %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Search"}
 
 .row.cidr_explore_flows_data
-  .col-xs-12
+  .col-12.mt-2
     #cidr_progress_bar
-  .col-xs-12
-    .panel.panel-default.add_download_btn
-      .panel-heading
-        %h4
-          Matching 
-          %span.badge.badge-info.ips_count
-          IP(s) from the subnet
-          %span.cidr_subnet_text
-          %small %i.fa.fa-clock-o.fa-fw
-          %small Duration
-          %small.tint_duration
-      .panel-body
+  .col-12.mt-2
+    .card.border-primary.add_download_btn
+      .card-header.bg-primary.text-white
+        .row
+          .col-auto.me-auto
+            %h4
+              Matching 
+              %span.badge.bg-secondary.ips_count
+              IP(s) from the subnet
+              %span.cidr_subnet_text
+              %small %i.fa.fa-clock-o.fa-fw
+              %small Duration
+              %small.tint_duration
+          .col-auto.card-options
+            %ul.list-inline
+      .card-body
         %table.table.table-sysdata#top_ips_cidr{data-sheet-name:"Top IPs in CIDR"}
           %tbody
             %tr
               %td
                 %ul.list-inline.piped.key_spaces_ul
         
-  .col-xs-12
-    .widget
-      .widget-header
+  .col-12.mt-3
+    .card
+      .card-header
         %h4 
           Aggregated volumes based on matching flows
           %small
-      .widget-body.clearfix
+      .card-body
         
         %ul.nav.nav-tabs#agg_tabs
           -agg=["source_port", "dest_port", "source_ip", "dest_ip","internal_ip", "external_ip", "internal_port", "protocol","flowtag"];
           -for(let i=0;i<agg.length;i++){
           -clsname=i==0? "active": "";
-          %li{class:`${clsname}`}
-            %a{href:`#${agg[i]}`,'data-toggle':"tab"} 
+          %li{class:"nav-item"}
+            %a{data-bs-target:`#${agg[i]}`,'data-bs-toggle':"tab",href:"javascript:;;",class:`nav-link ${clsname}`} 
               -let s=$.map(agg[i].split("_"),function(e){return e.charAt(0).toUpperCase() + e.slice(1)}).join(" ");
               =`${s}`
               %span{class:`${agg[i]}_count`}
@@ -80,16 +84,16 @@
           -for(let i=0;i<agg.length;i++){
           -clsname=i==0? "active": "";
           %div.tab-pane{id:`${agg[i]}`,class:`${clsname}`,style:"padding-top:10px"}
-            .col-xs-12
-              .panel.panel-info
-                .panel-heading
+            .col-12
+              .card.border-info
+                .card-header.bg-info
                   %h4
                     -let s=$.map(agg[i].split("_"),function(e){return e.charAt(0).toUpperCase() + e.slice(1)}).join(" ");
                     =`Aggregated by ${s}`
                     %span{class:`${agg[i]}_count`} 
                     .widget-tool.pull-right
                       %ul.list-inline
-                .panel-body.clearfix
+                .card-body
                   %table.table.table-sysdata{id:`agg_${agg[i]}_tbl`,data-sheet-name:s}
                     %thead
                       %tr
@@ -100,13 +104,13 @@
                         %th.hide Raw Volume
                     %tbody
           -}
-  .col-xs-12
-    .widget
-      .widget-header 
+  .col-12.mt-2
+    .card
+      .card-header 
         %h4
           Showing 0 matches 
           %small Top matching flows(max=1000)
-      .widget-body
+      .card-body
         %table.table.table-sysdata.col_select.has_label_readable#explore_flows_tbl
           %thead
             %tr

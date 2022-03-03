@@ -39,7 +39,7 @@ SecurityOverview = $.klass({
     // build a callback chain
     //
     var cthis = this;
-    this.reset_ui();
+    this.reset_ui(opts);
     prom = prom.then( function( f) {
       cthis.updatestatus("IDS High priority alerts")
       return cthis.ax_get_all_alerts(GUID.GUID_AG_IDS(),1)
@@ -150,23 +150,24 @@ SecurityOverview = $.klass({
   },
 
 
-  reset_ui:function(){
+  reset_ui: async function(opts){
     $(this.domid).html("<span id = 'statusline'></span>");
-    this.panel = $("<div id='sec_ip_overview'> <div class='row' id='sec_top_header'> <div class='col-xs-12'> <small class='pull-right text-muted' id='sec_tint_duration'></small> </div> </div> <div class='row total_alerts'> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>High Priority IDS</small> <h2> <span class='pull-left'> <i class='fa fa-snowflake-o fa-lg text-danger'></i> </span> <span class='pull-right' id='total_ids_p1'></span> </h2> </div> </div> </div> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>Medium Priority IDS</small> <h2> <span class='pull-left'> <i class='fa fa-snowflake-o fa-lg text-info'></i> </span> <span class='pull-right' id='total_ids_p2'></span> </h2> </div> </div> </div> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>Low Priority IDS</small> <h2> <span class='pull-left'> <i class='fa fa-snowflake-o fa-lg'></i> </span> <span class='pull-right' id='total_ids_p3'></span> </h2> </div> </div> </div> <div class='col-xs-3'> <div class='panel panel-default'> <div class='panel-body'> <small class='text-muted'>Badfellas</small> <h2> <span class='pull-left'> <i class='fa fa-bug fa-lg'></i> </span> <span class='pull-right' id='total_badfellas_p0'></span> </h2> </div> </div> </div> </div> <div class='col-xs-4 breakup_ip'> <div class='panel panel-info'> <div class='panel-heading'> <div class='panel-title'> <h4> <span class='ip_readable'></span> <span class='ip_score label label-success pull-right' style='font-size:20px'></span> </h4> <small class='clearfix ip_label text-muted'></small> </div> </div> <div class='panel-body'> <table class='table table-bordered'> <tbody> <tr> <td class='priority_count'> <h4> <span class='ids_p1 label label-danger'></span> </h4> </td> <td class='priority_count'> <h4> <span class='ids_p2 label label-warning'></span> </h4> </td> <td class='priority_count'> <h4> <span class='ids_p3 label label-info'></span> </h4> </td> <td class='priority_count'> <h4> <span class='badfellas_p0 label label-primary'></span> </h4> </td> </tr> <tr> <td colspan='5'> <ul class='sigids_ids list-unstyled border_bottom'> <li class='info_text text-center'>TOP IDS</li> </ul> <ul class='sigids_badfellas list-unstyled'> <li class='info_text text-center'>TOP Badfellas</li> </ul> </td> </tr> </tbody> </table> </div> </div> </div> </div>");
+    let html_str = await get_html_from_hamltemplate(opts);
+    this.card = $(html_str)
   },
 
   update_UI:function(){
     var idx = 0;
     $('#statusline').remove();
-    var header_panel = this.panel.find('#sec_top_header').clone();
+    var header_panel = this.card.find('#sec_top_header').clone();
     var duration = "<i  class='fa fa-clock-o'></i> Duration - "+h_fmtduration(this.tmint.to.tv_sec -this.tmint.from.tv_sec );
     duration = duration + " Starting from "+ new Date(this.tmint.from.tv_sec*1000);
 
     header_panel.find('#sec_tint_duration').html(duration);
     $(this.domid).append(header_panel);
 
-    var total_panel = this.panel.find('.total_alerts');
-    total_panel.find('.col-xs-3 .panel-body').css('min-height','90px');
+    var total_panel = this.card.find('.total_alerts');
+    total_panel.find('.col-xs-3 .card-body').css('min-height','90px');
                   
    
     var total_count =_.zip.apply(_,_.pluck(this.alerts_data,'counts'));
@@ -202,15 +203,15 @@ SecurityOverview = $.klass({
       if(idx%3==0){
         $(this.domid).append($("<div>",{class:"row",id:"row_"+idx/3}));
       }
-      var panel = this.panel.find('.breakup_ip').clone();
+      var panel = this.card.find('.breakup_ip').clone();
 
       var params = {guid:GUID.GUID_CG_INTERNAL_HOSTS(),key:data.keyt.key};
       var href = "/newdash/index?dash_key=key&"+$.param(params);
       var anchor = $("<a>",{href:href,target:'_blank'}).html(data.keyt.readable)
 
-      panel.find('.panel-title .ip_readable').html(anchor);
-      panel.find('.panel-title .ip_score').html(Math.ceil(score_convert(data.score)));
-      panel.find('.panel-title small').html(data.keyt.label);
+      panel.find('.card-header .ip_readable').html(anchor);
+      panel.find('.card-header .ip_score').html(Math.ceil(score_convert(data.score)));
+      panel.find('.card-header small').html(data.keyt.label);
       
       params = {agguid:GUID.GUID_AG_IDS(),ip:data.keyt.key,priority:1};
       href = "/trisul_ids_alerts/show_by_priority?"+$.param(params);

@@ -1,6 +1,6 @@
 name: Search Keys
 
-version: 0.0.2
+version: 2.0.3
 
 author: trisul
 
@@ -13,6 +13,6 @@ description:
 
 apptype: dashboard_js
 
-appresources: search_keys.js
+appresources: search_keys.js template.haml app.css
 
 dependencies: 
