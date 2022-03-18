@@ -2,11 +2,11 @@
   .col-12
     .card
       .card-header
-        %h4 
+        %h5.card-title
           %i.fa.fa-filter.fa-fw
           Filter criteria
-      .card-body.form-dots
-        %form
+      .card-body
+        %form.form-dots
           .row
             .col-6
               .col-12.nopadding
@@ -42,11 +42,9 @@
 .ui_data.clearfix
 .router_details.mt-3
   .card.boder-info.add_download_btn
-    .card-header.bg-primary.text-white
-      .row
-        .col-auto.me-auto
-          %h4
-        .col-auto.card-options.d-flex.gap-2.justify-content-end
+    .card-header.bg-primary.d-flex.justify-content-between.align-items-center
+      %h5.card-title.text-white
+      .col-auto.card-options.d-flex.gap-2.justify-content-end
     .card-body
       %dl.row
 
@@ -54,17 +52,17 @@
   .col-6
     .card.border-primary.netflow
       .card-header.bg-primary.text-white
-        %h4 
+        %h5.card-title.text-white 
           Netflow
-          %small
+          %small.text-light.ms-2
       .card-body
         .netflow_chart
   .col-6
-    .cards.border-success.snmp
+    .card.border-success.snmp
       .card-header.bg-success.text-white
-          %h4
+          %h5.card-title.text-white
             SNMP
-            %small
+            %small.text-light.ms-2
       .card-body
         .snmp_chart
 

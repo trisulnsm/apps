@@ -30,11 +30,11 @@ var EdgeVertexMonitor= $.klass({
     this.form=$(Haml.render(`
     .card
       .card-header
-        %h4
+        %h5.card-title
           %i.fa.fa-search.fa-fw
           Search Criteria
-      .card-body.form-dots
-        %form
+      .card-body
+        %form.form-dots
           .row
             .col-6
               .row.mb-3
@@ -159,7 +159,7 @@ var EdgeVertexMonitor= $.klass({
     text = text + " ( " + this.keys.split(",").length + " ) " ;
     text = text + "<span class='text-info'>"+h_fmtduration(duration/1000,true)+" Ending " + from_date.toString()+"</span>";
 
-    card.find('.card-header h4').html(text)
+    card.find('.card-header h5').html(text)
     card.find('.card-body').append(table);
     $('#show_key_usage').append(card);
     this.get_usage();

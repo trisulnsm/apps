@@ -2,28 +2,28 @@
   .col-12
     .card
       .card-header
-        %h4 
+        %h5.card-title
           %i.fa.fa-search.fa-fw
           Search criteria - select a time intervalsdfs
-      .card-body.form-dots
-        %form
+      .card-body
+        %form.form-dots
           .row
             .col-12
               .row
                 #new_time_selector
 
-          .row.justify-content-center.mt-5
+          .row.justify-content-center.mt-1
             .col-auto
               %input#from_date{type:"hidden",name:"from_date"}
               %input#to_date{type:"hidden",name:"to_date"}
               %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
   .col-12#ixp-matrix.mt-3
     .card.border-success
-      .card-header.bg-success.text-white
-        %h4
+      .card-header.bg-success
+        %h5.card-title.text-white
           %i.fa.fa-table.fa-fw
           IXP Crossconnect Traffic Matrix 
-          %small  Shows TX and RX traffic between IXP members
+          %small.text-light  Shows TX and RX traffic between IXP members
       .card-body
         Select a time interval above..
         %table.table.table-hover.table-bordered.table-condensed

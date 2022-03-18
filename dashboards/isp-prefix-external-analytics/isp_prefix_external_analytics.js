@@ -193,12 +193,12 @@ class ISPPrefixExternalMapping{
       this.section_headers.push({h1:$(sec_hed).text()});
       await this.get_data();
 
-      this.report_nodes.push({type:"table",header_text:"auto",h1:"h4",h2:"h4 small",section_header:this.meter_index,find_by:`#table_${this.meter_index}`});
+      this.report_nodes.push({type:"table",header_text:"auto",h1:"h5",h2:"h5 small",section_header:this.meter_index,find_by:`#table_${this.meter_index}`});
       this.report_nodes.push({type:"page_break"});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h4",h2:"h4 small",find_by:`#traffic_chart_${this.meter_index}_`});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h4",h2:"h4 small",find_by:`#donut_chart_${this.meter_index}_`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`#traffic_chart_${this.meter_index}_`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`#donut_chart_${this.meter_index}_`});
       this.report_nodes.push({type:"page_break"});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h4",h2:"h4 small",find_by:`#sankey_chart_${this.meter_index}`});
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`#sankey_chart_${this.meter_index}`});
       if(this.meter_index!=3){
         this.report_nodes.push({type:"page_break",add_header_footer:false});
       }
@@ -724,8 +724,8 @@ class ISPPrefixExternalMapping{
     let tr = target.closest("tr");
     let statid = tr.data("statid-index");
     var shell_modal = create_shell_modal();
-    shell_modal.find(".modal-header h4").html("Top prefixes <small>Show top 100 prefixes </small><span class='badge'></span>");
-    var message = "<h4><i class='fa fa-spin fa-spinner'></i> Please wait ... Getting data</h4>";
+    shell_modal.find(".modal-header h5").html("Top prefixes <small>Show top 100 prefixes </small><span class='badge'></span>");
+    var message = "<h5><i class='fa fa-spin fa-spinner'></i> Please wait ... Getting data</h5>";
     shell_modal.find(".modal-body").html(message);
     $('#shortcut-div').html(shell_modal);
     $(shell_modal).modal({
@@ -741,10 +741,10 @@ class ISPPrefixExternalMapping{
       opts["nf_routerid"] = TRP.KeyT.create({key:interfaces[0]});
       if(interfaces[1]){
         if (statid == 0){
-          shell_modal.find(".modal-header h4 span.badge").addClass('badge-success');
+          shell_modal.find(".modal-header h5 span.badge").addClass('badge-success');
           opts[`nf_ifindex_out`]= TRP.KeyT.create({key:interfaces[1]});
         }else{
-          shell_modal.find(".modal-header h4 span.badge").addClass('badge-warning');
+          shell_modal.find(".modal-header h5 span.badge").addClass('badge-warning');
           opts[`nf_ifindex_in`]= TRP.KeyT.create({key:interfaces[1]});
         }
       }
@@ -753,11 +753,11 @@ class ISPPrefixExternalMapping{
 
     let prefix_toppers =resp.tag_group.find(x=>x.group_name=="prf")
     if(! prefix_toppers){
-      shell_modal.find(".modal-body h4").html("<div class='alert alert-info'>No data found</div>");
+      shell_modal.find(".modal-body h5").html("<div class='alert alert-info'>No data found</div>");
       return true;
     }
     let tag_metrics = prefix_toppers.tag_metrics.slice(0,100);
-    shell_modal.find(".modal-header h4 span.badge").html(tag_metrics.length);
+    shell_modal.find(".modal-header h5 span.badge").html(tag_metrics.length);
     var table = $("<table>",{class:"table table-sysdata"});
     table.append("<thead><tr><th>Prefix</th><th>Count </th><th sort='volume'>Volume</th></thead>");
     table.append("<tbody></tbody>");
@@ -770,7 +770,7 @@ class ISPPrefixExternalMapping{
     });
     let label = tr.data("label").split("\\")[0];
     this.target_text = `${this.target_text}->${tr.data("key")}(${label})`;
-    shell_modal.find(".modal-body h4").html(this.target_text);
+    shell_modal.find(".modal-body h5").html(this.target_text);
     shell_modal.find(".modal-body").append(table);
     table.tablesorter()
   }

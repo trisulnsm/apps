@@ -1,10 +1,10 @@
 .card
   .card-header
-    %h4 
+    %h5.card-title 
       %i.fa.fa-search
       Search Criteria
-  .card-body.form-dots
-    %form
+  .card-body
+    %form.form-dots
       .row.mb-3
         .col-6 
           .row 
@@ -65,28 +65,28 @@
     .col-12
       .card.border-primary.sankey_chart_div
         .card-header.bg-primary.text-white
-          %h4
+          %h5.card-title.text-white
             %i.fa.fa-random.fa-fw
             Sankey Chart 
-            %small
+            %small.text-light
               Thickness represents volume of traffic. Put your mouse over a node to show actual values
             %span.badge.bg-info.text-primary.bg-white.rounded-pill.fs-6.ms-2
           .row
-            %small.target
+            %small.text-light.target
         .card-body
           .animated-background
           #sankey_chart
   .row.mt-3
     .col-12
       .card.border-primary.table_div
-        .card-header.bg-primary.text-white
-          %h4
+        .card-header.bg-primary.text-white.d-block
+          %h5.card-title.text-white
             %i.fa.fa-table.fa-fw
             Table Toppers
-            %small
+            %small.text-light
             %span.badge.bg-info.text-primary.bg-white.rounded-pill.fs-6.ms-2
           .row
-            %small.target
+            %small.text-light.target
         .card-body
           %table.table.table-sysdata.toppers_table.table-hover
             %thead

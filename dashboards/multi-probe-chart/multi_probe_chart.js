@@ -97,7 +97,7 @@ class ProbesChart {
           var carddiv = $(get_card_shell());
           carddiv.addClass('border-info mt-3');
           carddiv.find(".card-header").remove();
-          carddiv.append(`<h4 class='text-center'>${probe.probe_id}</h4>`);
+          carddiv.append(`<h5 class='text-center card-title'>${probe.probe_id}</h4>`);
           carddiv.append($("<div>",{id:`${probe.probe_id}_${this.randomid}`}));
 
 

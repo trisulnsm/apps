@@ -36,16 +36,14 @@
               %i.fa.fa-bug.fa-lg
             %span#total_badfellas_p0.float-end
   .col-4.breakup_ip.mt-3
-    .card.border-info
-      .card-header.bg-info.text-white
+    .card.border-success
+      .card-header.bg-success.d-flex.justify-content-between.align-items-center
+        %h5.card-title.text-white
+          %span.ip_readable
+        .col-auto.card-options.card-options.d-flex.gap-2.align-items-center
+          %span.ip_score.badge.bg-white.text-info.fs-5
         .row
-          .col-auto.me-auto
-            %h4
-              %span.ip_readable
-          .col-auto.card-options
-              %span.ip_score.badge.bg-white.text-info.fs-5
-        .row
-          %small.clearfix.ip_label.text-muted
+          %small.clearfix.ip_label.text-light
 
       .card-body
         %table.table.table-bordered

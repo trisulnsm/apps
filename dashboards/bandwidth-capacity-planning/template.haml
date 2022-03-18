@@ -1,29 +1,28 @@
 .row.bw_planning
-  .col-xs-12
-    .widget
-      .widget-header
-        %h4 
+  .col-12
+    .card.border-primary
+      .card-header.bg-primary.d-flex.justify-content-between.align-items-center.border-bottom-0
+        %h5.card-title.text-light
           %i.fa.fa-search.fa-fw
           Search Criteria
-      .widget-body
-          %form.form-horizontal.bw_planning_form
-            .row
-              .col-xs-6
-                .form-group
-                  .new_time_selector#new_time_selector
-              .col-xs-6
-                .form-group
-                   %label.control-label.col-xs-2 Maxitems
-                  .col-xs-4
+      .card-body
+          %form.form-dots.bw_planning_form
+            .row.mb-2
+              .col-6
+                .new_time_selector#new_time_selector
+              .col-6
+                .row
+                  %label.col-form-label.col-4 Maxitems
+                  .col-8
                     %input#show_intf_toppers{type:"text",value:1000}
               
-              .col-xs-12
+              .col-12
                 %small.col-md-offset-2 Select router interfaces from the left side to generate usage reports
-                .form-group.
-                  %label.control-label.col-xs-2 Interfaces
-                  .col-xs-4
+                .row
+                  %label.col-form-label.col-2 Interfaces
+                  .col-4
                     %select#select_interface_keys_left{multiple:true,size:10,class:"form-control",style:"height:auto;font-size:10px;overflow-x:scroll"}
-                  .col-xs-1
+                  .col-1
                     %button#js_right_all.btn.btn-block{style:"width:auto;"}
                       %i.fa.fa-forward
                     %button#js_right_selected.btn.btn-block{style:"width:auto;"}
@@ -32,25 +31,25 @@
                       %i.fa.fa-chevron-left
                     %button#js_left_all.btn.btn-block{style:"width:auto;"}
                       %i.fa.fa-backward
-                  .col-xs-4
+                  .col-4
                      %select#select_interface_keys_right{multiple:true,size:10,class:"form-control",style:"height:auto;font-size:10px;overflow-x:scroll"}
-            .row
-              .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+            .row.justify-content-center.mt-3
+              .col-4
                 %input#from_date{type:"hidden",name:"from_date"}
                 %input#to_date{type:"hidden",name:"to_date"}
                 %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
 
 .bw_planning_data
-  .row
-    .col-xs-12
+  .row.mt-3
+    .col-12
       #bcp_progress_bar
-      .panel.panel-primary.add_download_btn
-        .panel-heading
-          %h3
+      .card.border-info.add_download_btn
+        .card-header.bg-info
+          %h5.card-title.text-white
             Bandwidth Capacity Planning
             %small.duration
 
-        .panel-body
+        .card-body
           %table.table.table-sysdata#table_bw_planning
             %thead
               %tr
@@ -66,7 +65,7 @@
             %tbody
           
 
-          .col-xs-3
+          .col-3
             %table.table.table-bordered
               %tbody
                 %tr 

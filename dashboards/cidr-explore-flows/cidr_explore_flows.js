@@ -102,6 +102,7 @@ class CIDRExploreFlows{
   }
 
   reset_ui(){
+
     let nodes = [];
     this.ips={};
     $('#app_error_box').addClass('hidden');
@@ -113,17 +114,17 @@ class CIDRExploreFlows{
                             "internal_ip", "external_ip", "internal_port", "protocol",
                             "flowtag"];
 
-    nodes.push({type:"table",find_by:`#top_ips_cidr`,header_text:"auto",h1:"h4"});
+    nodes.push({type:"table",find_by:`#top_ips_cidr`,header_text:"auto",h1:"h5"});
     nodes.push({type:"page_break",add_header_footer:false});
     for(let i=0; i<this.all_agg_groups.length;i++){
 
       this[this.all_agg_groups[i]]= new CIDRTaggerToppers({name:this.all_agg_groups[i],maxitems:this.maxitems});
-      nodes.push({type:"table",find_by:`#agg_${this.all_agg_groups[i]}_tbl`,header_text:"auto",h1:"h4"});
+      nodes.push({type:"table",find_by:`#agg_${this.all_agg_groups[i]}_tbl`,header_text:"auto",h1:"h5"});
 
       nodes.push({type:"page_break",add_header_footer:false});
     }
 
-    nodes.push({type:"table",find_by:`#explore_flows_tbl`,header_text:"auto",h1:"h4"});
+    nodes.push({type:"table",find_by:`#explore_flows_tbl`,header_text:"auto",h1:"h5"});
     this.key_spaces_mustache_tmpl = '{{readable}}';
 
     this.mustache_tmpl ='<td>{{readable}}</td>'+
@@ -137,8 +138,7 @@ class CIDRExploreFlows{
       $(this).tab('show');
     });
     window.flowApp = new TFlowApp("",{flow_legs_correlation:0});
-
-    window.flowApp.flow_count=10000;
+    window.flowApp.flow_count=100;
    
     this.flowModel= new TFlowModel();
     this.flowUI = new TFlowUI(this.flowModel);
@@ -148,7 +148,7 @@ class CIDRExploreFlows{
                                             divid:'cidr_progress_bar'});
     
 
-    new ExportToPDF({add_button_to:".add_download_btn",tint:this.tmint,
+    new ExportToPDF({add_button_to:".add_download_btn",add_button_class:"btn-white",tint:this.tmint,
                      download_file_name:"cidr_usage_report",
                      logo_tlhs:this.logo_tlhs,
                      report_opts:{

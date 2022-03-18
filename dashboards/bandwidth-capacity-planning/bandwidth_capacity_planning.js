@@ -31,6 +31,8 @@ class  BandwidthCapacityPlannig {
                                update_input_ids:"#from_date,#to_date",
                                default_ts:this.default_selected_time
                             },this.callback_load_router_intfs,this);
+    $('#from_date').val(this.default_selected_time.start_date);
+    $('#to_date').val(this.default_selected_time.end_date);
     this.mk_time_interval();
     this.cg_meters = {};
     await get_counters_and_meters_json(this.cg_meters);
@@ -65,8 +67,10 @@ class  BandwidthCapacityPlannig {
         label = `${label}(${keyt.label})`;
         label = label.replace(/"/g, '');
       }
-      this.opt_groups[keyt.key] = $(`<optgroup label=${label}></optgroup>`);
+      
+      this.opt_groups[keyt.key] = $(`<optgroup label='${label}'></optgroup>`);
     }
+
     let from_key = TRP.KeyT.create({label:"$0"});
     let to_key = TRP.KeyT.create({label:"$z"});
     let key_spaces = TRP.KeySpaceRequest.KeySpace.create({from_key:from_key,to_key:to_key})
@@ -114,7 +118,9 @@ class  BandwidthCapacityPlannig {
 
       }
       let option = $(`<option value='${keyt.key}'></option>`).text(label.replace(/"/g, ''));
-      this.opt_groups[rkey].append(option);
+      if(this.opt_groups[rkey]){
+        this.opt_groups[rkey].append(option);
+      }
     } 
     for(let [key, optgroup] of Object.entries(this.opt_groups)){
       if(optgroup.children().length > 0){
@@ -216,9 +222,9 @@ class  BandwidthCapacityPlannig {
     
   }
   redraw_table(){
-      let dropdown = $(`<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;;' data-toggle='tooltip' title='Click to get more options'><i class='fa fa-fw fa-ellipsis-h fa-lg'></i></a></span>`);
-      let dropdown_menu = $("<ul class='dropdown-menu  pull-right'></ul>");
-      dropdown_menu.append(`<li id='traffic_chart'><a href='javascript:;;'>Traffic Chart</a></li>`);
+      let dropdown = $(`<span class='dropdown'><a class='dropdown-toggle' data-bs-toggle='dropdown' href='javascript:;;' title='Click to get more options'><i class='fa fa-fw fa-bars'></i></a></span>`);
+      let dropdown_menu = $("<ul class='dropdown-menu border-0 shadow'></ul>");
+      dropdown_menu.append(`<li id='traffic_chart'><a class='dropdown-item' href='javascript:;;'>Traffic Chart</a></li>`);
       dropdown.append(dropdown_menu);
 
     let mustache_tmpl =`<td>{{ifindex}}</td>

@@ -2,11 +2,11 @@
   .col-12
     .card
       .card-header
-        %h4 
+        %h5.card-title
           %i.fa.fa-filter.fa-fw
           Filter criteria
-      .card-body.form-dots
-        %form
+      .card-body
+        %form.form-dots
           .row
             .col-6
               .row
@@ -33,7 +33,7 @@
 .ui_data.mt-3
   .row
     .col-12
-      %ul.nav.nav-tabs#isp_ott_apps_tabs
+      %ul.nav.nav-tabs#isp_ott_apps_tabs.tab-card
         %li.nav-item
           %a.nav-link.active{data-bs-target:"#ott_apps_overview_0",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-upload.fa-fw
@@ -49,14 +49,14 @@
           .row.mt-3
             .col-12.toppers_table_div
               .card.card-primary
-                .card-header.bg-primary.text-white
-                  %h4 
+                .card-header.bg-primary
+                  %h5.card-title.text-white
                     %i.fa.fa-table.fa-fw
                     Top Upload OTT Apps 
                     %small Show top 100 OTT Apps to which you are uploading data
                     %span.badge.bg-white.text-primary.rounded-pill.fs-6.ms-2
                   .row
-                    %small.target
+                    %small.target.text-light
                 .card-body
                   .toppers_table
                     %table
@@ -66,13 +66,13 @@
           .row.mt-3
             .col-12.traffic_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white
-                  %h4
+                .card-header.bg-primary
+                  %h5.card-title.text-white
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
                     %small Showing top OTT Apps upload traffic over the selected time period 
                   .row
-                    %small.target
+                    %small.target.text-light
                    
                 .card-body
                   .traffic_chart
@@ -80,20 +80,21 @@
           .row.mt-3
             .col-12.donut_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white
-                  %h4
-                    %i.fa.fa-pie-chart.fa-fw 
-                    Percent share of OTT Apps upload traffic 
+                .card-header.bg-primary.d-block
                   .row
-                    %small.target
+                    %h5.card-title.text-white
+                      %i.fa.fa-pie-chart.fa-fw 
+                      Percent share of OTT Apps upload traffic 
+                  .row
+                    %small.target.text-light
                 .card-body
                   .donut_chart
                   .animated-background
           .row.mt-3
             .col-12.sankey_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white
-                  %h4 
+                .card-header.bg-primary
+                  %h5.card-title.text-white 
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
                     %small
@@ -105,14 +106,14 @@
           .row.mt-3
             .col-12.toppers_table_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4 
+                .card-header.bg-success
+                  %h5.card-title.text-white 
                     %i.fa.fa-table.fa-fw
                     Top Download OTT Apps 
                     %small Show top 100 OTT Apps to which you are downloading data
                     %span.badge.bg-white.text-success.rounded-pill.fs-6.ms-2
                   .row
-                    %small.target
+                    %small.target.text-light
                 .card-body
                   .toppers_table
                     %table
@@ -122,13 +123,13 @@
           .row.mt-3
             .col-12.traffic_chart_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
+                .card-header.bg-success
+                  %h5.card-title.text-white
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
                     %small Showing top OTT Apps download traffic over the selected time period 
                   .row
-                    %small.target
+                    %small.target.text-light
                    
                 .card-body
                   .traffic_chart
@@ -136,20 +137,20 @@
           .row.mt-3
             .col-12.donut_chart_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
+                .card-header.bg-success.d-block
+                  %h5.card-title.text-white
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of OTT Apps download traffic 
                   .row
-                    %small.target
+                    %small.target.text-light
                 .card-body
                   .donut_chart
                   .animated-background
           .row.mt-3
             .col-12.sankey_chart_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4 
+                .card-header.bg-success
+                  %h5.card-title.text-white 
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
                     %small

@@ -207,7 +207,7 @@ SecurityOverview = $.klass({
 
       var params = {guid:GUID.GUID_CG_INTERNAL_HOSTS(),key:data.keyt.key};
       var href = "/newdash/index?dash_key=key&"+$.param(params);
-      var anchor = $("<a>",{href:href,target:'_blank'}).html(data.keyt.readable)
+      var anchor = $("<a>",{href:href,target:'_blank',class:"text-info"}).html(data.keyt.readable)
 
       panel.find('.card-header .ip_readable').html(anchor);
       panel.find('.card-header .ip_score').html(Math.ceil(score_convert(data.score)));

@@ -2,11 +2,11 @@
   .col-12
     .card
       .card-header
-        %h4 
+        %h5.card-title
           %i.fa.fa-filter.fa-fw
           Filter criteria
-      .card-body.form-dots
-        %form
+      .card-body
+        %form.form-dots
           .row
             .col-6
               .row
@@ -32,7 +32,7 @@
 .ui_data
   .row.mt-3
     .col-12
-      %ul.nav.nav-tabs#isp_country_overview_tabs
+      %ul.nav.nav-tabs#isp_country_overview_tabs.tab-card
         %li.nav-item
           %a.nav-link.active{data-bs-target:"#country_overview_0",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-upload.fa-fw
@@ -48,18 +48,16 @@
           .row.mt-3
             .col-12.toppers_table_div
               .card.border-primary.add_download_btn
-                .card-header.bg-primary.text-white
+                .card-header.bg-primary.d-flex.gap-2.align-items-center.d-flex.gap-2.align-items-center
+                  %h5.card-title.text-white
+                    %i.fa.fa-table.fa-fw
+                    Top Upload Country 
+                    %small.text-light Show top 100 Countries to which you are uploading data
+                    %span.badge.bg-white.text-primary.fs-6.ms-1.rounded-pill
+                  .col-auto.card-options.d-flex.gap-2.justify-content-end
                   .row
-                    .col-auto.me-auto
-                      %h4
-                        %i.fa.fa-table.fa-fw
-                        Top Upload Country 
-                        %small Show top 100 Countries to which you are uploading data
-                        %span.badge.bg-white.text-primary.fs-6.ms-1.rounded-pill
-                    .col-auto.card-options.d-flex.gap-2.justify-content-end
-                  .row
-                  %p
-                    %small.target
+                    %p
+                      %small.text-light.target
                 .card-body
                   .toppers_table
                     %table
@@ -69,13 +67,13 @@
           .row.mt-3
             .col-12.traffic_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white
-                  %h4
+                .card-header.bg-primary.d-flex.gap-2.align-items-center
+                  %h5.card-title.text-white
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
-                    %small Showing top countries upload traffic over the selected time period 
+                    %small.text-light Showing top countries upload traffic over the selected time period 
                   %p
-                    %small.target
+                    %small.text-light.target
                    
                 .card-body
                   .traffic_chart
@@ -83,24 +81,24 @@
           .row.mt-2
             .col-12.donut_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white
-                  %h4
+                .card-header.bg-primary.d-flex.gap-2.align-items-center
+                  %h5.card-title.text-white
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of country upload traffic 
                   %p
-                    %small.target
+                    %small.text-light.target
                 .card-body
                   .donut_chart
                   .animated-background
           .row.mt-3
             .col-12.sankey_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white
-                  %h4
+                .card-header.bg-primary.d-flex.gap-2.align-items-center
+                  %h5.card-title.text-white
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart
                   %p 
-                    %small
+                    %small.text-light
                       Shows upload traffic flows from the left side (Country) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
                 .card-body
                   .sankey_chart
@@ -110,14 +108,14 @@
           .row.mt-3
             .col-12.toppers_table_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
+                .card-header.bg-success.d-flex.gap-2.align-items-center
+                  %h5.card-title.text-white
                     %i.fa.fa-table.fa-fw
                     Top Download Country 
-                    %small Show top 100 countries to which you are downloading data
+                    %small.text-light Show top 100 countries to which you are downloading data
                     %span.badge.bg-white.text-success.fs-6.ms-1.rounded-pill
                   %p
-                    %small.target
+                    %small.text-light.target
                 .card-body
                   .toppers_table
                     %table
@@ -127,13 +125,13 @@
           .row.mt-3
             .col-12.traffic_chart_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
+                .card-header.bg-success.d-flex.gap-2.align-items-center
+                  %h5.card-title.text-white
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
-                    %small Showing top countries download traffic over the selected time period 
+                    %small.text-light Showing top countries download traffic over the selected time period 
                   %p
-                    %small.target
+                    %small.text-light.target
                    
                 .card-body
                   .traffic_chart
@@ -141,24 +139,24 @@
           .row.mt-3
             .col-12.donut_chart_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
+                .card-header.bg-success.d-flex.gap-2.align-items-center
+                  %h5.card-title.text-white
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of countries download traffic 
                   %p
-                    %small.target
+                    %small.text-light.target
                 .card-body
                   .donut_chart
                   .animated-background
           .row.mt-3
             .col-12.sankey_chart_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4 
+                .card-header.bg-success.d-flex.gap-2.align-items-center
+                  %h5.card-title.text-white 
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
                   %p
-                    %small
+                    %small.text-light
                       Shows download traffic flows from the left side (Country) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
                 .card-body
                   .sankey_chart

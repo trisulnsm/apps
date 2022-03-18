@@ -35,7 +35,7 @@ var InKeysMagicMap   =  $.klass({
   add_form:function(){
     var form = $(Haml.render(`
       #inkey_search_form
-        %form#fkeymatch.form-horizontal
+        %form#fkeymatch.form-dots
           .row
             .col-6
               .row.mb-3

@@ -1,11 +1,11 @@
 .drilldown_data_form
   .card
     .card-header
-      %h4
+      %h5.card-title
         %i.fa.fa-search
          Search Criteria
-    .card-body.form-dots
-        %form.drilldown_prefix_form
+    .card-body
+        %form.drilldown_prefix_form.form-dots
           .row
             .col-6
               .row
@@ -24,8 +24,8 @@
 .drilldown_data.mt-3
   .row
     .col-12
-      %h4.target
-      %ul.nav.nav-tabs#prefix_drilldown_tabs
+      %h5.card-title.text-white.target
+      %ul.nav.nav-tabs#prefix_drilldown_tabs.tab-card
         %li.nav-item
           %a.nav-link.active{data-bs-target:"#prefix_drilldown_0",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"}
             %i.fa.fa-cloud-upload.fa-fw
@@ -60,17 +60,15 @@
           .row.mt-3
             .col-12.toppers_table_div
               .card.border-primary.add_download_btn
-                .card-header.bg-primary.text-white.header_text
+                .card-header.bg-primary.header_text
+                    %h5.card-title.text-white
+                      %i.fa.fa-table.fa-fw
+                      Top Interfaces Prefix Receive
+                      %small.text-light Show top 100 interfaces by Receive (Downloading from upstream) 
+                    %span.badge.bg-white.text-primary.rounded-pill.ms-1.fs-6
+                  .col-auto.card-options.d-flex.gap-2.justify-content-end
                   .row
-                    .col-auto.me-auto
-                      %h4
-                        %i.fa.fa-table.fa-fw
-                        Top Interfaces Prefix Receive
-                        %small Show top 100 interfaces by Receive (Downloading from upstream) 
-                      %span.badge.bg-white.text-primary.rounded-pill.ms-1.fs-6
-                    .col-auto.card-options.d-flex.gap-2.justify-content-end
-                  .row
-                    %small.target
+                    %small.text-light.target
                 .card-body
                   .toppers_table
                     %table
@@ -80,36 +78,36 @@
             .row.mt-3
               .col-12.traffic_chart_div
                 .card.border-primary
-                  .card-header.bg-primary.text-white.header_text
-                    %h4
+                  .card-header.bg-primary.header_text
+                    %h5.card-title.text-white
                       %i.fa.fa-area-chart.fa-fw 
                       Stacked area chart  
-                      %small Showing top Interface traffic receive from upstream over the selected time period 
+                      %small.text-light Showing top Interface traffic receive from upstream over the selected time period 
                     .row
-                      %small.target
+                      %small.text-light.target
                   .card-body
                     .traffic_chart
                     .animated-background
             .row.mt-3
               .col-12.donut_chart_div
                 .card.border-primary
-                  .card-header.bg-primary.text-white.header_text
-                    %h4
+                  .card-header.bg-primary.header_text.d-block
+                    %h5.card-title.text-white
                       %i.fa.fa-pie-chart.fa-fw 
                       Percent share of Interface traffic receive from upstream
                     .row
-                      %small.target
+                      %small.text-light.target
                   .card-body
                     .donut_chart
                     .animated-background
             .row.mt-3
             .col-12.sankey_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white.header_text
-                  %h4
+                .card-header.bg-primary.header_text
+                  %h5.card-title.text-white
                     %i.fa.fa-random.fa-fw
                     Sankey Chart
-                    %small
+                    %small.text-light
                       Shows receive traffic flows from the left side (Prefix) to the right (Interfaces). Thickness represents volume of traffic. Put your mouse over a node to show actual values.
                 .card-body
                   .interfaces_sankey_chart
@@ -120,14 +118,16 @@
           .row.mt-3
             .col-12.toppers_table_div
               .card.border-primary
-                .card-header.bg-primary.text-white.header_text
-                  %h4
+                .card-header.bg-primary.header_text
+                  %h5.card-title.text-white
                     %i.fa.fa-table.fa-fw
                     Top Upstream Transmit  
-                    %small Show top 100 Upstream Interace by Transmit (Upload to upstream)
+                    %small.text-light Show top 100 Upstream Interace by Transmit (Upload to upstream)
                     %span.badge.bg-white.text-primary.rounded-pill.ms-1.fs-6
+                  .col-auto.card-options.d-flex.gap-2.align-items-center
+
                   .row
-                    %small.target
+                    %small.text-light.target
                 .card-body
                   .toppers_table
                     %table
@@ -137,13 +137,13 @@
           .row.mt-3
             .col-12.traffic_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white.header_text
-                  %h4
+                .card-header.bg-primary.header_text
+                  %h5.card-title.text-white
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
-                    %small Showing top interfaces upload to upstream traffic over the selected time period 
+                    %small.text-light Showing top interfaces upload to upstream traffic over the selected time period 
                   .row
-                    %small.target
+                    %small.text-light.target
                    
                 .card-body
                   .traffic_chart
@@ -151,23 +151,23 @@
           .row.mt-3
             .col-12.donut_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white.header_text
-                  %h4
+                .card-header.bg-primary.header_text.d-block
+                  %h5.card-title.text-white
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of interfaces upload traffic to upstream 
                   .row
-                    %small.target
+                    %small.text-light.target
                 .card-body
                   .donut_chart
                   .animated-background
           .row.mt-3
             .col-12.sankey_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white.header_text
-                  %h4
+                .card-header.bg-primary.header_text
+                  %h5.card-title.text-white
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
-                    %small
+                    %small.text-light
                       Shows download traffic flows from the left side (Prefix) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
                 .card-body
                   .interfaces_sankey_chart
@@ -177,14 +177,16 @@
           .row.mt-3
             .col-12.toppers_table_div
               .card.border-success
-                .card-header.bg-success.text-white.header_text
-                  %h4
+                .card-header.bg-success.header_text
+                  %h5.card-title.text-white
                     %i.fa.fa-table.fa-fw
                     Top Interfaces receive from downstream  
-                    %small Show top 100 interfaces receive from downstream (Receive form downstrem)
+                    %small.text-light Show top 100 interfaces receive from downstream (Receive form downstrem)
                     %span.badge.bg-white.text-success.rounded-pill.ms-1.fs-6
+                  .col-auto.card-options.d-flex.gap-2.align-items-center
+
                   .row
-                    %small.target
+                    %small.text-light.target
                 .card-body
                   .toppers_table
                     %table
@@ -194,13 +196,13 @@
           .row.mt-3
             .col-12.traffic_chart_div
               .card.border-success
-                .card-header.bg-success.text-white.header_text
-                  %h4
+                .card-header.bg-success.header_text
+                  %h5.card-title.text-white
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
-                    %small Showing top interfaces download from downstream traffic over the selected time period 
+                    %small.text-light Showing top interfaces download from downstream traffic over the selected time period 
                   .row
-                    %small.target
+                    %small.text-light.target
                    
                 .card-body
                   .traffic_chart
@@ -208,23 +210,23 @@
           .row.mt-3
             .col-12.donut_chart_div
               .card.border-success
-                .card-header.bg-success.text-white.header_text
-                  %h4
+                .card-header.bg-success.header_text.d-block
+                  %h5.card-title.text-white
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of interfaces download traffic from downstream
                   .row
-                    %small.target
+                    %small.text-light.target
                 .card-body
                   .donut_chart
                   .animated-background
           .row.success
             .col-12.sankey_chart_div
               .card.border-success
-                .card-header.bg-success.text-white.header_text
-                  %h4 
+                .card-header.bg-success.header_text
+                  %h5.card-title.text-white 
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
-                    %small
+                    %small.text-light
                       Shows download traffic flows from the left side (Prefix) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
                 .card-body
                   .interfaces_sankey_chart
@@ -233,14 +235,15 @@
           .row.mt-3
             .col-12.toppers_table_div
               .card.border-success
-                .card-header.bg-success.text-white.header_text
-                  %h4
+                .card-header.bg-success.header_text
+                  %h5.card-title.text-white
                     %i.fa.fa-table.fa-fw
                     Top Interfaces transmit to downstream  
-                    %small Show top 100 interfaces transmit to downstream 
+                    %small.text-light Show top 100 interfaces transmit to downstream 
                     %span.badge.bg-white.text-success.rounded-pill.ms-1.fs-6
+                  .col-auto.card-options.d-flex.gap-2.align-items-center
                   .row
-                    %small.target
+                    %small.text-light.target
                 .card-body
                   .toppers_table
                     %table
@@ -250,13 +253,13 @@
           .row.mt-3
             .col-12.traffic_chart_div
               .card.border-success
-                .card-header.bg-success.text-white.header_text
-                  %h4
+                .card-header.bg-success.header_text
+                  %h5.card-title.text-white
                     %i.fa.fa-area-chart.fa-fw 
                     Stacked area chart  
-                    %small Showing top interfaces transmit to downstream  traffic over the selected time period 
+                    %small.text-light Showing top interfaces transmit to downstream  traffic over the selected time period 
                   .row
-                    %small.target
+                    %small.text-light.target
                    
                 .card-body
                   .traffic_chart
@@ -264,23 +267,23 @@
           .row.mt-3
             .col-12.donut_chart_div
               .card.border-success
-                .card-header.bg-success.text-white.header_text
-                  %h4
+                .card-header.bg-success.header_text.d-block
+                  %h5.card-title.text-white
                     %i.fa.fa-pie-chart.fa-fw 
                     Percent share of interfaces download transmit to downstream 
                   .row
-                    %small.target
+                    %small.text-light.target
                 .card-body
                   .donut_chart
                   .animated-background
           .row.mt-3
             .col-12.sankey_chart_div
               .card.border-success
-                .card-header.bg-success.text-white.header_text
-                  %h4
+                .card-header.bg-success.header_text
+                  %h5.card-title.text-white
                     %i.fa.fa-random.fa-fw 
                     Sankey Chart 
-                    %small
+                    %small.text-light
                       Shows download traffic flows from the left side (Prefix) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
                 .card-body
                   .interfaces_sankey_chart
@@ -290,8 +293,8 @@
             .row.mt-3
               .col-6
                 .card.border-success
-                  .card-header.bg-success.text-white.header_text
-                    %h4
+                  .card-header.bg-success.header_text
+                    %h5.card-title.text-white
                       %i.fa.fa-table.fa-fw
                       Top ASNumbers
                   .card-body
@@ -306,8 +309,8 @@
                         %tbody
               .col-6
                 .card.border-success
-                  .card-header.bg-success.text-white.header_text
-                    %h4
+                  .card-header.bg-success.header_text
+                    %h5.card-title.text-white
                       %i.fa.fa-table.fa-fw
                       Top Prefixes
                   .card-body
@@ -323,8 +326,8 @@
             .row.mt-3
               .col-6
                 .card.border-success
-                  .card-header.bg-success.text-white.header_text
-                    %h4
+                  .card-header.bg-success.header_text
+                    %h5.card-title.text-white
                       %i.fa.fa-table.fa-fw
                       Top Internal Hosts
                   .card-body
@@ -339,8 +342,8 @@
                         %tbody
               .col-6
                 .card.border-success
-                  .card-header.bg-success.text-white.header_text
-                    %h4
+                  .card-header.bg-success.header_text
+                    %h5.card-title.text-white
                       %i.fa.fa-table.fa-fw
                       Top External Hosts
                   .card-body

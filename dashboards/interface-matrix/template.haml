@@ -1,22 +1,75 @@
 .row#interface-filter-form
-  .col-xs-12
-    .widget
-      .widget-header
-        %h4 
+  .col-12
+    .card
+      .card-header
+        %h5.card-title
           %i.fa.fa-filter.fa-fw
           Filter criteria select timewindow
-      .widget-body
-        %form.form-horizontal
+      .card-body
+        %form.form-dots
           .row
-            .col-xs-6
-              .form-group
-                .new_time_selector#new_time_selector
-          .row
-            .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+            .col-12
+              .new_time_selector#new_time_selector
+
+          .row.justify-content-center.mt-1
+            .col-auto
               %input#from_date{type:"hidden",name:"from_date"}
               %input#to_date{type:"hidden",name:"to_date"}
               %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
 
-  .col-xs-12
-    %h3 Top utilized interfaces 
-    #results
+.ui_data.mt-2
+  .row
+    .col-12
+      %ul.nav.nav-tabs#ifmatrix_overview_tabs.tab-card
+        %li.nav-item
+          %a.nav-link.active{data-bs-target:"#ifmatrix_overview_0",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"}
+            %i.fa.fa-upload.fa-fw
+            Transmitting to interface 
+            %span.volume_0
+        %li.nav-item
+          %a.nav-link{data-bs-target:"#ifmatrix_overview_1",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"}
+            %i.fa.fa-download.fa-fw
+            Receiving from interface
+            %span.volume_1
+      .tab-content
+        .tab-pane.active#ifmatrix_overview_0{data-use-width:1}
+          .row.mt-3
+            .col-12.toppers_table_div
+              .card.border-primary.add_download_btn
+                .card-header.bg-primary.d-block
+                  .row.d-flex.justify-content-between.align-items-center
+                    %h5.card-title.text-white
+                      %i.fa.fa-table.fa-fw
+                      %span#target_interface 
+                      is transmitting to these interfaces 
+                      %span.badge.bg-white.text-primary.rounded-pill.ms-1.fs-6
+                    .col-auto.card-options.d-flex.gap-2.justify-content-end
+                  .row
+                   %p#target_timewindow.text-light
+                .card-body
+                  .toppers_table
+                    %table
+                      %thead
+                      %tbody
+                  .animated-background
+        .tab-pane#ifmatrix_overview_1{data-use-width:1}
+          .row.mt-3
+            .col-12.toppers_table_div
+              .card.border-success
+                .card-header.bg-success.d-block
+                  .row.d-flex.justify-content-between.align-items-center
+                    %h5.card-title.text-white
+                      %i.fa.fa-table.fa-fw
+                      %span#target_interface
+                      is receiving from these interfaces 
+                      %span.badge.bg-white.text-success.rounded-pill.ms-1.fs-6
+                  .row
+                    %p#target_timewindow.text-light
+                .card-body
+                  .toppers_table
+                    %table
+                      %thead
+                      %tbody
+                    .animated-background
+
+

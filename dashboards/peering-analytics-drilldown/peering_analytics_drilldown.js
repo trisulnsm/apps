@@ -92,12 +92,12 @@ class ISPDrilldownMapping{
       await this.get_toppers(meter);
       let idx = Object.keys(this.meters).findIndex(k=>k==meter);
       section_headers.push({h1:meter});
-      nodes.push({find_by:`#table_${idx}`,type:"table",header_text:"auto",h1:"h4",section_header:idx});
+      nodes.push({find_by:`#table_${idx}`,type:"table",header_text:"auto",h1:"h5",section_header:idx});
       nodes.push({type:"page_break"});
-      nodes.push({find_by:`#peering_drilldown_${idx}_donut`,type:"svg",header_text:"auto",h1:"h4",float:"right"});
-      nodes.push({find_by:`#peering_drilldown_${idx}_traffic_chart`,type:"svg",header_text:"auto",h1:"h4",float:"right"});
+      nodes.push({find_by:`#peering_drilldown_${idx}_donut`,type:"svg",header_text:"auto",h1:"h5",float:"right"});
+      nodes.push({find_by:`#peering_drilldown_${idx}_traffic_chart`,type:"svg",header_text:"auto",h1:"h5",float:"right"});
       nodes.push({type:"page_break"});
-      nodes.push({find_by:`#peering_drilldown_${idx}_sankey`,type:"svg",header_text:"auto",h1:"h4",float:"right"});
+      nodes.push({find_by:`#peering_drilldown_${idx}_sankey`,type:"svg",header_text:"auto",h1:"h5",float:"right"});
       nodes.push({type:"page_break",add_header_footer:false});
     }
     await this.get_aggregated_flows();
@@ -110,7 +110,7 @@ class ISPDrilldownMapping{
     section_headers.push({h1:"Top Prefixes and Hosts"});
     let prefixes = ['.tag_asnumber','.tag_prefixes','.internal_ip','.external_ip'];
     for(let i=0; i<prefixes.length; i++ ){
-      nodes.push({type:"table",find_by:`${prefixes[i]} table`,header_text:"auto",h1:"h4"});
+      nodes.push({type:"table",find_by:`${prefixes[i]} table`,header_text:"auto",h1:"h5"});
       if(i!=prefixes.length-1){
         nodes.push({type:"page_break",add_header_footer:false});
       }

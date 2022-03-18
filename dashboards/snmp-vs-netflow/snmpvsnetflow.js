@@ -110,7 +110,7 @@ class SNMPVSNetflow{
   show_router_details(){
     let base_div = $(this.haml_dom[2]).clone();
     let keyt = this.router_keyt.keys[0];
-    base_div.find(".card-header h4").text(`Router Details -${keyt.readable}`);
+    base_div.find(".card-header h5").text(`Router Details -${keyt.readable}`);
     let dl=base_div.find("dl")
     dl.append(`<dt class='col-3'> IP </dt>
               <dd class='col-9'>${keyt.readable}</dd>`);
@@ -158,9 +158,9 @@ class SNMPVSNetflow{
     }
     $('.ui_data').append(base_div);
     chart_to_show.forEach(async function(ai){
-      this.report_nodes.push({type:"svg",header_text:"auto",find_by:`#${ai}_chart_${i}`,parent:"panel",h1:"h4",h2:"h4 small"});
+      this.report_nodes.push({type:"svg",header_text:"auto",find_by:`#${ai}_chart_${i}`,parent:"panel",h1:"h5",h2:"h5 small"});
       let div = $(`.${ai}`);
-      base_div.find(`.${ai} .card-header h4 small`).text(desc);
+      base_div.find(`.${ai} .card-header h5 small`).text(desc);
       base_div.find(`.${ai}_chart`).attr("id",`${ai}_chart_${i}`);
       let intfkey = keyt.key;
 

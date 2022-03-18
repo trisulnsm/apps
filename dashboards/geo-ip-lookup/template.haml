@@ -1,6 +1,6 @@
 .row.ui_form
   .col-12
-    %form.form-horizontal
+    %form.form-dots
       .row
         .col-12
           .row
@@ -12,12 +12,12 @@
         .col-auto.align-self-center{style:"padding-top:10px"}
           %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Search"}
 
-.ui_data{style:"padding-top:10px"}
+.ui_data.pt-3
   .row
     .col-12.mt-3
       .card.border-primary
         .card-header.bg-primary.text-white
-          %h4
+          %h5.card-title.text-light
             %i.fa.fa-table.fa-fw 
             Geo lookup   
             %small Showing ASNumber path,country,prefix etc..
@@ -27,7 +27,7 @@
     .col-12.mt-3
       .card.border-primary
         .card-header.bg-primary.text-white
-          %h4
+          %h5.card-title.text-light
             %i.fa.fa-table.fa-fw 
             BGP lookup   
             %small Showing ASpath,Prefix,AS

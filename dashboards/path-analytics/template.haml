@@ -8,11 +8,11 @@
 
     .card
       .card-header
-        %h4 
+        %h5.card-title
           %i.fa.fa-search.fa-fw
           Search criteria
-      .card-body.form-dots
-        %form
+      .card-body
+        %form.form-dots
           .row
             .col-6 
               .row
@@ -62,7 +62,7 @@
 .path_data.mt-3
   .row
     .col-12
-      %ul.nav.nav-tabs#isp_overview_tabs
+      %ul.nav.nav-tabs#isp_overview_tabs.tab-card
         %li.nav-item
           %a.nav-link.active.text-primary{data-bs-target:"#path_analytics_upload",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"}
             %i.fa.fa-upload.fa-fw
@@ -73,23 +73,21 @@
             %i.fa.fa-download.fa-fw
             Download
             %span.tot_download_vol
-      .tab-content{style:"padding-top:10px"}
+      .tab-content.mt-3
         .tab-pane.active#path_analytics_upload{data-use-width:1}
           .row
             .col-12
               .card.border-primary.add_download_btn
-                .card-header.bg-primary.text-white
-                  .row
-                    .col-auto.me-auto
-                      %h4
-                        %i.fa.fa-table.fa-fw
-                        Busiest Routes 
-                        %small Shows  top 100 used AS PATHS 
-                        %span.badge.bg-white.text-primary.rounded-pill.ms-1.fs-6
-                    .col-auto.card-options.d-flex.gap-2.justify-content-end
+                .card-header.bg-primary.d-flex.justify-content-between.align-items-center
+                  %h5.card-title.text-white
+                    %i.fa.fa-table.fa-fw
+                    Busiest Routes 
+                    %small.text-light Shows  top 100 used AS PATHS 
+                    %span.badge.bg-white.text-primary.rounded-pill.ms-1.fs-6
+                  .col-auto.card-options.d-flex.gap-2.justify-content-end
                   .row
                     %p
-                      %small.target
+                      %small.text-light.target
                 .card-body
                   %h3.noitify
                     %i.fa.fa-spinner.fa-spin
@@ -104,21 +102,21 @@
                       %tbody
             .col-12#nested-upload.mt-3
               .card.border-primary
-                .card-header.bg-primary.text-white
-                  %h4
+                .card-header.bg-primary
+                  %h5.card-title.text-white
                     %i.fa.fa-table.fa-fw
                     Per Hop Path Analytics  : Transmit 
-                    %small Shows volume transfer on entire path 
+                    %small.text-light Shows volume transfer on entire path 
                 .card-body
                   %table.table.table-hover.table-bordered.table-condensed
 
             .col-12.sankey_asn_upload.sankey_chart.mt-3
               .card.border-primary
-                .card-header.bg-primary.text-white
-                  %h4
+                .card-header.bg-primary
+                  %h5.card-title.text-white
                     %i.fa.fa-random.fa-fw
                     Route Per Hop Analytics - Transmit 
-                    %small Usage of busiest route segments
+                    %small.text-light Usage of busiest route segments
                 .card-body
                   .sankey_chart_upload
 
@@ -126,19 +124,17 @@
           .row
             .col-12
               .card.border-success
-                .card-header.bg-success.text-white
-                  .row
-                    .col-auto.me-auto
-                      %h4
-                        %i.fa.fa-table.fa-fw
-                        Busiest Routes 
-                        %small Shows  top 100 used AS PATHS 
-                        %span.badge.bg-white.text-success.rounded-pill.ms-1.fs-6
-                    .col-auto.card-options.d-flex.gap-2.justify-content-end
+                .card-header.bg-success.d-flex.justify-content-between.align-items-center
+                  %h5.card-title.text-white
+                    %i.fa.fa-table.fa-fw
+                    Busiest Routes 
+                    %small.text-light Shows  top 100 used AS PATHS 
+                    %span.badge.bg-white.text-success.rounded-pill.ms-1.fs-6
+                  .col-auto.card-options.d-flex.gap-2.justify-content-end
                           
                   .row
                     %p
-                      %small.target
+                      %small.text-light.target
                 .card-body
                   %h3.noitify
                     %i.fa.fa-spinner.fa-spin
@@ -154,21 +150,21 @@
 
             .col-12#nested-download.mt-3
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
+                .card-header.bg-success
+                  %h5.card-title.text-white
                     %i.fa.fa-table.fa-fw
                     Per Hop Path Analytics  : Download 
-                    %small Shows volume transfer on entire path 
+                    %small.text-light Shows volume transfer on entire path 
                 .card-body
                   %table.table.table-hover.table-bordered.table-condensed
 
             .col-12.sankey_asn_download.sankey_chart.mt-3
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
+                .card-header.bg-success
+                  %h5.card-title.text-white
                     %i.fa.fa-random.fa-fw
                     Route Per Hop Analytics - Download  
-                    %small Usage of busiest route segments
+                    %small.text-light Usage of busiest route segments
                 .card-body
                   .sankey_chart_download
 

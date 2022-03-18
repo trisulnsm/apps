@@ -1,11 +1,11 @@
 .drilldown_data_form
   .card
     .card-header
-      %h4
+      %h5.card-title
         %i.fa.fa-search
          Search Criteria
-    .card-body.form-dots
-        %form.drilldown_country_form
+    .card-body
+        %form.drilldown_country_form.form-dots
           .row
             .col-6
               .row
@@ -24,8 +24,8 @@
 .drilldown_data
   .row.mt-3
     .col-12
-      %h4.target
-      %ul.nav.nav-tabs#country_drilldown_tabs
+      %h5.card-title.text-white.target
+      %ul.nav.nav-tabs#country_drilldown_tabs.tab-card
         %li.nav-item
           %a.nav-link.active{data-bs-target:"#country_drilldown_0",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"}
             %i.fa.fa-cloud-upload.fa-fw
@@ -43,22 +43,21 @@
           %a.nav-link{data-bs-target:"#country_drilldown_agg",data-bs-toggle:"tab",role:"tab",href:"javascript:;;"}
             %i.fa.fa-table.fa-fw
             Prefixes and Hosts
-      .tab-content{style:"padding-top:10px"}
+      .tab-content.mt-3
         .tab-pane.active#country_drilldown_0{data-use-width:1}
           .row.mt-3
             .col-12.toppers_table_div
               .card.border-primary.add_download_btn
-                .card-header.bg-primary.text-white
-                  .row
-                    .col-auto.me-auto.header_text 
-                      %h4
-                        %i.fa.fa-table.fa-fw
-                        Top Interfaces country upload
-                        %small.ms-1 Show top 100 interfaces by upload
-                        %span.badge.bg-white.text-primary.rounded-pill.fs-6.ms-2
+                .card-header.bg-primary.d-block
+                  .d-flex.justify-content-between.align-items-center
+                    %h5.text-white.card-title
+                      %i.fa.fa-table.fa-fw
+                      Top Interfaces country upload
+                      %small.ms-1 Show top 100 interfaces by upload
+                      %span.badge.bg-white.text-primary.rounded-pill.fs-6.ms-2
                     .col-auto.card-options.d-flex.gap-2.justify-content-end
-                  .row
-                    %small.ms-1.target
+                  .row.d-block
+                    %p.small.ms-1.target.text-light
                 .card-body
                   .toppers_table
                     %table
@@ -68,37 +67,40 @@
           .row.mt-3
             .col-12.traffic_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white
-                  %h4
-                    %i.fa.fa-area-chart.fa-fw 
-                    Stacked area chart  
-                    %small.ms-1 Showing top Interfac uploaded to country
+                .card-header.bg-primary.d-block
                   .row
-                    %small.ms-1.target
+                    %h5.card-title.text-white
+                      %i.fa.fa-area-chart.fa-fw 
+                      Stacked area chart  
+                      %small.ms-1 Showing top Interfac uploaded to country
+                  .row
+                    %small.ms-1.target.text-light
                 .card-body
                   .traffic_chart
                   .animated-background
             .row.mt-3
               .col-12.donut_chart_div
                 .card.border-primary
-                  .card-header.bg-primary.text-white
-                    %h4
-                      %i.fa.fa-pie-chart.fa-fw 
-                      Percent share of Interface traffic upload
+                  .card-header.bg-primary.d-block
                     .row
-                      %small.target
+                      %h5.card-title.text-white
+                        %i.fa.fa-pie-chart.fa-fw 
+                        Percent share of Interface traffic upload
+                    .row
+                      %small.target.text-light
                   .card-body
                     .donut_chart
                     .animated-background
             .row.mt-3
             .col-12.sankey_chart_div
               .card.border-primary
-                .card-header.bg-primary.text-white
-                  %h3
-                    %i.fa.fa-random.fa-fw
-                    Sankey Chart
+                .card-header.bg-primary.d-block
                   .row
-                    %small
+                    %h5.card-title.text-white
+                      %i.fa.fa-random.fa-fw
+                      Sankey Chart
+                  .row
+                    %small.text-light
                       Shows receive traffic flows from the left side (AS) to the right (Interfaces). Thickness represents volume of traffic. Put your mouse over a node to show actual values.
                 .card-body
                   .interfaces_sankey_chart
@@ -109,14 +111,15 @@
           .row.mt-3
             .col-12.toppers_table_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
-                    %i.fa.fa-table.fa-fw
-                    Top Country downlaod
-                    %small.ms-1 Show top  100 interfaces download from country
-                    %span.badge.bg-white.text-success.rounded-pill.fs-6.ms-2
+                .card-header.bg-success.d-block
                   .row
-                    %small.target
+                    %h5.card-title.text-white
+                      %i.fa.fa-table.fa-fw
+                      Top Country downlaod
+                      %small.ms-1 Show top  100 interfaces download from country
+                      %span.badge.bg-white.text-success.rounded-pill.fs-6.ms-2
+                  .row
+                    %small.target.text-light
                 .card-body
                   .toppers_table
                     %table
@@ -126,13 +129,14 @@
           .row.mt-3
             .col-12.traffic_chart_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
-                    %i.fa.fa-area-chart.fa-fw 
-                    Stacked area chart  
-                    %small.ms-1 Showing top interfaces download from country
+                .card-header.bg-success.d-block
                   .row
-                    %small.target
+                    %h5.card-title.text-white
+                      %i.fa.fa-area-chart.fa-fw 
+                      Stacked area chart  
+                      %small.ms-1 Showing top interfaces download from country
+                  .row
+                    %small.target.text-light
                    
                 .card-body
                   .traffic_chart
@@ -140,24 +144,26 @@
           .row.mt-3
             .col-12.donut_chart_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
-                    %i.fa.fa-pie-chart.fa-fw 
-                    Percent share of interfaces download traffic
+                .card-header.bg-success.d-block
                   .row
-                    %small.ms-1.target
+                    %h5.card-title.text-white
+                      %i.fa.fa-pie-chart.fa-fw 
+                      Percent share of interfaces download traffic
+                  .row
+                    %small.target.text-light
                 .card-body
                   .donut_chart
                   .animated-background
           .row.mt-3
             .col-12.sankey_chart_div
               .card.border-success
-                .card-header.bg-success.text-white
-                  %h4
-                    %i.fa.fa-random.fa-fw 
-                    Sankey Chart 
+                .card-header.bg-success.d-block
                   .row
-                    %small
+                    %h5.card-title.text-white
+                      %i.fa.fa-random.fa-fw 
+                      Sankey Chart 
+                  .row
+                    %small.text-light
                       Shows download traffic flows from the left side (AS) to the right (ISP routers). Thickness represents volume of traffic. Put your mouse over a node to show actual values. 
                 .card-body
                   .interfaces_sankey_chart
@@ -167,8 +173,8 @@
             .row.mt-3
               .col-6
                 .card.border-success
-                  .card-header.bg-success.text-white
-                    %h4
+                  .card-header.bg-success.d-block
+                    %h5.card-title.text-white
                       %i.fa.fa-table.fa-fw
                       Top ASNumbers
                   .card-body
@@ -183,8 +189,8 @@
                         %tbody
               .col-6
                 .card.border-success
-                  .card-header.bg-success.text-white
-                    %h4
+                  .card-header.bg-success.d-block
+                    %h5.card-title.text-white
                       %i.fa.fa-table.fa-fw
                       Top Prefixes
                   .card-body
@@ -200,8 +206,8 @@
             .row.mt-3
               .col-6
                 .card.border-success
-                  .card-header.bg-success.text-white
-                    %h4
+                  .card-header.bg-success.d-block
+                    %h5.card-title.text-white
                       %i.fa.fa-table.fa-fw
                       Top Internal Hosts
                   .card-body
@@ -216,8 +222,8 @@
                         %tbody
               .col-6
                 .card.border-success
-                  .card-header.bg-success.text-white
-                    %h4
+                  .card-header.bg-success.d-block
+                    %h5.card-title.text-white
                       %i.fa.fa-table.fa-fw
                       Top External Hosts
                   .card-body

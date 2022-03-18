@@ -29,13 +29,3 @@
     background: rgba(0,0,0,.4);
     text-align: center;
 }
-h3 {
-  font-size: 20px;
-}
-
-h3 small {
-  font-size: 75%;
-}
-.panel-heading {
-  padding: 5px 15px;
-}

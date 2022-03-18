@@ -117,12 +117,17 @@ async function draw_asn_traffic_chart(opts){
   }
   for(let i=0; i< 2; i++){
     let models = [];
+
     let cgtoppers=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,{
       counter_group: cgguid,
       meter:i,
       time_interval:mk_time_interval(opts.new_time_selector),
       maxitems:15
     });
+    if(cgtoppers.keys.length == 0){
+      $(`#asn_traffic_chart_${i}`).html("<div class='alert alert-info'>No data found</div>");
+      continue;
+    }
     _.each(cgtoppers.keys,function(keyt,idx){
       if(keyt.key!="SYS:GROUP_TOTALS" && idx <=10){
         models.push([cgguid,keyt.key,i,keyt.label])

@@ -3,12 +3,13 @@ var DailyKeyUsage = $.klass({
   init:function(opts){
     let card =$(get_card_shell());
     card.addClass('mb-3');
-    card.find(".card-body").addClass('form-dots');
-    card.find(".card-header h4").html("<i class='fa fa-search fa-fw'></i> Search Criteria")
+    card.find(".card-body");
+    card.find(".card-header h5").html("<i class='fa fa-search fa-fw'></i> Search Criteria")
     $(opts["divid"]).append(card);
     card.attr("id","dail_key_key_report_form");
     opts["card_id"]="#dail_key_key_report_form";
     this.trp_form = new TrpFormClass(opts,$.proxy(function(){this.reset_ui()},this));
+    
 
   },
 
@@ -22,7 +23,7 @@ var DailyKeyUsage = $.klass({
     var card =$(get_card_shell());
     card.attr("id","mmm_data_card");
     card.find(".card-body").attr("id","mma_data");
-    card.find(".card-header h4").text("Day wise key report");
+    card.find(".card-header h5").text("Day wise key report");
     $(this.trp_form.domid).append(card);
 
     var table = $("<table>",{id:"mma_data_table",class:"table table-sysdata"});
@@ -39,7 +40,7 @@ var DailyKeyUsage = $.klass({
 
   //get dates between to dates
   load_tint_array:function(){
-   this.dates = get_dates(new Date(this.trp_form.from_date),new Date(this.trp_form.to_date));
+   this.dates = get_dates(new Date($('#from_date').val()),new Date($('#to_date').val()));
    this.tris_pg_bar = new TrisProgressBar({max:this.dates.length,
                                             divid:'sq_content',
                                             slim: true});
@@ -70,7 +71,7 @@ var DailyKeyUsage = $.klass({
                     return ai.values[meter].toNumber();
                   })
               .value();
-      $('#mmm_data_card').find(".card-header h4").text("Day wise key usage report for "+resp.key.readable);
+      $('#mmm_data_card').find(".card-header h5").text("Day wise key usage report for "+resp.key.readable);
       this.update_table(resp.counter_group,meter,data,t[0]);
       this.get_data();
     },this));
