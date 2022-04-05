@@ -306,13 +306,13 @@ class ASNPathAnalytics{
                       report_opts:{
                         header:{h1:"Path Analytics"},
                         section_headers:[{h1:"Upload"},{h1:"download"}],
-                        nodes:[{find_by:`#table_upload`,type:"table",header_text:"auto",h1:"h4",h2:"h4 small",section_header:0},
+                        nodes:[{find_by:`#table_upload`,type:"table",header_text:"auto",h1:"h5",h2:"h5 small",section_header:0},
                                {type:"page_break"},
-                               {find_by:`.sankey_chart_upload`,type:"svg",header_text:"auto",h1:"h4",h2:"h4 small"},
+                               {find_by:`.sankey_chart_upload`,type:"svg",header_text:"auto",h1:"h5",h2:"h5 small"},
                                {type:"page_break",add_header_footer:false},
-                               {find_by:`#table_download`,type:"table",header_text:"auto",h1:"h4",h2:"h4 small",section_header:1},
+                               {find_by:`#table_download`,type:"table",header_text:"auto",h1:"h5",h2:"h5 small",section_header:1},
                                {type:"page_break"},
-                               {find_by:`.sankey_chart_upload`,type:"svg",header_text:"auto",h1:"h4",h2:"h4 small"}]
+                               {find_by:`.sankey_chart_upload`,type:"svg",header_text:"auto",h1:"h5",h2:"h5 small"}]
                       }
     });
 
@@ -478,7 +478,7 @@ class ASNPathAnalytics{
       // row for each child
       _.chain(node.children).values().sortBy((a)=>{return -a.metric}).each( (c) => {
         let tr=$('<tr>');
-        tr.append(`<td> <h4>${c.key}  <span class="text-primary pull-right" title=${c.metric}>${h_fmtvol(c.metric)}</span></h4>${c.name.replace(/:\d$/,"")} peers: ${_.size(c.children)}</td>`);
+        tr.append(`<td> <h5>${c.key}  <span class="text-primary pull-right" title=${c.metric}>${h_fmtvol(c.metric)}</span></h5>${c.name.replace(/:\d$/,"")} peers: ${_.size(c.children)}</td>`);
 
         let td=$('<td>', {style:"padding:0px"});
         let subtbl=$('<table>',{class:"table table-condensed table-bordered", style:"margin-bottom:0px"});
