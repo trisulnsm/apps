@@ -1,6 +1,6 @@
 name: Customer AS Analytics
 
-version: 2.0.1
+version: 2.0.2
 
 author: trisul
 
@@ -13,7 +13,7 @@ description:
 
 apptype: dashboard_js
 
-appresources: app.css template.haml customer_as_traffic.js
+appresources: customer_as_traffic.js app.css template.haml
 
 
 jsparams:
