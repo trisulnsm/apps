@@ -1,0 +1,53 @@
+.row.peeringanalytics_form
+  .col-12
+    .card
+      .card-header
+        %h5.card-title
+          %i.fa.fa-filter.fa-fw
+          Filter criteria
+      .card-body
+        %form.form-dots
+          .row
+            .col-6
+              .row
+                .new_time_selector#new_time_selector
+          .row
+            .col-6
+              .row
+                %label.col-form-label.col-4 Routers         
+                .col-8 
+                  %select#routers.form-select{name:'routers'} 
+            .col-6
+              .row
+                %label.col-form-label.col-4 Interfaces 
+                .col-8 
+                  %select.form-select#interfaces{name:'interfaces'}
+          .row.justify-content-center.mt-3
+            .col-auto
+              %input#from_date{type:"hidden",name:"from_date"}
+              %input#to_date{type:"hidden",name:"to_date"}
+              %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
+
+
+.ui_data.mt-3
+  .row
+    .col-12.toppers_table_div
+      #pg_bar
+      .card.border-success.add_download_btn
+        .card-header.bg-success.d-flex.justify-content-between.align-items-center
+          %h5.card-title.text-white
+            %i.fa.fa-table.fa-fw
+            Top ASNumbers
+            %small.ms-2 Show top asnumber for receive and transmit
+            %span.badge.bg-white.text-success.rounded-pill.fs-6.ms-2
+          .col-auto.card-options.d-flex.gap-2.align-items-center
+            %ul.list-inline
+          .row
+            %p
+              %small.target.text-light
+        .card-body
+          .toppers_table
+            %table#asn_toppers
+              %thead
+              %tbody
+            .animated-background
