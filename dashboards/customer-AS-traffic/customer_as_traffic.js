@@ -166,12 +166,12 @@ class CustomerASNTraffic{
   }
 
   async get_data_all_meters_data(){
+    this.draw_traffic_chart();
     let keys = Object.keys(this.meter_details_in);
     this.toppers_data = {}
     this.combined_totals = [0,0]
-    for (const [i, key] of keys.entries()) {
-      this.meter_index = i;
-      this.meter_details_in[key].forEach(async(m)=>{
+    for(const [i,meters] of Object.values(this.meter_details_in).entries()){
+      for(const m of meters){
         this.meter = m;
         await this.get_data();
         this.tris_pg_bar.update_progress_bar();
@@ -184,12 +184,10 @@ class CustomerASNTraffic{
           this.toppers_data[keyt.key].data[i]=this.toppers_data[keyt.key].data[i]+keyt.metric.toNumber()
         },this);
 
-        if(i==1 && m==4){
-          this.draw_table();
-        }
-      },this);
+      }
       
-    };
+    }
+    this.draw_table();
     this.form.find("#btn_submit").prop('disabled', false);
     new ExportToPDF({add_button_to:".add_download_btn",
                       tint:this.tmint,
@@ -324,10 +322,34 @@ class CustomerASNTraffic{
     this.sys_group_totals = this.sys_group_totals*this.top_bucket_size;
 
   }
+  async draw_traffic_chart(){
+    let interfaces = document.getElementById('interfaces');
 
+    let guid = GUID.GUID_CG_FLOWINTERFACE();
+    let models = [[1,"Recv"],[2,"Transmit"]].map(m=>{
+      return [guid,interfaces[interfaces.selectedIndex].value,m[0],m[1]]
+    });
+    var model_data = {
+      models:JSON.stringify(models),
+      from_date:this.form.find("#from_date").val(),
+      to_date:this.form.find("#to_date").val(),
+      valid_input:1,
+      surface:"MRTGTABLE",
+      title:interfaces[interfaces.selectedIndex].text.replace(/"/g,"").replace(/'/g,""),
+      legend_position:"bottom"
+    };
+    $.ajax({
+      url:"/trpjs/generate_chart",
+      data:model_data,
+      success:function(resp){
+        $('.interface_traffic_chart').html(resp)
+      }
+
+    });
+  }
 
   async draw_table(){
-    document.querySelector(".animated-background").remove();
+    document.querySelector(".toppers_table_div .animated-background").remove();
     // get uniq prefix and interfaces
     let rows=[];
     var table = this.data_dom.find(".toppers_table").find("table");
@@ -350,7 +372,7 @@ class CustomerASNTraffic{
       let label = topper.label.split("\\").shift();
       let desc = topper.description.replace("\\\\","")
 
-      let dropdown = `<span class='dropdown'>
+      let dropdown = `<span class='dropdown float-end'>
                         <a class='dropdown-toggle asn_dropdown' data-bs-toggle='dropdown' href='javascript:;;'  title='Click to get more options'>
                           <i class='fa fa-server'></i>
                           </a>
@@ -363,9 +385,9 @@ class CustomerASNTraffic{
       rows.push(`<tr data-key="${topper.key}" data-label="${readable}(${label})">
                       <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
                       <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
-                      <td>${desc}</td>
-                      <td>${h_fmtvol(cgtoppers[i].data[0]*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
-                      <td>${h_fmtvol(cgtoppers[i].data[1]*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
+                      <td>${truncate(desc,15)}</td>
+                      <td><span class='d-flex'>${h_fmtvol(cgtoppers[i].data[0]*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</span></td>
+                      <td><span class='d-flex'>${h_fmtvol(cgtoppers[i].data[1]*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</span></td>
                       <td>${dropdown}</td>
                       </tr>`);
 
@@ -399,15 +421,17 @@ class CustomerASNTraffic{
       valid_input:1,
       expression:"Receive=(1+2),Transmit=(3+4)",
       surface:"MRTGTABLE",
-      title:key = tr.dataset.label,
+      title:tr.dataset.label,
       legend_position:"bottom"
     };
     let url = "/trpjs/generate_chart_lb?"+$.param(model_data);
     load_modal(url);
   }
+
+
   pagination_callback(){
-    add_barspark("#asn_toppers",{barspark_id:"barsparkrecv",sys_group_totals:this.combined_totals[0] ,width:50,height:16});
-    add_barspark("#asn_toppers",{barspark_id:"barsparktrans",sys_group_totals:this.combined_totals[1],width:50,height:16});
+    add_barspark("#asn_toppers",{barspark_id:"barsparkrecv",sys_group_totals:this.combined_totals[0] ,width:40,height:16});
+    add_barspark("#asn_toppers",{barspark_id:"barsparktrans",sys_group_totals:this.combined_totals[1],width:40,height:16});
     for ( const link of [...document.querySelectorAll('#asn_toppers ul.dropdown-menu li a')] )  {
       link.addEventListener("click",this.dropdown_click.bind(this));
     };

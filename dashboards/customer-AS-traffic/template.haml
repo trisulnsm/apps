@@ -31,10 +31,25 @@
 
 .ui_data.mt-3
   .row
+    #pg_bar.my-2
+    .col-12
+
+      .card.border-success.mb-3
+        .card-header.bg-secondary.d-flex.justify-content-between.align-items-center
+          %h5.card-title.text-white
+            %i.fa.fa-chart
+            Traffic Chart
+          .col-auto.card-options.d-flex.gap-2.align-items-center
+            %ul.list-inline
+          .row
+            %p
+              %small.target.text-light
+        .card-body
+          .interface_traffic_chart
+
     .col-12.toppers_table_div
-      #pg_bar
-      .card.border-success.add_download_btn
-        .card-header.bg-success.d-flex.justify-content-between.align-items-center
+      .card.border-success
+        .card-header.bg-secondary.d-flex.justify-content-between.align-items-center
           %h5.card-title.text-white
             %i.fa.fa-table.fa-fw
             Top ASNumbers
@@ -46,8 +61,9 @@
             %p
               %small.target.text-light
         .card-body
+          .animated-background
           .toppers_table
             %table#asn_toppers
               %thead
               %tbody
-            .animated-background
+            
