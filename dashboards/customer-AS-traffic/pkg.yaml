@@ -1,0 +1,24 @@
+name: Customer AS Analytics
+
+version: 1.0.0
+
+author: trisul
+
+
+description: 
+   short: View ASN traffic maps for customers
+   long:  |
+      A breakup of ASN to router mappings in table and chart format
+      This plugin is a visualization of that. 
+
+apptype: dashboard_js
+
+appresources: customer_as_traffic.js app.css template.haml
+
+
+jsparams:
+  crosskey_router: "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}"
+  crosskey_interface: "{A6411875-1C9C-2C6C-4879-54C437223815}"
+  meters:
+    receive: [1,3]
+    transmit: [2,4]
