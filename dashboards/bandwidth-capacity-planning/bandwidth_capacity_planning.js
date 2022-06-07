@@ -264,17 +264,18 @@ class  BandwidthCapacityPlannig {
     let td = target.closest("td");
     switch(target.parent().attr("id")){
       case "traffic_chart":
+        let models=[[1,"Receive"],[2,"Transmit"]].map(m=>{
+          return {counter_group:GUID.GUID_CG_FLOWINTERFACE(),meter:m[0],key:td.data("key"),label:m[1]}
+        })
         var p = {
-          key:td.data("key"),
-          description:`${td.data("router")}-${td.data("label")}`,
-          meter:[1,2],
-          mrtg:true,
-          name:"Interface usage",
-          guid:GUID.GUID_CG_FLOWINTERFACE() ,
+          models:JSON.stringify(models),
+          show_default_title:1,
+          surface:"MRTG",
+          show_table:1,
           from_date:this.form.find("#from_date").val(),
           to_date:this.form.find("#to_date").val()
         }
-        load_modal("/trpjs/generate_chart_lb?" + $.param(p));
+        new ApexChartLB(p,{modal_title:"Interface Usage"});
       break;
     }
   }

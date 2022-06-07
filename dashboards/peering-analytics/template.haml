@@ -32,36 +32,51 @@
 .ui_data.mt-3
   .row
     .col-12
-      %ul.nav.nav-tabs#isp_overview_tabs.tab-card
+      .card.add_download_btn
+        .card-header.d-flex.justify-content-between.align-items-center.d-flex.justify-content-between.justify-content-between.align-items-center
+          %h5.card-title
+            %i.fa.fa-line-chart
+            Interface Traffic
+          .col-auto.card-options.d-flex.gap-2.align-items-center
+        .card-body
+          .row
+            .col-10
+              #peer_interface_traffic
+            .col-2
+              #peer_interface_gauge
+
+
+    .col-12.mt-4
+      %ul#isp_overview_tabs.nav.nav-tabs.tab-card.border-top-0.border-start-0.border-end-0.border.border-primary.rounded-4.bg-white
         %li.nav-item
           %a.nav-link.active{data-bs-target:"#isp_overview_0",data-toggle:"tab",role:"tab",href:"javascript:;;"}
             %i.fa.fa-cloud-upload.fa-fw
             %i.fa.fa-download.fa-fw
-            Receive from Upstream
+            Recv from Upstream
             %span.volume_0
         %li.nav-item
           %a.nav-link{data-bs-target:"#isp_overview_1",data-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-cloud-upload.fa-fw
             %i.fa.fa-upload.fa-fw
-            Transmit to Upstream
+            Trans to Upstream
             %span.volume_1
         %li.nav-item
           %a.nav-link{data-bs-target:"#isp_overview_2",data-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-cloud-download.fa-fw
             %i.fa.fa-download.fa-fw
-            Receive from Downstream
+            Recv from Downstream
             %span.volume_2
         %li.nav-item
           %a.nav-link{data-bs-target:"#isp_overview_3",data-toggle:"tab",role:"tab",href:"javascript:;;"} 
             %i.fa.fa-cloud-download.fa-fw
             %i.fa.fa-upload.fa-fw
-            Transmit to Downstream
+            Trans to Downstream
             %span.volume_3
       .tab-content.mt-3
         .tab-pane.active#isp_overview_0{data-use-width:1}
           .row.mt-3
             .col-12.toppers_table_div
-              .card.border-primary.add_download_btn
+              .card.border-primary
                 .card-header.bg-primary.d-flex.justify-content-between.align-items-center.d-flex.justify-content-between.align-items-center
                   %h5.card-title.text-white
                     %i.fa.fa-table.fa-fw

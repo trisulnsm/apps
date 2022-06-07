@@ -1,6 +1,6 @@
 name: Peering Analytics
 
-version: 2.0.28
+version: 2.0.29
 
 author: trisul
 
@@ -16,7 +16,7 @@ apptype: dashboard_js
 appresources: peering_analytics.js app.css crosskey_router_asn.json crosskey_interface_asn.json flowtager_asn.json flowtager_prefix.json template.haml  ctl_countervar_flowas_router.json ctl_countervar_flowas_interface.json cardinality_flowas_paths.json cardinality_flowas_xprefix.json contextmenu.js crosskey_counter_bgp_peer_as.json crosskey_counter_bgp_peer_as_drilldown.json ctl_countervar_bgppeeras_router.json ctl_countervar_bgppeeras_interface.json
 
 dependencies: 
-  webtrisul: 6.5.2228
+  webtrisul: 6.5.2380
 
 jsparams:
   crosskey_router: "{9DD99CA2-4353-09BF-9BFA-64E38AE2FD5C}"

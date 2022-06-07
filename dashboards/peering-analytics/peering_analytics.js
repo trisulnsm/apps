@@ -9,7 +9,6 @@
 */
 class ISPOverviewMapping{
   constructor(opts) {
-
     this.dom = $(opts.divid);
     this.rand_id="";
    
@@ -36,6 +35,7 @@ class ISPOverviewMapping{
     }
     this.probe_id = opts.probe_id;
     this.dash_params = opts.dash_params;
+    this.percentile = opts.percentile
     this.add_form(opts);
   }
 
@@ -163,6 +163,8 @@ class ISPOverviewMapping{
     return false;
   }
   async get_data_all_meters_data(){
+    await this.draw_interface_traffic_chart()
+
     let keys = Object.keys(this.meter_details_in);
     keys = keys.slice(0,4);  
     for (const [i, key] of keys.entries()) {
@@ -198,6 +200,8 @@ class ISPOverviewMapping{
     });
     this.report_nodes = [];
     this.section_headers=[];
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",find_by:`#peer_interface_traffic`});
+      this.report_nodes.push({type:"page_break"});
     _.each([this.meter_details_in.upstream_receive,this.meter_details_in.upstream_transmit,this.meter_details_in.downstream_receive,this.meter_details_in.downstream_transmit],$.proxy(function(idx,ai){
       this.report_nodes.push({type:"table",header_text:"auto",h1:"h5",h2:"h5 small",section_header:ai,find_by:`#table_${ai}`});
       this.report_nodes.push({type:"page_break"});
@@ -212,7 +216,34 @@ class ISPOverviewMapping{
     },this));
   }
 
-  
+  async draw_interface_traffic_chart(){
+
+    let models = [];
+    let interfaceDrop = document.querySelector(`#interfaces${this.rand_id}`);
+    let interfaceKey=interfaceDrop.options[interfaceDrop.selectedIndex].value;
+
+    models.push({counter_group:GUID.GUID_CG_FLOWINTERFACE(),key:interfaceKey,meter:1,label:"Received"});
+    models.push({counter_group:GUID.GUID_CG_FLOWINTERFACE(),key:interfaceKey,meter:2,label:"Transmit"});
+    let opts ={
+      models:JSON.stringify(models),
+      surface:"MRTG",
+      show_table:1,
+      window_fromts:this.tmint.from.tv_sec,
+      window_tots:this.tmint.to.tv_sec,
+      divid:"#peer_interface_traffic",
+      show_default_title:1,
+      height:250
+    }
+
+    draw_apex_chart(opts);
+
+   new InterfaeGauge({interfaceKey:interfaceKey,
+                  divid:"#peer_interface_gauge",
+                  tint:{ window_fromts:this.tmint.from.tv_sec,window_tots:this.tmint.to.tv_sec}});
+
+
+
+  }
   update_target_text(){
     let selected_router = $('#routers'+this.rand_id).val();
     let selected_interface = $('#interfaces'+this.rand_id).val();
@@ -292,12 +323,19 @@ class ISPOverviewMapping{
       counter_group: this.cgguid,
       time_interval: this.tmint ,
       meter:this.meter,
-      maxitems:5000
+      maxitems:100,
+      
+    }
+    if(this.percentile > 0){
+      req_opts["get_percentiles"]=[this.percentile];
     }
     if(this.filter_text){
       req_opts["key_filter"]=this.filter_text
     }
+    console.log(req_opts)
+
     this.cgtoppers_resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, req_opts);
+    console.log(this.cgtoppers_resp.keys[1])
     this.cgtoppers_resp.keys = this.sort_hash(this.cgtoppers_resp,"metric");
     
     // reject sysgrup and xx
@@ -307,6 +345,7 @@ class ISPOverviewMapping{
     
     this.sys_group_totals = 1;
     _.each(this.cgtoppers_resp.keys,function(topper){
+
       this.sys_group_totals = this.sys_group_totals + topper.metric.toNumber(); 
     },this);
     this.sys_group_totals = this.sys_group_totals*this.top_bucket_size;
@@ -355,10 +394,14 @@ class ISPOverviewMapping{
     this.table_id = `table_${this.meter_index}${this.rand_id}`;
     table.attr("id",this.table_id)
     table.addClass('table table-hover table-sysdata');
-    table.find("thead").append(`<tr><th>ASN</th><th style="width:200px">Name</th>
-                                <th>Full name</th>
-                                <th sort='volume' barspark='auto'>Volume</th>
-                                <th sort='volume'>Avg <br/>Bandwidth</th><th>Uniq <br/>ASPath</th><th>Uniq <br/>Prefix</th><th class='nosort'></th>
+    let percentile_th = ``;
+    if(this.percentile > 0){
+    percentile_th = `<th sort='volume'>${this.percentile}th</th>`;
+
+    }
+    table.find("thead").append(`<tr><th>ASN</th><th>Name</th>
+                                <th sort='volume' barspark='auto'>Volume</th><th sort='volume'>Max <br/>Bandwidth</th>
+                                <th sort='volume'>Avg <br/>Bandwidth</th>${percentile_th}<th>Uniq <br/>ASPath</th><th>Uniq <br/>Prefix</th><th class='nosort'></th>
                                 </tr>`);
     let totvol=this.cgtoppers_resp.keys.reduce((a,b)=>a +parseInt(b.metric),0);
     $('.volume_'+this.meter_index).text(` (${h_fmtvol(totvol*this.top_bucket_size)}) `);
@@ -366,7 +409,7 @@ class ISPOverviewMapping{
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       
-      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-bs-toggle='dropdown' href='javascript:;; data-bs-toggle='tooltip' title='Click to get more options'><i class='fa fa-fw fa-server'></i></a></span>");
+      let dropdown = $("<span class='dropdown float-end'><a class='dropdown-toggle' data-bs-toggle='dropdown' href='javascript:;; data-bs-toggle='tooltip' title='Click to get more options'><i class='fa fa-fw fa-server'></i></a></span>");
       let dropdown_menu = $("<ul class='dropdown-menu'></ul>");
       dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Drilldown</a></li>");
       dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Traffic Chart</a></li>");
@@ -390,19 +433,28 @@ class ISPOverviewMapping{
       let desc = topper.description.replace("\\\\","")
       let avg_bw = topper.metric_avg.toNumber(); 
       avg_bw = avg_bw*this.multiplier;
+      let max_bw = topper.metric_max.toNumber()*this.multiplier; 
+    
       let intf_readable = topper.readable.split("\\").pop();
       let router_ip = intf_readable.split("_")[0];
 
-      let statids = Object.values(this.meter_details_in).slice(0,2)
+      let statids = Object.values(this.meter_details_in).slice(0,2);
+      let percentile_td = '';
+      if(this.percentile > 0 && topper.percentiles.length >0 ){
+        let percentile_val=topper.percentiles[0].value.toNumber()*this.multiplier;
+        percentile_td=`<td>${h_fmtbw(percentile_val)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>`
+
+      }
       rows.push(`<tr data-key="${key}" data-statid=${this.meter} data-label="${topper.label}" 
                     data-readable="${topper.readable}" data-full_key="${full_key}"
                     data-statids="${statids}" data-statid-index=${this.meter_index}
                     data-router_ip="${router_ip}">
                       <td class='linkdrill'><a href='javascript:;;'>${readable}</a></td>
-                      <td class='linkdrill'><a href='javascript:;;'>${label}</a></td>
-                      <td>${desc}</td>
+                      <td class='linkdrill'><a href='javascript:;;'>${label}</a><p class='small'>${desc}</p></td>
                       <td>${h_fmtvol(topper.metric*this.top_bucket_size)}${this.meter_types[this.meter].units.replace("ps","")}</td>
+                      <td>${h_fmtbw(max_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
                       <td>${h_fmtbw(avg_bw)}${this.meter_types[this.meter].units.replace("Bps","bps")}</td>
+                      ${percentile_td}
                       <td>${uniques[full_key][0]}</td>
                       <td>${uniques[full_key][1]}</td>
                       <td>${dropdown[0].outerHTML}</td>
@@ -468,45 +520,53 @@ class ISPOverviewMapping{
       labels[i] =  cgtoppers[i].label.replace(/:0|:1|:2/g,"").split("\\").shift();
       labels[i] = labels[i].substr(0,parseInt((width/100)*6))+"("+h_fmtvol(values[i])+")";
     }
-    var data = [{
-      values:values,
-      labels:labels,
-      hoverinfo: 'label+percent+name',
-      hole: .4,
-      type: 'pie'
-    }];
-
-    var layout = {
-      title: '',
-      annotations: [
-        {
-          font: {
-            size: 20
+    
+    var options = {
+      series: values.flat(),
+      chart: {
+        height:250,
+        type: "pie",
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function (val,i) {
+          
+          return `${h_fmtvol(i.w.globals.seriesTotals[i.seriesIndex])}(${val.toFixed(1)})%`
+        },
+      },
+      
+      labels: labels,
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200
           },
-          showarrow: false,
-          text: '',
-          x: 0.17,
-          y: 0.5
+            legend: {
+              position: "bottom"
+            }
         }
-      ],
-      height: 400,
-      width:  width,
-      showlegend: true,
+      }]
     };
-    var ploty_options = { modeBarButtonsToRemove: ['hoverClosestCartesian','toggleSpikelines','hoverCompareCartesian',
-                               'sendDataToCloud'],
-                          showSendToCloud:false,
-                          responsive: true };
-    Plotly.newPlot(this.donut_div_id, data, layout,ploty_options);
+    let ele = document.querySelector(`#${this.donut_div_id}`);
+    if(ele.offsetWidth==0){
+      let width = ele.closest('.tab-pane').parentElement.offsetWidth;
+      options.chart.width=width;
+    }
+    var chart = new ApexCharts(ele, options);
+
+
+    chart.render();
 
     if(cgtoppers.length==0){
       $('#'+this.donut_div_id).html("<div class='alert alert-info'>No data found.</div>"); 
     }
 
-    var keys = _.map(cgtoppers,function(ai){return ai.key});
+    var keys = _.map(cgtoppers,function(ai){return [ai.key,ai.label]});
     for(let i=0 ; i < keys.length;i++){
-      if(keys[i].includes("\\")){
-        keys[i]=keys[i].replace(/\\/g,"\\\\")
+      if(keys[i][0].includes("\\")){
+        keys[i][0]=keys[i][0].replace(/\\/g,"\\\\");
+        keys[i][1]=keys[i][1].split("\\")[0];
       }
     }
     if(keys.length==0){
@@ -516,7 +576,7 @@ class ISPOverviewMapping{
     let cgguid = this.cgguid;
     let key = this.filter_text;
     let meter = this.meter;
-    let ref_model =[];
+    
     if(this.filter_text==null || this.filter_text == undefined){
       cgguid = GUID.GUID_CG_AGGREGATE();
       key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter_index];
@@ -525,30 +585,21 @@ class ISPOverviewMapping{
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
      // meter = [1,2,3,4][this.meter_index];
     }
+    let models=[];
+    keys.forEach(k=>{
+      models.push({counter_group:this.cgguid,meter:meter,key:k[0],label:k[1]})
+    })
+    let ref_model = [{counter_group:cgguid,key:key,meter:meter}];
 
-    ref_model = [cgguid,key,meter,"Total"]
-
-    var model_data = {cgguid:this.cgguid,
-        meter:this.meter,
-        key:keys.join(","),
+    var model_data = {
+        models:JSON.stringify(models),
         from_date:this.form.find("#from_date"+this.rand_id).val(),
         to_date:this.form.find("#to_date"+this.rand_id).val(),
-        valid_input:1,
         surface:"STACKEDAREA",
-        ref_model:ref_model,
-        show_title:false,
-        legend_position:"bottom"
+        legend_position:"bottom",
+        divid:`#${this.trfchart_div_id}`
     };
-    await $.ajax({
-      url:"/trpjs/generate_chart",
-      data:model_data,
-      context:this,
-      success:function(resp){
-        $('#'+this.trfchart_div_id).html(resp);
-
-      }
-    });
-
+    draw_apex_chart(model_data);
   }
   async draw_sankey_chart(){
     this.sankey_div_id = `sankey_chart_${this.meter_index}${this.rand_id}`;
@@ -690,16 +741,17 @@ class ISPOverviewMapping{
         let desc = this.form.find("#routers option:selected").text();
         desc = `${desc} / ${this.form.find("#interfaces option:selected").text()}`
         desc = `${desc} / ${tr.data("label")}`;
+        let models=[{counter_group:this.cgguid,
+                    key:tr.data("full_key").toString().replace(/\\/g,"\\\\"),
+                    meter:tr.data("statid")}]
         let params = {
-          key: tr.data("full_key").toString().replace(/\\/g,"\\\\"),
-          statids:tr.data("statid"),
-          cgguid:this.cgguid,
           window_fromts:this.tmint.from.tv_sec,
           window_tots:this.tmint.to.tv_sec,
-          description:desc
+          models:JSON.stringify(models),
+          show_table:1,
+          surface:"mrtg"
         }
-        let url = "/trpjs/generate_chart_lb?"+$.param(params);
-        load_modal(url);
+        new ApexChartLB(params,{modal_title:desc});
         break;
       case 2:
         let link_params =$.param({dash_key:"key",
