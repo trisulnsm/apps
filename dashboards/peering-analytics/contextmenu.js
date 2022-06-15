@@ -9,7 +9,7 @@ function getattachmentpoints(){
 
 function onclick(opts){
   let lp=$.param({dash_key_regex:"gitPeeringAnalytics",
-                   key:opts.key,
+                   key:opts.key.key,
                    valid_input:1,
                    window_fromts:opts.time_interval.window_fromts,
                    window_seconds:opts.time_interval.window_secs

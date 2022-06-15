@@ -181,7 +181,7 @@ class ISPDrilldownMapping{
     table.attr("id",`table_${idx}`);
     this.dom.find(`#peering_drilldown_${idx}`).find(".toppers_table_div").find('.animated-background').remove();
     table.addClass('table table-hover table-sysdata');
-    table.find("thead").append("<tr><th>Router</th><th>Interface</th><th sort='volume' barspark='auto'>Volume </th>></tr>");
+    table.find("thead").append("<tr><th>Router</th><th>Interface</th><th sort='volume' barspark='auto' >Volume </th></tr>");
     let cgtoppers =  this.toppers_data;
     let totvol = 0;
     totvol=cgtoppers.reduce((a,b)=>a +parseInt(b.metric),0);
@@ -256,7 +256,7 @@ class ISPDrilldownMapping{
       rows.push(`<tr>
                                 <td>${anchor}</td>
                                 <td>${anchor1}</td>
-                                <td>${h_fmtvol(topper.metric)}</td>
+                                <td><span class='flexwrapper d-flex' style='min-width:120px'><span class='ms-1'>${h_fmtvol(topper.metric)}</span></span></td>
                                 </tr>`);
       
 
@@ -272,7 +272,7 @@ class ISPDrilldownMapping{
     this.donut_div_id = `peering_drilldown_${idx}_donut`;
     this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart_div").find('.animated-background').remove();
     this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart").append($("<div>",{id:this.donut_div_id}));
-    let width = this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart_div").width()
+    let width = this.dom.find(`#peering_drilldown_${idx}`).find(".donut_chart_div").width();
     if($(`#${this.donut_div_id}`).is(":hidden")){
       let tab_pane = $(`#${this.donut_div_id}`).closest('.tab-pane');
       width = tab_pane.width()-50;
@@ -284,58 +284,66 @@ class ISPDrilldownMapping{
       values[i] =  cgtoppers[i].metric;
       labels[i] =  cgtoppers[i].keyt.label.replace(/:0|:1|:2/g,"");
     }
-    var data = [{
-      values:values,
-      labels:labels,
-      domain: {column: 0},
-      hoverinfo: 'label+percent+name',
-      hole: .4,
-      type: 'pie'
-    }];
-
-    var layout = {
-      title: 'Toppers',
-      annotations: [
-        {
-          font: {
-            size: 20
+     
+    var options = {
+      series: values.flat(),
+      chart: {
+        height:250,
+        type: "pie",
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function (val,i) {
+          
+          return `${h_fmtvol(i.w.globals.seriesTotals[i.seriesIndex])}(${val.toFixed(1)})%`
+        },
+      },
+      
+      labels: labels,
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200
           },
-          showarrow: false,
-          text: '',
-          x: 0.17,
-          y: 0.5
+            legend: {
+              position: "bottom"
+            }
         }
-      ],
-      height: 400,
-      width:  width,
-      showlegend: true,
+      }]
     };
-    var ploty_options = { modeBarButtonsToRemove: ['hoverClosestCartesian','toggleSpikelines','hoverCompareCartesian',
-                               'sendDataToCloud'],
-                          showSendToCloud:false,
-                          responsive: true };
-    Plotly.newPlot(this.donut_div_id, data, layout,ploty_options);
+    let ele = document.querySelector(`#${this.donut_div_id}`);
+    if(ele.offsetWidth==0){
+      let width = ele.closest('.tab-pane').parentElement.offsetWidth;
+      options.chart.width=width;
+    }
+    var chart = new ApexCharts(ele, options);
+
+
+    chart.render();
+
   }
   async draw_traffic_chart(meter_name,idx){
+    let models = [];
     let cgtoppers =  this.toppers_data.slice(0,this.maxitems);
     let keys = cgtoppers.map(x=>x.keyt.key);
     for(let i=0 ; i < keys.length;i++){
       if(keys[i].includes("\\")){
         keys[i]=keys[i].replace(/\\/g,"\\\\")
       }
+      models.push({counter_group:this.crosskey_interface,meter:this.meters[meter_name],key:keys[i]});
     }
     this.traf_chart_id = `peering_drilldown_${idx}_traffic_chart`
     this.dom.find(`#peering_drilldown_${idx}`).find(`.traffic_chart`).attr("id",this.traf_chart_id);
     let ref_model = [this.parent_cgguid,this.keyt.key,this.meters[meter_name],"Total"];
-    var model_data = {cgguid:this.crosskey_interface,
-        meter:this.meters[meter_name],
-        key:keys.join(","),
+    var model_data = {models:JSON.stringify(models),
         from_date:this.form.find("#from_date").val(),
         to_date:this.form.find("#to_date").val(),
-        valid_input:1,
-        ref_model:ref_model,
+        surface:"STACKEDAREA",
         show_title:false,
-        legend_position:"bottom"
+        label_type:"multi_keys",
+        legend_position:"bottom",
+        divid:'#'+this.traf_chart_id
       };
     this.dom.find(`#peering_drilldown_${idx}`).find(`.traffic_chart_div`).find(".animated-background").remove();
 
@@ -343,15 +351,7 @@ class ISPDrilldownMapping{
       $('#'+this.traf_chart_id).html("no data found");
       return
     }
-    $.ajax({
-      url:"/trpjs/generate_chart",
-      data:model_data,
-      context:this,
-      success:function(resp){
-        $('#'+this.traf_chart_id).html(resp);
-
-      }
-    });
+    draw_apex_chart(model_data)
   }
    async draw_sankey_chart(meter_name,midx){
 

@@ -327,7 +327,7 @@ class CustomerASNTraffic{
 
     let guid = GUID.GUID_CG_FLOWINTERFACE();
     let models = [[1,"Recv"],[2,"Transmit"]].map(m=>{
-      return [guid,interfaces[interfaces.selectedIndex].value,m[0],m[1]]
+      return {counter_group:guid,key:interfaces[interfaces.selectedIndex].value,meter:m[0],label:m[1]}
     });
     var model_data = {
       models:JSON.stringify(models),
@@ -336,16 +336,11 @@ class CustomerASNTraffic{
       valid_input:1,
       surface:"MRTGTABLE",
       title:interfaces[interfaces.selectedIndex].text.replace(/"/g,"").replace(/'/g,""),
-      legend_position:"bottom"
+      legend_position:"bottom",
+      divid:'.interface_traffic_chart'
     };
-    $.ajax({
-      url:"/trpjs/generate_chart",
-      data:model_data,
-      success:function(resp){
-        $('.interface_traffic_chart').html(resp)
-      }
-
-    });
+   
+    draw_apex_chart(model_data);
   }
 
   async draw_table(){

@@ -93,7 +93,7 @@ class ISPOverviewMapping{
     $('#to_date').val(this.default_selected_time.end_date);
     this.mk_time_interval();
 
-    this.load_routers_interfaces();
+    await this.load_routers_interfaces();
 
     this.cg_meters = {};
     await get_counters_and_meters_json(this.cg_meters);
@@ -332,10 +332,8 @@ class ISPOverviewMapping{
     if(this.filter_text){
       req_opts["key_filter"]=this.filter_text
     }
-    console.log(req_opts)
 
     this.cgtoppers_resp=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, req_opts);
-    console.log(this.cgtoppers_resp.keys[1])
     this.cgtoppers_resp.keys = this.sort_hash(this.cgtoppers_resp,"metric");
     
     // reject sysgrup and xx
