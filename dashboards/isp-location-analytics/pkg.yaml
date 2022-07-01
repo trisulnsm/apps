@@ -19,8 +19,8 @@ dependencies:
   webtrisul: 6.5.2380
 
 jsparams:
-  parent_counter_group: "{1EB5B954-5869-4498-2009-FA2336287726}",
-  counter_group: "{94703E9E-6A3B-4FBD-6B9F-8E653C827058}",
+  parent_counter_group: "{1EB5B954-5869-4498-2009-FA2336287726}"
+  counter_group: "{94703E9E-6A3B-4FBD-6B9F-8E653C827058}"
   meters:
     upstream_receive: 1
     upstream_transmit: 2
