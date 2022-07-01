@@ -1,12 +1,12 @@
 name: ISP Location Analytics
 
-version: 2.0.01
+version: 2.0.02
 
 author: trisul
 
 
 description: 
-   short: View ASN traffic maps for routers(grouping)
+   short: View ASN traffic maps for routers by location
    long:  |
       A breakup of ASN to router mappings in table and chart format
       This plugin is a visualization of that. 
