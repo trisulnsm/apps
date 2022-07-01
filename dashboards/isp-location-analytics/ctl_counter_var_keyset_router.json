@@ -1,0 +1,61 @@
+{
+  "TrisulCtlCountervar": [
+    [
+      {
+        "id": 305,
+        "ItemGUID": "{1EB5B954-5869-4498-2009-FA2336287726}",
+        "SubItem": 0,
+        "VarType": 4,
+        "TopNCount": 50,
+        "BottomNCount": 0,
+        "Name": "Bps",
+        "Description": "Total",
+        "Units": "Bps"
+      },
+      {
+        "id": 306,
+        "ItemGUID": "{1EB5B954-5869-4498-2009-FA2336287726}",
+        "SubItem": 1,
+        "VarType": 4,
+        "TopNCount": 50,
+        "BottomNCount": 0,
+        "Name": "Bps",
+        "Description": "Flow Volume",
+        "Units": "Bps"
+      },
+      {
+        "id": 307,
+        "ItemGUID": "{1EB5B954-5869-4498-2009-FA2336287726}",
+        "SubItem": 2,
+        "VarType": 4,
+        "TopNCount": 50,
+        "BottomNCount": 0,
+        "Name": "Rps",
+        "Description": "Flow Records",
+        "Units": "Rps"
+      },
+      {
+        "id": 308,
+        "ItemGUID": "{1EB5B954-5869-4498-2009-FA2336287726}",
+        "SubItem": 3,
+        "VarType": 5,
+        "TopNCount": 20,
+        "BottomNCount": 20,
+        "Name": "uniqs",
+        "Description": "Unused Cardinality counter",
+        "Units": "Uniques "
+      },
+      {
+        "id": 309,
+        "ItemGUID": "{1EB5B954-5869-4498-2009-FA2336287726}",
+        "SubItem": 4,
+        "VarType": 5,
+        "TopNCount": 20,
+        "BottomNCount": 20,
+        "Name": "uniqs",
+        "Description": "Unused Cardinality counter",
+        "Units": "Uniques "
+      }
+    ]
+  ]
+}

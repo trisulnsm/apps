@@ -1,0 +1,28 @@
+name: ISP Location Analytics
+
+version: 2.0.01
+
+author: trisul
+
+
+description: 
+   short: View ASN traffic maps for routers(grouping)
+   long:  |
+      A breakup of ASN to router mappings in table and chart format
+      This plugin is a visualization of that. 
+
+apptype: dashboard_js
+
+appresources: isp_location_analytics.js app.css template.haml crosskey_routergroup_flowasn.json  keyset_router.json ctl_counter_var_keyset_router.json ctl_counter_var_crosskey.json
+
+dependencies: 
+  webtrisul: 6.5.2380
+
+jsparams:
+  parent_counter_group: "{1EB5B954-5869-4498-2009-FA2336287726}",
+  counter_group: "{94703E9E-6A3B-4FBD-6B9F-8E653C827058}",
+  meters:
+    upstream_receive: 1
+    upstream_transmit: 2
+    downstream_receive: 3
+    downstream_transmit: 4

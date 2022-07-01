@@ -1,0 +1,39 @@
+{
+  "TrisulCounterGroupCrosskey": [
+    [
+      {
+        "id": 1,
+        "CounterGUID": "{94703E9E-6A3B-4FBD-6B9F-8E653C827058}",
+        "ParentCounterGUID": "{120A3124-E2BB-47BD-6C64-71BBB861C428}",
+        "CrosskeyCounterGUID": "{1EB5B954-5869-4498-2009-FA2336287726}",
+        "CrosskeyThirdCounterGUID": null,
+        "KeyLength1": null,
+        "KeyLength2": null,
+        "KeyLength3": null,
+        "BalanceDepth1": null,
+        "BalanceDepth2": null
+      }
+    ],
+    [
+      {
+        "id": 58,
+        "CounterGUID": "{94703E9E-6A3B-4FBD-6B9F-8E653C827058}",
+        "Name": "FlowGens_Location_x_ASN",
+        "Description": "Automatically track ASN for flow interfaces",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 60000,
+        "TrackHiWater": 8000,
+        "TrackLoWater": 5000,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Active",
+        "CardinalityEstimateBits": "",
+        "TopperTrafficOnly": "False",
+        "EnableSliceKeys": 1,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1656670713,
+        "ResolverCounterGUID": ""
+      }
+    ]
+  ]
+}

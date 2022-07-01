@@ -1,0 +1,33 @@
+{
+  "TrisulCounterGroupKeyset": [
+    [
+      {
+        "id": 1,
+        "CounterGUID": "{1EB5B954-5869-4498-2009-FA2336287726}",
+        "ParentCounterGUID": "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
+        "MeterOnlyKeysets": "true"
+      }
+    ],
+    [
+      {
+        "id": 57,
+        "CounterGUID": "{1EB5B954-5869-4498-2009-FA2336287726}",
+        "Name": "FlowGens Locations",
+        "Description": "ASN for router locations",
+        "TopNCommitIntervalSecs": 300,
+        "BucketSizeMS": 60000,
+        "TrackHiWater": 8000,
+        "TrackLoWater": 5000,
+        "TailPruneFactor": null,
+        "LastTopperBucketTS": null,
+        "RowStatus": "Active",
+        "CardinalityEstimateBits": null,
+        "TopperTrafficOnly": null,
+        "EnableSliceKeys": 1,
+        "CreateTimestamp": null,
+        "ModifyTimestamp": 1656674044,
+        "ResolverCounterGUID": null
+      }
+    ]
+  ]
+}
