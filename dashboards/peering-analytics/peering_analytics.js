@@ -132,6 +132,7 @@ class ISPOverviewMapping{
       update_dom_st : "interfaces"+this.rand_id,
       chosen:true
     }
+
     $(`#routers${this.rand_id}`).find("option").remove();
     await load_routers_interfaces_dropdown(load_router_opts);
   }
@@ -221,9 +222,16 @@ class ISPOverviewMapping{
     let models = [];
     let interfaceDrop = document.querySelector(`#interfaces${this.rand_id}`);
     let interfaceKey=interfaceDrop.options[interfaceDrop.selectedIndex].value;
+    if(interfaceKey=='0'){
+      let routerDrop = document.querySelector(`#routers${this.rand_id}`);
+      let routerkey=routerDrop.options[routerDrop.selectedIndex].value;
+      models.push({counter_group:GUID.GUID_CG_FLOWGENS(),key:routerkey,meter:0,label:"Total"});
 
-    models.push({counter_group:GUID.GUID_CG_FLOWINTERFACE(),key:interfaceKey,meter:1,label:"Received"});
-    models.push({counter_group:GUID.GUID_CG_FLOWINTERFACE(),key:interfaceKey,meter:2,label:"Transmit"});
+    }
+    else{
+      models.push({counter_group:GUID.GUID_CG_FLOWINTERFACE(),key:interfaceKey,meter:1,label:"Received"});
+      models.push({counter_group:GUID.GUID_CG_FLOWINTERFACE(),key:interfaceKey,meter:2,label:"Transmit"});
+    }
     let opts ={
       models:JSON.stringify(models),
       surface:"MRTG",
