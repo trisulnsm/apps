@@ -53,11 +53,17 @@ class ISPDrilldownMapping{
     this.agg_flows={};
     this.dom.find(".drilldown_data").remove();
     this.dom.append($(this.haml_dom[1]).clone());
+    this.tris_pg_bar = new TrisProgressBar({max:6,
+                                            divid:'progress_bar_analytics',
+                                            slim: true });
   }
   submit_form(){
+    
     this.form.find(".btn-submit").attr("disabled",true);
     //this.form.find('#drilldown_asn').val('9498');
     this.key=this.form.find('#drilldown_asn').val();
+    this.key=this.key.replace(/ASNUMBER|ASN|AS|\s/gi,"");
+   
     if(this.key.length ==0 ){
       alert("ASNumber filed can't be empty.");
       this.form.find(".btn-submit").removeAttr("disabled");
@@ -66,6 +72,7 @@ class ISPDrilldownMapping{
     }
     this.mk_time_interval();
     this.reset_ui();
+
     this.get_keyt();//starting point for the request
     return false;
   }
@@ -84,6 +91,7 @@ class ISPDrilldownMapping{
       counter_group: GUID.GUID_CG_ASN(),
       label:this.key,
     });
+    this.tris_pg_bar.update_progress_bar();
     this.keyt=resp.keys[0];
     this.update_description();
     let nodes = [];
@@ -99,8 +107,10 @@ class ISPDrilldownMapping{
       nodes.push({type:"page_break"});
       nodes.push({find_by:`#peering_drilldown_${idx}_sankey`,type:"svg",header_text:"auto",h1:"h5",float:"right"});
       nodes.push({type:"page_break",add_header_footer:false});
+      this.tris_pg_bar.update_progress_bar();
     }
     await this.get_aggregated_flows();
+    this.tris_pg_bar.update_progress_bar();
     this.draw_aggregate_table('internal_ip');
     this.draw_aggregate_table('external_ip');
     this.draw_aggregate_table('tag_asnumber');

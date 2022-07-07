@@ -193,6 +193,9 @@ class ISPOverviewMapping{
       e.preventDefault()
       $(this).tab('show')
     });
+    this.tris_pg_bar = new TrisProgressBar({max:5,
+                                            divid:'progress_bar_analytics',
+                                            slim: true });
     this.report_nodes = [];
     this.section_headers=[];
       this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",find_by:`#router_loc_traffic`});
@@ -233,6 +236,7 @@ class ISPOverviewMapping{
     }
 
     draw_apex_chart(opts);
+    this.tris_pg_bar.update_progress_bar();
 
 
 
@@ -317,6 +321,8 @@ class ISPOverviewMapping{
     await this.draw_table();
     await this.draw_chart();
     //await this.draw_sankey_chart();
+    this.tris_pg_bar.update_progress_bar();
+
   }
 
 

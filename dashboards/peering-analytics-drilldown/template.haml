@@ -15,6 +15,7 @@
                  %label.con-from-label.col-4 ASNumber         
                 .col-8 
                   %input{type:"text",class:"form-control",id:"drilldown_asn",style:"width:300px"}
+                  %span.form-help Enter ASNumber Ex.15169
           .row.justify-content-center.mt-3
             .col-auto
               %input#from_date{type:"hidden",name:"from_date"}
@@ -24,6 +25,7 @@
 .drilldown_data.mt-3
   .row
     .col-12
+      #progress_bar_analytics
       %h5.card-title.text-white.target
       %ul#peering_drilldown_tabs.nav.nav-tabs.tab-card.border-top-0.border-start-0.border-end-0.border.border-primary.rounded-4.bg-white
         %li.nav-item

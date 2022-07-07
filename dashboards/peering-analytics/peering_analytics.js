@@ -199,6 +199,9 @@ class ISPOverviewMapping{
       e.preventDefault()
       $(this).tab('show')
     });
+    this.tris_pg_bar = new TrisProgressBar({max:5,
+                                            divid:'progress_bar_analytics',
+                                            slim: true });
     this.report_nodes = [];
     this.section_headers=[];
       this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",find_by:`#peer_interface_traffic`});
@@ -222,6 +225,7 @@ class ISPOverviewMapping{
     let models = [];
     let interfaceDrop = document.querySelector(`#interfaces${this.rand_id}`);
     let interfaceKey=interfaceDrop.options[interfaceDrop.selectedIndex].value;
+
     if(interfaceKey=='0'){
       let routerDrop = document.querySelector(`#routers${this.rand_id}`);
       let routerkey=routerDrop.options[routerDrop.selectedIndex].value;
@@ -245,9 +249,12 @@ class ISPOverviewMapping{
 
     draw_apex_chart(opts);
 
-   new InterfaeGauge({interfaceKey:interfaceKey,
+    new InterfaeGauge({interfaceKey:interfaceKey,
                   divid:"#peer_interface_gauge",
                   tint:{ window_fromts:this.tmint.from.tv_sec,window_tots:this.tmint.to.tv_sec}});
+
+    this.tris_pg_bar.update_progress_bar();
+
 
 
 
@@ -359,6 +366,8 @@ class ISPOverviewMapping{
     await this.draw_table();
     await this.draw_chart();
     await this.draw_sankey_chart();
+    this.tris_pg_bar.update_progress_bar();
+
   }
 
 
