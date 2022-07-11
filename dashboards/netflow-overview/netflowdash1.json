@@ -1,0 +1,131 @@
+{
+  "WebtrisulDashboard": [
+    [
+      {
+        "id": 10045,
+        "webtrisul_addon_package_id": 1,
+        "trisul_web_user_id": 2,
+        "key": "dashboard10045",
+        "name": "Netflow Dashboard",
+        "description": "Netflow overview dashboard ",
+        "moduri": "/webtrisul_module/getmod",
+        "axupdateuri": "/newdash/traffic_axsavepos",
+        "collapsedmods": null,
+        "undecoratedmods": ",10319,10320,10321,10322",
+        "pos_head": null,
+        "pos_left": null,
+        "pos_right": null,
+        "pos_foot": null,
+        "pos_top1": null,
+        "pos_top2": null,
+        "pos_mid3": null,
+        "pos_bot2": null,
+        "pos_bot1": null,
+        "pos_mid4": null,
+        "pos_reserved1": null,
+        "pos_reserved2": null,
+        "pos_reserved3": null,
+        "dashboard_type": null,
+        "pos_flexi": "10319:w3,10320:w3,10321:w3,10322:w3,10324:w6,64:w6,10323:w6,10325:w6"
+      }
+    ],
+    [
+      {
+        "id": 10319,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 61,
+        "name": "Routers",
+        "description": "Routers",
+        "options": "{\"cgguid\":\"{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}\",\"statid\":\"0\",\"key\":\"FlowGens[[{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}]]\",\"label\":\"Routers\",\"color\":\"primary\",\"aggregation\":\"latest\",\"show_trends\":1,\"chart_color\":\"#2794eb\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 10320,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 61,
+        "name": "Interfaces",
+        "description": "Interfaces",
+        "options": "{\"cgguid\":\"{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}\",\"statid\":\"0\",\"key\":\"FlowIntfs[[{C0B04CA7-95FA-44EF-8475-3835F3314761}]]\",\"label\":\"Interfaces\",\"color\":\"success\",\"aggregation\":\"latest\",\"show_trends\":1,\"chart_color\":\"#6fb92c\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 10321,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 61,
+        "name": "Total Throughput",
+        "description": "Total network throughput",
+        "options": "{\"cgguid\":\"{393B5EBC-AB41-4387-8F31-8077DB917336}\",\"statid\":\"0\",\"key\":\"TOTALBW\",\"label\":\"Total Volume\",\"color\":\"info\",\"aggregation\":\"total\",\"show_trends\":0,\"chart_color\":\"#adb5bd\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 10322,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 61,
+        "name": "Bandwidth",
+        "description": "Latest Bandwidth",
+        "options": "{\"cgguid\":\"{393B5EBC-AB41-4387-8F31-8077DB917336}\",\"statid\":\"0\",\"key\":\"TOTALBW\",\"label\":\"Total Volume\",\"color\":\"secondary\",\"aggregation\":\"latest\",\"show_trends\":0,\"chart_color\":\"#2794eb\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 10324,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 102,
+        "name": "Top Routers",
+        "description": "Routers",
+        "options": "{\"surface\":\"SQUARELINE\",\"models\":\"[{\\\"cgguid\\\":\\\"{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}\\\",\\\"meter\\\":\\\"0\\\",\\\"topcount\\\":\\\"25\\\"}]\",\"refmodel\":\"[{}]\",\"show_table\":1,\"legend_position\":\"top\",\"title\":\"\",\"height\":\"300\",\"show_range_slider\":0,\"pcap_range_marker\":0,\"show_time_selector\":0,\"cgguid\":\"{47820C27-14BA-E3C3-7B0C-40810CFF0E52}\",\"meter\":\"0\",\"key\":\"\",\"label\":\"\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 64,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 22,
+        "name": "Threshold Crossing Alerts",
+        "description": "Most recently fired alerts",
+        "options": "{\"maxcount\":2}",
+        "stretch_to_fit": 1,
+        "maintain_aspect_ratio": 0,
+        "show_decoration": 1
+      },
+      {
+        "id": 10323,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 1,
+        "name": "Top Interfaces Bandwidth",
+        "description": "Interfaces",
+        "options": "{\"topcount\":\"5\",\"cgguid\":\"{C0B04CA7-95FA-44EF-8475-3835F3314761}\",\"statid\":\"0\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      },
+      {
+        "id": 10325,
+        "webtrisul_addon_package_id": 1,
+        "webtrisul_addon_package_mod_id": 0,
+        "webtrisul_module_template_id": 1,
+        "name": "Top Interfaces Utilization",
+        "description": "Interfaces",
+        "options": "{\"topcount\":\"5\",\"cgguid\":\"{C0B04CA7-95FA-44EF-8475-3835F3314761}\",\"statid\":\"4\"}",
+        "stretch_to_fit": null,
+        "maintain_aspect_ratio": null,
+        "show_decoration": null
+      }
+    ]
+  ]
+}
