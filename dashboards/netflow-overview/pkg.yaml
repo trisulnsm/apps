@@ -1,0 +1,17 @@
+name: Netflow Overview
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Netflow top overview
+   long:  |
+      Netflow dashoard shows overview of number of routers, interfaces,
+      current throughput, top routers and ports by bandwidth 
+
+apptype: dashboard_share
+
+appresources:  netflowdash1.json 
+
+dependencies : 
