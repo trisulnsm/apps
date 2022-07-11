@@ -1,0 +1,67 @@
+.row.peeringanalytics_form
+  .col-xs-12
+    .widget
+      .widget-header
+        %h4 
+          %i.fa.fa-filter.fa-fw
+          Filter criteria
+      .widget-body
+        %form.form-horizontal
+          .row
+            .col-xs-6
+              .form-group
+                .new_time_selector#new_time_selector
+          .row
+            .col-xs-6
+              .form-group 
+                %label.control-label.col-xs-4 Routers         
+                .col-xs-8 
+                  %select#routers{name:'routers'} 
+            .col-xs-6
+              .form-group 
+                %label.control-label.col-xs-4 Interfaces 
+                .col-xs-8 
+                  %select#interfaces{name:'interfaces'}
+          .row
+            .col-xs-10.col-md-offset-4{style:"padding-top:10px"}
+              %input#from_date{type:"hidden",name:"from_date"}
+              %input#to_date{type:"hidden",name:"to_date"}
+              %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Submit"}
+
+
+.ui_data.mt-3
+  .row
+    .col-xs-12
+       #pg_bar.my-2
+      .panel.panel-primary.add_download_btn
+        .panel-heading
+          %h3
+            %i.fa.fa-chart
+            Traffic Chart
+          .col-auto.card-options.d-flex.gap-2.align-items-center
+            %ul.list-inline
+          
+            %p
+              %small.target
+        .panel-body
+          .interface_traffic_chart
+
+    .col-xs-12.toppers_table_div
+      .panel.panel-success
+        .panel-heading
+          %h3.card-title.text-white
+            %i.fa.fa-table.fa-fw
+            Top ASNumbers
+            %small.ms-2 Show top asnumber for receive and transmit
+            %span.badge.badge-info
+          .col-auto.card-options.d-flex.gap-2.align-items-center
+            %ul.list-inline
+          %p
+              %small.target.text-light
+        .panel-body
+          .animated-background
+          .toppers_table
+            %table#asn_toppers
+              %thead
+              %tbody
+            
