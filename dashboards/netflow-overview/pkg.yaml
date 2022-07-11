@@ -8,7 +8,7 @@ description:
    short: Netflow top overview
    long:  |
       Netflow dashoard shows overview of number of routers, interfaces,
-	  current throughput, top routers and ports by bandwidth 
+      current throughput, top routers and ports by bandwidth 
 
 apptype: dashboard_share
 
