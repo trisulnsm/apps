@@ -1,5 +1,5 @@
 .card
-  .card-header
+  .card-header.bg-primary.d-flex.justify-content-between.align-items-center{data_bind_hidden:0}
     %h5.card-title 
       %i.fa.fa-search
       Search Criteria
@@ -35,7 +35,7 @@
             %label.col-form-label.col-4 Filter Item
             .col-8
               %input#fltr_crs{type:"text",name:"fltr_crs_items"}
-              %span.form-text Type text to filter crosskey items
+              %span.form-text Text filter results, prefix with $ for database filter
 
         .col-6
           .row

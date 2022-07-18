@@ -2,20 +2,21 @@ class SankeyCrossDrill  {
 
   constructor(opts) {
     this.divid   = opts['divid'].replace("#","")
-    this.cgguid  = opts['cgguid']
-    this.meter   = opts['meter']
+    this.cgguid  = opts.dash_params['cgguid']
+    this.meter   = opts.dash_params['meter']
     this.tmint   = opts['time_interval']
     this.remove_topper_count = 0;
     this.max_nodes=30;
     this.select_cgname=opts.jsparams.default_cgname
     this.dom = $(opts.divid);
+    this.dash_params = opts.dash_params;
+    this.default_selected_time = opts.new_time_selector;
 
     //we need it for time zone conversion
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
 
     //append form in the div
     this.append_form(opts);
-
   }
 
   // load the frame 
@@ -33,15 +34,24 @@ class SankeyCrossDrill  {
     await this.load_assets(opts)
     this.form = $(this.haml_dom[0]);
     this.dom.append(this.form);
+
+
+
     //time selector
     var update_ids = "#from_date_sk"+",#to_date_sk";
-    new ShowNewTimeSelector({divid:"#new_time_selector_sk",
-                              update_input_ids:update_ids});
+    new ShowNewTimeSelector({ 
+                              divid:"#new_time_selector_sk",
+                              update_input_ids:update_ids,
+                              default_ts:this.default_selected_time
+                            }
+                          );
 
+    $('#from_date_sk').val(this.default_selected_time.start_date);
+    $('#to_date_sk').val(this.default_selected_time.end_date);
+ 
 
     //handle slider to remove toppers
-
-     let cthis = this;
+    let cthis = this;
     document.getElementById('remove-top-n').oninput=function(){
       document.getElementById('value-remove-top-n').innerHTML=this.value;
       cthis.remove_topper_count=parseInt(this.value);
@@ -63,12 +73,13 @@ class SankeyCrossDrill  {
       let v = this.cg_meters.all_cg_meters[key];
       if(v[1].length==0 &&  this.cg_meters.crosskey[key]){
         var parent_cgguid = this.cg_meters.crosskey[key][1];
-        v[1] = cthis.cg_meters.all_cg_meters[parent_cgguid][1];
+        if (cthis.cg_meters.all_cg_meters[parent_cgguid]) {
+          v[1] = cthis.cg_meters.all_cg_meters[parent_cgguid][1];
+        }
       }
     }
 
 
-    let selectcgguid = _.findKey(this.cg_meters.all_cg_meters, (v,k) => { return v[0] == this.select_cgname  } ) 
     //only only crosskey guid
     let all_crosskey_cgguids = Object.keys(this.cg_meters.crosskey)
     let guid_with_meters ={}
@@ -77,18 +88,37 @@ class SankeyCrossDrill  {
         guid_with_meters[k] = v;
       }
     });
-    var js_params = {meter_details:guid_with_meters,
-      selected_cg : selectcgguid,
-      selected_st : "0",
+    var js_params = {
+      meter_details:guid_with_meters,
+      selected_cg : this.cgguid,
+      selected_st : this.meter || "0",
       update_dom_cg :"cg_id",
       update_dom_st :"meter_id",  
     }
 
     new CGMeterCombo(JSON.stringify(js_params));
 
+    // filter cross keys 
+    document.getElementById("fltr_crs").value = this.dash_params.key || "";
+
     //submitform
     this.form.submit($.proxy(this.submitform,this));
+
+    // hide form if valid_input 
+    if(this.dash_params.valid_input == "1" ) {
+      const f  = document.querySelector(".card-header[data_bind_hidden]")
+      f.setAttribute('data_bind_hidden','1');
+    }
+
+
+    show_hide_form();
+
+
+    if(this.dash_params.valid_input == "1" || this.dash_params.valid_input==1){
+      this.form.submit();
+    }   
   }
+
   //bind the form values to get toppers
   submitform(){
 
@@ -139,11 +169,19 @@ class SankeyCrossDrill  {
     }
 
 
+    // Filter text only send to CG Topper when used in raw key format
+    // with a leading $ sign
+    let cgtopper_key_filter = "";
+    if (this.filter_text.match(/^\$/)) {
+      cgtopper_key_filter = this.filter_text.replace('$','');
+    }
+
     // Get Bytes Toppers 
     this.cgtoppers_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
       counter_group: this.cgguid,
       time_interval: this.tmint ,
       meter:parseInt(this.meter),
+      key_filter: cgtopper_key_filter,
       maxitems:1000
     }); 
 
@@ -168,7 +206,7 @@ class SankeyCrossDrill  {
     }
     
    
-    if(this.filter_text){
+    if(this.filter_text && !this.filter_text.match(/^\$/)){
       var reg_exp = new RegExp(this.filter_text,"i")
       cgtoppers_bytes = _.select(cgtoppers_bytes,function(item){
         if($("input[name*='invertfilter']").prop('checked')==true){
