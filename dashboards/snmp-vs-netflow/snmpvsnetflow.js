@@ -149,7 +149,6 @@ class SNMPVSNetflow{
     }
     let meters = this.jsparams.meters;
     let base_div = $(this.haml_dom[3]).clone();
-    debugger
     let chart_to_show=["netflow","snmp"];
     if($('#show_netflow_only').prop('checked')){
       chart_to_show=["netflow"];
