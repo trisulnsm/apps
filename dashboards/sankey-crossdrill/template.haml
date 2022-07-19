@@ -1,6 +1,6 @@
 .card
   .card-header.bg-primary.d-flex.justify-content-between.align-items-center{data_bind_hidden:0}
-    %h5.card-title 
+    %h5.card-title.text-white
       %i.fa.fa-search
       Search Criteria
   .card-body
@@ -63,8 +63,8 @@
 .ui_data.mt-3
   .row
     .col-12
-      .card.border-primary.sankey_chart_div
-        .card-header.bg-primary.text-white
+      .card.border-primary.sankey_chart_div.add_download_btn
+        .card-header.bg-primary.text-white.d-flex.justify-content-between.align-items-center
           %h5.card-title.text-white
             %i.fa.fa-random.fa-fw
             Sankey Chart 
@@ -73,6 +73,9 @@
             %span.badge.bg-info.text-primary.bg-white.rounded-pill.fs-6.ms-2
           .row
             %small.text-light.target
+
+          .col-auto.card-options.d-flex.gap-2.align-items-center
+          
         .card-body
           .animated-background
           #sankey_chart

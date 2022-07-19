@@ -141,10 +141,15 @@ class SankeyCrossDrill  {
   }
 
   reset(){
-    
+    this.report_nodes=[];
+
     this.dom.find(".ui_data").remove();
     this.data_dom = $(this.haml_dom[1]).clone();
     this.dom.append(this.data_dom);
+    this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",find_by:`.sankey_chart_div`});
+    this.report_nodes.push({type:"page_break"});
+    this.report_nodes.push({type:"table",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`.toppers_table`});
+
    
   }
 
@@ -188,6 +193,18 @@ class SankeyCrossDrill  {
     this.cgtoppers_bytes = _.each(this.cgtoppers_bytes.keys, (k)=> { k.metric = parseInt(k.metric)*bucket_size; return k})
 
     this.prase_toppers();
+    let dropdowncg = document.getElementById('cg_id');
+
+    new ExportToPDF({add_button_to:".add_download_btn",
+                      tint:this.tmint,
+                      logo_tlhs:this.logo_tlhs,
+                      download_file_name:"Sankey CrossDrill",
+                      report_opts:{
+                        header:{h1:"Sankey Cross drill"},
+                        report_title:{h1:`${dropdowncg.options[dropdowncg.selectedIndex].text}`},
+                        nodes:this.report_nodes 
+                      }
+                    });
   }
 
  async prase_toppers(){
