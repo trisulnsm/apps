@@ -14,7 +14,7 @@ UPDATES
 =======
 
 ````
-2.0.18   Jul 17  2022     major improvement automatic cross drill menu intg
+2.0.20   Jul 17  2022     major improvement automatic cross drill menu intg
 0.0.12   Apr 12  2019     added slider to control node count and table output
 ````
 
