@@ -1,0 +1,16 @@
+name: IP to MAC Mapper
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: IP to MAC to IP
+   long:  |
+      Tracks IP to MAC address mappings with a new counter group IP-MAC-PAIR
+
+apptype: lua
+
+appresources: ip-mac.lua README.md 
+
+dependencies:  
