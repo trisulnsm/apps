@@ -18,9 +18,9 @@ You can retrieve toppers for this group and extract the mappings yourselves.
 Edges are added for IP to MAC and MAC to IP pairs.
 
 
-	* Go to Tools > Edge
-	* Select "Hosts" and enter IP Address to see MACs using that IP
-	* Select "MAC" and enter MAC Address to see IPs behind that MAC 
+- Go to Tools > Edge
+- Select "Hosts" and enter IP Address to see MACs using that IP
+- Select "MAC" and enter MAC Address to see IPs behind that MAC 
 
 
 
