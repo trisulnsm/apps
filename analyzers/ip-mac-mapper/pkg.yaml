@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: ip-mac.lua README.md 
+appresources: ip-mac.lua sweepbuf.lua README.md 
 
 dependencies:  
