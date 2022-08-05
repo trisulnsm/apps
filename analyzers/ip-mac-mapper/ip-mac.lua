@@ -37,8 +37,8 @@ TrisulPlugin = {
     -- id, type of meter, toppers to track, bottom-ers to track, Name, units, units-short
     --
     meters = {
-        {  0, T.K.vartype.RATE_COUNTER, 20, 0, "SourceBW", "bps",    "bps" },
-        {  1, T.K.vartype.RATE_COUNTER, 20, 0, "DestBW", "bps",    "bps" },
+        {  0, T.K.vartype.RATE_COUNTER, 20, 0, "SourceBW", "Bps",    "Bps" },
+        {  1, T.K.vartype.RATE_COUNTER, 20, 0, "DestBW", "Bps",    "Bps" },
     },
 
   },
