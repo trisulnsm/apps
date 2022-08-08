@@ -235,12 +235,12 @@ class CIDRExploreFlows{
     trs.enter()
         .insert("tr")
         .html(function(d){
-          return Mustache.to_html(cthis.mustache_tmpl,d);
+          return mustache.render(cthis.mustache_tmpl,d);
         });
 
     trs
         .html(function(d){
-          return Mustache.to_html(cthis.mustache_tmpl,d);
+          return mustache.render(cthis.mustache_tmpl,d);
         });
 
     trs.exit().remove();
@@ -265,12 +265,12 @@ class CIDRExploreFlows{
     lis.enter()
         .insert("li")
         .html(function(d){
-          return Mustache.to_html(cthis.key_spaces_mustache_tmpl ,d);
+          return mustache.render(cthis.key_spaces_mustache_tmpl ,d);
         });
 
     lis
         .html(function(d){
-          return Mustache.to_html(cthis.key_spaces_mustache_tmpl,d);
+          return mustache.render(cthis.key_spaces_mustache_tmpl,d);
         });
 
     lis.exit().remove();

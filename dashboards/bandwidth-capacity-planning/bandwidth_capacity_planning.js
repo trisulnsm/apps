@@ -246,12 +246,12 @@ class  BandwidthCapacityPlannig {
     trs.enter()
         .insert("tr")
         .html(function(d){
-          return Mustache.to_html(mustache_tmpl,d);
+          return mustache.render(mustache_tmpl,d);
         });
 
     trs
         .html(function(d){
-          return Mustache.to_html(mustache_tmpl,d);
+          return mustache.render(mustache_tmpl,d);
         });
 
     trs.exit().remove();

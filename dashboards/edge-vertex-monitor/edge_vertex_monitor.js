@@ -231,12 +231,12 @@ var EdgeVertexMonitor= $.klass({
     trs.enter()
         .insert("tr")
         .html(function(d){
-          return Mustache.to_html(cthis.mustache_tmpl,d);
+          return mustache.render(cthis.mustache_tmpl,d);
         });
 
     trs
         .html(function(d){ 
-          return Mustache.to_html(cthis.mustache_tmpl,d);
+          return mustache.render(cthis.mustache_tmpl,d);
         });
 
     trs.exit().remove();
