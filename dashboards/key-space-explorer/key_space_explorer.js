@@ -304,7 +304,7 @@ var InKeysMagicMap   =  $.klass({
         width = +svg.attr("width"),
         height = +svg.attr("height");
 
-    var color = d3.scaleOrdinal(d3.schemeCategory20),
+    var color = d3.scaleOrdinal(d3.schemeCategory10),
         format = d3.format(",d");
 
     var treemap = d3.treemap()

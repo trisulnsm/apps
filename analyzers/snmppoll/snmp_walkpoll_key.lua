@@ -9,7 +9,7 @@ local lsqlite3 = require 'lsqlite3'
 local JSON=require'JSON'
 local dbg = require("debugger")
 
-local SNMP_DATABASE="/usr/local/var/lib/trisul-hub/domain0/hub0/context0/meters/persist/c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
+local SNMP_DATABASE="/usr/local/var/lib/trisul-hub/domain0/hub0/context_netflow/meters/persist/c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
 
 
 TrisulPlugin = {
@@ -118,15 +118,28 @@ TrisulPlugin = {
       ok, stepret = pcall(stmt.step, stmt) 
     end
     for ipkey,snmp in pairs(snmp_attributes) do
+
       if snmp["snmp.ip"] ~=nil and T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id) then 
-	  	if snmp['snmp.community'] ~= nil and #snmp['snmp.community'] > 0  then 
-			targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"]}
-			T.log(T.K.loglevel.INFO, "LOADED  ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
-			--print("LOADED  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
-		else
-			T.log(T.K.loglevel.INFO, "NULL community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
-			print("NULL    community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
-		end
+        if snmp["snmp.version"] =="2c" then
+          if snmp['snmp.community'] ~= nil and #snmp['snmp.community'] > 0  then 
+            targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"]}
+            T.log(T.K.loglevel.INFO, "LOADED  ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
+            --print("LOADED  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
+          else
+            T.log(T.K.loglevel.INFO, "NULL community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
+            print("NULL    community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
+          end
+        elseif snmp["snmp.version"] == "3" then
+           print("version3")
+          targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_version = snmp["snmp.version"],
+                                    agent_auth_password = snmp["snmp.auth_password"],
+                                    agent_auth_protocol = snmp["snmp.auth_protocol"],
+                                    agent_priv_password = snmp["snmp.priv_password"],
+                                    agent_priv_protocol = snmp["snmp.priv_protocol"],
+                                    agent_username = snmp["snmp.username"],
+                                    agent_contextname = snmp["snmp.contextname"]
+                                  }
+        end
       elseif  snmp["snmp.ip"] ~=nil and snmp['snmp.community'] ~= nil then
         T.log(T.K.loglevel.INFO, "SKIPPED ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
         print("SKIPPED ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])

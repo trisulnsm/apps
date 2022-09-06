@@ -30,7 +30,7 @@ AsyncTasks.onexecute = function(in_data)
 	local oid = ".1.3.6.1.2.1.31.1.1.1.6"
 	if agent.agent_version == "1"  then oid = "1.3.6.1.2.1.2.2.1.10" end
 	-- print("Async bulk walk start for "..agent.agent_ip)
-	local bw_in =  do_bulk_walk( agent.agent_ip, agent.agent_version,  agent.agent_community, oid)
+	local bw_in =  do_bulk_walk( agent, oid)
 	local has_varbinds = false
 	for k,v in pairs( bw_in) do 
 	  v = tonumber(v) or 0
@@ -39,7 +39,8 @@ AsyncTasks.onexecute = function(in_data)
 	end
 
 	if not has_varbinds then
-    local logmsg = "SNMP Poll Failed for "..agent.agent_ip.." with v"..agent.agent_version.." comm = "..agent.agent_community
+    
+    local logmsg = "SNMP Poll Failed for "..agent.agent_ip.." with v"..agent.agent_version
 	  T.logerror(logmsg)
     local dest_ip = ipstr_tokey(agent.agent_ip)
     local flow_key = "11A:00.00.00.00:p-804D_"..dest_ip..":p-00A1"
@@ -49,7 +50,7 @@ AsyncTasks.onexecute = function(in_data)
 	local oid = ".1.3.6.1.2.1.31.1.1.1.10"
 	if agent.agent_version == "1"  then oid = "1.3.6.1.2.1.2.2.1.16" end
 	if has_varbinds then 
-	  local bw_in =  do_bulk_walk( agent.agent_ip, agent.agent_version, agent.agent_community, oid)
+	  local bw_in =  do_bulk_walk( agent, oid)
 	  for k,v in pairs( bw_in) do 
 	  v = tonumber(v) or 0
 		table.insert(async_results.update_counters, {  "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}", k, 2, tonumber(v)}   );
@@ -58,7 +59,7 @@ AsyncTasks.onexecute = function(in_data)
 	  -- update keys - ALIAS iii
 	  local oid = ".1.3.6.1.2.1.31.1.1.1.18"
 	  if agent.agent_version == "1"  then oid = "1.3.6.1.2.1.2.2.1.2" end
-	  local up_key =  do_bulk_walk( agent.agent_ip, agent.agent_version, agent.agent_community, oid)
+	  local up_key =  do_bulk_walk( agent, oid)
 	  for k,v in pairs( up_key) do 
       if(v~="") then
         table.insert(async_results.update_key_info, {  "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}", k, v}   );
