@@ -101,9 +101,8 @@ class SNMPVSNetflow{
     //for each interface show snmp and netflow traffic start
     for(let i =0; i<this.intf_keyts.keys.length;i++){
       await this.draw_traffic_charts(this.intf_keyts.keys[i],i);
-      if(i < this.intf_keyts.keys.length-1 ){
-        this.report_nodes.push({type:"page_break"}); 
-      }
+      
+      
     }
     this.add_download_pdf();
   }
@@ -158,7 +157,9 @@ class SNMPVSNetflow{
     $('.ui_data').append(base_div);
     chart_to_show.forEach(async function(ai){
 
-      this.report_nodes.push({type:"svg",header_text:"auto",find_by:`#${ai}_chart_${i}`,parent:"panel",h1:"h5",h2:"h5 small"});
+      this.report_nodes.push({type:"svg",header_text:"auto",find_by:`#${ai}_chart_${i}`,parent:"card",h1:"h5",h2:"h5 small"});
+      this.report_nodes.push({type:"page_break"}); 
+
       let div = $(`.${ai}`);
       base_div.find(`.${ai} .card-header h5 small`).text(desc);
       base_div.find(`.${ai}_chart`).attr("id",`${ai}_chart_${i}`);
