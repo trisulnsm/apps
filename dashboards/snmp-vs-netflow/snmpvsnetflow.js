@@ -157,6 +157,7 @@ class SNMPVSNetflow{
     }
     $('.ui_data').append(base_div);
     chart_to_show.forEach(async function(ai){
+
       this.report_nodes.push({type:"svg",header_text:"auto",find_by:`#${ai}_chart_${i}`,parent:"panel",h1:"h5",h2:"h5 small"});
       let div = $(`.${ai}`);
       base_div.find(`.${ai} .card-header h5 small`).text(desc);
@@ -179,19 +180,21 @@ class SNMPVSNetflow{
         }
 
       }
-      let model_data = {cgguid:this.jsparams[`${ai}_guid`],
-        key:intfkey,
-        meter:Object.values(this.jsparams.meters[ai]),
+      let models = [];
+      for (const [key, value] of Object.entries(this.jsparams.meters[ai])) {
+        models.push({"counter_group":this.jsparams[`${ai}_guid`],
+                      "meter":value,
+                      "key":intfkey,
+                      "label":key})
+      } 
+      let model_data = {models:JSON.stringify(models),
         from_date:this.form.find("#from_date").val(),
         to_date:this.form.find("#to_date").val(),
-        valid_input:1,
-        mrtg:true,
-        show_title:false,
-        auto_label:false,
-        chart_legend_names:Object.keys(this.jsparams.meters[ai])
+        surface:"MRTGTABLE",
+        valid_input:1
       };
       await $.ajax({
-        url:"/trpjs/generate_chart",
+        url:"/trpjs/apex_chart",
         data:model_data,
         context:this,
         success:function(resp){
