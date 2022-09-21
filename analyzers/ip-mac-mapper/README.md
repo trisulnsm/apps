@@ -32,6 +32,7 @@ Edges are added for IP to MAC and MAC to IP pairs.
 # Version History
 
 ````
-0.0.1   Aug  5 2022     Initial version 
+0.0.2   Sep  20 2022     Meters label were wrong 
+0.0.1   Aug  5  2022     Initial version 
 
 ````
