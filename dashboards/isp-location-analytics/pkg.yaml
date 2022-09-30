@@ -1,6 +1,6 @@
 name: ISP Location Analytics
 
-version: 2.0.03
+version: 2.0.04
 
 author: trisul
 
@@ -19,6 +19,7 @@ dependencies:
   webtrisul: 6.5.2380
 
 jsparams:
+  parent_asn: "{120A3124-E2BB-47BD-6C64-71BBB861C428}"
   parent_counter_group: "{1EB5B954-5869-4498-2009-FA2336287726}"
   counter_group: "{94703E9E-6A3B-4FBD-6B9F-8E653C827058}"
   meters:

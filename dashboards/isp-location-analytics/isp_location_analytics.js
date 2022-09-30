@@ -18,7 +18,7 @@ class ISPOverviewMapping{
     this.counter_group = opts.jsparams.counter_group
      //parent countergroup crosskey for flowasn/lroutergroup
     this.parent_counter_group = opts.jsparams.parent_counter_group
-   
+    this.parent_asn = opts.jsparams.parent_asn || "{120A3124-E2BB-47BD-6C64-71BBB861C428}";
     this.meter_details_in = {upstream_receive:1,upstream_transmit:2,
                              downstream_receive:3,downstream_transmit:4,
                              uniq_aspath:5,uniq_prefix:6}
@@ -265,9 +265,10 @@ class ISPOverviewMapping{
   async get_data()  {
     //find guid to load data
     this.selected_router = $('#routers').val();
-    if(this.selected_router!=0){
+    if(this.selected_router!='0'){
       this.filter_text=this.selected_router;
     }
+    
     this.update_target_text();
     
     if(this.cg_meters.all_cg_bucketsize[this.counter_group]==undefined){
@@ -290,8 +291,9 @@ class ISPOverviewMapping{
     this.ck_top_bucket_size =  300;
    
     // load_toppers
+
     let req_opts = {
-      counter_group: this.counter_group,
+      counter_group: this.selected_router=='0'? this.parent_asn :  this.counter_group,
       time_interval: this.tmint ,
       meter:this.meter,
       maxitems:100,
