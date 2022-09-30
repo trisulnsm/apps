@@ -508,7 +508,8 @@ class ISPOverviewMapping{
    
     let models=[];
     keys.forEach(k=>{
-      models.push({counter_group:this.counter_group,meter:this.meter,key:k[0],label:k[1]})
+      models.push({counter_group:this.selected_router=='0'? this.parent_asn : this.counter_group ,
+        meter:this.meter,key:k[0],label:k[1]})
     })
 
     var model_data = {
