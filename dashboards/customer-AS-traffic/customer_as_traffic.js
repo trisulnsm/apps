@@ -168,8 +168,8 @@ class CustomerASNTraffic{
   async get_data_all_meters_data(){
     this.draw_traffic_chart();
     let keys = Object.keys(this.meter_details_in);
-    this.toppers_data = {}
-    this.combined_totals = [0,0]
+    this.toppers_data = {};
+    this.combined_totals = [0,0];
     for(const [i,meters] of Object.values(this.meter_details_in).entries()){
       for(const m of meters){
         this.meter = m;
@@ -324,18 +324,32 @@ class CustomerASNTraffic{
   }
   async draw_traffic_chart(){
     let interfaces = document.getElementById('interfaces');
-
+    let intf_val=interfaces[interfaces.selectedIndex].value;
     let guid = GUID.GUID_CG_FLOWINTERFACE();
+
     let models = [[1,"Recv"],[2,"Transmit"]].map(m=>{
-      return {counter_group:guid,key:interfaces[interfaces.selectedIndex].value,meter:m[0],label:m[1]}
+      return {counter_group:guid,key:intf_val,meter:m[0],label:m[1]}
     });
+    let title = interfaces[interfaces.selectedIndex].text.replace(/"/g,"").replace(/'/g,"");
+
+    if(intf_val=='0'){
+      guid = GUID.GUID_CG_FLOWGENS();
+      let routers = document.getElementById('routers');
+
+      models = [[0,"Total"]].map(m=>{
+        return {counter_group:guid,key:routers[routers.selectedIndex].value,meter:m[0],label:m[1]}
+      });
+      title = routers[routers.selectedIndex].text.replace(/"/g,"").replace(/'/g,"");
+    }
+    
+
     var model_data = {
       models:JSON.stringify(models),
       from_date:this.form.find("#from_date").val(),
       to_date:this.form.find("#to_date").val(),
       valid_input:1,
       surface:"MRTGTABLE",
-      title:interfaces[interfaces.selectedIndex].text.replace(/"/g,"").replace(/'/g,""),
+      title:title,
       legend_position:"bottom",
       divid:'.interface_traffic_chart'
     };
