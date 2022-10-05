@@ -656,16 +656,16 @@ class ISPOverviewMapping{
         }
         new ApexChartLB(params,{modal_title:desc});
         break;
-      case 2:
+      case 1:
         let link_params =$.param({dash_key:"key",
-                         guid:this.cgguid,
+                         guid:this.counter_group,
                          key:tr.data("full_key"),
                          statid:tr.data("statid")
                         });
         window.open("/newdash/index?"+link_params);
         break;
       
-      case 3:
+      case 2:
         let asn=tr.data('full_key').match(/\w+/)[0]
         window.open("https://bgpview.io/asn/"+asn,"_blank")
         break;
