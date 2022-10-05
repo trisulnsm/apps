@@ -9,7 +9,8 @@ local lsqlite3 = require 'lsqlite3'
 local JSON=require'JSON'
 local dbg = require("debugger")
 
-local SNMP_DATABASE="/usr/local/var/lib/trisul-hub/domain0/hub0/context0/meters/persist/c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
+local SNMP_DATABASE="/usr/local/var/lib/trisul-hub/domain0/hub0/context_netflow/meters/persist/c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
+local SNMP_IPS={}
 
 
 TrisulPlugin = {
@@ -118,8 +119,8 @@ TrisulPlugin = {
       ok, stepret = pcall(stmt.step, stmt) 
     end
     for ipkey,snmp in pairs(snmp_attributes) do
-
-      if snmp["snmp.ip"] ~=nil and T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id) then 
+      if snmp["snmp.ip"] ~=nil and T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id)  and (#(SNMP_IPS)==0 or (#(SNMP_IPS) >0 and TrisulPlugin.has_value(SNMP_IPS,snmp["snmp.ip"]) )) then
+        print(snmp["snmp.ip"])
         if snmp["snmp.version"] =="2c" then
           if snmp['snmp.community'] ~= nil and #snmp['snmp.community'] > 0  then 
             targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"]}
@@ -150,6 +151,16 @@ TrisulPlugin = {
     return targets
 
   end, 
+  has_value=function(tbl,val)
+   for index, value in ipairs(tbl) do
+        if value == val then
+            return true
+        end
+    end
+
+    return false
+ end,
+
 
 }
 
