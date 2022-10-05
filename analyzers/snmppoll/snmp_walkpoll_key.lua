@@ -9,7 +9,7 @@ local lsqlite3 = require 'lsqlite3'
 local JSON=require'JSON'
 local dbg = require("debugger")
 
-local SNMP_DATABASE="/usr/local/var/lib/trisul-hub/domain0/hub0/context_netflow/meters/persist/c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
+local SNMP_DATABASE="/usr/local/var/lib/trisul-hub/domain0/hub0/context0/meters/persist/c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
 local SNMP_IPS={}
 
 
