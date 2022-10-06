@@ -199,18 +199,14 @@ class ISPOverviewMapping{
     this.report_nodes = [];
     this.section_headers=[];
       this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",find_by:`#router_loc_traffic`});
-      this.report_nodes.push({type:"page_break"});
+     
     _.each([this.meter_details_in.upstream_receive,this.meter_details_in.upstream_transmit,this.meter_details_in.downstream_receive,this.meter_details_in.downstream_transmit],$.proxy(function(idx,ai){
+      this.report_nodes.push({type:"page_break"});
       this.report_nodes.push({type:"table",header_text:"auto",h1:"h5",h2:"h5 small",section_header:ai,find_by:`#table_${ai}`});
       this.report_nodes.push({type:"page_break"});
       this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`#traffic_chart_${ai}_`});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`#donut_chart${ai}_`});
       this.report_nodes.push({type:"page_break"});
-      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`#sankey_chart_${ai}`});
-      if(ai!=3){
-        this.report_nodes.push({type:"page_break",add_header_footer:false});
-      }
-
+      this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`#donut_chart${ai}_`});
     },this));
   }
 
