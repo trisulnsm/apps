@@ -162,7 +162,7 @@ class ISPCountryrilldownMapping{
     await this.redraw_all(meter_name);
   }
    async get_aggregated_flows(){
-    let opts = {flowtag:`[asn]${this.keyt.key}`,time_interval:this.tmint,probe_id:this.probe_id,maxcount:100};
+    let opts = {flowtag:`[cn]${this.keyt.key}`,time_interval:this.tmint,probe_id:this.probe_id,maxcount:100};
     this.agg_flows=await fetch_trp(TRP.Message.Command.AGGREGATE_SESSIONS_REQUEST,opts);
     
   }
