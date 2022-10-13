@@ -1,6 +1,6 @@
 name: ISP Country Analytics
 
-version: 2.0.5
+version: 2.0.6
 
 author: trisul
 
@@ -13,7 +13,7 @@ description:
 
 apptype: dashboard_js
 
-appresources: isp_country_analytics.js app.css template.haml crosskey_country_interface.json crosskey_country_router.json ctl_countervar_xinterface.json ctl_countervar_xrouter.json
+appresources: isp_country_analytics.js app.css template.haml crosskey_country_interface.json crosskey_country_router.json ctl_countervar_xinterface.json ctl_countervar_xrouter.json flowtagger_country.json
 
 dependencies: 
 
