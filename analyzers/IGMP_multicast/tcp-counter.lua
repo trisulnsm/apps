@@ -1,8 +1,5 @@
 --
 -- TCP - TCP packet counter 
---
--- TYPE:        FRONTEND SCRIPT
--- PURPOSE:     Protocol Handler, 
 -- 
 
 local SWP= require'sweepbuf'
@@ -24,9 +21,6 @@ TrisulPlugin = {
     --attach to TCP  protocol
     protocol_guid = "{77E462AB-2E42-42EC-9A58-C1A6821D6B31}" ,
 
-    -- WHEN CALLED: when the Trisul platform detects a packet at the protocol_guid layer
-    --              above. In this case, every DNS packet
-    -- 
     onpacket = function(engine,layer)
 
 		local swb=SWP.new(layer:rawbytes():tostring())
@@ -43,6 +37,8 @@ TrisulPlugin = {
 		local dip = ipswb:next_ipv4()
 
 		local key=""
+		-- create the crosskey sip\dip\dport 
+		-- for TCP no multicast group 
 		if sport > dport then
 			key = sip.."\\"..dip.."\\"..dport 
 			engine:update_counter_bytes( "{942AB99F-7A65-4B2E-6F6C-A3050F0F7B35}", key, 0)

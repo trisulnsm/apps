@@ -76,6 +76,7 @@ TrisulPlugin = {
 
 		-- check if DIP has a mapping 
 		-- if no mapping dont do anything.. this is only for multicast mapping
+		-- a 4 tuple multicast mapping 
 		local mmap = T.multicast_mapping[dip]
 		if mmap then
 
