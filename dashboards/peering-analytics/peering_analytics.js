@@ -174,10 +174,14 @@ class ISPOverviewMapping{
       await this.get_data();
     };
     this.form.find("#btn_submit").prop('disabled', false);
+    let download_file_name="Peering_analytics";
+    if(this.target_text.length!=0){
+      download_file_name = this.target_text.replace(/[^a-z0-9_]/i, '');
+    }
     new ExportToPDF({add_button_to:".add_download_btn",
                       tint:this.tmint,
                       logo_tlhs:this.logo_tlhs,
-                      download_file_name:"Peering_analytics",
+                      download_file_name:download_file_name,
                       report_opts:{
                         header:{h1:"Peering Analytics Report"},
                         report_title:{h1:this.target_text},
@@ -204,19 +208,19 @@ class ISPOverviewMapping{
                                             slim: true });
     this.report_nodes = [];
     this.section_headers=[];
+
       this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",find_by:`#peer_interface_traffic`});
-      this.report_nodes.push({type:"page_break"});
     _.each([this.meter_details_in.upstream_receive,this.meter_details_in.upstream_transmit,this.meter_details_in.downstream_receive,this.meter_details_in.downstream_transmit],$.proxy(function(idx,ai){
+      this.report_nodes.push({type:"page_break"});
+      this.report_nodes.push({type:"click",selector:`a[data-bs-target="#isp_overview_${ai}"]`});
       this.report_nodes.push({type:"table",header_text:"auto",h1:"h5",h2:"h5 small",section_header:ai,find_by:`#table_${ai}`});
       this.report_nodes.push({type:"page_break"});
       this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`#traffic_chart_${ai}_`});
+      this.report_nodes.push({type:"page_break"});
+
       this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`#donut_chart${ai}_`});
       this.report_nodes.push({type:"page_break"});
       this.report_nodes.push({type:"svg",header_text:"auto",h1:"h5",h2:"h5 small",find_by:`#sankey_chart_${ai}`});
-      if(ai!=3){
-        this.report_nodes.push({type:"page_break",add_header_footer:false});
-      }
-
     },this));
   }
 
@@ -248,14 +252,13 @@ class ISPOverviewMapping{
     }
 
     draw_apex_chart(opts);
-
-    new InterfaeGauge({interfaceKey:interfaceKey,
-                  divid:"#peer_interface_gauge",
-                  tint:{ window_fromts:this.tmint.from.tv_sec,window_tots:this.tmint.to.tv_sec}});
+    if(interfaceKey!='0'){
+      new InterfaeGauge({interfaceKey:interfaceKey,
+                    divid:"#peer_interface_gauge",
+                    tint:{ window_fromts:this.tmint.from.tv_sec,window_tots:this.tmint.to.tv_sec}});
+    }
 
     this.tris_pg_bar.update_progress_bar();
-
-
 
 
   }
