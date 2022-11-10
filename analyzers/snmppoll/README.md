@@ -32,6 +32,9 @@ UPDATES
 =======
 
 ````
+1.0.2		Nov 10 2022 		Completely revamped for distributed probe support, refactored code, config, 
+                                optimized reloading of agents only if changed, key format matching netflow,
+								optimized no retrieval of Alias info on every cycle.
 0.0.11		Feb 26 2021			Updated to properly require async command file bulkwalk.cmd 
 0.0.3		Nov 03 2020			Updated completely to use ASYNC polling 
 0.0.1		Feb 03 2018			Initial release as an App. This was in 
