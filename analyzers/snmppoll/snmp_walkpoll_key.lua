@@ -1,4 +1,4 @@
--- .lua
+-- .lua     
 --       
 -- snmp_walkpoll.lua   
 -- Update Trisul Counters based on SNMP walk 
@@ -10,7 +10,6 @@ local lsqlite3 = require 'lsqlite3'
 local JSON=require'JSON'
 -- local dbg = require("debugger")
 local SNMP_DATABASE="c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
-local SNMP_IPS={}
 require'mkconfig'
 
 TrisulPlugin = {
@@ -33,8 +32,9 @@ TrisulPlugin = {
       bucketsize = 60,
     },
     meters = {
-      {  0, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes", "In Octets",  "Bps" },
-      {  1, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes", "Out Octets",  "Bps" },
+      {  0, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes", "Total BW",  "Bps" },
+      {  1, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes", "In BW",  	"Bps" },
+      {  2, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes", "Out BW",  	"Bps" },
     },
   },
 
@@ -57,6 +57,11 @@ TrisulPlugin = {
 
                 -- Print debug messages 
                 DebugMode=false,
+
+				-- Filter these IP, default all are allowed 
+				IsIPEnabled=function(ip) 
+					return true
+				end 
             })
 
    end,
@@ -142,10 +147,13 @@ TrisulPlugin = {
     end
 
     for ipkey,snmp in pairs(snmp_attributes) do
-      if snmp["snmp.ip"] ~=nil and T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id)  and (#(SNMP_IPS)==0 or (#(SNMP_IPS) >0 and TrisulPlugin.has_value(SNMP_IPS,snmp["snmp.ip"]) )) then
+      if snmp["snmp.ip"] ~=nil and T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id)  and T.active_config.IsIPEnabled(snmp["snmp.ip"]) then 
         if snmp["snmp.version"] =="2c" then
           if snmp['snmp.community'] ~= nil and #snmp['snmp.community'] > 0  then 
-            targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"]}
+            targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], 
+								       agent_community = snmp["snmp.community"], 
+									   agent_version = snmp["snmp.version"]
+									 }
             T.log(T.K.loglevel.INFO, "LOADED  ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
           else
             T.log(T.K.loglevel.INFO, "NULL community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
@@ -162,7 +170,6 @@ TrisulPlugin = {
         end
       elseif  snmp["snmp.ip"] ~=nil and snmp['snmp.community'] ~= nil then
         T.log(T.K.loglevel.INFO, "SKIPPED ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
-        print("SKIPPED ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
       end 
     end
 
@@ -175,15 +182,6 @@ TrisulPlugin = {
 
     return targets
   end, 
-
-  has_value=function(tbl,val)
-   for index, value in ipairs(tbl) do
-        if value == val then
-            return true
-        end
-    end
-    return false
-  end,
 
 
   capture_oscmd=function(cmd, raw)
