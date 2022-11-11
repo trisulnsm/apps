@@ -28,6 +28,49 @@ This APP uses the Trisul LUA API to poll SNMP interface usage along with their n
 **All interfaces from all the specified routers** will be tracked and all in/out/total utilizations will be stored at 1-min interval. All Trisul features like Top-K Bottom-K will be available. 
 
 
+## Customizing
+
+Place the following config file in `/usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/trisulnsm_snmpwalkpoll.lua` 
+
+
+```
+			return 
+			{
+                -- Resolution Seconds 
+                ResolutionSeconds=60,
+    
+                -- Print debug messages 
+                DebugMode=false,
+
+                -- Filter these IP, default all are allowed 
+                IsIPEnabled=function(ip)
+                    return true
+                end 
+            }
+```
+
+### Only enabling SNMP for some IPs
+
+The default behavior of this APP is to start SNMP monitoring of all devices for which a valid SNMP configuration was found.
+To only allow some selected IPs override the `IsIPEnabled(ip)` function as follows
+
+```
+
+	IsIPEnabled=function(ip)
+		
+		local allowed_ips = {
+			["10.0.0.12"] = true,
+			["10.0.0.55"] = true,
+		}
+		return allowed_ips[ip]
+	end 
+
+
+```
+
+
+
+
 UPDATES
 =======
 
