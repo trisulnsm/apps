@@ -166,8 +166,6 @@ class SNMPVSNetflow{
       let intfkey = keyt.key;
 
       if(ai=="snmp"){
-        let router_ip = keyt.readable.split("_")[0]
-        intfkey = `$${router_ip}_${port}`
         if(! this.cg_meters.all_cg_meters[this.jsparams.snmp_guid]){
           let alert_msg = `<div class='alert alert-danger'>
                             SNMP Poller App is not installed 
