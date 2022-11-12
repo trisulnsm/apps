@@ -1,6 +1,6 @@
 name: SNMP Poller
 
-version: 0.0.14
+version: 1.0.2 
 
 author: trisul
 
@@ -12,6 +12,6 @@ description:
 
 apptype: lua
 
-appresources: snmp_walkpoll_key.lua  bulkwalk_cmd.lua  async_tasks.lua 
+appresources: snmp_walkpoll_key.lua  async_tasks.lua  mkconfig.lua
 
 dependencies:  
