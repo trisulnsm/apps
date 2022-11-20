@@ -30,11 +30,14 @@ TrisulPlugin = {
       name = "SNMP-Interface",
       description = "Traffic using SNMP input ",
       bucketsize = 60,
+	  resolver_guid = "{C0B04CA7-95FA-44EF-8475-3835F3314761}", -- flow interfaces
     },
     meters = {
-      {  0, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes", "Total BW",  "Bps" },
-      {  1, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes", "In BW",  	"Bps" },
-      {  2, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes", "Out BW",  	"Bps" },
+      {  0, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes",   "Total BW",     "Bps" },
+      {  1, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes",   "Recv BW",  	 "Bps" },
+      {  2, T.K.vartype.DELTA_RATE_COUNTER,      100, "bytes",   "Transmit BW",  "Bps" },
+      {  3, T.K.vartype.GAUGE,      			 100, "percent", "Recv Util",  	 "Pct" },
+      {  4, T.K.vartype.GAUGE,      			 100, "percent", "Transmit Util","Pct" },
     },
   },
 
