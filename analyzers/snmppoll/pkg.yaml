@@ -12,6 +12,6 @@ description:
 
 apptype: lua
 
-appresources: snmp_walkpoll_key.lua  async_tasks.lua  mkconfig.lua
+appresources: snmp_walkpoll_key.lua  async_tasks.lua  mkconfig.lua snmp-interface-util.lua
 
 dependencies:  

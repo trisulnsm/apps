@@ -75,7 +75,9 @@ UPDATES
 =======
 
 ````
-1.0.3		Nov 19 2022 		Added utilization and resolver_guid as FlowIntfs 
+1.0.3		Nov 19 2022 		Added utilization and resolver_guid as FlowIntfs, added cg monitor to compute
+                                SNMP interface utilization based on ifSpeed numbers from the Netflow Interface
+								counter group
 1.0.2		Nov 10 2022 		Completely revamped for distributed probe support, refactored code, config, 
                                 optimized reloading of agents only if changed, key format matching netflow,
 								optimized no retrieval of Alias info on every cycle.
