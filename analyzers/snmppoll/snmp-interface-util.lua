@@ -92,8 +92,8 @@ TrisulPlugin = {
 			if nspeed > 0 then 
 				local recvutil  = (metrics[2] * 8 * 100 )  / nspeed
 				local xmitutil  = (metrics[3] * 8 * 100 )  / nspeed
-				engine:update_counter("{9781DB2C-F78A-4F7F-A7E8-2B1A9A7BE71A}", key, 4,  recvutil)
-				engine:update_counter("{9781DB2C-F78A-4F7F-A7E8-2B1A9A7BE71A}", key, 5,  xmitutil)
+				engine:update_counter("{9781DB2C-F78A-4F7F-A7E8-2B1A9A7BE71A}", key, 3,  recvutil)
+				engine:update_counter("{9781DB2C-F78A-4F7F-A7E8-2B1A9A7BE71A}", key, 4,  xmitutil)
 				return true, { -1, -1, -1, -1, recvutil, xmitutil }  -- -1 will not touch the metric 
 			end 
 		end 
