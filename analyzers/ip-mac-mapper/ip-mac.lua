@@ -74,11 +74,6 @@ TrisulPlugin = {
 	  engine:update_counter_bytes("{4D6F1A1C-B8B5-4635-AFF8-20BE2A306020}" , sip.."_"..smac,0)
 	  engine:update_counter_bytes("{4D6F1A1C-B8B5-4635-AFF8-20BE2A306020}" , dip.."_"..dmac,1)
 
-	  engine:add_edge("{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}", ipstr_tokey(sip),"{4B09BD22-3B99-40FC-8215-94A430EA0A35}",    smac)
-	  engine:add_edge("{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}", ipstr_tokey(dip),"{4B09BD22-3B99-40FC-8215-94A430EA0A35}",    dmac)
-
-	  engine:add_edge("{4B09BD22-3B99-40FC-8215-94A430EA0A35}", smac, "{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}", ipstr_tokey(sip))
-	  engine:add_edge("{4B09BD22-3B99-40FC-8215-94A430EA0A35}", dmac, "{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}", ipstr_tokey(dip))
 
     end,
 
