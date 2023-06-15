@@ -1,0 +1,16 @@
+name: Stable Keys
+
+version: 1.0.1
+
+author: trisul
+
+description: 
+   short: Checks stable key activity
+   long:  |
+      If within a counter group a particular key stops being seen. Generate an Alert 
+
+apptype: lua
+
+appresources: stablekeys.lua mkconfig.lua
+
+dependencies:  
