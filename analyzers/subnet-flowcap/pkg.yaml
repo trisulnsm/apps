@@ -1,0 +1,16 @@
+name: Subnet Flowcap
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: Remove flow storage caps for subnets
+   long:  |
+     For selected subnets remove flow storage caps.  
+
+apptype: lua
+
+appresources: subnet-flowcap.lua mkconfig.lua iputils.lua
+
+dependencies:  
