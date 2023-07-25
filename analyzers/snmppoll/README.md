@@ -75,6 +75,7 @@ UPDATES
 =======
 
 ````
+1.0.5		Jul 25 2023	        SNMP Interface util meter ID mismatch ,                                  
 1.0.3		Nov 19 2022 		Added utilization and resolver_guid as FlowIntfs, added cg monitor to compute
                                 SNMP interface utilization based on ifSpeed numbers from the Netflow Interface
 								counter group
