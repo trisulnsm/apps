@@ -37,6 +37,7 @@ UPDATES
 =======
 
 ````
+0.0.5   Sep 1  2023     Meter 2 changed for XKEY from transmit to heartbeat 
 0.0.4   Oct 13 2022     Added README.md 
 ````
 

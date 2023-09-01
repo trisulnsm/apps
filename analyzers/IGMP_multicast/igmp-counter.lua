@@ -48,6 +48,7 @@ TrisulPlugin = {
 
 			engine:post_message_backend("{18D4B77A-AA86-4924-2201-6ABE892F2937}", mip.."="..source_ip)
 			engine:post_message_frontend("{18D4B77A-AA86-4924-2201-6ABE892F2937}", mip.."="..source_ip)
+			engine:update_counter("{074E78B6-E032-4B22-B085-12A2E72E1BB7}", source_ip.."\\"..mip , 2, 1 )
 
 		end 
 
