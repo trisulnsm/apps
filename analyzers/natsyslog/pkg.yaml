@@ -1,0 +1,16 @@
+name: NAT SYSLOG
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: Flow storage from NAT and AAA syslog events
+   long:  |
+     Use with Trisul IPDR more where this app provides the reception and parse of NAT SYSLOG events
+
+apptype: lua
+
+appresources: flowkey.lua  ipfixnatctr.lua  ipfix-protocol.lua  natsyslogctr.lua  raw-syslogs.lua  store-tagged-only.lua  sweepbuf.lua  syslog-protocol.lua
+
+dependencies:  
