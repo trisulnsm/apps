@@ -1,0 +1,23 @@
+name: IPDR Netflow Statistics
+
+version: 2.0.1
+
+author: trisul
+
+
+description: 
+   short: IPDR Netflow Statistics
+   long:  |
+      Dashboard for the IPDR Netflow. 
+      Shows netflow volume 
+      Shows total bandwidth
+      Shows total no.of revices sending netflow/syslog
+      Shows netflow records 
+      Shows top devices list 
+      shows alert if any of the devices stopped to send netflow
+
+apptype: dashboard_share
+
+appresources: dashboard.json
+
+dependencies : 
