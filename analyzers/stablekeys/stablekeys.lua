@@ -43,7 +43,8 @@ TrisulPlugin = {
             {
                 -- By default FlowGens 
                 CounterGUID  ="{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
-
+                --- By default sigid (Alert name)
+		SigID="STABLEKEYS",
                 -- number of stable intervals 
                 NumStableIntervals =1,
             })
@@ -93,7 +94,7 @@ TrisulPlugin = {
           -- alert 
           engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}", 
                     nil,
-                    "STABLEKEYS" ,
+                    T.active_config.SigID,
                     1, 
                     "No activity on expected key "..readable.."Potentially stopped")
           T.logwarning("STABLEKEYS ALERT: No activity on expected key "..readable.." Potentially stopped")
