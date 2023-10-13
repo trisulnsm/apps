@@ -72,12 +72,11 @@ class ProbesChart {
     resp.layers.forEach(function(probe,index){
 
       $.ajax({
-        url:"/trpjs/generate_chart",
+        url:"/trpjs/apex_chart",
         context:this,
         data:{
           models:JSON.stringify(this.jsparams.models),
           probe_id:probe.probe_id,
-          auto_label:false,
           from_date:$(`#from_date_${this.randomid}`).val(),
           to_date:$(`#to_date_${this.randomid}`).val(),
           valid_input:1,
