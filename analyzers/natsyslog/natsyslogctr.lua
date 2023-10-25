@@ -50,6 +50,8 @@ TrisulPlugin = {
     T.re2_CiscoNATSyslog=T.re2("(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d).\\d\\d\\d.*(Created|Deleted)\\s+Translation\\s+(\\w+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\s*\\d+")
 
     T.re2_CiscoNATSyslog2=T.re2("(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d).\\d\\d\\d.*(Created|Deleted)\\s+(\\w+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)")
+    
+    T.re2_CiscoNATSyslog3=T.re2("(\\d+):\\s+(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d):\\s+.*(CREATED|DELETED):\\s+(\\w+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)")
 
     --microkit has firwall in that syslog message
     T.re2_MikroTikNATSyslog=T.re2("firewall,info.*proto\\s(\\w+).*,\\s(\\S+):(\\d+)->(\\S+):(\\d+)")
@@ -84,7 +86,6 @@ TrisulPlugin = {
 	  engine:update_counter( COUNTERID_FLOWGEN, ipkey, 0, #syslogstr)
 	  engine:update_counter( COUNTERID_FLOWGEN, ipkey, 1, #syslogstr)
 	  engine:update_counter( COUNTERID_FLOWGEN, ipkey, 2, 1)
-
 
       if syslogstr:find("NAT_ACCT",1,true) then 
         -- JIO device 
@@ -130,6 +131,28 @@ TrisulPlugin = {
 
 
         elseif cmd == "Deleted" then 
+          engine:update_flow_raw( fkey, 1, 1)
+          engine:terminate_flow ( fkey)
+        end 
+      elseif syslogstr:find("%IPNAT-6-CREATED",1,true) or syslogstr:find("%IPNAT-6-DELETED",1,true)  then 
+        -- CISCO device 3
+        local bret,sessid, mon, day, hd,m,s, cmd, proto, sip, sport, tsip, tsport, dip, dport = T.re2_CiscoNATSyslog3:partial_match_n(syslogstr)
+        if bret ==false then return; end
+
+        local tvsec = os.time( {
+          year = tonumber(os.date('%Y')),
+          month = MONTHNAMES[mon],
+          day = tonumber(day),
+          hour =h, min = m, sec = s
+        })
+        local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
+
+        if cmd == "CREATED" then
+          engine:update_flow_raw( fkey, 0, 1)
+          engine:tag_flow ( fkey, "[natip]"..tsip)
+          engine:tag_flow ( fkey, "[natport]"..tsport)
+          engine:tag_flow ( fkey, "[deviceip]"..sip)
+        elseif cmd == "DELETED" then 
           engine:update_flow_raw( fkey, 1, 1)
           engine:terminate_flow ( fkey)
         end 
