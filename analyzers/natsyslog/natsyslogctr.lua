@@ -148,10 +148,11 @@ TrisulPlugin = {
         local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
 
         if cmd == "CREATED" then
+          print(iplayer_deviceip)
           engine:update_flow_raw( fkey, 0, 1)
           engine:tag_flow ( fkey, "[natip]"..tsip)
           engine:tag_flow ( fkey, "[natport]"..tsport)
-          engine:tag_flow ( fkey, "[deviceip]"..sip)
+          engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
         elseif cmd == "DELETED" then 
           engine:update_flow_raw( fkey, 1, 1)
           engine:terminate_flow ( fkey)
