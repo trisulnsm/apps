@@ -1,10 +1,6 @@
 name: Netflow Overview
 
-<<<<<<< HEAD
-version: 0.0.1
-=======
-version: 0.0.2
->>>>>>> 26f234dffcbfdfd562694f92c9d74be557bd1ace
+version: 0.0.3
 
 author: trisul
 
