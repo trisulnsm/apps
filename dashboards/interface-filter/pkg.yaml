@@ -1,0 +1,16 @@
+name: Interface Filter
+
+version: 0.0.3
+
+author: trisul
+
+description: 
+   short: Interface Filter
+   long:  |
+      Interface filter
+
+apptype: dashboard_js
+
+appresources:  interface_filter.js
+
+dependencies : 
