@@ -53,9 +53,12 @@ TrisulPlugin = {
     
     T.re2_CiscoNATSyslog3=T.re2("(\\d+):\\s+(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d):\\s+.*(CREATED|DELETED):\\s+(\\w+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)")
 
-    T.re2_TacitineNATSylog=T.re2("firewall,info.*\\sproto\\s+(\\w+).*\\s(\\S+):(\\d+)->(\\S+):(\\d+),\\sNAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
     --microkit has firwall in that syslog message
     T.re2_MikroTikNATSyslog=T.re2("firewall,info.*proto\\s(\\w+).*,\\s(\\S+):(\\d+)->(\\S+):(\\d+)")
+    T.re2_MikroTikNATSyslog2=T.re2("firewall,info.*\\sproto\\s+(\\w+).*\\s(\\S+):(\\d+)->(\\S+):(\\d+),\\sNAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
+    
+    --tacitine devices
+    T.re2_TacitineNATSylog=T.re2("<6>(\\w+)\\s\\s(\\d+)\\s(\\d\\d):(\\d+):(\\d+).*SRC=(\\S+)\\sDST=(\\S+)\\s.*PROTO=(\\S+)\\sSPT=(\\d+)\\sDPT=(\\d+)")
   end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
@@ -111,6 +114,34 @@ TrisulPlugin = {
         elseif cmd == "STOP" then 
           engine:terminate_flow ( fkey)
         end 
+      elseif syslogstr:find("kernel: [",1,true) then 
+       --tacitine devices
+        local bret, 
+       	  mon, 
+          day, 
+          h,
+          m,
+          s,
+          sip,
+          dip,
+          proto,
+          sport,
+          dport=T.re2_TacitineNATSylog:partial_match_n(syslogstr)
+        
+        if bret ==false then return; end
+
+        local tvsec = os.time( {
+          year = tonumber(os.date('%Y')),
+          month = MONTHNAMES[mon],
+          day = tonumber(day),
+          hour =h, min = m, sec = s
+        })
+	      proto = PROTOCOl[proto]
+        local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
+        engine:update_flow_raw( fkey, 0, 1)
+        engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
+        engine:update_flow_raw( fkey, 1, 1)
+        engine:terminate_flow ( fkey)
 
       elseif syslogstr:find("LOG_TRANSLATION",1,true) then 
         -- CISCO device 
@@ -273,7 +304,7 @@ TrisulPlugin = {
         natsip1,
         natsport1,
         natdip,
-        natdport=T.re2_TacitineNATSylog:partial_match_n(syslogstr)
+        natdport=T.re2_MikroTikNATSyslog2:partial_match_n(syslogstr)
 
 
         if bret ==false then return; end
