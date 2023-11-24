@@ -109,7 +109,9 @@ AsyncTasks.onresult = function(engine,req,response)
 	local JSON=require'JSON'
 	local async_results=JSON:decode(response)
 	for _,v in ipairs(async_results.update_counters) do
-	  engine:update_counter(v[1],v[2],v[3],v[4])
+	  if v[4] ~= 0 then 
+		  engine:update_counter(v[1],v[2],v[3],v[4])
+	  end 
 	end
 
 	for _,v in ipairs(async_results.update_key_info)  do
