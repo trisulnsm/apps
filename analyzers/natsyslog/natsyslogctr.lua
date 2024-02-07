@@ -41,7 +41,7 @@ TrisulPlugin = {
   -- 
   -- WHEN CALLED : your LUA script is loaded into Trisul 
   onload = function()
-    T.re2_NetElasticBNGNATSyslog=T.re2('19412\\s(SADD|SDEL)\\s\\[nsess\\sTRIG="(\\w+)"\\sPROTO="(\\d+)"\\sSSUBIX="(\\d)"\\sIATYP="(\\w+)"\\sUSERNAME="(\\w+)"\\sISADDR="(\\S+)"\\sIDADDR="(\\S+)"\\sISPORT="(\\d+)"\\sIDPORT="(\\d+)"\\sXATYP="(\\w+)"\\sXSADDR="(\\S+)"\\sXDADDR="(\\S+)"\\sXSPORT="(\\d+)"\\sXDPORT="(\\d+)"\\]\\stime=\'(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})\'')
+    T.re2_NetElasticBNGNATSyslog=T.re2('NAT\\s+\\d+\\s+(SADD|SDEL)\\s\\[nsess\\sTRIG="(\\w+)"\\sPROTO="(\\d+)"\\sSSUBIX="(\\d)"\\sIATYP="(\\w+)"\\sUSERNAME="(\\w+)"\\sISADDR="(\\S+)"\\sIDADDR="(\\S+)"\\sISPORT="(\\d+)"\\sIDPORT="(\\d+)"\\sXATYP="(\\w+)"\\sXSADDR="(\\S+)"\\sXDADDR="(\\S+)"\\sXSPORT="(\\d+)"\\sXDPORT="(\\d+)"\\]\\stime=\'(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})\'')
 
     T.re2_HuaweiNATSyslog=T.re2(".*<NAT444>:<(\\w+)>\\s(\\d+)\\|(\\d+|-)\\|(\\S+)\\|(\\S+)\\|(\\d+)\\|(\\S+)\\|(\\d+)\\|(\\d+)")
 
