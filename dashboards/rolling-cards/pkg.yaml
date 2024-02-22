@@ -1,6 +1,6 @@
 name: Rolling Cards
 
-version: 2.0.1
+version: 2.0.2
 
 author: trisul
 
@@ -12,7 +12,7 @@ description:
 
 apptype: dashboard_js
 
-appresources: rolling_card.js
+appresources: rolling_card.js template.haml
 
 dependencies: 
   webtrisul: 6.5.2380
