@@ -93,11 +93,13 @@ class RollingCard {
       //fecthing the data
       let req_opts = {counter_group: selected_cguid,maxitems:meter_count || 10,meter:meter,get_meter_info:true};
       let resp = await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts);
+      console.log(resp);
+      console.log(this.cg_meters_opts);
 
       //creating slider template
       let owl_card_template = document.createElement('template');
       owl_card_template.innerHTML=`<div class="card fieldset bg-${this.get_color(index)} border-${this.get_color(index)} mb-3">
-                                    <div class="fieldset-tile bg-${this.get_color(index)} text-white "> ${selected_meters_text[index]}</div>
+                                    <div class="fieldset-tile bg-${this.get_color(index)} text-white border rounded-pill"> ${selected_meters_text[index]}</div>
                                     <div class="owl-carousel" id="slider${index+1}">
                                     </div>
                                   </div>
@@ -114,6 +116,7 @@ class RollingCard {
       
       //finding the meter type
       let meter_type = this.cg_meters_opts.all_meters_type[selected_cguid][meter].type;
+      let meter_units = this.cg_meters_opts.all_meters_type[selected_cguid][meter].units;
       //adding each items in the slider
       resp.keys.forEach(topper => {
         if(topper.key=="SYS:GROUP_TOTALS"){
@@ -145,7 +148,7 @@ class RollingCard {
                                           <div class="avatar rounded no-thumbnail bg-${this.get_color(index)} text-light"><i class="fa fa-${this.ASN_TO_FA_MAPPING[topper.key] || 'question-circle'} fa-lg"></i></div>
                                           <div class="flex-fill ms-3 text-truncate">
                                             <div class="h6 mb-0">${topper.label}</div>
-                                            <span class="rounded small">${formatBW(bandwidth,1,"bps")}</span>
+                                            <span class="rounded small">${formatBW(bandwidth,1, meter_units).toLowerCase()}</span>
                                           </div>
                                         </div>
                                       </div>`;
