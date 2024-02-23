@@ -16,9 +16,29 @@ class RollingCard {
 
   }
 
+  async load_map_assets(opts,fname){
+    let js_file =opts.jsfile;
+    let file_path = js_file.split("/")
+    file_path.pop()
+    file_path = file_path.join("/");
+    let file_full_path = `/plugins/${file_path}/${fname}`;
+    if(fname.match(/\.js$/)){
+      await jQuery.ajax({
+        url: file_full_path,
+        dataType: 'script',
+        async: true
+      });
+    }
+    else{
+      $('head').append(`<link rel="stylesheet" type="text/css" href="${file_full_path}">`);
+    }
+  }
+  
 
   //adding the form to the document
   async add_form(opts){
+    await this.load_map_assets(opts,"owl.carousel.min.js");
+
     let html_str = await get_html_from_hamltemplate(opts);
     let template = document.createElement('template');
     template.innerHTML=html_str;
@@ -50,6 +70,7 @@ class RollingCard {
   }
 
 
+
   //displaying the selected meters in the slider
   async submit_form(){
     let selected_cguid = this.form.querySelector('#rc_counter_group').value;
@@ -62,7 +83,7 @@ class RollingCard {
       selected_meters_text.push(option.text);
       selected_meters_value.push(option.value);
     });
-    
+
     //clearing the previous results
     document.getElementById('rolling_card').innerHTML = "";
 
@@ -75,11 +96,12 @@ class RollingCard {
 
       //creating slider template
       let owl_card_template = document.createElement('template');
-      owl_card_template.innerHTML=`<div class="card fieldset border-${this.get_color(index)} mb-3">
+      owl_card_template.innerHTML=`<div class="card fieldset bg-${this.get_color(index)} border-${this.get_color(index)} mb-3">
                                     <div class="fieldset-tile bg-${this.get_color(index)} text-white "> ${selected_meters_text[index]}</div>
                                     <div class="owl-carousel" id="slider${index+1}">
                                     </div>
-                                    </div>`
+                                  </div>
+                                  `
       
       // owl_card_template.innerHTML=`<div class="card border-${this.get_color(index)} p-0 mb-3">
       //                                 <div class='card-header pt-3'>
@@ -116,31 +138,35 @@ class RollingCard {
         //                                 </div>
         //                               </div>
         //                               </div>`;
+        
 
         card_item_template.innerHTML=`<div class="alert alert-${this.get_color(index)} rounded-4 mt-2 mb-1">
                                         <div class="d-flex align-items-center">
                                           <div class="avatar rounded no-thumbnail bg-${this.get_color(index)} text-light"><i class="fa fa-${this.ASN_TO_FA_MAPPING[topper.key] || 'question-circle'} fa-lg"></i></div>
                                           <div class="flex-fill ms-3 text-truncate">
                                             <div class="h6 mb-0">${topper.label}</div>
-                                            <span class="counter_bandwidth rounded small">${formatBW(bandwidth,1,"bps").split(' ')[0]}</span><span>${formatBW(bandwidth,1,"bps").split(' ').pop()}</span>
+                                            <span class="rounded small">${formatBW(bandwidth,1,"bps")}</span>
                                           </div>
                                         </div>
                                       </div>`;
 
                           //<span class="bg-light text-dark px-1 rounded small">${formatBW(bandwidth,1,"bps")}</span>
-
+        
+        //appending item to the slider
         owl_card_template.content.querySelector('.owl-carousel').appendChild(card_item_template.content.firstElementChild);
         
       });
+
+      //appending slider to the web page
       this.data_dom.appendChild(owl_card_template.content.firstElementChild);
 
-      
+
+      //calculating the speed for slider
       let min_speed = 2000;
       let max_speed = 7000;
       let current_speed = Math.floor(min_speed+(max_speed-min_speed)/(selected_meters_value.length-1)*index) || min_speed
-      let new_current_speed = Math.max(selected_meters_value.length*(index+1))
-
       console.log(current_speed);
+
       
       // animating the rolling cards
       $(`#slider${index+1}`).owlCarousel({
@@ -160,11 +186,7 @@ class RollingCard {
         }
       });
 
-      $('.counter_bandwidth').counterUp({
-        delay: 10,
-        time:   1000,
-        triggerOnce:true
-        })
+      
 
 
     });
