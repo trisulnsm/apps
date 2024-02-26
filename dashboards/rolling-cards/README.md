@@ -15,6 +15,7 @@ Install this app to get access to the following useful Rolling Cards
 |---------|---------|---------|
 |v1.0.0|26-FEB-2024|Initial release to public|
 
+</br>
 
 ### 📊 Repo Stats
 ![dark][dark_repo]
