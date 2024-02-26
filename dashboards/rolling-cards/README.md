@@ -13,7 +13,7 @@ Install this app to get access to the following useful Rolling Cards
 
 | Version | Release Date | Description |
 |---------|---------|---------|
-|v1.0.0|26-FEB-2024|Initial release to public|
+|`v1.0.0`|26-FEB-2024|Initial release to public|
 
 </br>
 

@@ -8,7 +8,8 @@ class RollingCard {
     this.card_color_array=["primary","success","info","secondary"];
     //asnumber like 16159 mapping to google
     this.ASN_TO_FA_MAPPING={"15169":"google","8075":"windows","399104":"twitter","8068":"windows",
-                            "16509":"amazon","17488":"twitter","13414":"twitter","14618":"amazon","13335":"cloud","396982":"cloud"}
+                            "16509":"amazon","17488":"twitter","13414":"twitter","14618":"amazon",
+                            "13335":"cloud","396982":"cloud"}
   }
 
   get_color(index){
@@ -121,7 +122,7 @@ class RollingCard {
                                           <div class="avatar rounded no-thumbnail bg-${this.get_color(index)} text-light"><i class="fa fa-${this.ASN_TO_FA_MAPPING[topper.key] || 'question-circle'} fa-lg"></i></div>
                                           <div class="flex-fill ms-3 text-truncate">
                                             <div class="h6 mb-0">${topper.label}</div>
-                                            <span class="rounded small">${formatBW(bandwidth,1, meter_units).toLowerCase()}</span>
+                                            <span class="rounded small">${formatBW(bandwidth,1, meter_units)}</span>
                                           </div>
                                         </div>
                                       </div>`;
@@ -148,7 +149,7 @@ class RollingCard {
         center:true,
         margin:10,
         dots: false,
-        autoplay:false,
+        autoplay:true,
         autoplayTimeout: current_speed,
         autoplaySpeed: current_speed,
         touchDrag: false,
