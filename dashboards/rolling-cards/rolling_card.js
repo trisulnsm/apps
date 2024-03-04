@@ -4,6 +4,7 @@ class RollingCard {
   constructor(opts) {
     this.divid = document.querySelector(opts.divid);
     this.cg_meters_opts={};
+    this.topper_keys={};
     this.add_form(opts);
     this.card_color_array=["primary","success","info","secondary"];
     //asnumber like 16159 mapping to google
@@ -38,6 +39,7 @@ class RollingCard {
   //adding the form to the document
   async add_form(opts){
     await this.load_map_assets(opts,"owl.carousel.min.js");
+    load_css_file(opts);
 
     let html_str = await get_html_from_hamltemplate(opts);
     let template = document.createElement('template');
@@ -54,6 +56,7 @@ class RollingCard {
       e.preventDefault();
       this.submit_form();
     });
+
   }
 
   //loading the dropdown items to the cg and meters menu
@@ -69,6 +72,7 @@ class RollingCard {
     new CGMeterCombo(JSON.stringify(js_params));
   }
 
+  
 
 
   //displaying the selected meters in the slider
@@ -88,7 +92,7 @@ class RollingCard {
 
 
     //adding slider for each meters
-    selected_meters_value.forEach(async (meter, index) => {
+    await Promise.all(selected_meters_value.map(async (meter, index) => {
       //fecthing the data
       let req_opts = {counter_group: selected_cguid,maxitems:meter_count || 10,meter:meter,get_meter_info:true};
       let resp = await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST,req_opts);
@@ -106,6 +110,8 @@ class RollingCard {
       //finding the meter type
       let meter_type = this.cg_meters_opts.all_meters_type[selected_cguid][meter].type;
       let meter_units = this.cg_meters_opts.all_meters_type[selected_cguid][meter].units;
+
+
       //adding each items in the slider
       resp.keys.forEach(topper => {
         if(topper.key=="SYS:GROUP_TOTALS"){
@@ -117,25 +123,24 @@ class RollingCard {
         //creating each item in a card
         let card_item_template = document.createElement('template');
 
-        card_item_template.innerHTML=`<div class="alert alert-${this.get_color(index)} rounded-4 mt-2 mb-1">
-                                        <div class="d-flex align-items-center">
-                                          <div class="avatar rounded no-thumbnail bg-${this.get_color(index)} text-light"><i class="fa fa-${this.ASN_TO_FA_MAPPING[topper.key] || 'question-circle'} fa-lg"></i></div>
-                                          <div class="flex-fill ms-3 text-truncate">
-                                            <div class="h6 mb-0">${topper.label}</div>
-                                            <span class="rounded small">${formatBW(bandwidth,1, meter_units)}</span>
+        card_item_template.innerHTML=`<a class="topper_${topper.key.replace(/\./g, "-")}">
+                                        <div class="neon alert alert-${this.get_color(index)} rounded-4 mt-2 mb-1">
+                                          <div class="d-flex align-items-center">
+                                            <div class="avatar rounded no-thumbnail bg-${this.get_color(index)} text-light"><i class="fa fa-${this.ASN_TO_FA_MAPPING[topper.key] || 'question-circle'} fa-lg"></i></div>
+                                            <div class="flex-fill ms-3 text-truncate">
+                                              <div class="h6 mb-0">${topper.label}</div>
+                                              <span class="rounded small">${formatBW(bandwidth,1, meter_units)}</span>
+                                            </div>
                                           </div>
                                         </div>
-                                      </div>`;
+                                      </a>`;
 
-        
         //appending item to the slider
         owl_card_template.content.querySelector('.owl-carousel').appendChild(card_item_template.content.firstElementChild);
-        
-      });
+      });//topers
 
       //appending slider to the web page
       this.data_dom.appendChild(owl_card_template.content.firstElementChild);
-
 
       //calculating the speed for slider
       let min_speed = 2000;
@@ -148,6 +153,7 @@ class RollingCard {
         loop:true,
         center:true,
         margin:10,
+        autoplayHoverPause:true,
         dots: false,
         autoplay:true,
         autoplayTimeout: current_speed,
@@ -160,12 +166,36 @@ class RollingCard {
           1000:{items:5}
         }
       });
-      
+
+      //collecting the topper keys
+      resp.keys.forEach(t => {
+        if(!(t.key in this.topper_keys) && t.key!="SYS:GROUP_TOTALS"){
+          this.topper_keys[t.key] = t.label
+        }
+      });
+
+    }));//meters
 
 
+    //adding event listener
+    Object.keys(this.topper_keys).forEach(key => {
+      document.querySelectorAll(`.topper_${key.replace(/\./g, "-")}`).forEach(element => {
+        element.addEventListener('click', ()=>{
+          let models = [];
+          selected_meters_value.forEach(meter=>{
+            models.push({counter_group:selected_cguid,meter:meter,key:key});
+          });
+          let queryparams = {models:JSON.stringify(models),"show_default_title": 1,"surface": "line","show_table": 1};
+          new ApexChartLB(queryparams,{modal_title:`Traffic Chart - ${this.topper_keys[key]}`});
+        });
+      });
     });
-  }
-}
+
+
+  }//submit form
+
+ 
+}//class
 
 async function run(opts) {
   let rc = new RollingCard(opts);
