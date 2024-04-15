@@ -1,0 +1,17 @@
+name: DHCP Syslog Connector
+
+version: 0.0.1
+
+author: trisul
+
+description: 
+   short: Connects to DHCP syslog
+   long:  |
+      The DHCP connector consumes DHCP syslog messages from Fortinet and other devices 
+      and uses that to meter IP based network usage but for users and hosts. 
+
+apptype: lua
+
+appresources: cg_monitor_hosts.lua forti-dhcp.lua newcg-hostname.lua syslog-protocol.lua 
+
+dependencies:  
