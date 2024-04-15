@@ -40,7 +40,7 @@ TrisulPlugin = {
     protocol_guid = "{4323003E-D060-440B-CA26-E146C0C7DB4E}", 
 
 	-- also work in NETFLOW_TAP mode
-	-- flow_counter = true,
+	flow_counter = true,
 
     onpacket = function(engine,layer)
       local syslogstr = layer:rawbytes():tostring()
