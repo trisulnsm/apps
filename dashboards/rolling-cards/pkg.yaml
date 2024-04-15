@@ -1,0 +1,20 @@
+name: Rolling Cards
+
+version: 1.0.1
+
+author: trisul
+
+
+description: 
+   short: View counter group toppers in rolling cards
+   long:  |
+      List topper in rolling cards
+
+apptype: dashboard_js
+
+appresources: rolling_card.js owl.carousel.min.js template.haml app.css
+
+dependencies: 
+  webtrisul: 6.5.2380
+
+jsparams:

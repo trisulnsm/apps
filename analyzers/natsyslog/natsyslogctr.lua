@@ -59,7 +59,13 @@ TrisulPlugin = {
     
     --tacitine devices
     T.re2_TacitineNATSylog=T.re2("<6>(\\w+)\\s\\s(\\d+)\\s(\\d\\d):(\\d+):(\\d+).*SRC=(\\S+)\\sDST=(\\S+)\\s.*PROTO=(\\S+)\\sSPT=(\\d+)\\sDPT=(\\d+)")
-  end,
+    --Fortigate firewall snat+dnat
+    T.re2_FortigateNATSylog=T.re2(".*date=(\\S+)\\stime=(\\S+).*srcip=(\\S+)\\ssrcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+).*tranip=(\\S+)\\stranport=(\\d+)\\stransip=(\\S+)\\stransport=(\\d+)")
+    --Fortigate firewall noop
+    T.re2_FortigateNATSylogNoopPort=T.re2(".*date=(\\S+)\\stime=(\\S+).*srcip=(\\S+)\\ssrcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+)")
+    T.re2_FortigateNATSylogNoop=T.re2(".*date=(\\S+)\\stime=(\\S+).*srcip=(\\S+).*dstip=(\\S+).*proto=(\\w+)")
+    T.re2_FortigateNATSylogSNat=T.re2(".*date=(\\S+)\\stime=(\\S+).*srcip=(\\S+)\\s.*srcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+).*transip=(\\S+)\\stransport=(\\d+)")
+    end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
   onunload = function()
@@ -75,6 +81,7 @@ TrisulPlugin = {
 	flow_counter = true,
 
     onpacket = function(engine,layer)
+    
       local syslogstr = layer:rawbytes():tostring()
       --ip_layer protocol
       local iplayer = layer:packet():find_layer("{0A2C724B-5B9F-4BA6-9C97-B05080558574}");
@@ -180,7 +187,6 @@ TrisulPlugin = {
         local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
 
         if cmd == "CREATED" then
-          print(iplayer_deviceip)
           engine:update_flow_raw( fkey, 0, 1)
           engine:tag_flow ( fkey, "[natip]"..tsip)
           engine:tag_flow ( fkey, "[natport]"..tsport)
@@ -333,6 +339,79 @@ TrisulPlugin = {
         engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
         engine:update_flow_raw( fkey, 1, 1)
         engine:terminate_flow ( fkey)
+      elseif syslogstr:find('trandisp="snat+dnat"',1,true) then
+        local bret,
+	date,
+	time,
+	sip,
+	sport,
+	dip,
+	dport,
+	proto,
+	tranip,
+	tranport,
+	transip,
+	transport=T.re2_FortigateNATSylog:partial_match_n(syslogstr)
+        if bret ==false then return; end
+	local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
+        engine:update_flow_raw( fkey, 0, 1)
+        engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
+        engine:tag_flow ( fkey, "[natip]"..tranip)
+        engine:tag_flow ( fkey, "[natport]"..tranport)
+        engine:update_flow_raw( fkey, 1, 1)
+        engine:terminate_flow ( fkey)
+      elseif syslogstr:find('trandisp="snat"',1,true) then
+        local bret,
+	date,
+	time,
+	sip,
+	sport,
+	dip,
+	dport,
+	proto,
+	transip,
+	transport=T.re2_FortigateNATSylogSNat:partial_match_n(syslogstr)
+        if bret ==false then return; end
+	
+	local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
+	
+        engine:update_flow_raw( fkey, 0, 1)
+        engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
+        engine:tag_flow ( fkey, "[natip]"..transip)
+        engine:tag_flow ( fkey, "[natport]"..transport)
+        engine:update_flow_raw( fkey, 1, 1)
+        engine:terminate_flow ( fkey)
+      elseif syslogstr:match('srcport.*trandisp="noop"') then
+        local bret,
+	date,
+	time,
+	sip,
+	sport,
+	dip,
+	dport,
+	proto=T.re2_FortigateNATSylogNoopPort:partial_match_n(syslogstr)
+        if bret ==false then return; end
+	local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
+        engine:update_flow_raw( fkey, 0, 1)
+        engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
+        engine:update_flow_raw( fkey, 1, 1)
+        engine:terminate_flow ( fkey)
+      elseif syslogstr:match('trandisp="noop"') then
+        local bret,
+	date,
+	time,
+	sip,
+	dip,
+	proto=T.re2_FortigateNATSylogNoop:partial_match_n(syslogstr)
+	
+        if bret ==false then return; end
+	if sip:match(":") then return; end
+	local fkey = Fk.toflow_format_v4( proto, sip,'0', dip, '0')
+        engine:update_flow_raw( fkey, 0, 1)
+        engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
+        engine:update_flow_raw( fkey, 1, 1)
+        engine:terminate_flow ( fkey)
+
 
       end 
     end,
