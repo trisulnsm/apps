@@ -24,8 +24,11 @@ TrisulPlugin = {
   -- COMMON FUNCTIONS:  onload, onunload, onmessage 
   -- 
   -- WHEN CALLED : your LUA script is loaded into Trisul 
+  -- 5><190>logver=700140601 timestamp=1713200834 devname="Elan_HO_Sec-43" devid="FG200FT922933941" vd="root" date=2024-04-15 time=17:07:14 eventtime=1713181035082310613 tz="+0530" logid="0100026001" type="event" subtype="system" level="information" logdesc="DHCP Ack log" interface="Local_LAN" dhcp_msg="Ack" mac="20:79:18:93:22:C7" ip=192.168.6.20 lease=1440 hostname="Gauravthakur" msg="DHCP server sends a DHCPACK"
+
   onload = function()
-    T.re2_Fortigate_DHCKAck=T.re2('msg="DHCP server sends a DHCPACK".*hostname="(.\\S+)".*ip=(\\S+).*mac="(\\S+)".*lease=(\\d+).*itime_t=(\\d+)')
+    T.re2_Fortigate_DHCPAck=T.re2('msg="DHCP server sends a DHCPACK".*hostname="(.\\S+)".*ip=(\\S+).*mac="(\\S+)".*lease=(\\d+).*itime_t=(\\d+)')
+    T.re2_Fortigate_DHCPAck_2=T.re2('timestamp=(\\d+).*mac="(\\S+)".*ip=(\\S+).*lease=(\\d+).*hostname="(\\S+)".*msg="DHCP server sends a DHCPACK"')
 
   end,
 
@@ -45,7 +48,10 @@ TrisulPlugin = {
     onpacket = function(engine,layer)
       local syslogstr = layer:rawbytes():tostring()
 
-	  local bret, hostname,ip,mac,lease, starttm = T.re2_Fortigate_DHCKAck:partial_match_n(syslogstr)
+
+print(syslogstr) 
+
+	  local bret, starttm,mac,ip,lease,hostname = T.re2_Fortigate_DHCPAck_2:partial_match_n(syslogstr)
 
 	  if bret ==false then return;  end
 
