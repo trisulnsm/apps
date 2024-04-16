@@ -14,7 +14,8 @@ UPDATES
 =======
 
 ````
-0.0.1       Apr 15 2023         Initial release 
+0.0.3       Apr 17 2024         Add edges to map users to IP, create crosskeys 
+0.0.1       Apr 15 2024         Initial release 
 ````
 
 

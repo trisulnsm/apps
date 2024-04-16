@@ -68,12 +68,16 @@ TrisulPlugin = {
 				T.dhcp_map[key]=nil
 				return
 			end
-			print("Got map..".. table.concat(mp,' '))
+			-- print(""..timestamp.." "..engine:id().." Got map..".. table.concat(mp,' '))
 
 			local newkey=mp[2]
-			engine:update_counter( "{A8D34B1F-E0E5-458D-012A-0A31B0746D41}", newkey, 0, metrics[1])
-			engine:update_counter( "{A8D34B1F-E0E5-458D-012A-0A31B0746D41}", newkey, 1, metrics[2])
-			engine:update_counter( "{A8D34B1F-E0E5-458D-012A-0A31B0746D41}", newkey, 2, metrics[3])
+			engine:update_counter( "{A8D34B1F-E0E5-458D-012A-0A31B0746D41}", newkey, 0, 60*metrics[1])
+			engine:update_counter( "{A8D34B1F-E0E5-458D-012A-0A31B0746D41}", newkey, 1, 60*metrics[2])
+			engine:update_counter( "{A8D34B1F-E0E5-458D-012A-0A31B0746D41}", newkey, 2, 60*metrics[3])
+		else
+			engine:update_counter( "{A8D34B1F-E0E5-458D-012A-0A31B0746D41}", key, 0, 60*metrics[1])
+			engine:update_counter( "{A8D34B1F-E0E5-458D-012A-0A31B0746D41}", key, 1, 60*metrics[2])
+			engine:update_counter( "{A8D34B1F-E0E5-458D-012A-0A31B0746D41}", key, 2, 60*metrics[3])
 		end
 
     end,
