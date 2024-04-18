@@ -1,4 +1,4 @@
--- hostnames from DHCP ACK messages 
+-- External IP but from Forti syslog 
 --  	a new counter group 
 -- 
 TrisulPlugin = { 
@@ -6,21 +6,19 @@ TrisulPlugin = {
   -- the ID block, you can skip the fields marked 'optional '
   -- 
   id =  {
-    name = "DHCP Host ",
-    description = "DHCP host", -- optional
+    name = "Syslog External IP",
+    description = "External IP from syslog", -- optional
     author = "Unleash", -- optional
   },
 
   countergroup = {
 
     control = {
-      guid = "{A8D34B1F-E0E5-458D-012A-0A31B0746D41}", 
-      name = "DHCP Hostnames",
-      description = "Count DHCP hostname from IP",
+      guid = "{459BACD7-8F16-428F-2882-9DED4801C46D}", 
+      name = "External Syslog IP",
+      description = "Count IP outside from syslog",
       bucketsize = 60,
-	  resolver_guid="{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}",
     },
-
 
     meters = {
         {  0, T.K.vartype.RATE_COUNTER, 100, 0, "bytes", 		"Total",      "Bps" },
