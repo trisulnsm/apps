@@ -67,12 +67,19 @@ TrisulPlugin = {
 		local dport = swb:next_u16()
 
 
+		local maclayer = layer:packet():get_layer(0)
+		local etherswb = SWP.new(maclayer:rawbytes():tostring())
+		local mac = etherswb:next_mac();
+
 		local iplayer = layer:packet():get_layer(1)
 		local ipbuf = iplayer:rawbytes():tostring() 
 		local ipswb = SWP.new(ipbuf)
 		ipswb:skip(12) 
 		local sip = ipswb:next_ipv4()
 		local dip = ipswb:next_ipv4()
+
+		local mackey = sip.."\\"..dip.."\\"..mac
+		engine:update_counter_bytes( "{095E0C56-D17F-4634-A0B8-E000B4E85140}", mackey, 0)
 
 		-- check if DIP has a mapping 
 		-- if no mapping dont do anything.. this is only for multicast mapping

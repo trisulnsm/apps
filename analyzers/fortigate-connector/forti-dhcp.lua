@@ -38,6 +38,7 @@ TrisulPlugin = {
 	T.re2_Fortigate_FSSO_Logon=T.re2('timestamp=(\\d+).*FSSO-logon event from FSSO-AD: user (\\S+) logged on ([\\d\\.]+)')
 	T.re2_Fortigate_Forward_Delta=T.re2('timestamp=(\\d+).*srcip="(\\S+)".*srcname="(\\S+).*dstip=(\\S+).*dstintfrole="wan".*user="(\\S+)".*app="(\\S+)".*sentdelta=(\\d+).*rcvddelta=(\\d+)')
 	T.re2_Fortigate_Forward=T.re2('timestamp=(\\d+).*srcip="(\\S+)".*srcname="(\\S+).*dstip=(\\S+).*dstintfrole="wan".*user="(\\S+)".*app="(\\S+)".*sentbyte=(\\d+).*rcvdbyte=(\\d+)')
+	T.re2_Fortigate_Forward_Delta_Eventtime=T.re2('eventtime=(\\d{10}).*srcip=(\\S+).*srcname="(\\S+).*dstip=(\\S+).*dstintfrole="wan".*user="(\\S+)".*service="(\\S+)".*sentdelta=(\\d+).*rcvddelta=(\\d+)')
 
   end,
 
@@ -57,7 +58,6 @@ TrisulPlugin = {
     onpacket = function(engine,layer)
       local syslogstr = layer:rawbytes():tostring()
 
-	  -- DHCP 
 	  local bret, starttm,mac,ip,lease,hostname = T.re2_Fortigate_DHCPAck_2:partial_match_n(syslogstr)
 	  if bret  then 
 		  local serialstr = ip.."\n"..hostname:upper() .."\n"..mac.."\n"..starttm+lease;
@@ -83,6 +83,9 @@ TrisulPlugin = {
 	  bret, starttm,srcip,srcname,dstip,userid,app,sentbyte,recvbyte= T.re2_Fortigate_Forward_Delta:partial_match_n(syslogstr)
 	  if not bret then 
 		  bret, starttm,srcip,srcname,dstip,userid,app,sentbyte,recvbyte= T.re2_Fortigate_Forward:partial_match_n(syslogstr)
+		  if not bret then 
+			  bret, starttm,srcip,srcname,dstip,userid,app,sentbyte,recvbyte= T.re2_Fortigate_Forward_Delta_Eventtime:partial_match_n(syslogstr)
+		  end 
 	  end 
 	  if bret  then 
 		  local serialstr = srcip.."\n"..srcname:upper() .."\n".."00:00:00:00:00:00".."\n"..starttm+120;
