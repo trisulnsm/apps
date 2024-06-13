@@ -37,8 +37,11 @@ TrisulPlugin = {
     T.re2_Fortigate_DHCPAck_2=T.re2('timestamp=(\\d+).*mac="(\\S+)".*ip=(\\S+).*lease=(\\d+).*hostname="(\\S+)".*msg="DHCP server sends a DHCPACK"')
 	T.re2_Fortigate_FSSO_Logon=T.re2('timestamp=(\\d+).*FSSO-logon event from FSSO-AD: user (\\S+) logged on ([\\d\\.]+)')
 	T.re2_Fortigate_Forward_Delta=T.re2('timestamp=(\\d+).*srcip="(\\S+)".*srcname="(\\S+).*dstip=(\\S+).*dstintfrole="wan".*user="(\\S+)".*app="(\\S+)".*sentdelta=(\\d+).*rcvddelta=(\\d+)')
-	T.re2_Fortigate_Forward=T.re2('timestamp=(\\d+).*srcip="(\\S+)".*srcname="(\\S+).*dstip=(\\S+).*dstintfrole="wan".*user="(\\S+)".*app="(\\S+)".*sentbyte=(\\d+).*rcvdbyte=(\\d+)')
-	T.re2_Fortigate_Forward_Delta_Eventtime=T.re2('eventtime=(\\d{10}).*srcip=(\\S+).*srcname="(\\S+).*dstip=(\\S+).*dstintfrole="wan".*user="(\\S+)".*service="(\\S+)".*sentdelta=(\\d+).*rcvddelta=(\\d+)')
+	T.re2_Fortigate_Forward=T.re2('timestamp=(\\d+).*srcip="(\\S+)".*srcname="(\\S+)".*dstip=(\\S+).*dstintfrole="wan".*user="(\\S+)".*app="(\\S+)".*sentbyte=(\\d+).*rcvdbyte=(\\d+)')
+	T.re2_Fortigate_Forward_Delta_Eventtime=T.re2('eventtime=(\\d{10}).*srcip=(\\S+).*srcname="(\\S+|[\\w -_])".*dstip=(\\S+).*dstintfrole="wan".*user="(\\S+)".*(?:service|app)="(\\S+|[\\w -_])".*(?:sentdelta|sentbyte)=(\\d+).*(?:rcvddelta|rcvdbyte)=(\\d+)')
+	T.re2_Fortigate_Forward_Delta_Eventtime_Withoutsrcname=T.re2('eventtime=(\\d{10}).*srcip=(\\S+).*dstip=(\\S+).*dstintfrole="wan".*user="([\\w ]+)".*(?:sentdelta|sentbyte)=(\\d+).*(?:rcvddelta|rcvdbyte)=(\\d+).*srchwvendor="(\\S+|[\\w -_])"')
+	T.re2_Fortigate_Forward_Delta_Eventtime_Withoutuser=T.re2('eventtime=(\\d{10}).*srcip=(\\S+).*srcname="(\\S+|[\\w -_])".*dstip=(\\S+).*dstintfrole="wan".*(?:service|app)="(\\S+|[\\w -_])".*(?:sentdelta|sentbyte)=(\\d+).*(?:rcvddelta|rcvdbyte)=(\\d+)')
+	T.re2_Fortigate_Forward_Delta_Eventtime_Srcfamily=T.re2('eventtime=(\\d{10}).*srcip=(\\S+).*dstip=(\\S+).*dstintfrole="wan".*(?:service|app)="(\\S+|[\\w -_])".*(?:sentdelta|sentbyte)=(\\d+).*(?:rcvddelta|rcvdbyte)=(\\d+).*srcfamily="([\\w -_]+)"')
 
   end,
 
@@ -87,6 +90,20 @@ TrisulPlugin = {
 			  bret, starttm,srcip,srcname,dstip,userid,app,sentbyte,recvbyte= T.re2_Fortigate_Forward_Delta_Eventtime:partial_match_n(syslogstr)
 		  end 
 	  end 
+	  --syslog with out username , srcname as username
+	  if not bret then
+	     bret, starttm,srcip,srcname,dstip,app,sentbyte,recvbyte= T.re2_Fortigate_Forward_Delta_Eventtime_Withoutuser:partial_match_n(syslogstr)
+	     userid=srcname
+	  end 
+	  --syslog without srcname , usename as srcname
+	  if not bret then
+	     bret, starttm,srcip,dstip,userid,sentbyte,recvbyte,app= T.re2_Fortigate_Forward_Delta_Eventtime_Withoutsrcname:partial_match_n(syslogstr)
+	  end 
+	  --srcfamily
+	  if not bret then
+	     bret, starttm,srcip,dstip,app,sentbyte,recvbyte,srcname= T.re2_Fortigate_Forward_Delta_Eventtime_Srcfamily:partial_match_n(syslogstr)
+	     userid=srcname
+	  end 
 	  if bret  then 
 		  local serialstr = srcip.."\n"..srcname:upper() .."\n".."00:00:00:00:00:00".."\n"..starttm+120;
 		  engine:post_message_backend( '{DE53D193-9A98-4443-2289-84E537A5820A}', serialstr  )
@@ -115,6 +132,8 @@ TrisulPlugin = {
 
 
 		  return 
+	   else
+		 print(syslogstr)
 	  end 
 
 
