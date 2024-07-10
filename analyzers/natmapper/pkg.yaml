@@ -1,0 +1,16 @@
+name: NAT Mapper 
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: Add NAT IP and NAT Port tags
+   long:  |
+      Used to tag NAT/CGNAT IP and Port tags to flows 
+
+apptype: lua
+
+appresources: nat_tagger.lua 
+
+dependencies:  
