@@ -87,7 +87,7 @@ TrisulPlugin = {
 	local appid   = T.apps[ ipz ]
 	local appcat  = T.appcats[ ipz ]
 
-	local t, r, x = bytes_az + bytes_za , bytes_az, bytes_za 
+	local t, x, r = bytes_az + bytes_za , bytes_az, bytes_za 
 
 	if userid  then 
           -- update user
