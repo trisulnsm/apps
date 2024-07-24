@@ -1,6 +1,6 @@
 name: Fortigate Connector
 
-version: 0.0.8
+version: 0.0.9
 
 author: trisul
 
@@ -12,6 +12,6 @@ description:
 
 apptype: lua
 
-appresources: cg_monitor_hosts.lua forti-dhcp.lua newcg-hostname.lua newcg-external.lua syslog-protocol.lua crosskey_counter_group1713265391980.json crosskey_counter_group1713436408896.json
+appresources: mmon.lua cg_monitor_hosts.lua forti-dhcp.lua newcg-hostname.lua newcg-external.lua syslog-protocol.lua crosskey_counter_group1713265391980.json crosskey_counter_group1713436408896.json newcg-appcat.lua 
 
 dependencies:  
