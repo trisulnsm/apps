@@ -46,17 +46,21 @@ TrisulPlugin = {
 		local t = {}
 			  t['srcip']=""
 		      t['srcname']=""
+		      t['service']=""
 			  t['dstip']=""
 			  t['hostname']=""
 			  t['app']=""
 			  t['appcat']=""
 			  t['user']=""
+			  t['url']=""
 			  t['unauthuser']=""
-		for k, v in string.gmatch(syslogstr, "(%w+)=([%w.-]+)") do
+			  t['service']=""
+
+		for k, v in string.gmatch(syslogstr, "(%w+)=([%w%.%-%/]+)") do
 		  t[k] = v
 		end
 
-		for k, v in string.gmatch(syslogstr, '(%w+)="([%w.-]+)"') do
+		for k, v in string.gmatch(syslogstr, '(%w+)="([%w%.%-%/]+)"') do
 		  t[k] = v
 		end
 
@@ -68,13 +72,16 @@ TrisulPlugin = {
 
 		local user2  = t['user'] .. t['unauthuser'] 
 		local srcname  = t['srcname'] 
+		if t['hostname']=='unscanned' then
+			t['hostname']=''
+		end 
 
 		if #user2 ==0 and #srcname > 0 then
 			 user2 = srcname 
 		end 
 
 
-	    if #user2 > 0 and #t['srcip'] > 0  then 
+	    if #user2 > 0 and #t['srcip'] > 0  and string.find(t['srcip'],'.',1,true )  then 
 			local ipk = to_ipkey_format( t['srcip'])
 			engine:update_key_info(  '{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', ipk, user2, t['srcname'])
 
@@ -96,8 +103,17 @@ TrisulPlugin = {
 			engine:update_key_info(  '{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', to_ipkey_format( t['dstip']), t['hostname'])
 		end
 
+	    if #t['url']  > 0 and #t['dstip'] > 0 then 
+			local hname = string.gsub(t['url'],"https:","")
+			hname = string.gsub(hname,"/","")
+
+			engine:update_key_info(  '{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', to_ipkey_format( t['dstip']), hname)
+		end
+
 		if #t['app']  > 0 and #t['dstip'] > 0 then
 			engine:post_message_frontend('{56C435B7-D623-49B7-55F8-5D1210288002}', "APP|"..t['dstip']..'|'..t['app'])
+		elseif #t['service']  > 0 and #t['dstip'] > 0 then
+			engine:post_message_frontend('{56C435B7-D623-49B7-55F8-5D1210288002}', "APP|"..t['dstip']..'|'..t['service'])
 		end
 
 		if #t['appcat']  > 0 and #t['dstip'] > 0 then
@@ -113,7 +129,8 @@ TrisulPlugin = {
 			  string.format("%25s", t['appcat'])..
 			  string.format("%15s", t['user'])..
 			  string.format("%15s", t['unauthuser'])..
-			  string.format("%30s", t['hostname']))
+			  string.format("%30s", t['hostname'])..
+			  string.format("%30s", t['service']))
 		]]-- 
 
 	  return 

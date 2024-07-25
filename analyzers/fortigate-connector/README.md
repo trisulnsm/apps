@@ -14,7 +14,8 @@ UPDATES
 =======
 
 ````
-0.0.9       Jul 24 2024         New architecture using flow monitor LUA 
+0.1.0       Jul 25 2024         More updates and new architecture, syslog only used for 
+                                label updates 
 0.0.6       Jun 12 2024         More syslog variants 
 0.0.5       Apr 18 2024         Use delta counters when available, userid-to-hosts crosskey 
 0.0.3       Apr 17 2024         Add edges to map users to IP, create crosskeys 
