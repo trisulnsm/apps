@@ -12,6 +12,7 @@ description:
 
 apptype: lua
 
-appresources: mmon.lua cg_monitor_hosts.lua forti-dhcp.lua newcg-hostname.lua newcg-external.lua syslog-protocol.lua crosskey_counter_group1713265391980.json crosskey_counter_group1713436408896.json InternalXAppCategory.json InternalXAppID.json InternalXExternal.json FlowintfXUser.json FlowtaggerAppCatageory.json FlowtaggerAppID.json FlowtaggerUserID.json        
+appresources: mmon.lua cg_monitor_hosts.lua forti-dhcp.lua newcg-hostname.lua newcg-external.lua syslog-protocol.lua crosskey_counter_group1713265391980.json crosskey_counter_group1713436408896.json InternalXAppCategory.json InternalXAppID.json InternalXExternal.json FlowintfXUser.json FlowtaggerAppCatageory.json FlowtaggerAppID.json FlowtaggerUserID.json CounterVarIntXAppCat.json CounterVarIntXAppID.json CounterVarIntXExt.json     
+
 
 dependencies:  
