@@ -75,6 +75,10 @@ TrisulPlugin = {
 		if t['hostname']=='unscanned' then
 			t['hostname']=''
 		end 
+		if t['srcfamily'] and #srcname==0 then
+                  srcname=t['srcfamily']
+                  t['srcname']=t['srcfamily']
+                end
 
 		if #user2 ==0 and #srcname > 0 then
 			 user2 = srcname 
