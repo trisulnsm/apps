@@ -8,36 +8,29 @@ function to_ipkey_format(dotted_ip)
     return string.format("%02X.%02X.%02X.%02X", b1, b2, b3, b4)
 end
 
+TrisulPlugin = {
 
-TrisulPlugin = { 
+    -- the ID block, you can skip the fields marked 'optional '
+    --
+    id = {
+        name = "Fortigate DHCP logs packet monitor",
+        description = "Listen to SYSLOG DHCP packets",
+    },
 
-
-  -- the ID block, you can skip the fields marked 'optional '
-  -- 
-  id =  {
-    name = "Fortigate DHCP logs packet monitor",
-    description = "Listen to SYSLOG DHCP packets", 
-  },
-
-    -- COMMON FUNCTIONS:  onload, onunload, onmessage 
-    -- 
-    onload = function()
-    end,
-
+    -- COMMON FUNCTIONS:  onload, onunload, onmessage
+    --
+    onload = function() end,
 
     -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul
-    onunload = function()
-    end,
+    onunload = function() end,
 
     simplecounter = {
 
         -- to UDP>SYSLOG protocol
         protocol_guid = "{4323003E-D060-440B-CA26-E146C0C7DB4E}",
 
-
         -- also work in NETFLOW_TAP mode
         flow_counter = true,
-
 
         -- each SYSLOG packet
         onpacket = function(engine, layer)
@@ -147,7 +140,7 @@ TrisulPlugin = {
                     "CAT|" .. t["dstip"] .. "|" .. t["appcat"]
                 )
             end
-             --
+            --
 
             --[[
       print(string.format("%18s", t['srcip']) ..
@@ -159,7 +152,8 @@ TrisulPlugin = {
           string.format("%15s", t['unauthuser'])..
           string.format("%30s", t['hostname'])..
           string.format("%30s", t['service']))
-      ]] return
-        end
-    }
+      ]]
+            return
+        end,
+    },
 }
