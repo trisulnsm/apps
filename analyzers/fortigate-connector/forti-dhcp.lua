@@ -8,20 +8,27 @@ function to_ipkey_format(dotted_ip)
     return string.format("%02X.%02X.%02X.%02X", b1, b2, b3, b4)
 end
 
-TrisulPlugin = {
-    -- the ID block, you can skip the fields marked 'optional '
-    --
-    id = {
-        name = "Fortigate DHCP logs packet monitor",
-        description = "Listen to SYSLOG DHCP packets"
-    },
-    -- COMMON FUNCTIONS:  onload, onunload, onmessage
-    --
+
+TrisulPlugin = { 
+
+
+  -- the ID block, you can skip the fields marked 'optional '
+  -- 
+  id =  {
+    name = "Fortigate DHCP logs packet monitor",
+    description = "Listen to SYSLOG DHCP packets", 
+  },
+
+    -- COMMON FUNCTIONS:  onload, onunload, onmessage 
+    -- 
     onload = function()
     end,
+
+
     -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul
     onunload = function()
     end,
+
     simplecounter = {
 
         -- to UDP>SYSLOG protocol
