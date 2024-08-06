@@ -1,6 +1,6 @@
 name: NAT SYSLOG
 
-version: 1.0.7
+version: 1.0.8
 
 author: trisul
 
@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: flowkey.lua  ipfixnatctr.lua  ipfix-protocol.lua  natsyslogctr.lua  raw-syslogs.lua  store-tagged-only.lua  sweepbuf.lua  syslog-protocol.lua
+appresources: flowkey.lua  ipfixnatctr.lua  ipfix-protocol.lua  natsyslogctr.lua  raw-syslogs.lua  store-tagged-only.lua  sweepbuf.lua  syslog-protocol.lua radius-syslog.lua
 
 dependencies:  
