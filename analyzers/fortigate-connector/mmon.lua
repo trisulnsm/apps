@@ -94,6 +94,7 @@ TrisulPlugin = {
           engine:update_counter("{86A8880D-F4B2-4E49-A4FA-718880CAA976}", userid, 0, t)
           engine:update_counter("{86A8880D-F4B2-4E49-A4FA-718880CAA976}", userid, 1, r)
           engine:update_counter("{86A8880D-F4B2-4E49-A4FA-718880CAA976}", userid, 2, x)
+	  engine:update_key_info("{86A8880D-F4B2-4E49-A4FA-718880CAA976}", userid, userid)
 
 	end
 
