@@ -6,9 +6,9 @@ author: trisul
 
 
 description: 
-   short: Network In and Out bandith with average rates
+   short: Network In and Out bandwidth with average rates
    long:  |
-      A breakup of In and out traffic banwidth with average rates 
+      A breakup of In and out traffic bandwidth with average rates 
 
 apptype: dashboard_js
 
