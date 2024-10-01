@@ -1,0 +1,16 @@
+name: Banned Comms
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: Watches for banned communications 
+   long:  |
+      Certain endpoints are only allowed to talk to certain other endpoints, alert otherwise
+
+apptype: lua
+
+appresources: fwatch.lua 
+
+dependencies:  
