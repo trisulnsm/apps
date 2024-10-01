@@ -37,8 +37,7 @@ TrisulPlugin = {
     onnewflow  = function(engine, flow ) 
 
 		print(flow:key()) 
-		if  flow:key():match("0A.02.02.??")  then
-		  if not  flow:key():match("0A.02.00.F[BC]")  then 
+		if  flow:key():match("0A.02.02.%x%x")  and not  flow:key():match("0A.02.00.F[BC]")  then 
 
          -- alert
           engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",
@@ -48,7 +47,6 @@ TrisulPlugin = {
                     "End point tried to connect with another end point.  Potentially stopped")
           T.logwarning("BANNED-CONN End point tried to connect with another End point")
 
-		  end
 		end
     end,
 

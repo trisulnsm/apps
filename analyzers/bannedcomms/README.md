@@ -10,5 +10,5 @@ UPDATES
 =======
 
 ````
-1.0.0   Oct 1 2024     Initial release 
+1.0.2   Oct 1 2024     Initial release 
 ````
