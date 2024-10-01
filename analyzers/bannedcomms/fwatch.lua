@@ -37,8 +37,8 @@ TrisulPlugin = {
     onnewflow  = function(engine, flow ) 
 
 		print(flow:key()) 
-		if  flow:key():match("C0.A8.01.??")  then
-		  if not  flow:key():match("C0.A8.01.4D")  then 
+		if  flow:key():match("0A.02.02.??")  then
+		  if not  flow:key():match("0A.02.00.F[BC]")  then 
 
          -- alert
           engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",
