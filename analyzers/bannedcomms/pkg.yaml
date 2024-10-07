@@ -1,6 +1,6 @@
 name: Banned Comms
 
-version: 1.0.2
+version: 1.0.3
 
 author: trisul
 
@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: fwatch.lua 
+appresources: fwatch.lua  mkconfig.lua
 
 dependencies:  

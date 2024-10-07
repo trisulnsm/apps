@@ -4,6 +4,8 @@
 -- TYPE:        BACKEND SCRIPT
 -- PURPOSE:     Detect when host isolation is broken 
 -- 
+require 'mkconfig' 
+
 TrisulPlugin = { 
 
   id =  {
@@ -17,6 +19,17 @@ TrisulPlugin = {
 
   -- WHEN CALLED : your LUA script is loaded into Trisul 
   onload = function()
+
+
+   T.active_config = make_config(
+            T.env.get_config("App>DBRoot").."/config/trisulnsm_bannedcomms.lua",
+            {
+				WhiteList  =  {
+						{ ["0A.02.02.%x%x"] = "0A.02.00.F[BC]" },
+						{ ["0A.02.02.%x%x"] = "[EF]%x.%x%x.%x%x.%x%x" },
+				} ;
+            })
+
   end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
@@ -34,20 +47,44 @@ TrisulPlugin = {
     session_guid = '{99A78737-4B41-4387-8F31-8077DB917336}', -- optional
 
     -- WHEN CALLED: a new flow is seen 
-    onnewflow  = function(engine, flow ) 
+    onupdate  = function(engine, flow ) 
 
-		print(flow:key()) 
-		if  flow:key():match("0A.02.02.%x%x")  and not  flow:key():match("0A.02.00.F[BC]")  then 
+		local cltmatch,svrmatch=0,0
+		for _,rule in  ipairs(T.active_config.WhiteList) do
+			for clt,svr in pairs(rule) do 
+				if  flow:key():match(clt)  then 
+					if  flow:key():match(svr)  then 
+						svrmatch=svrmatch+1 
+					else 
+						cltmatch=cltmatch+1 
+					end
+				end
+			end 
+		end 
 
-         -- alert
-          engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",
-                    flow:key(),
-                    "BANNED-CONN",
-                    1,
-                    "End point tried to connect with another end point.  Potentially stopped")
-          T.logwarning("BANNED-CONN End point tried to connect with another End point")
+		if cltmatch>0 and svrmatch ==0 then 
 
-		end
+			print(flow:key()) 
+
+			local fo=flow:flow()
+			local amsg = "Prohibited traffic detected between "..fo:ipa_readable().." and "..fo:ipz_readable()
+						   .. " device "..fo:netflow_router_readable()
+						   .. " in-port ".. fo:netflow_ifindex_in_readable() 
+						   .. " out-port ".. fo:netflow_ifindex_out_readable() 
+
+			print(amsg)
+
+			-- alert
+			engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",
+					flow:key(),
+					"BANNED-CONN",
+					1,
+					amsg) 
+			T.logwarning("BANNED-CONN "..amsg) 
+
+
+		end 
+		
     end,
 
     -- WHEN CALLED: before a flow is flushed to the Hub node  
