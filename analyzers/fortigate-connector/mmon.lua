@@ -67,12 +67,6 @@ TrisulPlugin = {
   -- 
   messagemonitor   = {
 
-  onflowmetric  = function(engine,flowid,meter,value)
-
-	print("onflowmetric ="..flowid:key())
-
-  end,
-
   onnewflowrecord = function(engine, flowid, bytes_az, bytes_za, packets_az, packets_za)
 
 	-- print("onnewflowrecord ="..flowid:key().. ' az=' .. bytes_az.. " za="..bytes_za)
