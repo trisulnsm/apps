@@ -1,0 +1,20 @@
+name: Banned Comms UI
+
+version: 1.0.0
+
+author: trisul
+
+
+description: 
+   short: Banned Comms Viewer
+   long:  |
+      Total Terminals under watch 
+      Terminals traffic 
+      End to End violation
+      Multiple IP for MAC violation 
+
+apptype: dashboard_share
+
+appresources: dashboard1733389469706.json  filter_counter_group1733389504465.json 
+
+dependencies : 
