@@ -38,6 +38,7 @@ UPDATES
 =======
 
 ````
+1.0.5   Dec 6 2024      Alert counts 
 1.0.4   Nov 29 2024     Alert when multiple IP assigned to a MAC .. 
 1.0.3   Oct 7  2024     Rules based to exclude broadcast traffic and other opts
 1.0.2   Oct 1  2024     Initial release 
