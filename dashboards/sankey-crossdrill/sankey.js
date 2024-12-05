@@ -190,7 +190,87 @@ class SankeyCrossDrill  {
       maxitems:1000
     }); 
 
-    this.cgtoppers_bytes = _.each(this.cgtoppers_bytes.keys, (k)=> { k.metric = parseInt(k.metric)*bucket_size; return k})
+    this.cgtoppers_bytes = _.each(this.cgtoppers_bytes.keys, (k)=> { k.metric = parseInt(k.metric)*bucket_size; return k});
+
+
+    //for resolve ifalias for flowinterface
+    let flow_intf_lookup  = {};
+    let router_lookup = {};
+    let parent_cgguids =  this.cg_meters.crosskey[this.cgguid].slice(1)
+    let flow_intf = parent_cgguids.some( ai => [GUID.GUID_CG_SNMP_INTERFACE(),GUID.GUID_CG_FLOWINTERFACE()].includes(ai) );
+    
+    if(flow_intf){
+      let flow_intf_regex=/^((([0-9A-Fa-f]){2}\.){3}([0-9A-Fa-f]){2})_(\d|[a-f]|[A-F])+$/;
+      let flow_intf_keys = [];
+      let router_keys = [];
+      for(const keyt of this.cgtoppers_bytes){
+        
+        let crosskeys = keyt.key.split("\\");
+        let keys = crosskeys.filter(key=>key.match(flow_intf_regex));
+        if(keys.length > 0)
+        {
+          keys.forEach((key)=>{
+            router_keys.push(key.split("_")[0]);
+          });
+          flow_intf_keys.push(keys);
+        }
+      }
+      flow_intf_keys=[...new Set(flow_intf_keys.flat(Infinity))];
+      router_keys=[...new Set(router_keys.flat(Infinity))];
+
+      //for routers
+      let req_opts = {
+        counter_group:GUID.GUID_CG_FLOWGENS(),
+        keys:router_keys,
+      }
+      
+      let resp  = await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,req_opts);
+      resp.keys.forEach(keyt=>{
+        router_lookup[keyt.key]=keyt.label;
+      });
+
+      //for interface
+      req_opts = {
+        counter_group:GUID.GUID_CG_FLOWINTERFACE(),
+        keys:flow_intf_keys,
+        get_attributes:true
+
+      }
+      
+      resp  = await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,req_opts);
+      resp.keys.forEach(keyt=>{
+        let attr =_.select(keyt.attributes,function(e){return e.attr_name=='snmp.ifalias'})[0];
+        if (attr && attr.attr_value.length > 0){
+          flow_intf_lookup[keyt.key]=attr.attr_value;
+        }
+      })
+
+      //replace name with ifalias
+      for(const keyt of this.cgtoppers_bytes){
+        
+        let crosskeys = keyt.key.split("\\");
+        for(const [index,key] of crosskeys.entries())
+        {
+          if(key.match(flow_intf_regex) && flow_intf_lookup[key]){
+            let label = keyt.label.split("\\");
+            let router = key.split("_")[0];
+            if(parent_cgguids.includes(GUID.GUID_CG_FLOWGENS())){
+              label[index]=`${label[index]} ${flow_intf_lookup[key]}`;
+
+            }else{
+              label[index]=`${router_lookup[router]} ${label[index]} ${flow_intf_lookup[key]}`;
+
+            }
+            label = label.join("\\");
+
+            keyt.label=label;
+          }
+        }
+      }
+
+    }
+
+
 
     this.prase_toppers();
     let dropdowncg = document.getElementById('cg_id');
