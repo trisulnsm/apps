@@ -52,6 +52,25 @@
             .col-8
               %input#invert_filter{type:"checkbox",name:"invertfilter",value:1}
 
+      .row.mb-3
+        .col-12.text-center
+          %a.btn-link#adv_form_collapse{'data-bs-toggle':"collapse",'data-bs-target':"#advfields"} advanced search options
+
+      #advfields.collapse
+        %hr
+        .row
+          .col-6
+            .row.mb-3
+              %label.col-form-label.col-4 Routers
+              .col-8
+                %select#routers.form-select{name: "routers"}
+          .col-6
+            .row.mb-3
+              %label.col-form-label.col-4 Interfaces
+              .col-8
+                %select#interfaces.form-select{name: "interfaces"}
+
+
 
       .row.justify-content-center
         .col-auto

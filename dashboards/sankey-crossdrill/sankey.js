@@ -17,8 +17,8 @@ class SankeyCrossDrill  {
 
     //append form in the div
     this.append_form(opts);
+    
   }
-
   // load the frame 
   async load_assets(opts)
   {
@@ -113,6 +113,21 @@ class SankeyCrossDrill  {
 
     show_hide_form();
 
+    var element = document.getElementById("advfields");
+    var myCollapse = new bootstrap.Collapse(element,{toggle:false});
+    var btn = document.getElementById("adv_form_collapse");
+    btn.addEventListener("click", function(){
+      myCollapse.toggle();
+    });
+
+    let load_router_opts = {
+      tmint :{from_date:document.getElementById('from_date_sk').value,to_date:document.getElementById('to_date_sk').value},
+      selected_cg : "",
+      selected_st : "",
+      update_dom_cg : "routers",
+      update_dom_st : "interfaces",chosen:false
+    }
+    trp_load_router_intfs(load_router_opts);
 
     if(this.dash_params.valid_input == "1" || this.dash_params.valid_input==1){
       this.form.submit();
@@ -136,6 +151,17 @@ class SankeyCrossDrill  {
     this.cgguid = this.form.find('#cg_id').val();
     this.meter = this.form.find('#meter_id').val();
     this.filter_text=this.form.find('#fltr_crs').val();
+    this.key_filter = null;
+    let selectElement = document.querySelector('#routers');
+    if(selectElement.value !='0')
+    {
+      this.key_filter = selectElement.value;
+    }
+    selectElement = document.querySelector('#interfaces');
+    if(selectElement.value !='0')
+    {
+      this.key_filter = selectElement.value;
+    }    
     this.run();
     return false;
   }
@@ -177,9 +203,14 @@ class SankeyCrossDrill  {
     // Filter text only send to CG Topper when used in raw key format
     // with a leading $ sign
     let cgtopper_key_filter = "";
-    if (this.filter_text.match(/^\$/)) {
-      cgtopper_key_filter = this.filter_text.replace('$','');
+    if(this.key_filter){
+      cgtopper_key_filter=this.key_filter;
     }
+    if (this.filter_text.match(/^\$/)) {
+      let filter_text = this.filter_text.replace('$','');
+      cgtopper_key_filter=`${filter_text}.*${cgtopper_key_filter}|${cgtopper_key_filter}.*${filter_text}`;
+    }
+
 
     // Get Bytes Toppers 
     this.cgtoppers_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
