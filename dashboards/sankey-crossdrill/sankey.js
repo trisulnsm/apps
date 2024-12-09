@@ -190,7 +190,13 @@ class SankeyCrossDrill  {
       maxitems:1000
     }); 
 
-    this.cgtoppers_bytes = _.each(this.cgtoppers_bytes.keys, (k)=> { k.metric = parseInt(k.metric)*bucket_size; return k});
+    this.cgtoppers_bytes = _.each(this.cgtoppers_bytes.keys, (k)=> { 
+      k.metric = parseInt(k.metric)*bucket_size; 
+      k.metric_max = parseInt(k.metric_max)*8; 
+      k.metric_min = parseInt(k.metric_min)*8; 
+      k.metric_avg = parseInt(k.metric_avg)*8; 
+      return k
+    });
 
 
     //for resolve ifalias for flowinterface
@@ -423,48 +429,63 @@ class SankeyCrossDrill  {
 
   // table : show filtered toppers in a table 
   repaint_table(cgtoppers_bytes) {
-    let table_header = $("<tr>");
+    let units = "";
+    if(this.cg_meters.all_meters_type[this.cgguid] && this.cg_meters.all_meters_type[this.cgguid][this.meter]){
+      units = this.cg_meters.all_meters_type[this.cgguid][this.meter].units;
+    }
+
+    let tbl = document.querySelector('.toppers_table');
+    tbl.classList.add('table',"table-sysdata");
+    tbl.innerHTML='';
+    let template = document.createElement('template')
+    template.innerHTML=`<thead></thead><tbody></tbody>`;
+    
     let ck_parents = this.cg_meters.crosskey[this.cgguid].slice(1,4);
     for(let i=0 ;i < ck_parents.length;i++){
       
       if(this.cg_meters.all_cg_meters[ck_parents[i]]){
         let header = this.cg_meters.all_cg_meters[ck_parents[i]][0] || "";
-        table_header.append($("<th>").text(header));
+        let th = document.createElement('th');
+        th.textContent=header;
+        template.content.querySelector('thead').appendChild(th);
       }
+      
+      
     }
+    for(const h of [["Volume"],["Max"],["Min"],["Avg"],[""]]){
+      let th = document.createElement('th');
+      th.textContent=h[0];
+      template.content.querySelector('thead').appendChild(th);
+    }
+    
+    for(const kt of cgtoppers_bytes){
+      let r = document.createElement('tr');
+      r.dataset.cgguid=this.cgguid;
+      r.dataset.meter=this.meter;
+      r.dataset.key=kt.key;
+      r.dataset.label=kt.label.replace(/:0|:1|:2|:3|:4|:5|:6/g,"");
+      let readable = kt.readable.split("\\");
+      for(const [idx,ai] of kt.label.split("\\").entries()){
+        let td = document.createElement('td');
+        let t = ai.replace(/:0|:1|:2|:3|:4|:5|:6/g,"");
+        if(t != readable[idx])
+        {
+          t = `${t}(${readable[idx]})`
+        }
+        td.textContent=t;
+        r.appendChild(td);
+      }
+      r.insertAdjacentHTML('beforeend', `<td>${h_fmtvol(kt.metric)}</td>`);
+      r.insertAdjacentHTML('beforeend', `<td>${h_fmtbw(kt.metric_max)}${units.toLocaleLowerCase()}</td>`);
+      r.insertAdjacentHTML('beforeend', `<td>${h_fmtbw(kt.metric_min)}${units.toLocaleLowerCase()}</td>`);
+      r.insertAdjacentHTML('beforeend', `<td>${h_fmtbw(kt.metric_avg)}${units.toLocaleLowerCase()}</td>`);
+      r.insertAdjacentHTML('beforeend','<td><a class="sk_opts dropdown-toggle" href="javascript:;;"><i class="fa fa-fw fa-server"></i></a></td>');
+      r.querySelector('.sk_opts').addEventListener("click",this.add_dropdown_menu.bind(this));
+      template.content.querySelector('tbody').appendChild(r);
+    }
+    tbl.appendChild(template.content);
+    tbl.nextElementSibling.remove();
 
-    table_header.append("<th sort='volume'> Volume </th>");
-    table_header.append("<th sort='nosort'> </th>");
-    let tbl=this.data_dom.find('.toppers_table');
-    tbl.find("thead").empty();
-    tbl.find("tbody").empty();
-    tbl.find("thead").append(table_header)
-    tbl.addClass('table table-sysdata');
-    tbl.tablesorter();
-
-    _.each(cgtoppers_bytes, $.proxy(function(kt) {
-        let r = $('<tr>')
-        r.data("cgguid",this.cgguid);
-        r.data("meter",this.meter);
-        r.data("key",kt.key);
-        r.data("label",kt.label.replace(/:0|:1|:2|:3|:4|:5|:6/g,""));
-        let readable = kt.readable.split("\\");
-        _.each(kt.label.split("\\"),function(ai,idx){
-          let t = ai.replace(/:0|:1|:2|:3|:4|:5|:6/g,"");
-          if(t != readable[idx])
-          {
-            t = `${t}(${readable[idx]})`
-          }
-          r.append(`<td>${t}</td>`)
-        });
-        r.append(`<td>${h_fmtvol(kt.metric)}</td>`)
-        r.append('<td><a class="sk_opts dropdown-toggle" href="javascript:;;"><i class="fa fa-fw fa-server"></i></a></td>')
-        tbl.find("tbody").append(r)
-    },this));
-    this.data_dom.find('.toppers_table').siblings('.animated-background').remove();
-    tbl.find(".sk_opts").click($.proxy(function(){
-      this.add_dropdown_menu(event);
-    },this));
   }
 
   add_dropdown_menu(event){
@@ -519,13 +540,13 @@ class SankeyCrossDrill  {
         break;
 
       case "traffic_chart":
-        let p =_.extend({},h)
-        p["key"]= p["key"].replace(/\\/g,"\\\\");
-        p["description"]=tr.data("label").replace(/\\/g,"\\\\");
-        p["name"] = $('#cg_id').find('option:selected').text();
+        let models = [];
+        models.push({counter_group:tr.data("cgguid"),meter:tr.data("meter"),key:tr.data("key"),label:tr.data("label")})
+        let p ={};
+        p["models"]=JSON.stringify(models)
         p["window_fromts"]=tmint.from.tv_sec;
         p["window_tots"]=tmint.to.tv_sec;
-        load_modal("/trpjs/generate_chart_lb?" + $.param(p));
+        new ApexChartLB(p,{modal_title:"Traffic History"})
         break;
     }
   }
