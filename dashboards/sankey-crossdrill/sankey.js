@@ -151,17 +151,7 @@ class SankeyCrossDrill  {
     this.cgguid = this.form.find('#cg_id').val();
     this.meter = this.form.find('#meter_id').val();
     this.filter_text=this.form.find('#fltr_crs').val();
-    this.key_filter = null;
-    let selectElement = document.querySelector('#routers');
-    if(selectElement.value !='0')
-    {
-      this.key_filter = selectElement.value;
-    }
-    selectElement = document.querySelector('#interfaces');
-    if(selectElement.value !='0')
-    {
-      this.key_filter = selectElement.value;
-    }    
+   
     this.run();
     return false;
   }
@@ -199,25 +189,57 @@ class SankeyCrossDrill  {
       bucket_size=1;
     }
 
+    //convet string to hash
+    let crosskeys_cg = [...this.cg_meters.crosskey[this.cgguid]];
+    crosskeys_cg.shift();
 
-    // Filter text only send to CG Topper when used in raw key format
-    // with a leading $ sign
-    let cgtopper_key_filter = "";
-    if(this.key_filter){
-      cgtopper_key_filter=this.key_filter;
+
+    let filter_text_arr=new Array(crosskeys_cg.length).fill(null);
+    
+    if(this.filter_text.length > 0 && this.filter_text.includes("$")==false){
+      for(const [idx,cgguid] of crosskeys_cg.entries()){
+        
+        let resp = await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,{counter_group:cgguid,pattern:this.filter_text});
+        if(resp.keys.length==0){
+          continue;
+        }
+        let keyt =resp.keys[0];
+        if(keyt.key!=this.filter_text){
+          filter_text_arr[idx]=keyt.key
+          break;
+        }
+      }
     }
-    if (this.filter_text.match(/^\$/)) {
-      let filter_text = this.filter_text.replace('$','');
-      cgtopper_key_filter=`${filter_text}.*${cgtopper_key_filter}|${cgtopper_key_filter}.*${filter_text}`;
+    
+   
+    let selectElement = document.querySelector('#routers');
+    if(selectElement.value !='0')
+    {
+      let router = selectElement.value;
+      let index = crosskeys_cg.indexOf(GUID.GUID_CG_FLOWGENS());
+      filter_text_arr[index]=router;
     }
 
+    selectElement = document.querySelector('#interfaces');
+    if(selectElement.value !='0')
+    {
+      
+      let intf = selectElement.value;
+      let index = crosskeys_cg.indexOf(GUID.GUID_CG_FLOWINTERFACE());
+      filter_text_arr[index]=intf;
+    }
+    
+    let key_filter =  filter_text_arr.filter(e=>{return e}).join("\\\\");
+    if(this.filter_text.includes("$")){
+      key_filter = this.filter_text.replace("$","");
+    }
 
     // Get Bytes Toppers 
     this.cgtoppers_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
       counter_group: this.cgguid,
       time_interval: this.tmint ,
       meter:parseInt(this.meter),
-      key_filter: cgtopper_key_filter,
+      key_filter: key_filter,
       maxitems:1000
     }); 
 
