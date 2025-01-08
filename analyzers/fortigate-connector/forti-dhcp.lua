@@ -1,7 +1,7 @@
 --
 -- Fortigate DHCP syslog protocol
 --
-
+local dbg=require'debugger'
 -- in trisul: ipv4 keys look like XX.XX.XX.XX
 function to_ipkey_format(dotted_ip)
     local b1, b2, b3, b4 = dotted_ip:match("(%d+).(%d+).(%d+).(%d+)")
@@ -48,6 +48,8 @@ TrisulPlugin = {
             t["url"] = ""
             t["unauthuser"] = ""
             t["service"] = ""
+            t["srchwvendor"] = ""
+            t["dsthwvendor"] = ""
 
             for k, v in string.gmatch(syslogstr, "(%w+)=([%w%.%-%/]+)") do
                 t[k] = v
@@ -74,8 +76,20 @@ TrisulPlugin = {
                 user2 = srcname
             end
 
+	    if #user2==0 and #t["srchwvendor"] > 0 then
+	       user2=t["srchwvendor"]
+            end
+	    
+	    if #user2==0 and #t["dsthwvendor"] > 0 then
+	       user2=t["dsthwvendor"]
+            end
+
+
             if #user2 > 0 and #t["srcip"] > 0 and string.find(t["srcip"], ".", 1, true) then
                 local ipk = to_ipkey_format(t["srcip"])
+		if user2 == t["dsthwvendor"] then
+		  ipk=to_ipkey_format(t["dstip"])
+	        end
                 engine:update_key_info("{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}", ipk, user2, t["srcname"])
 
                 engine:add_edge(
