@@ -1,6 +1,6 @@
 name: NAT Mapper 
 
-version: 1.0.0
+version: 1.0.1
 
 author: trisul
 
@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: nat_tagger.lua 
+appresources: nat_tagger.lua tris_leveldb.lua 
 
 dependencies:  
