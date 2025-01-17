@@ -89,12 +89,6 @@ TrisulPlugin = {
 
     end,
 
-	--- moron --- for ttesting only 
-	flushfilter = function(engine,flow) 
-		return false
-	end, 
-
-
     -- WHEN CALLED: end of flush
     onendflush = function(engine) 
 		T.loginfo("Size of NAT table = " .. T.nitems .. " delete ok=" .. T.delete_ok .. " not found =" .. T.delete_not_found .. 
