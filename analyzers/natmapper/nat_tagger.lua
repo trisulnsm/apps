@@ -50,22 +50,8 @@ TrisulPlugin = {
 	local cmd = msg:sub(1,6)
 	local pubip = msg:sub(27,-1)
 	if cmd == "CREATE" then
-		local k = T.LDB:getval(pubip)
-		if k then
-			T.create_already_exists = T.create_already_exists + 1
-		else 
-			T.create_ok = T.create_ok  + 1
-			T.nitems = T.nitems + 1
-		end 
 		T.LDB:put(pubip, msg) 
 	elseif cmd == "DELETE" then
-		local k = T.LDB:getval(pubip)
-		if k then 
-			T.delete_ok = T.delete_ok + 1
-			T.nitems = T.nitems - 1
-		else 
-			T.delete_not_found = T.delete_not_found + 1
-		end 
 		T.LDB:delete(pubip) 
 	end 
   end,
