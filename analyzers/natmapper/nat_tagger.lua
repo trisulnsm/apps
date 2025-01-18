@@ -4,8 +4,6 @@
 -- TYPE:        BACKEND SCRIPT
 -- PURPOSE:     handles NAT events and tags flows before flushing 
 -- 
-local LDB=require'tris_leveldb'
-
 TrisulPlugin = { 
 
   id =  {
@@ -22,40 +20,52 @@ TrisulPlugin = {
 
   -- WHEN CALLED : your LUA script is loaded into Trisul 
   onload = function()
-	T.nitems = 0 
-	T.create_ok = 0 
-	T.create_already_exists = 0 
-	T.delete_ok = 0 
-	T.delete_not_found = 0 
+  	
+	T.flows_match = 0 
+	T.flows_notmatch = 0 
 
-	T.LDB = LDB.new()
-	local leveldbfile  = T.env.get_config("App>RunStateDirectory").."/natmap."..T.contextid 
-	T.LDB:open(leveldbfile)
-
+	T.MAX_AGE=2  -- TWO+TWO minutes window maintained 
+	T.running_age = 0  
+	T.current_map_age = 0  
+	T.current_map = { } 
+	T.prev_map = { } 
 
   end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
   onunload = function()
-	LDB:close() 
+  	T.current_map = nil 
+	T.prev_map = nil 
   end,
 
   -- any messages you want to handle for state management 
   message_subscriptions = {"{6ECC7051-616B-4AD8-91C7-40BE8B396A26}" },
 
   -- WHEN CALLED: when another plugin sends you a message 
-  -- CREATE/AC.10.BC.14:p-D5C0/67.DA.70.45:p-E9D4
-  -- DELETE/AC.10.BC.14:p-D5C0/67.DA.70.45:p-E9D4
+  -- CREATE/AC.10.BC.14:p-D5C0/67.DA.70.45:p-E9D4-06
+  -- DELETE/AC.10.BC.14:p-D5C0/67.DA.70.45:p-E9D4-11
   onmessage = function(msgid, msg)
 	local cmd = msg:sub(1,6)
 	local pubip = msg:sub(27,-1)
+	local privipkey = msg:sub(8,25) 
+
 	if cmd == "CREATE" then
-		T.LDB:put(pubip, msg) 
+		T.current_map[pubip]=privipkey 
 	elseif cmd == "DELETE" then
-		T.LDB:delete(pubip) 
+		T.current_map[privipkey]=nil    
+		T.prev_map[privipkey]=nil    
 	end 
   end,
 
+  
+  lookup_private_ipport = function( natmap, pub1, pub2 ) 
+
+		local natm = natmap[pub1] 
+		if not natm then
+			natm = natmap[pub2]
+		end 
+		return natm 
+  end,
 
   sg_monitor  = {
 
@@ -64,21 +74,27 @@ TrisulPlugin = {
     onnewflow  = function(engine, flow ) 
 
 		local k = flow:key()
-		local ep1 = k:sub(5,22)
-		local ep2 = k:sub(27,44)
+		local proto = flow:flow():protocol() 
+		local ep1 = k:sub(5,22) .. '-' .. proto 
+		local ep2 = k:sub(27,44) .. '-' .. proto 
 
-		local natm = T.LDB:getval(ep1)
-		if not natm then
-			natm = T.LDB:getval(ep2)
+		local natm = TrisulPlugin.lookup_private_ipport( T.current_map, ep1, ep2) 
+		if not natm then 
+			natm = TrisulPlugin.lookup_private_ipport( T.prev_map, ep1, ep2) 
 		end 
 
+
 		if not natm then
+			T.flows_notmatch = T.flows_notmatch + 1
 			return
+		else 
+			T.flows_match = T.flows_match + 1
 		end
 
 		-- we got a map, tag 
-		local nip_key = natm:sub(8,18)
-		local nport_key = natm:sub(20,25) 
+		local nip_key = natm:sub(1,11)
+		local nport_key = natm:sub(13,18) 
+
 
 		local nip = tonumber(nip_key:sub(1,2),16) .."." ..  tonumber(nip_key:sub(4,5),16) .. "." ..  tonumber(nip_key:sub(7,8),16) .. "." ..  tonumber(nip_key:sub(10,11),16) 
 		local nport = tonumber(nport_key:sub(3,6),16)
@@ -89,10 +105,38 @@ TrisulPlugin = {
 
     end,
 
+    flushfilter = function(engine,flow) 
+		return false
+	end, 
+
     -- WHEN CALLED: end of flush
     onendflush = function(engine) 
-		T.loginfo("Size of NAT table = " .. T.nitems .. " delete ok=" .. T.delete_ok .. " not found =" .. T.delete_not_found .. 
-				" create ok="..T.create_ok.." already exists="..T.create_already_exists)  
+		T.running_age = T.running_age + 1 
+
+		--
+		-- Print stats 
+		-- 
+		local nitems=0
+		for _ in pairs(T.current_map) do
+			nitems = nitems + 1
+		end 
+		T.loginfo("Gen "..T.running_age .." Size of NAT table = " .. nitems .. " Last window flows match="..T.flows_match.." nomatch="..T.flows_notmatch.." "
+					.. (100*T.flows_match)/(T.flows_match+T.flows_notmatch) ..'%')
+
+		T.flows_notmatch, T.flows_match = 0 ,0 
+
+
+		-- Age out tables if old  
+		if T.running_age -  T.current_map_age  > T.MAX_AGE then 
+			T.loginfo("Aging out old NAT table .. at ".. T.running_age) 
+
+			T.prev_map = T.current_map
+			T.current_map = { } 
+			T.current_map_age = T.running_age 
+
+			collectgarbage()  
+		end 
+
     end,
   },
 

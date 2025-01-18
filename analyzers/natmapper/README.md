@@ -21,6 +21,8 @@ UPDATES
 =======
 
 ````
+1.0.3   Jan 18 2025     Redid with generational table in LUA itself without leveldb 
+                        levelDB was slow causing msg queue to block 
 1.0.1   Jan 17 2025     Changed backing map to LEVELDB to handle ISP scale 
 1.0.0   Jul 10 2024     Initial release 
 ````
