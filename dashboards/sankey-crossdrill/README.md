@@ -14,6 +14,8 @@ UPDATES
 =======
 
 ````
+2.0.25   Dec 11  2024     Filter item supports label to filter or search item
+2.0.24   Dec 09  2024     Router and Interface dropdown filter support added
 2.0.20   Jul 17  2022     major improvement automatic cross drill menu intg
 0.0.12   Apr 12  2019     added slider to control node count and table output
 ````

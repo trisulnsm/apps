@@ -4,6 +4,8 @@
 -- TYPE:        BACKEND SCRIPT
 -- PURPOSE:     handles NAT events and tags flows before flushing 
 -- 
+local LDB=require'tris_leveldb'
+
 TrisulPlugin = { 
 
   id =  {
@@ -20,13 +22,22 @@ TrisulPlugin = {
 
   -- WHEN CALLED : your LUA script is loaded into Trisul 
   onload = function()
-  	T.natmap = { } 
 	T.nitems = 0 
+	T.create_ok = 0 
+	T.create_already_exists = 0 
+	T.delete_ok = 0 
+	T.delete_not_found = 0 
+
+	T.LDB = LDB.new()
+	local leveldbfile  = T.env.get_config("App>RunStateDirectory").."/natmap."..T.contextid 
+	T.LDB:open(leveldbfile)
+
+
   end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
   onunload = function()
-  	T.natmap = nil 
+	LDB:close() 
   end,
 
   -- any messages you want to handle for state management 
@@ -39,11 +50,9 @@ TrisulPlugin = {
 	local cmd = msg:sub(1,6)
 	local pubip = msg:sub(27,-1)
 	if cmd == "CREATE" then
-		T.natmap[pubip] = msg
-		T.nitems = T.nitems + 1
+		T.LDB:put(pubip, msg) 
 	elseif cmd == "DELETE" then
-		T.natmap[pubip] = nil 
-		T.nitems = T.nitems - 1
+		T.LDB:delete(pubip) 
 	end 
   end,
 
@@ -58,15 +67,14 @@ TrisulPlugin = {
 		local ep1 = k:sub(5,22)
 		local ep2 = k:sub(27,44)
 
-		local natm = T.natmap[ep1]
+		local natm = T.LDB:getval(ep1)
 		if not natm then
-			natm = T.natmap[ep2]
+			natm = T.LDB:getval(ep2)
 		end 
 
 		if not natm then
 			return
 		end
-
 
 		-- we got a map, tag 
 		local nip_key = natm:sub(8,18)
@@ -83,7 +91,8 @@ TrisulPlugin = {
 
     -- WHEN CALLED: end of flush
     onendflush = function(engine) 
-		T.loginfo("Size of NAT table = " .. T.nitems ) 
+		T.loginfo("Size of NAT table = " .. T.nitems .. " delete ok=" .. T.delete_ok .. " not found =" .. T.delete_not_found .. 
+				" create ok="..T.create_ok.." already exists="..T.create_already_exists)  
     end,
   },
 

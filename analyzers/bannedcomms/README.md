@@ -5,6 +5,7 @@ This app watches for flows and detects if these rules are broken
 - Some clt IP are only supposed to talk to specific servers IPs and not to each other 
 - Broadcast traffic is allowed 
 - IP clients not on the whitelist are allowed 
+- If multiple IP assigned to a single MAC then alert, this use case is specific to a customer 
 
 
 
@@ -37,6 +38,8 @@ UPDATES
 =======
 
 ````
-1.0.2   Oct 7 2024     Rules based to exclude broadcast traffic and other opts
-1.0.2   Oct 1 2024     Initial release 
+1.0.5   Dec 6 2024      Alert counts 
+1.0.4   Nov 29 2024     Alert when multiple IP assigned to a MAC .. 
+1.0.3   Oct 7  2024     Rules based to exclude broadcast traffic and other opts
+1.0.2   Oct 1  2024     Initial release 
 ````

@@ -17,8 +17,8 @@ class SankeyCrossDrill  {
 
     //append form in the div
     this.append_form(opts);
+    
   }
-
   // load the frame 
   async load_assets(opts)
   {
@@ -113,6 +113,21 @@ class SankeyCrossDrill  {
 
     show_hide_form();
 
+    var element = document.getElementById("advfields");
+    var myCollapse = new bootstrap.Collapse(element,{toggle:false});
+    var btn = document.getElementById("adv_form_collapse");
+    btn.addEventListener("click", function(){
+      myCollapse.toggle();
+    });
+
+    let load_router_opts = {
+      tmint :{from_date:document.getElementById('from_date_sk').value,to_date:document.getElementById('to_date_sk').value},
+      selected_cg : "",
+      selected_st : "",
+      update_dom_cg : "routers",
+      update_dom_st : "interfaces",chosen:false
+    }
+    trp_load_router_intfs(load_router_opts);
 
     if(this.dash_params.valid_input == "1" || this.dash_params.valid_input==1){
       this.form.submit();
@@ -136,6 +151,7 @@ class SankeyCrossDrill  {
     this.cgguid = this.form.find('#cg_id').val();
     this.meter = this.form.find('#meter_id').val();
     this.filter_text=this.form.find('#fltr_crs').val();
+   
     this.run();
     return false;
   }
@@ -173,12 +189,49 @@ class SankeyCrossDrill  {
       bucket_size=1;
     }
 
+    //convet string to hash
+    let crosskeys_cg = [...this.cg_meters.crosskey[this.cgguid]];
+    crosskeys_cg.shift();
 
-    // Filter text only send to CG Topper when used in raw key format
-    // with a leading $ sign
-    let cgtopper_key_filter = "";
-    if (this.filter_text.match(/^\$/)) {
-      cgtopper_key_filter = this.filter_text.replace('$','');
+
+    let filter_text_arr=new Array(crosskeys_cg.length).fill(null);
+    
+    if(this.filter_text.length > 0 && this.filter_text.includes("$")==false){
+      for(const [idx,cgguid] of crosskeys_cg.entries()){
+        
+        let resp = await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,{counter_group:cgguid,pattern:this.filter_text});
+        if(resp.keys.length==0){
+          continue;
+        }
+        let keyt =resp.keys[0];
+        if(keyt.key!=this.filter_text){
+          filter_text_arr[idx]=keyt.key
+          break;
+        }
+      }
+    }
+    
+   
+    let selectElement = document.querySelector('#routers');
+    if(selectElement.value !='0')
+    {
+      let router = selectElement.value;
+      let index = crosskeys_cg.indexOf(GUID.GUID_CG_FLOWGENS());
+      filter_text_arr[index]=router;
+    }
+
+    selectElement = document.querySelector('#interfaces');
+    if(selectElement.value !='0')
+    {
+      
+      let intf = selectElement.value;
+      let index = crosskeys_cg.indexOf(GUID.GUID_CG_FLOWINTERFACE());
+      filter_text_arr[index]=intf;
+    }
+    
+    let key_filter =  filter_text_arr.filter(e=>{return e}).join("\\\\");
+    if(this.filter_text.includes("$")){
+      key_filter = this.filter_text.replace("$","");
     }
 
     // Get Bytes Toppers 
@@ -186,11 +239,97 @@ class SankeyCrossDrill  {
       counter_group: this.cgguid,
       time_interval: this.tmint ,
       meter:parseInt(this.meter),
-      key_filter: cgtopper_key_filter,
+      key_filter: key_filter,
       maxitems:1000
     }); 
 
-    this.cgtoppers_bytes = _.each(this.cgtoppers_bytes.keys, (k)=> { k.metric = parseInt(k.metric)*bucket_size; return k})
+    this.cgtoppers_bytes = _.each(this.cgtoppers_bytes.keys, (k)=> { 
+      k.metric = parseInt(k.metric)*bucket_size; 
+      k.metric_max = parseInt(k.metric_max)*8; 
+      k.metric_min = parseInt(k.metric_min)*8; 
+      k.metric_avg = parseInt(k.metric_avg)*8; 
+      return k
+    });
+
+
+    //for resolve ifalias for flowinterface
+    let flow_intf_lookup  = {};
+    let router_lookup = {};
+    let parent_cgguids =  this.cg_meters.crosskey[this.cgguid].slice(1)
+    let flow_intf = parent_cgguids.some( ai => [GUID.GUID_CG_SNMP_INTERFACE(),GUID.GUID_CG_FLOWINTERFACE()].includes(ai) );
+    
+    if(flow_intf){
+      let flow_intf_regex=/^((([0-9A-Fa-f]){2}\.){3}([0-9A-Fa-f]){2})_(\d|[a-f]|[A-F])+$/;
+      let flow_intf_keys = [];
+      let router_keys = [];
+      for(const keyt of this.cgtoppers_bytes){
+        
+        let crosskeys = keyt.key.split("\\");
+        let keys = crosskeys.filter(key=>key.match(flow_intf_regex));
+        if(keys.length > 0)
+        {
+          keys.forEach((key)=>{
+            router_keys.push(key.split("_")[0]);
+          });
+          flow_intf_keys.push(keys);
+        }
+      }
+      flow_intf_keys=[...new Set(flow_intf_keys.flat(Infinity))];
+      router_keys=[...new Set(router_keys.flat(Infinity))];
+
+      //for routers
+      let req_opts = {
+        counter_group:GUID.GUID_CG_FLOWGENS(),
+        keys:router_keys,
+      }
+      
+      let resp  = await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,req_opts);
+      resp.keys.forEach(keyt=>{
+        router_lookup[keyt.key]=keyt.label;
+      });
+
+      //for interface
+      req_opts = {
+        counter_group:GUID.GUID_CG_FLOWINTERFACE(),
+        keys:flow_intf_keys,
+        get_attributes:true
+
+      }
+      
+      resp  = await fetch_trp(TRP.Message.Command.SEARCH_KEYS_REQUEST,req_opts);
+      resp.keys.forEach(keyt=>{
+        let attr =_.select(keyt.attributes,function(e){return e.attr_name=='snmp.ifalias'})[0];
+        if (attr && attr.attr_value.length > 0){
+          flow_intf_lookup[keyt.key]=attr.attr_value;
+        }
+      })
+
+      //replace name with ifalias
+      for(const keyt of this.cgtoppers_bytes){
+        
+        let crosskeys = keyt.key.split("\\");
+        for(const [index,key] of crosskeys.entries())
+        {
+          if(key.match(flow_intf_regex) && flow_intf_lookup[key]){
+            let label = keyt.label.split("\\");
+            let router = key.split("_")[0];
+            if(parent_cgguids.includes(GUID.GUID_CG_FLOWGENS())){
+              label[index]=`${label[index]} ${flow_intf_lookup[key]}`;
+
+            }else{
+              label[index]=`${router_lookup[router]} ${label[index]} ${flow_intf_lookup[key]}`;
+
+            }
+            label = label.join("\\");
+
+            keyt.label=label;
+          }
+        }
+      }
+
+    }
+
+
 
     this.prase_toppers();
     let dropdowncg = document.getElementById('cg_id');
@@ -343,48 +482,63 @@ class SankeyCrossDrill  {
 
   // table : show filtered toppers in a table 
   repaint_table(cgtoppers_bytes) {
-    let table_header = $("<tr>");
+    let units = "";
+    if(this.cg_meters.all_meters_type[this.cgguid] && this.cg_meters.all_meters_type[this.cgguid][this.meter]){
+      units = this.cg_meters.all_meters_type[this.cgguid][this.meter].units;
+    }
+
+    let tbl = document.querySelector('.toppers_table');
+    tbl.classList.add('table',"table-sysdata");
+    tbl.innerHTML='';
+    let template = document.createElement('template')
+    template.innerHTML=`<thead></thead><tbody></tbody>`;
+    
     let ck_parents = this.cg_meters.crosskey[this.cgguid].slice(1,4);
     for(let i=0 ;i < ck_parents.length;i++){
       
       if(this.cg_meters.all_cg_meters[ck_parents[i]]){
         let header = this.cg_meters.all_cg_meters[ck_parents[i]][0] || "";
-        table_header.append($("<th>").text(header));
+        let th = document.createElement('th');
+        th.textContent=header;
+        template.content.querySelector('thead').appendChild(th);
       }
+      
+      
     }
+    for(const h of [["Volume"],["Max"],["Min"],["Avg"],[""]]){
+      let th = document.createElement('th');
+      th.textContent=h[0];
+      template.content.querySelector('thead').appendChild(th);
+    }
+    
+    for(const kt of cgtoppers_bytes){
+      let r = document.createElement('tr');
+      r.dataset.cgguid=this.cgguid;
+      r.dataset.meter=this.meter;
+      r.dataset.key=kt.key;
+      r.dataset.label=kt.label.replace(/:0|:1|:2|:3|:4|:5|:6/g,"");
+      let readable = kt.readable.split("\\");
+      for(const [idx,ai] of kt.label.split("\\").entries()){
+        let td = document.createElement('td');
+        let t = ai.replace(/:0|:1|:2|:3|:4|:5|:6/g,"");
+        if(t != readable[idx])
+        {
+          t = `${t}(${readable[idx]})`
+        }
+        td.textContent=t;
+        r.appendChild(td);
+      }
+      r.insertAdjacentHTML('beforeend', `<td>${h_fmtvol(kt.metric)}</td>`);
+      r.insertAdjacentHTML('beforeend', `<td>${h_fmtbw(kt.metric_max)}${units.toLocaleLowerCase()}</td>`);
+      r.insertAdjacentHTML('beforeend', `<td>${h_fmtbw(kt.metric_min)}${units.toLocaleLowerCase()}</td>`);
+      r.insertAdjacentHTML('beforeend', `<td>${h_fmtbw(kt.metric_avg)}${units.toLocaleLowerCase()}</td>`);
+      r.insertAdjacentHTML('beforeend','<td><a class="sk_opts dropdown-toggle" href="javascript:;;"><i class="fa fa-fw fa-server"></i></a></td>');
+      r.querySelector('.sk_opts').addEventListener("click",this.add_dropdown_menu.bind(this));
+      template.content.querySelector('tbody').appendChild(r);
+    }
+    tbl.appendChild(template.content);
+    tbl.nextElementSibling.remove();
 
-    table_header.append("<th sort='volume'> Volume </th>");
-    table_header.append("<th sort='nosort'> </th>");
-    let tbl=this.data_dom.find('.toppers_table');
-    tbl.find("thead").empty();
-    tbl.find("tbody").empty();
-    tbl.find("thead").append(table_header)
-    tbl.addClass('table table-sysdata');
-    tbl.tablesorter();
-
-    _.each(cgtoppers_bytes, $.proxy(function(kt) {
-        let r = $('<tr>')
-        r.data("cgguid",this.cgguid);
-        r.data("meter",this.meter);
-        r.data("key",kt.key);
-        r.data("label",kt.label.replace(/:0|:1|:2|:3|:4|:5|:6/g,""));
-        let readable = kt.readable.split("\\");
-        _.each(kt.label.split("\\"),function(ai,idx){
-          let t = ai.replace(/:0|:1|:2|:3|:4|:5|:6/g,"");
-          if(t != readable[idx])
-          {
-            t = `${t}(${readable[idx]})`
-          }
-          r.append(`<td>${t}</td>`)
-        });
-        r.append(`<td>${h_fmtvol(kt.metric)}</td>`)
-        r.append('<td><a class="sk_opts dropdown-toggle" href="javascript:;;"><i class="fa fa-fw fa-server"></i></a></td>')
-        tbl.find("tbody").append(r)
-    },this));
-    this.data_dom.find('.toppers_table').siblings('.animated-background').remove();
-    tbl.find(".sk_opts").click($.proxy(function(){
-      this.add_dropdown_menu(event);
-    },this));
   }
 
   add_dropdown_menu(event){
@@ -439,13 +593,13 @@ class SankeyCrossDrill  {
         break;
 
       case "traffic_chart":
-        let p =_.extend({},h)
-        p["key"]= p["key"].replace(/\\/g,"\\\\");
-        p["description"]=tr.data("label").replace(/\\/g,"\\\\");
-        p["name"] = $('#cg_id').find('option:selected').text();
+        let models = [];
+        models.push({counter_group:tr.data("cgguid"),meter:tr.data("meter"),key:tr.data("key"),label:tr.data("label")})
+        let p ={};
+        p["models"]=JSON.stringify(models)
         p["window_fromts"]=tmint.from.tv_sec;
         p["window_tots"]=tmint.to.tv_sec;
-        load_modal("/trpjs/generate_chart_lb?" + $.param(p));
+        new ApexChartLB(p,{modal_title:"Traffic History"})
         break;
     }
   }
