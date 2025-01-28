@@ -52,8 +52,8 @@ TrisulPlugin = {
 	if cmd == "CREATE" then
 		T.current_map[pubip]=privipkey 
 	elseif cmd == "DELETE" then
-		T.current_map[privipkey]=nil    
-		T.prev_map[privipkey]=nil    
+		T.current_map[pubip]=nil    
+		T.prev_map[pubip]=nil    
 	end 
   end,
 
@@ -104,10 +104,6 @@ TrisulPlugin = {
 		flow:add_tag("[natport]".. nport)
 
     end,
-
-    flushfilter = function(engine,flow) 
-		return false
-	end, 
 
     -- WHEN CALLED: end of flush
     onendflush = function(engine) 
