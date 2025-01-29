@@ -1,0 +1,16 @@
+name: IPDR Tagger 
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: Adds User ID from customer database to flows
+   long:  |
+      This app allows you to query by user ID which can be linked to multiple IP Ranges 
+
+apptype: lua
+
+appresources: tag_terminal_id.lua mkconfig.lua 
+
+dependencies:  
