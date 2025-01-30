@@ -1,0 +1,17 @@
+name: AD Connector
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: Connects to Microsoft AD Controller Syslog
+   long:  |
+      The AD Connector listens to authentication messages and builds user map
+
+apptype: lua
+
+appresources: ad-auth.lua  ad-syslogs.lua  cg_monitor_hosts.lua  FlowintfXUser.json FlowtaggerUserID.json mmon.lua syslog-protocol.lua
+
+
+dependencies:  
