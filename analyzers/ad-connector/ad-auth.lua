@@ -21,13 +21,11 @@ TrisulPlugin = {
     -- COMMON FUNCTIONS:  onload, onunload, onmessage
     --
     onload = function() 
-		local kRexLogon = '^<\\d+>([A-Za-z]{3} [0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}).+\\s4624\\s.+An account was successfully logged on.+?Account Name:\\s+(\\w[\\w-]+).+?Account Domain:\\s+(\\w+).+?Workstation Name:\\s+([\\w-]+).+?Source Network Address: (\\d{1,3}(?:\\.\\d{1,3}){3})';
+		local kRexLogon = '([A-Za-z]{3} [0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}).+\\s4624\\s.+An account was successfully logged on.+?Account Name:\\s+(\\w[\\w-]+).+?Account Domain:\\s+(\\w+).+?Workstation Name:\\s+([\\w-]+).+?Source Network Address: (\\d{1,3}(?:\\.\\d{1,3}){3})';
 
 		T.regex_kerb_logon  = T.re2(kRexLogon)
 
-		print(kRexLogon);
-
-		T.regex_kerb_logoff  = T.re2('^<\\d+>([A-Za-z]{3}\\s+[0-9]{2}\\s+[0-9]{2}:[0-9]{2}:[0-9]{2}).+An account was logged off.+?Account Name:\\s+(\\w+).+?Account Domain:\\s+(\\w+)')
+		T.regex_kerb_logoff  = T.re2('([A-Za-z]{3}\\s+[0-9]{2}\\s+[0-9]{2}:[0-9]{2}:[0-9]{2}).+An account was logged off.+?Account Name:\\s+(\\w[\\w-]+).+?Account Domain:\\s+(\\w+)')
 
 
 	end,
@@ -71,6 +69,10 @@ TrisulPlugin = {
 
 				end 
 
+				engine:add_edge( "{86A8880D-F4B2-4E49-A4FA-718880CAA976}", aduser, 
+								 "{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}", to_ipkey_format(ipaddress) )
+
+
 				engine:add_resource( "{E3EF6B1A-6553-4474-69B6-D015CEF3D41F}", 
 									 layer:packet():flowid():id(), "AD AUTH SYSLOG", syslogstr)
 
@@ -78,7 +80,8 @@ TrisulPlugin = {
 			end 
 
 			local match, ts, username, adomain = T.regex_kerb_logoff:partial_match_n( syslogstr)
-			if match then 
+			-- if match then 
+			if false  then 
 				-- print( "    >>" .. ts.." " .. adomain .. "/".. username )
 
 				local aduser = adomain.."/"..username 
