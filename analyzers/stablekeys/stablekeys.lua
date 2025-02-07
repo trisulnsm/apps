@@ -36,25 +36,28 @@ TrisulPlugin = {
   onload = function()
     -- override by trisulnsm_stablekeys.lua 
     -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
-    --
+    ----
 
     T.active_config = make_config(
-            T.env.get_config("App>DBRoot").."/config/trisulnsm_stablekeys.lua",
-            {
-                -- By default FlowGens 
-                CounterGUID  ="{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
-                --- By default sigid (Alert name)
-		SigID="STABLEKEYS",
-                -- number of stable intervals 
-                NumStableIntervals =1,
-            })
+      T.env.get_config("App>DBRoot").."/config/trisulnsm_stablekeys.lua",
+      {
+          -- By default FlowGens 
+          CounterGUID  ="{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
+          --- By default sigid (Alert name)
+          SigID="STABLEKEYS",
+          -- number of stable intervals 
+          NumStableIntervals =1,
+      })
 
     T.keys_prev_interval = { } 
+    T.pending_keys={ }
   end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
   onunload = function()
     -- your code 
+    --if we have interval more then 1 we need to maintain the 
+    
   end,
 
   -- cg_monitor block
@@ -73,6 +76,7 @@ TrisulPlugin = {
     -- by default called every "stream snapshot interval" of 60 seconds
     onbeginflush = function(engine, timestamp) 
       T.keys_this_interval = { } 
+      
     end,
 
   
@@ -80,27 +84,43 @@ TrisulPlugin = {
     onflush = function(engine, timestamp,key, metrics) 
       if key == "SYS:GROUP_TOTALS"  then return; end 
       T.keys_this_interval[key]=true 
+
     end,
 
   
     -- WHEN CALLED: end of flush
     onendflush = function(engine) 
-
+      local countergroup=T.active_config.SigID
+      
       for k,v in pairs(T.keys_prev_interval) do 
         if not T.keys_this_interval[k]  then
+          --add pending count to match number of interval
+          T.pending_keys[k]= (T.pending_keys[k] or 0 )
+        end
+      end
 
+      for k,v in pairs(T.pending_keys) do
+        --if key present this interval remove the key
+        --else increase pending key count 0
+        if T.keys_this_interval[k] then
+          T.pending_keys[k]=nil
+        else
+          T.pending_keys[k] = T.pending_keys[k]+1 
+        end
+        --once alert generated remove the key
+        if (T.pending_keys[k] or 0) >= T.active_config.NumStableIntervals then
           local readable = ip_readable(k) 
-
           -- alert 
+          print("alert"..readable)
           engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}", 
                     nil,
                     T.active_config.SigID,
                     1, 
                     "No activity on expected key "..readable.."Potentially stopped")
           T.logwarning("STABLEKEYS ALERT: No activity on expected key "..readable.." Potentially stopped")
-
-        end 
-      end 
+          T.pending_keys[k]=nil
+        end
+      end
 
       T.keys_prev_interval = T.keys_this_interval
     
