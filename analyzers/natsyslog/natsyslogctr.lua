@@ -27,6 +27,32 @@ end
 
 
 
+function is_private_ip(ip)
+    local private_ranges = {
+        { "10.0.0.0", "10.255.255.255" },
+        { "172.16.0.0", "172.31.255.255" },
+        { "192.168.0.0", "192.168.255.255" }
+    }
+
+    local function ip_to_number(ip)
+        local o1, o2, o3, o4 = ip:match("(%d+)%.(%d+)%.(%d+)%.(%d+)")
+        return 2^24 * o1 + 2^16 * o2 + 2^8 * o3 + o4
+    end
+
+    local ip_num = ip_to_number(ip)
+
+    for _, range in ipairs(private_ranges) do
+        local start_ip, end_ip = ip_to_number(range[1]), ip_to_number(range[2])
+        if ip_num >= start_ip and ip_num <= end_ip then
+            return true
+        end
+    end
+
+    return false
+end
+
+
+
 TrisulPlugin = { 
 
 
@@ -184,13 +210,26 @@ TrisulPlugin = {
           day = tonumber(day),
           hour =h, min = m, sec = s
         })
+
+		if is_private_ip(sip) then 
+			-- swap with tsip 
+			local ti,tp = sip,sport
+			sip,sport=tsip,tsport 
+			tsip,tsport = ti,tp
+		elseif is_private(dip) then
+			-- swap with tsip 
+			local ti,tp = dip,dport
+			dip,dport=tsip,tsport 
+			tsip,tsport = ti,tp
+		end 
         local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
+
+	    engine:tag_flow ( fkey, "[natip]"..tsip)
+	    engine:tag_flow ( fkey, "[natport]"..tsport)
+	    engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
 
         if cmd == "CREATED" then
           engine:update_flow_raw( fkey, 0, 1)
-          engine:tag_flow ( fkey, "[natip]"..tsip)
-          engine:tag_flow ( fkey, "[natport]"..tsport)
-          engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
         elseif cmd == "DELETED" then 
           engine:update_flow_raw( fkey, 1, 1)
           engine:terminate_flow ( fkey)

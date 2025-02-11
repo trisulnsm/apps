@@ -7,6 +7,7 @@ UPDATES
 =======
 
 ````
+1.0.10  Feb 11 2025    NAT SYSLOG ensure private IP is sent to NAT field and tags are set correctly 
 1.0.9   Jan 28 2025    Removed store_tagged_flows.lua -- now all flows are stored, this 
                        can accidentally prevent IPDR flows from being stored. 
 1.0.2   Aug 6  2024    RADIUS syslog - may move to a new APP 
