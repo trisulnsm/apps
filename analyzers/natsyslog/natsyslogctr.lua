@@ -211,16 +211,11 @@ TrisulPlugin = {
           hour =h, min = m, sec = s
         })
 
+	 	-- lua double swapper 
 		if is_private_ip(sip) then 
-			-- swap with tsip 
-			local ti,tp = sip,sport
-			sip,sport=tsip,tsport 
-			tsip,tsport = ti,tp
+			sip,tsip,sport,tsport=tsip,sip,tsport,sport 
 		elseif is_private(dip) then
-			-- swap with tsip 
-			local ti,tp = dip,dport
-			dip,dport=tsip,tsport 
-			tsip,tsport = ti,tp
+			dip,tsip,dport,tsport=tsip,dip,tsport,dport 
 		end 
         local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
 
