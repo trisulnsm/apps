@@ -1,4 +1,5 @@
---
+---
+----
 -- StableKeys.lua
 --
 -- TYPE:        BACKEND SCRIPT
@@ -47,6 +48,8 @@ TrisulPlugin = {
           SigID="STABLEKEYS",
           -- number of stable intervals 
           NumStableIntervals =1,
+	  mailsubject="IPDR Alert-No Netflow received for IP"
+
       })
 
     T.keys_prev_interval = { } 
@@ -112,12 +115,13 @@ TrisulPlugin = {
           local readable = ip_readable(k) 
           -- alert 
           print("alert"..readable)
+	  local alert_message="No activity detected on the expected key "..readable.." - potentially inactive."
           engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}", 
                     nil,
                     T.active_config.SigID,
                     1, 
-                    "No activity on expected key "..readable.."Potentially stopped")
-          T.logwarning("STABLEKEYS ALERT: No activity on expected key "..readable.." Potentially stopped")
+                    alert_message.."mailsubject:"..T.active_config.mailsubject.." "..readable.." in the last "..T.active_config.NumStableIntervals.." minutes:mailsubject")
+          T.logwarning(alert_message)
           T.pending_keys[k]=nil
         end
       end
