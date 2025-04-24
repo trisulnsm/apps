@@ -449,6 +449,11 @@ class ISPPrefixDrilldownMapping{
     Plotly.react(this.sankey_div_id, data, layout, ploty_options)
   }
   async draw_aggregate_table(group){
+    let group_cg_map = {"internal_ip":GUID.GUID_CG_INTERNAL_HOSTS(),
+                        "external_ip":GUID.GUID_CG_EXTERNAL_HOSTS(),
+                        "tag_asnumber":GUID.GUID_CG_ASN(),
+                        "tag_prefixes":GUID.GUID_CG_FLOW_PREFIX()};
+
     var table = this.dom.find(`.${group}`).find("table");
     this.dom.find(`.${group}`).removeClass('animated-background');
     var table_id = "agg_flows_tbl_"+Math.floor(Math.random()*100000);
@@ -496,12 +501,49 @@ class ISPPrefixDrilldownMapping{
       if(label == t.key.readable){
         label = "";
       }
-      rows.push(`<tr>
-                <td>${t.key.readable||t.key.key}</td>
-                <td>${label}</td>
-                <td>${t.count}</td>
-                <td>${h_fmtvol(t.metric)}</td>
+
+      let chartOpts = {
+        models:JSON.stringify([{counter_group:group_cg_map[group],
+                              key:`${t.key.key}`,
+                              meter:0,
+                              label:t.key.key}
+                            ]),
+        surface:"SQUAREAREA",
+        show_table:1,
+        show_default_title:1
+      };
+
+      let menu = [["Traffic Chart","apex:/trpjs/apex_chart",
+          chartOpts,
+          "Show usage chart with with time range slider."
+      ]]
+
+      
+      let row = $(`<tr>
+                  <td>${t.key.readable||t.key.key}</td>
+                  <td>${label}</td>
+                  <td>${t.count}</td>
+                  <td>${h_fmtvol(t.metric)}</td>
+                  <td>
+                    <span class="dropdown float-end">
+                      <a class="dropdown-toggle" data-bs-toggle="dropdown" href="javascript:;" title="Click to get more options" aria-expanded="false">
+                        <i class="fa fa-fw fa-server"></i>
+                      </a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" onclick="window.open('/newdash?' + '${$.param({dash_key:'key',guid:group_cg_map[group],key: t.key.key})}')">Key Dashboard</a></li>
+                      </ul>
+                    </span>
+                  </td>
                 </tr>`);
+
+      const mockEvent = {
+        preventDefault: () => {},stopPropagation: () => {},
+        target: row.find(".dropdown-menu")[0]
+      };
+      
+      int_show_menu(mockEvent,menu);
+
+      rows.push(row)
     } 
 
     new TrisTablePagination(table_id,{no_of_rows:10,rows:rows});

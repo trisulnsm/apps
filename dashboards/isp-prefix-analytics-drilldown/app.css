@@ -22,3 +22,7 @@
   height: 100px;
   position: relative;
 }
+
+.dropdown-item {
+  cursor: pointer;
+}
