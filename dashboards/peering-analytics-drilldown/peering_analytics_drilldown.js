@@ -473,7 +473,7 @@ class ISPDrilldownMapping{
     let group_cg_map = {"internal_ip":GUID.GUID_CG_INTERNAL_HOSTS(),
                         "external_ip":GUID.GUID_CG_EXTERNAL_HOSTS(),
                         "tag_asnumber":GUID.GUID_CG_ASN(),
-                        "tag_prefixes":GUID.GUID_CG_FLOW_PREFIX()};
+                        "tag_prefixes": "{2BE2A3B6-613D-4216-0737-3684E824EA33}" };
     
     var table = this.dom.find(`.${group}`).find("table");
     this.dom.find(`.${group}`).removeClass('animated-background');
