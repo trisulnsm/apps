@@ -452,7 +452,7 @@ class ISPPrefixDrilldownMapping{
     let group_cg_map = {"internal_ip":GUID.GUID_CG_INTERNAL_HOSTS(),
                         "external_ip":GUID.GUID_CG_EXTERNAL_HOSTS(),
                         "tag_asnumber":GUID.GUID_CG_ASN(),
-                        "tag_prefixes":GUID.GUID_CG_FLOW_PREFIX()};
+                        "tag_prefixes": "{2BE2A3B6-613D-4216-0737-3684E824EA33}" };
 
     var table = this.dom.find(`.${group}`).find("table");
     this.dom.find(`.${group}`).removeClass('animated-background');
@@ -501,23 +501,6 @@ class ISPPrefixDrilldownMapping{
       if(label == t.key.readable){
         label = "";
       }
-
-      let chartOpts = {
-        models:JSON.stringify([{counter_group:group_cg_map[group],
-                              key:`${t.key.key}`,
-                              meter:0,
-                              label:t.key.key}
-                            ]),
-        surface:"SQUAREAREA",
-        show_table:1,
-        show_default_title:1
-      };
-
-      let menu = [["Traffic Chart","apex:/trpjs/apex_chart",
-          chartOpts,
-          "Show usage chart with with time range slider."
-      ]]
-
       
       let row = $(`<tr>
                   <td>${t.key.readable||t.key.key}</td>
@@ -536,13 +519,17 @@ class ISPPrefixDrilldownMapping{
                   </td>
                 </tr>`);
 
-      const mockEvent = {
+      let mockEvent = {
         preventDefault: () => {},stopPropagation: () => {},
         target: row.find(".dropdown-menu")[0]
       };
+      let duration = this.tmint.to.tv_sec - this.tmint.from.tv_sec;
+      if(group_cg_map[group] == GUID.GUID_CG_ASN()){
+        show_advanced_retro_menu(mockEvent, group_cg_map[group], t.key, 0, this.tmint.from.tv_sec, duration)
+      } else {
+        show_host_advanced_retro_menu(mockEvent, group_cg_map[group], t.key, 0, this.tmint.from.tv_sec, duration);
+      }
       
-      int_show_menu(mockEvent,menu);
-
       rows.push(row)
     } 
 

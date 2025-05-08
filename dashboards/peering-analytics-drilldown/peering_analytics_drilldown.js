@@ -527,22 +527,6 @@ class ISPDrilldownMapping{
         label = "";
       }
 
-      let chartOpts = {
-        models:JSON.stringify([{counter_group:group_cg_map[group],
-                              key:`${t.key.key}`,
-                              meter:0,
-                              label:t.key.key}
-                            ]),
-        surface:"SQUAREAREA",
-        show_table:1,
-        show_default_title:1
-      };
-
-      let menu = [["Traffic Chart","apex:/trpjs/apex_chart",
-          chartOpts,
-          "Show usage chart with with time range slider."
-      ]]
-
       let row = $(`<tr>
                     <td>${t.key.readable||t.key.key}</td>
                     <td>${label}</td>
@@ -560,14 +544,16 @@ class ISPDrilldownMapping{
                     </td>
                   </tr>`);
 
-      const mockEvent = {
+      let mockEvent = {
         preventDefault: () => {},stopPropagation: () => {},
         target: row.find(".dropdown-menu")[0]
       };
-      int_show_menu(mockEvent,menu);
-
-
-
+      let duration = this.tmint.to.tv_sec - this.tmint.from.tv_sec;
+      if(group_cg_map[group] == GUID.GUID_CG_ASN()){
+        show_advanced_retro_menu(mockEvent, group_cg_map[group], t.key, 0, this.tmint.from.tv_sec, duration)
+      } else {
+        show_host_advanced_retro_menu(mockEvent, group_cg_map[group], t.key, 0, this.tmint.from.tv_sec, duration);
+      }
 
       rows.push(row);
     } 
