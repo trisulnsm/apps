@@ -50,6 +50,7 @@ TrisulPlugin = {
             t["service"] = ""
             t["srchwvendor"] = ""
             t["dsthwvendor"] = ""
+            t["ip"] = ""
 
             for k, v in string.gmatch(syslogstr, "(%w+)=([%w%.%-%/]+)") do
                 t[k] = v
@@ -58,6 +59,11 @@ TrisulPlugin = {
             for k, v in string.gmatch(syslogstr, '(%w+)="([%w%.%-%/]+)"') do
                 t[k] = v
             end
+	    --fortios 5.2.x 
+	    if #t["ip"] > 0 and #t["hostname"] > 0 then
+		 t["srcip"]=t["ip"]
+		 t["user"]=t["hostname"]
+             end
 
             if #t["user"] > 0 and #t["srcip"] > 0 then
                 engine:post_message_frontend(
