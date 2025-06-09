@@ -1,0 +1,20 @@
+name: Multicast View
+
+version: 1.0.0
+
+author: trisul
+
+
+description: 
+   short: Displaying the multicast Groups, senders, and receivers in a visual format.
+   long:  |
+      Displaying the multicast Groups, senders, and receivers in a visual format.
+
+apptype: dashboard_js
+
+appresources: multicast_view.js template.haml
+
+dependencies: 
+  webtrisul: 7.0.2553
+
+jsparams:
