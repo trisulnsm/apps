@@ -14,6 +14,7 @@ Install this app to get access to the following useful Multicast View
 | Version | Release Date | Description |
 |---------|---------|---------|
 |`v1.0.0`|09-JUN-2025|Initial release to public|
+|`v1.0.1`|10-JUN-2025|adding search form|
 
 
 </br>

@@ -1,15 +1,43 @@
-%div 
-  .d-flex.flex-wrap.justify-content-between.align-items-center.mb-3.gap-2
-    %h5.mb-0
-      Total Multicast Groups:
-      %span.badge.bg-secondary#total-multicast-count = 0
+%div
+  .card.border-primary
+    .card-header.bg-primary.d-flex.justify-content-between.align-items-center#show_hide_btn{data_bind_hidden: 0}
+      .card-title.text-white.header_text
+        %i.fa.fa-search
+        Search Multicast IP 
+      .col-auto.card-options.ms-auto.d-flex.gap-2.justify-content-end.align-items-center
 
-    %ul.nav.nav-tabs.tab-page-toolbar.rounded-pill.d-inline-flex{ role: 'tablist', id: 'toggle-all' }
-      %li.nav-item{ role: 'presentation' }
-        %a.nav-link.rounded-pill.active{ id: 'collapse-tab', href: '#collapse', role: 'tab', tabindex: '-1', data: { bs_toggle: 'tab' }, 'aria-selected': 'false' }
-          Collapse All
-      %li.nav-item{ role: 'presentation' }
-        %a.nav-link.rounded-pill{ id: 'expand-tab', href: '#expand', role: 'tab', data: { bs_toggle: 'tab' }, 'aria-selected': 'true' }
-          Expand All
+    .card-body.pe-0
+      %form.form-dots#multicast_search_form
+        .row
+          .col-6
+            .row
+              .new_time_selector#new_time_selector
+          .col-6
+            .row
+                %label.con-from-label.col-4 key
+              .col-8
+                %input{type:"text",class:"form-control",id:"key_filter",style:"width:300px"}
+                %span.form-help Enter IP Ex: 239.0.0.3
+        .row.justify-content-center.mt-3
+          .col-auto
+            %input#from_date{type:"hidden",name:"from_date"}
+            %input#to_date{type:"hidden",name:"to_date"}
 
-  #multicast-diagram-container
+            %input.btn.btn-primary#btn_submit{type:"submit",value:"Submit"}
+
+
+  #result_div.mt-5.hide
+    .d-flex.flex-wrap.justify-content-between.align-items-center.mb-3.gap-2
+      %h5.mb-0
+        Total Multicast Groups:
+        %span.badge.bg-secondary#total-multicast-count = 0
+
+      %ul.nav.nav-tabs.tab-page-toolbar.rounded-pill.d-inline-flex{ role: 'tablist', id: 'toggle-all' }
+        %li.nav-item{ role: 'presentation' }
+          %a.nav-link.rounded-pill.active{ id: 'collapse-tab', href: '#collapse', role: 'tab', tabindex: '-1', data: { bs_toggle: 'tab' }, 'aria-selected': 'false' }
+            Collapse All
+        %li.nav-item{ role: 'presentation' }
+          %a.nav-link.rounded-pill{ id: 'expand-tab', href: '#expand', role: 'tab', data: { bs_toggle: 'tab' }, 'aria-selected': 'true' }
+            Expand All
+
+    #multicast-diagram-container

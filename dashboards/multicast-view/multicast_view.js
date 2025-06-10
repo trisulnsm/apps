@@ -15,8 +15,7 @@ class MulticastView {
     this.container = document.getElementById(this.containerId);    
     this.expandTab = document.getElementById(this.expandTabId);
     this.collapseTab = document.getElementById(this.collapseTabId);
-    this.setupTabListeners();
-    this.init();
+
   }
 
   async addForm(opts) {
@@ -27,20 +26,41 @@ class MulticastView {
     this.data_dom = template.content.children[0];
     this.divid.appendChild(this.form);
     this.divid.appendChild(this.data_dom);
+    
+    new ShowNewTimeSelector({divid:"#new_time_selector",
+      update_input_ids:"#from_date,#to_date",
+      default_ts:opts.new_time_selector
+    });
+    show_hide_form();
+
+    // display the output
+    document.getElementById("multicast_search_form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      this.container.innerHTML = ""; // Clear previous content
+      this.diagrams = []; // Reset diagrams
+      this.setupTabListeners();
+      await this.init();
+      document.querySelector("#show_hide_btn a").click()
+      document.getElementById("result_div").classList.remove("hide");
+    })
   }
 
   async init() {
-    this.tmint = await new TimeInterval({}).get_total_window();
     let cg_meters = {};
     let exchange_xflow_guid = "{942AB99F-7A65-4B2E-6F6C-A3050F0F7B35}";
     await get_counters_and_meters_json(cg_meters);
     this.multipliers = get_multipliers(cg_meters,exchange_xflow_guid,2);
 
+    let time_interval=mk_time_interval({
+      from_date: document.getElementById("from_date").value,
+      to_date: document.getElementById("to_date").value
+    })
     
     const resp = await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
       counter_group: exchange_xflow_guid,
-      time_interval: this.tmint,
       meter: 2,
+      time_interval: time_interval,
+      key_filter: document.getElementById("key_filter").value.trim(),
       maxitems: 1000
     });
 
