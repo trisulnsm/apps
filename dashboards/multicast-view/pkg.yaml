@@ -15,6 +15,6 @@ apptype: dashboard_js
 appresources: multicast_view.js template.haml
 
 dependencies: 
-  webtrisul: 7.0.2553
+  webtrisul: 7.0.0
 
 jsparams:
