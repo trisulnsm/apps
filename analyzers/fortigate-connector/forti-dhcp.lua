@@ -60,7 +60,7 @@ TrisulPlugin = {
                 t[k] = v
             end
 	    --fortios 5.2.x 
-	    if #t["ip"] > 0 and #t["hostname"] > 0 then
+	    if t["ip"] and #t["ip"] > 0 and t["hostname"] and #t["hostname"] > 0 and t["hostname"] ~= "N/A" then
 		 t["srcip"]=t["ip"]
 		 t["user"]=t["hostname"]
              end
