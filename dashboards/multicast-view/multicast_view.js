@@ -12,10 +12,9 @@ class MulticastView {
 
   async setup(opts) {
     await this.addForm(opts);
-    this.container = document.getElementById(this.containerId);    
+    this.container = document.getElementById(this.containerId);
     this.expandTab = document.getElementById(this.expandTabId);
     this.collapseTab = document.getElementById(this.collapseTabId);
-
   }
 
   async addForm(opts) {
@@ -26,64 +25,88 @@ class MulticastView {
     this.data_dom = template.content.children[0];
     this.divid.appendChild(this.form);
     this.divid.appendChild(this.data_dom);
-    
-    new ShowNewTimeSelector({divid:"#new_time_selector",
-      update_input_ids:"#from_date,#to_date",
-      default_ts:opts.new_time_selector
-    });
+
+    // set last 1 hrs in time selector
+    let total_time = await fetch_trp(TRP.Message.Command.TIMESLICES_REQUEST,{get_total_window:true});
+    let default_ts = {
+      start_date:new Date((total_time.total_window.to.tv_sec.toNumber()-3600)*1000),
+      end_date:new Date((total_time.total_window.to.tv_sec.toNumber()*1000))
+    }
+
+    new ShowNewTimeSelector({divid: "#new_time_selector",update_input_ids: "#from_date,#to_date",default_ts: default_ts,send_recentsecs:true});
     show_hide_form();
 
-    // display the output
     document.getElementById("multicast_search_form").addEventListener("submit", async (e) => {
       e.preventDefault();
-      this.container.innerHTML = ""; // Clear previous content
-      this.diagrams = []; // Reset diagrams
+      this.container.innerHTML = "";
+      this.diagrams = [];
       this.setupTabListeners();
       await this.init();
-      document.querySelector("#show_hide_btn a").click()
+      document.querySelector("#show_hide_btn a").click();
       document.getElementById("result_div").classList.remove("hide");
-    })
+    });
   }
 
   async init() {
-    let cg_meters = {};
-    let exchange_xflow_guid = "{942AB99F-7A65-4B2E-6F6C-A3050F0F7B35}";
-    await get_counters_and_meters_json(cg_meters);
-    this.multipliers = get_multipliers(cg_meters,exchange_xflow_guid,2);
+    this.cg_meters = {};
+    this.exchange_xflow_guid = "{942AB99F-7A65-4B2E-6F6C-A3050F0F7B35}";
 
-    let time_interval=mk_time_interval({
+    this.time_interval = mk_time_interval({
       from_date: document.getElementById("from_date").value,
       to_date: document.getElementById("to_date").value
-    })
-    
-    const resp = await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: exchange_xflow_guid,
+    });
+
+    const xflow_resp = await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
+      counter_group: this.exchange_xflow_guid,
       meter: 2,
-      time_interval: time_interval,
+      time_interval: this.time_interval,
       key_filter: document.getElementById("key_filter").value.trim(),
       maxitems: 1000
     });
 
+    this.multicast_hosts_guid = "{CD2F4C1D-688F-4B7C-AF50-A92B2280BF16}";
 
+    await get_counters_and_meters_json(this.cg_meters);
+    this.multipliers = get_multipliers(this.cg_meters, this.multicast_hosts_guid, 0);
 
-    const multicastList = resp.keys
+    let multicast_hosts_resp = await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
+      counter_group: this.multicast_hosts_guid,
+      meter: 0,
+      time_interval: this.time_interval,
+      maxitems: 5000
+    });
+
+    const multicastList = xflow_resp.keys
       .filter(t => (t.label.match(/\\/g) || []).length === 3)
       .reduce((list, t) => {
         const [receiver, sender, , multicast_ip] = t.label.split("\\");
         let entry = list.find(e => e.multicast_ip === multicast_ip);
         if (!entry) {
-          entry = { multicast_ip, senders: [], receivers: [], volume: 0 };
+          let multicast_host = multicast_hosts_resp.keys.find(k => k.label === multicast_ip);
+
+          entry = {
+            multicast_ip,
+            senders: [],
+            receivers: [],
+            metrics: {
+              volume: h_fmtvol(multicast_host.metric * this.multipliers.topper_bucketsize),
+              max: h_fmtbw(multicast_host.metric_max * this.multipliers.bits_multiplier),
+              min: h_fmtbw(multicast_host.metric_min * this.multipliers.bits_multiplier),
+              avg: h_fmtbw(multicast_host.metric_avg * this.multipliers.bits_multiplier)
+            }
+          };
+
           list.push(entry);
         }
         if (!entry.senders.includes(sender)) entry.senders.push(sender);
         if (!entry.receivers.includes(receiver)) entry.receivers.push(receiver);
-        entry.volume += parseInt(t.metric) * this.multipliers.topper_bucketsize;
-
         return list;
       }, []);
 
-    multicastList.sort((a, b) => b.volume - a.volume);
-    document.getElementById("total-multicast-count").textContent = multicastList.length;    
+    multicastList.sort((a, b) => human_to_volume(b.metrics.volume) - human_to_volume(a.metrics.volume));
+
+    document.getElementById("total-multicast-count").textContent = multicastList.length;
+    document.getElementById("duration").innerHTML = `<b>Selected Time Frame: </b>${fmt_ts(this.time_interval.from.tv_sec).replace(/\s[A-Z]+$/, '')} To ${fmt_ts(this.time_interval.to.tv_sec).replace(/\s[A-Z]+$/, '')} </br> </br> `
     multicastList.forEach((m, i) => this.container.appendChild(this.createCard(m, i)));
   }
 
@@ -98,6 +121,8 @@ class MulticastView {
       this.diagrams.forEach(d => d.setVisibility(false, false));
       this.setActiveTab(this.collapseTabId);
     });
+    this.collapseTab.classList.add("active")
+    this.expandTab.classList.remove("active")
   }
 
   setActiveTab(id) {
@@ -109,47 +134,45 @@ class MulticastView {
     });
   }
 
-  createCard({ multicast_ip, senders, receivers, volume }, index) {
+  createCard({ multicast_ip, senders, receivers, metrics }, index) {
     const wrapper = document.createElement("div");
     wrapper.className = `multicast_${index}`;
     wrapper.style.width = "100%";
-    wrapper.style.overflowX = "auto";
 
     const card = document.createElement("div");
-    card.className = "card mb-3";
-    card.innerHTML = `
-      <div class="card-header">
-        <div class="card-title">
-          <span class="badge bg-info">${index + 1}</span>
-          <span> Multicast Group: ${multicast_ip}</span>
-        </div>
-      </div>
-    `;
+    card.className = "card mb-3 p-3";
+
+
+
     card.appendChild(wrapper);
-    
-    const diagram = new this.Diagram(wrapper, multicast_ip, senders, receivers, h_fmtvol(volume));
+    let metrics_str = `Max: ${metrics.max},  Min: ${metrics.min},  Avg: ${metrics.avg},  Volume: ${metrics.volume}`;
+    const diagram = new this.Diagram(wrapper, multicast_ip, senders, receivers, metrics_str, this.time_interval);
     this.diagrams.push(diagram);
 
     return card;
   }
 
   Diagram = class {
-    constructor(container, multicastIP, senders, receivers, volume) {
-      Object.assign(this, { container, senders, receivers, senderVisible: false, receiverVisible: false });
+    constructor(container, multicastIP, senders, receivers, metricsStr, time_interval) {
+      Object.assign(this, { container, senders, receivers, senderVisible: false, receiverVisible: false, metricsStr, time_interval });
       this.baseWidth = 1200;
-      this.baseHeight = 200;
+      this.baseHeight = 90;
+      this.container = container;
+      this.multicastIP = multicastIP;
+      this.multicast_hosts_guid = "{CD2F4C1D-688F-4B7C-AF50-A92B2280BF16}"
+      this.host_x_multicast_guid = "{84EC1A12-E77D-4299-87B1-50FC6FDB3F2B}"
       this.svg = d3.select(container).append("svg")
         .attr("viewBox", `0 0 ${this.baseWidth} ${this.baseHeight}`)
         .attr("preserveAspectRatio", "xMidYMid meet")
         .style("width", "100%").style("height", "auto");
       this.senderGroup = this.svg.append("g");
       this.receiverGroup = this.svg.append("g");
-      this.draw(multicastIP, volume);
+      this.draw(multicastIP, metricsStr);
       window.addEventListener("resize", () => this.updateHeight());
     }
-
-    draw(multicastIP, volume) {
-      const [cx, cy] = [this.baseWidth / 2, 50];
+  
+    draw(multicastIP, metricsStr) {
+      const [cx, cy] = [this.baseWidth / 2, 2];
       this.svg.append("defs").html(`
         <linearGradient id="multicastGradient" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stop-color="#66bb6a"/>
@@ -162,17 +185,24 @@ class MulticastView {
           <path d="M0,-5L10,0L0,5" fill="#555"/>
         </marker>
       `);
+  
       this.svg.append("rect")
         .attr("x", cx - 75)
-        .attr("y", cy)
+        .attr("y", cy + 10)
         .attr("width", 150)
-        .attr("height", 60)
+        .attr("height", 40)
         .attr("rx", 12)
-        .attr("fill", "url(#multicastGradient)")
+        .attr("fill", "#02a84d")
         .attr("filter", "url(#boxShadow)")
-        .on("click", () => {window.open("/newdash?" + $.param({dash_key: "key",guid: "{2792D434-496E-40C9-5E2D-73B60623A631}",key: convert_dotted_int_to_hex(multicastIP)}), "_blank")})
+        .on("click", () => {
+          window.open("/newdash?" + $.param({
+            dash_key: "key",
+            guid: this.multicast_hosts_guid,
+            key: convert_dotted_int_to_hex(multicastIP)
+          }), "_blank");
+        })
         .attr("cursor", "pointer");
-
+  
       this.svg.append("text")
         .attr("x", cx)
         .attr("y", cy + 35)
@@ -181,37 +211,45 @@ class MulticastView {
         .style("font-size", "17px")
         .style("font-weight", "600")
         .text(multicastIP)
-        .on("click", () => {window.open("/newdash?" + $.param({dash_key: "key",guid: "{2792D434-496E-40C9-5E2D-73B60623A631}",key: convert_dotted_int_to_hex(multicastIP)}), "_blank")})
+        .on("click", () => {
+          window.open("/newdash?" + $.param({
+            dash_key: "key",
+            guid: this.multicast_hosts_guid,
+            key: convert_dotted_int_to_hex(multicastIP)
+          }), "_blank");
+        })
         .attr("cursor", "pointer");
-
+  
       this.svg.append("text")
         .attr("x", cx)
-        .attr("y", cy + 90)
+        .attr("y", cy + 80)
         .attr("text-anchor", "middle")
         .attr("fill", "#388e3c")
         .style("font-size", "17px")
         .style("font-weight", "600")
-        .text(volume);
+        .text(metricsStr);
+  
       this.drawEndpoints(cx, cy);
     }
-
+  
     drawEndpoints(cx, cy) {
       const senderX = this.baseWidth * 0.125;
       const receiverX = this.baseWidth * 0.875 - 100;
       this.drawCircle(senderX, cy, this.senders.length, "#2196F3", () => this.toggleSender());
       this.drawCircle(receiverX, cy, this.receivers.length, "#FF9800", () => this.toggleReceiver());
-      this.drawArrow(senderX + 100, cx - 75, cy, "#2196F3");
-      this.drawArrow(cx + 75, receiverX, cy, "#FF9800");
+      this.drawArrow(senderX + 80, cx - 75, cy, "#2196F3");
+      this.drawArrow(cx + 75, receiverX + 20, cy, "#FF9800");
     }
-
+  
     drawCircle(x, y, count, color, onClick) {
       this.svg.append("circle")
         .attr("cx", x + 50)
         .attr("cy", y + 30)
-        .attr("r", 50)
+        .attr("r", 30)
         .attr("fill", color)
         .attr("cursor", "pointer")
         .on("click", onClick);
+  
       this.svg.append("text")
         .attr("x", x + 50)
         .attr("y", y + 37)
@@ -222,7 +260,7 @@ class MulticastView {
         .attr("cursor", "pointer")
         .on("click", onClick);
     }
-
+  
     drawArrow(x1, x2, y, color) {
       this.svg.append("line")
         .attr("x1", x1)
@@ -233,76 +271,136 @@ class MulticastView {
         .attr("stroke-width", 2)
         .attr("marker-end", "url(#arrow)");
     }
-
-    toggleSender() { this.setSenderVisible(!this.senderVisible); }
-    toggleReceiver() { this.setReceiverVisible(!this.receiverVisible); }
+  
+    toggleSender() {
+      this.setSenderVisible(!this.senderVisible);
+    }
+  
+    toggleReceiver() {
+      this.setReceiverVisible(!this.receiverVisible);
+    }
+  
     setVisibility(sender, receiver) {
       this.setSenderVisible(sender);
       this.setReceiverVisible(receiver);
     }
-
+  
     setSenderVisible(visible) {
       this.senderVisible = visible;
-      this.senderGroup.selectAll("*").remove();
-      if (visible) this.renderList(this.senderGroup, this.senders, this.baseWidth * 0.125 + 50, 150, "#2196F3");
-      this.updateHeight();
+      this.renderLists();
     }
-
+  
     setReceiverVisible(visible) {
       this.receiverVisible = visible;
-      this.receiverGroup.selectAll("*").remove();
-      if (visible) this.renderList(this.receiverGroup, this.receivers, this.baseWidth * 0.875 - 50, 150, "#FF9800");
+      this.renderLists();
+    }
+  
+    renderLists() {
+      const existingWrapper = this.container.querySelector("#list-wrapper");
+      if (existingWrapper) existingWrapper.remove();
+    
+      if (!this.senderVisible && !this.receiverVisible) {
+        this.updateHeight();
+        return;
+      }
+    
+      const wrapper = document.createElement("div");
+      wrapper.id = "list-wrapper";
+      wrapper.style.display = "flex";
+      wrapper.style.marginTop = "0px";
+      wrapper.style.minHeight = "100px";
+      wrapper.style.position = "relative";
+    
+      // Placeholder for spacing even if one is missing
+      if (this.senderVisible) {
+        const senderDiv = document.createElement("div");
+        senderDiv.style.flex = "1";
+        senderDiv.style.maxWidth = "50%";
+        senderDiv.style.textAlign = "left";
+        senderDiv.innerHTML = this.generateListHtml(this.senders, "left");
+
+        wrapper.appendChild(senderDiv);
+      } else {
+        const placeholder = document.createElement("div");
+        placeholder.style.flex = "1";
+        wrapper.appendChild(placeholder);
+      }
+    
+      if (this.receiverVisible) {
+        const receiverDiv = document.createElement("div");
+        receiverDiv.style.flex = "1";
+        receiverDiv.style.maxWidth = "50%";
+        receiverDiv.style.textAlign = "right";
+        receiverDiv.innerHTML = this.generateListHtml(this.receivers, "right");
+
+        wrapper.appendChild(receiverDiv);
+      } else {
+        const placeholder = document.createElement("div");
+        placeholder.style.flex = "1";
+        wrapper.appendChild(placeholder);
+      }
+      
+      this.container.appendChild(wrapper);
       this.updateHeight();
     }
+    
+  
+    generateListHtml(items, position) {
+      const listHtml = items.map(item => {
+        let margin;
+        if (position === "left") {
+          margin = "margin-left: 23%; margin-right: 47%;";
+        } else {
+          margin = "margin-left: 50%; margin-right: 20%;";
+        }
+        
+        var opts = {
+          models:JSON.stringify([{counter_group:this.host_x_multicast_guid,meter:0,key:`${convert_dotted_int_to_hex(item)}\\\\${convert_dotted_int_to_hex(this.multicastIP)}`}]),
+          show_table:1,
+          surface:"SQUARESTACKEDAREA",
+          show_default_title:1,
+          window_fromts:this.time_interval.from.tv_sec,
+          window_tots:this.time_interval.to.tv_sec
+        }        
 
-    renderList(group, items, x, startY, color) {
-      const boxW = 220, boxH = 40, spaceY = 12, gradientId = `grad-${Math.random().toString(36).substr(2, 5)}`;
-      const grad = group.append("defs")
-        .append("linearGradient")
-        .attr("id", gradientId)
-        .attr("x1", "0%")
-        .attr("y1", "0%")
-        .attr("x2", "100%")
-        .attr("y2", "100%");
-      grad.append("stop")
-        .attr("offset", "0%")
-        .attr("stop-color", d3.color(color)
-        .brighter(1));
-      grad.append("stop")
-        .attr("offset", "100%")
-        .attr("stop-color", d3.color(color)
-        .darker(0.5));
+        return `
+          <li style="line-height: 1.5; font-size: 0.9vw; text-align: ${position};" class="mb-1">
+            <div class="row">
+              <span class="col" style="display: inline-block; ${margin}">
+                <span class="float-start" style="padding-right: 10px;">${item}</span>
+                <span class="dropdown float-end">
+                  <a class="dropdown-toggle" data-bs-toggle="dropdown" href="javascript:;" title="Click to get more options" aria-expanded="false">
+                    <i class="fa fa-fw fa-server"></i>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a class="dropdown-item" onclick="window.open('/newdash?' + '${$.param({dash_key: 'key',guid: this.host_x_multicast_guid, key: `${convert_dotted_int_to_hex(item)}\\${convert_dotted_int_to_hex(this.multicastIP)}`})}')">
+                        Key Dashboard
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" onclick='new ApexChartLB(${JSON.stringify(opts)}, {modal_title: "Explore Traffic History"})'>
+                        Traffic Chart
+                        </a>
+                    </li>
+                  </ul>
+                </span>
+              </span>
+            </div>
+          </li>
+        `;
+      }).join("");
 
-      items.forEach((text, i) => {
-        const y = startY + i * (boxH + spaceY), xBox = x - boxW / 2;
-        group.append("rect")
-        .attr("x", xBox)
-        .attr("y", y)
-        .attr("width", boxW)
-        .attr("height", boxH)
-        .attr("rx", 20)
-        .attr("fill", `url(#${gradientId})`);
-        group.append("text")
-        .attr("x", x)
-        .attr("y", y + boxH / 2 + 5)
-        .attr("text-anchor", "middle")
-        .attr("fill", "#fff")
-        .style("font-size", "15px")
-        .style("font-family", "monospace")
-        .text(text);
-      });
+      return `<ul style="list-style-type: none; padding: 0; margin: 0;">${listHtml}</ul>`;
     }
 
     updateHeight() {
-      const sH = this.senderVisible ? this.senders.length * 51 : 0;
-      const rH = this.receiverVisible ? this.receivers.length * 51 : 0;
-      this.svg.attr("viewBox", `0 0 ${this.baseWidth} ${this.baseHeight + Math.max(sH, rH)}`);
+      const sH = this.senderVisible ? this.senders.length * 30 : 0;
+      const rH = this.receiverVisible ? this.receivers.length * 30 : 0;
+      const extra = Math.max(sH, rH);
     }
   };
 }
-
-
-
 
 async function run(opts) {
   let rc = new MulticastView(opts);

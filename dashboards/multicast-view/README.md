@@ -15,6 +15,7 @@ Install this app to get access to the following useful Multicast View
 |---------|---------|---------|
 |`v1.0.0`|09-JUN-2025|Initial release to public|
 |`v1.0.1`|10-JUN-2025|adding search form|
+|`v1.0.2`|13-JUN-2025| use host and multicast crosskey|
 
 
 </br>
