@@ -3,7 +3,7 @@
     .card-header.bg-primary.d-flex.justify-content-between.align-items-center#show_hide_btn{data_bind_hidden: 0}
       .card-title.text-white.header_text
         %i.fa.fa-search
-        Search Multicast IP 
+        Search Multicast IP
       .col-auto.card-options.ms-auto.d-flex.gap-2.justify-content-end.align-items-center
 
     .card-body.pe-0
@@ -14,10 +14,12 @@
               .new_time_selector#new_time_selector
           .col-6
             .row
-                %label.con-from-label.col-4 key
+                %label.con-from-label.col-4 Key
               .col-8
                 %input{type:"text",class:"form-control",id:"key_filter",style:"width:300px"}
-                %span.form-help Enter IP Ex: 239.0.0.3
+                %span.form-help Enter Multicast IP Ex: 239.0.0.3 or 
+                %br
+                %span.form-help Multicast Port Ex: 19096
         .row.justify-content-center.mt-3
           .col-auto
             %input#from_date{type:"hidden",name:"from_date"}

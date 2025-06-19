@@ -1,9 +1,8 @@
-name: Multicast View
+name: Multicast GraphX
 
-version: 1.0.2
+version: 1.0.3
 
 author: trisul
-
 
 description: 
    short: Displaying the multicast Groups, senders, and receivers in a visual format.

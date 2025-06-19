@@ -79,13 +79,14 @@ class MulticastView {
     const multicastList = xflow_resp.keys
       .filter(t => (t.label.match(/\\/g) || []).length === 3)
       .reduce((list, t) => {
-        const [receiver, sender, , multicast_ip] = t.label.split("\\");
+        const [receiver, sender, port, multicast_ip] = t.label.split("\\");
         let entry = list.find(e => e.multicast_ip === multicast_ip);
         if (!entry) {
           let multicast_host = multicast_hosts_resp.keys.find(k => k.label === multicast_ip);
 
           entry = {
             multicast_ip,
+            port,
             senders: [],
             receivers: [],
             metrics: {
@@ -134,29 +135,29 @@ class MulticastView {
     });
   }
 
-  createCard({ multicast_ip, senders, receivers, metrics }, index) {
+  createCard({ multicast_ip, port, senders, receivers, metrics }, index) {
     const wrapper = document.createElement("div");
     wrapper.className = `multicast_${index}`;
     wrapper.style.width = "100%";
 
     const card = document.createElement("div");
-    card.className = "card mb-3 p-3";
+    card.className = "card mb-3 py-1";
 
 
 
     card.appendChild(wrapper);
     let metrics_str = `Max: ${metrics.max},  Min: ${metrics.min},  Avg: ${metrics.avg},  Volume: ${metrics.volume}`;
-    const diagram = new this.Diagram(wrapper, multicast_ip, senders, receivers, metrics_str, this.time_interval);
+    const diagram = new this.Diagram(wrapper, multicast_ip, port, senders, receivers, metrics_str, this.time_interval);
     this.diagrams.push(diagram);
 
     return card;
   }
 
   Diagram = class {
-    constructor(container, multicastIP, senders, receivers, metricsStr, time_interval) {
+    constructor(container, multicastIP, port, senders, receivers, metricsStr, time_interval) {
       Object.assign(this, { container, senders, receivers, senderVisible: false, receiverVisible: false, metricsStr, time_interval });
       this.baseWidth = 1200;
-      this.baseHeight = 90;
+      this.baseHeight = 100;
       this.container = container;
       this.multicastIP = multicastIP;
       this.multicast_hosts_guid = "{CD2F4C1D-688F-4B7C-AF50-A92B2280BF16}"
@@ -167,11 +168,11 @@ class MulticastView {
         .style("width", "100%").style("height", "auto");
       this.senderGroup = this.svg.append("g");
       this.receiverGroup = this.svg.append("g");
-      this.draw(multicastIP, metricsStr);
+      this.draw(multicastIP, port, metricsStr);
       window.addEventListener("resize", () => this.updateHeight());
     }
   
-    draw(multicastIP, metricsStr) {
+    draw(multicastIP, port, metricsStr) {
       const [cx, cy] = [this.baseWidth / 2, 2];
       this.svg.append("defs").html(`
         <linearGradient id="multicastGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -185,10 +186,48 @@ class MulticastView {
           <path d="M0,-5L10,0L0,5" fill="#555"/>
         </marker>
       `);
-  
+
+      // Multicast port
+      this.svg.append("rect")
+        .attr("x", cx - 40)
+        .attr("y", cy - 1)
+        .attr("width", 80)
+        .attr("height", 20)
+        .attr("rx", 12)
+        .attr("fill", "#02a682")
+        .attr("filter", "url(#boxShadow)")
+        .on("click", () => {
+          window.open("/newdash?" + $.param({
+            dash_key: "key",
+            guid: "{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}",
+            key: this.portInvertXform(port)
+          }), "_blank");
+        })
+        .attr("cursor", "pointer");
+
+
+      this.svg.append("text")
+        .attr("x", cx)
+        .attr("y", cy + 14)
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .style("font-size", "15px")
+        .style("font-weight", "600")
+        .text(port)
+        .on("click", () => {
+          window.open("/newdash?" + $.param({
+            dash_key: "key",
+            guid: "{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}",
+            key: this.portInvertXform(port)
+          }), "_blank");
+        })
+        .attr("cursor", "pointer");
+
+
+      // Multicast ip
       this.svg.append("rect")
         .attr("x", cx - 75)
-        .attr("y", cy + 10)
+        .attr("y", cy + 23)
         .attr("width", 150)
         .attr("height", 40)
         .attr("rx", 12)
@@ -202,10 +241,11 @@ class MulticastView {
           }), "_blank");
         })
         .attr("cursor", "pointer");
-  
-      this.svg.append("text")
+        
+      
+        this.svg.append("text")
         .attr("x", cx)
-        .attr("y", cy + 35)
+        .attr("y", cy + 48)
         .attr("text-anchor", "middle")
         .attr("fill", "#fff")
         .style("font-size", "17px")
@@ -219,18 +259,28 @@ class MulticastView {
           }), "_blank");
         })
         .attr("cursor", "pointer");
+
   
+      // Metrics
       this.svg.append("text")
         .attr("x", cx)
-        .attr("y", cy + 80)
+        .attr("y", cy +85)
         .attr("text-anchor", "middle")
         .attr("fill", "#388e3c")
         .style("font-size", "17px")
         .style("font-weight", "600")
         .text(metricsStr);
-  
-      this.drawEndpoints(cx, cy);
+      
+      // Arrows and Counts
+      this.drawEndpoints(cx, cy + 13);
     }
+
+    portInvertXform(dstring) {
+      const input = dstring.toUpperCase().startsWith("PORT-") ? dstring.slice(5) : dstring;
+      const hex = parseInt(input, 10).toString(16).toUpperCase().padStart(4, '0');
+      return "p-" + hex;
+    }
+    
   
     drawEndpoints(cx, cy) {
       const senderX = this.baseWidth * 0.125;
