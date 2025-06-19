@@ -44,7 +44,7 @@ This app requires the `IGMP Multicast` app to be installed and active.
 1. Login as **admin** in WebTrisul  
 2. Go to the **Trisul Apps** page  
 3. Find and install the **IGMP Multicast** app  
-4. Make sure your **probe is running**
+4. Make sure your **Make sure your restart the probe**
 
 ---
 
@@ -84,10 +84,6 @@ At the top:
 Every group displays:
 - **Max**, **Min**, **Avg** transfer rate  
 - **Total Volume** in MB/GB
-
----
-
-Then restart `probe`:
 
 ---
 
