@@ -5,9 +5,9 @@ version: 1.0.3
 author: trisul
 
 description: 
-   short: Displaying the multicast Groups, senders, and receivers in a visual format.
+   short: An interactive view of multicast traffic.
    long:  |
-      Displaying the multicast Groups, senders, and receivers in a visual format.
+      Shows multicast groups, ports, senders and receivers.
 
 apptype: dashboard_js
 
