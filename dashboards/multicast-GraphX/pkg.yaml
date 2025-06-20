@@ -7,7 +7,7 @@ author: trisul
 description: 
    short: An interactive view of multicast traffic.
    long:  |
-      Shows multicast groups, ports, senders and receivers.
+      Shows multicast groups, ports, senders, and receivers.
 
 apptype: dashboard_js
 
