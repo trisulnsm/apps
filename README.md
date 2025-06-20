@@ -1,5 +1,11 @@
 # Trisul Apps 
 
+
+## ** New ** - Multicast GraphX 
+
+A new app that uses IGMP to build a tree of multicast senders and receivers. 
+
+
 Installable dashboards, custom analytics, and other extensions to the Trisul Network Analytics Platform
 
 
