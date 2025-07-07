@@ -19,11 +19,14 @@ The config settings you can customize on a per Probe basis
 ````lua
 
 DEFAULT_CONFIG = {
-	-- filename of FireHOL level1 Feed  - will trigger Sev-1 alert 
+	-- Counter Group GUID to monitor
 	CounterGUID  ="{7FAB8F84-C580-424B-2BA4-B2546D2DB15A}",
 
 	-- number of stable intervals 
 	NumStableIntervals =1,
+	
+	-- debouncing threshold - if more than this many keys are missing, generate single alert
+	DebounceThreshold = 5,
 }
 ````
 
@@ -40,6 +43,7 @@ To supply your own custom settings,
 
 return  {
 	CounterGUID  ="{7FAB8F84-C580-424B-2BA4-B2546D2DB15A}",
+	DebounceThreshold = 10,  -- Increase threshold for less sensitive environments
 }
 
 ````
@@ -53,10 +57,21 @@ The Alerts shows up in Trisul as User-Alerts
 
 
 
+## Debouncing Feature
+
+The script now includes debouncing logic to prevent alert spam when many keys stop simultaneously (e.g., end of office hours, network outages). 
+
+- **DebounceThreshold**: If more than this many keys are missing in a single interval, a single consolidated alert is generated instead of individual alerts
+- **Default**: 5 keys
+- **Alert Message**: "Multiple keys (X) stopped sending metrics - possible network/device outage."
+- **Alert Signature**: Uses `STABLEKEYS_DEBOUNCED` to distinguish from individual key alerts
+
 UPDATES
 =======
 
 ````
+1.0.4   Jul 7 2025 
+1.0.3   Jan 2025        Added debouncing logic to prevent alert spam
 1.0.2   Jun 21 2023     Changed default guid to flowgen 
 1.0.1   Jun 14 2023     Initial release 
 ````

@@ -39,7 +39,7 @@ TrisulPlugin = {
     -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
     ----
 
-    T.active_config = make_config(
+        T.active_config = make_config(
       T.env.get_config("App>DBRoot").."/config/trisulnsm_stablekeys.lua",
       {
           -- By default FlowGens 
@@ -48,19 +48,22 @@ TrisulPlugin = {
           SigID="STABLEKEYS",
           -- number of stable intervals 
           NumStableIntervals =1,
-	  mailsubject="IPDR Alert-No Netflow received for IP"
+          -- mail subject
+	        mailsubject="IPDR Alert-No Netflow received for IP",
+          -- debouncing threshold - if more than this many keys are missing, generate single alert
+          DebounceThreshold = 5
 
       })
 
     T.keys_prev_interval = { } 
     T.pending_keys={ }
+    T.debounce_pending_keys = { }
   end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
   onunload = function()
     -- your code 
     --if we have interval more then 1 we need to maintain the 
-    
   end,
 
   -- cg_monitor block
@@ -95,35 +98,75 @@ TrisulPlugin = {
     onendflush = function(engine) 
       local countergroup=T.active_config.SigID
       
+      -- Track keys that are missing this interval
+      local missing_keys_this_interval = {}
+      
       for k,v in pairs(T.keys_prev_interval) do 
         if not T.keys_this_interval[k]  then
           --add pending count to match number of interval
           T.pending_keys[k]= (T.pending_keys[k] or 0 )
+          missing_keys_this_interval[k] = true
         end
       end
 
+      -- Check if we have too many missing keys for debouncing
+      local missing_count = 0
+      for k,v in pairs(missing_keys_this_interval) do
+        missing_count = missing_count + 1
+      end
+      
+      local should_debounce = missing_count >= T.active_config.DebounceThreshold
+      
       for k,v in pairs(T.pending_keys) do
         --if key present this interval remove the key
-        --else increase pending key count 0
+        --else increase pending key count
         if T.keys_this_interval[k] then
           T.pending_keys[k]=nil
+          T.debounce_pending_keys[k]=nil
         else
           T.pending_keys[k] = T.pending_keys[k]+1 
         end
         --once alert generated remove the key
         if (T.pending_keys[k] or 0) >= T.active_config.NumStableIntervals then
           local readable = ip_readable(k) 
-          -- alert 
-          print("alert"..readable)
-	  local alert_message="No activity detected on the expected key "..readable.." - potentially inactive."
-          engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}", 
-                    nil,
-                    T.active_config.SigID,
-                    1, 
-                    alert_message.."mailsubject:"..T.active_config.mailsubject.." "..readable.." in the last "..T.active_config.NumStableIntervals.." minutes:mailsubject")
-          T.logwarning(alert_message)
-          T.pending_keys[k]=nil
+          
+          if should_debounce then
+            -- Add to debounce pending list instead of generating individual alert
+            T.debounce_pending_keys[k] = T.pending_keys[k]
+            T.pending_keys[k] = nil
+          else
+            -- Generate individual alert for single missing key
+            print("alert"..readable)
+            local alert_message="No activity detected on the expected key "..readable.." - potentially inactive."
+            engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}", 
+                      nil,
+                      T.active_config.SigID,
+                      1, 
+                      alert_message.."mailsubject:"..T.active_config.mailsubject.." "..readable.." in the last "..T.active_config.NumStableIntervals.." minutes:mailsubject")
+            T.logwarning(alert_message)
+            T.pending_keys[k]=nil
+          end
         end
+      end
+      
+      -- Generate debounced alert if we have accumulated enough keys
+      local debounced_keys_count = 0
+      for k,v in pairs(T.debounce_pending_keys) do
+        debounced_keys_count = debounced_keys_count + 1
+      end
+      
+      if debounced_keys_count > 0 and should_debounce then
+        local alert_message = string.format("Multiple keys (%d) stopped sending metrics - possible network/device outage.", debounced_keys_count)
+        
+        engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}", 
+                  nil,
+                  T.active_config.SigID .. "_DEBOUNCED",
+                  1, 
+                  alert_message.."mailsubject:"..T.active_config.mailsubject.." Multiple keys inactive in the last "..T.active_config.NumStableIntervals.." minutes:mailsubject")
+        T.logwarning(alert_message)
+        
+        -- Clear debounced keys after alert
+        T.debounce_pending_keys = {}
       end
 
       T.keys_prev_interval = T.keys_this_interval
