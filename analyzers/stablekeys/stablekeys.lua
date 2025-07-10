@@ -20,6 +20,34 @@ function ip_readable(key)
   end 
 end
 
+function ip_to_trisul_format(ip)
+  local ret,_, b1, b2, b3, b4 = string.find( ip, "(%d+).(%d+).(%d+).(%d+)")
+  if ret then 
+    return string.format( "%02X.%02X.%02X.%02X", tonumber(b1), tonumber(b2), tonumber(b3), tonumber(b4)) 
+  else 
+    return nil
+  end 
+end
+
+function should_track_key(key)
+  -- If no specific IPs configured, track all keys
+  if not T.active_config.TrackIPs or #T.active_config.TrackIPs == 0 then
+    return true
+  end
+  
+  -- Convert key to readable IP format for comparison
+  local readable_ip = ip_readable(key)
+  
+  -- Check if this IP is in our tracking list
+  for _, track_ip in ipairs(T.active_config.TrackIPs) do
+    if readable_ip == track_ip then
+      return true
+    end
+  end
+  
+  return false
+end
+
 TrisulPlugin = { 
 
   -- id block 
@@ -39,7 +67,7 @@ TrisulPlugin = {
     -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
     ----
 
-        T.active_config = make_config(
+                T.active_config = make_config(
       T.env.get_config("App>DBRoot").."/config/trisulnsm_stablekeys.lua",
       {
           -- By default FlowGens 
@@ -49,9 +77,11 @@ TrisulPlugin = {
           -- number of stable intervals 
           NumStableIntervals =1,
           -- mail subject
-	        mailsubject="IPDR Alert-No Netflow received for IP",
+  	        mailsubject="IPDR Alert-No Netflow received for IP",
           -- debouncing threshold - if more than this many keys are missing, generate single alert
-          DebounceThreshold = 5
+          DebounceThreshold = 5,
+          -- list of IP addresses to track (empty means track all)
+          TrackIPs = {}
 
       })
 
@@ -89,7 +119,11 @@ TrisulPlugin = {
     -- WHEN CALLED: before an item  is flushed to the Hub node  
     onflush = function(engine, timestamp,key, metrics) 
       if key == "SYS:GROUP_TOTALS"  then return; end 
-      T.keys_this_interval[key]=true 
+      
+      -- Only track keys that are in our configured IP list (if any)
+      if should_track_key(key) then
+        T.keys_this_interval[key]=true 
+      end
 
     end,
 
