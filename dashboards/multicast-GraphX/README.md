@@ -47,4 +47,5 @@ Filter multicast activity by **IP** or **Port**
 | `v1.0.1` | 10-JUN-2025 | Added search form |
 | `v1.0.2` | 13-JUN-2025 | Enhanced filtering with host & multicast crosskey |
 | `v1.0.3` | 19-JUN-2025 | Readme update, now displays port on group |
+| `v1.0.4` | 10-JUL-2025 | Support all three level crosskey |
 

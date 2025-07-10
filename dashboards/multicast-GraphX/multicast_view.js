@@ -7,6 +7,7 @@ class MulticastView {
     this.baseWidth = 1200;
     this.baseHeight = 200;
     this.diagrams = [];
+    this.multicast_mode = false;
     this.setup(opts);
   }
 
@@ -26,6 +27,38 @@ class MulticastView {
     this.divid.appendChild(this.form);
     this.divid.appendChild(this.data_dom);
 
+
+    //loadonly crosskey counter groups
+    this.cg_meters={};
+    await get_counters_and_meters_json(this.cg_meters);
+
+    //only crosskey guid
+    let all_crosskey_cgguids = Object.keys(this.cg_meters.crosskey)
+    let guid_with_meters ={}
+    let cthis = this;
+
+    _.forEach(this.cg_meters.all_cg_meters, function(v, k) {
+      if (all_crosskey_cgguids.includes(k) && cthis.cg_meters.crosskey[k][3].length != 0) {        
+        guid_with_meters[k] = v;
+      }
+    });
+
+    this.exchange_xflow_guid = "{942AB99F-7A65-4B2E-6F6C-A3050F0F7B35}";
+
+    // add Exchange XFlow guid
+    if(this.cg_meters.all_cg_meters[this.exchange_xflow_guid]){
+      guid_with_meters[this.exchange_xflow_guid] = ["Exchange XFlow",[[2,"Multicast"]]]
+    }
+    
+    let js_params = {
+      meter_details:guid_with_meters,
+      selected_cg : "",
+      selected_st : "0",
+      update_dom_cg : "cgguid",
+      update_dom_st : "meters"
+    }
+    new CGMeterCombo(JSON.stringify(js_params));
+
     // set last 1 hrs in time selector
     let total_time = await fetch_trp(TRP.Message.Command.TIMESLICES_REQUEST,{get_total_window:true});
     let default_ts = {
@@ -35,6 +68,7 @@ class MulticastView {
 
     new ShowNewTimeSelector({divid: "#new_time_selector",update_input_ids: "#from_date,#to_date",default_ts: default_ts,send_recentsecs:true});
     show_hide_form();
+
 
     document.getElementById("multicast_search_form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -47,9 +81,17 @@ class MulticastView {
     });
   }
 
+
   async init() {
     this.cg_meters = {};
-    this.exchange_xflow_guid = "{942AB99F-7A65-4B2E-6F6C-A3050F0F7B35}";
+    this.selected_guid = document.getElementById("cgguid").value;
+    let selected_meters = document.getElementById("meters").value;
+    this.multicast_mode = this.selected_guid === this.exchange_xflow_guid;
+
+    this.selected_key = document.getElementById("key_filter").value.trim();
+    if(! this.multicast_mode){
+      this.selected_key = convert_to_key_format(this.selected_key);
+    }
 
     this.time_interval = mk_time_interval({
       from_date: document.getElementById("from_date").value,
@@ -57,33 +99,59 @@ class MulticastView {
     });
 
     const xflow_resp = await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: this.exchange_xflow_guid,
-      meter: 2,
+      counter_group: this.selected_guid,
+      meter: selected_meters,
       time_interval: this.time_interval,
-      key_filter: document.getElementById("key_filter").value.trim(),
+      key_filter: this.selected_key ,
       maxitems: 1000
     });
 
-    this.multicast_hosts_guid = "{CD2F4C1D-688F-4B7C-AF50-A92B2280BF16}";
+    this.cginfo= await fetch_trp(TRP.Message.Command.COUNTER_GROUP_INFO_REQUEST);
+
+    // this.multicast_hosts_guid = "{CD2F4C1D-688F-4B7C-AF50-A92B2280BF16}";
+
+    let multicast_hosts_guid;
 
     await get_counters_and_meters_json(this.cg_meters);
-    this.multipliers = get_multipliers(this.cg_meters, this.multicast_hosts_guid, 0);
+    
+    if(this.multicast_mode) {
+      multicast_hosts_guid = "{CD2F4C1D-688F-4B7C-AF50-A92B2280BF16}"
+    } else {
+      multicast_hosts_guid = this.cginfo.group_details.find( (item) => item.guid==this.selected_guid).crosskey.crosskeyguid_1
+    }
+    
+    this.multipliers = get_multipliers(this.cg_meters, multicast_hosts_guid , 0);
 
     let multicast_hosts_resp = await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
-      counter_group: this.multicast_hosts_guid,
+      counter_group: multicast_hosts_guid,
       meter: 0,
       time_interval: this.time_interval,
       maxitems: 5000
     });
 
-    const multicastList = xflow_resp.keys
-      .filter(t => (t.label.match(/\\/g) || []).length === 3)
+    var multicastList = xflow_resp.keys
+    .filter(t => {
+      const count = (t.label.match(/\\/g) || []).length;
+      return count >= 2 && count <= 3;
+    })
       .reduce((list, t) => {
-        const [receiver, sender, port, multicast_ip] = t.label.split("\\");
+        let sender, receiver, multicast_ip, port;
+        const parts = t.label.split("\\");
+        
+        if (parts.length === 4) {
+          [receiver, sender, port, multicast_ip] = parts;
+        } else if (parts.length === 3) {
+          [sender, multicast_ip, receiver] = parts;
+          port = null;
+        }
+        
         let entry = list.find(e => e.multicast_ip === multicast_ip);
         if (!entry) {
           let multicast_host = multicast_hosts_resp.keys.find(k => k.label === multicast_ip);
 
+          // If no multicast host found, skip this entry
+          if(!multicast_host) {return list;}
+          
           entry = {
             multicast_ip,
             port,
@@ -103,8 +171,11 @@ class MulticastView {
         if (!entry.receivers.includes(receiver)) entry.receivers.push(receiver);
         return list;
       }, []);
-
+    
     multicastList.sort((a, b) => human_to_volume(b.metrics.volume) - human_to_volume(a.metrics.volume));
+
+    // Filter out the given key
+    multicastList = multicastList.filter(item => item.multicast_ip.startsWith(document.getElementById("key_filter").value.trim()));
 
     document.getElementById("total-multicast-count").textContent = multicastList.length;
     document.getElementById("duration").innerHTML = `<b>Selected Time Frame: </b>${fmt_ts(this.time_interval.from.tv_sec).replace(/\s[A-Z]+$/, '')} To ${fmt_ts(this.time_interval.to.tv_sec).replace(/\s[A-Z]+$/, '')} </br> </br> `
@@ -144,34 +215,74 @@ class MulticastView {
     card.className = "card mb-3 py-1";
 
 
-
     card.appendChild(wrapper);
     let metrics_str = `Max: ${metrics.max},  Min: ${metrics.min},  Avg: ${metrics.avg},  Volume: ${metrics.volume}`;
-    const diagram = new this.Diagram(wrapper, multicast_ip, port, senders, receivers, metrics_str, this.time_interval);
-    this.diagrams.push(diagram);
+    // const diagram = new this.Diagram(wrapper, multicast_ip, port, senders, receivers, metrics_str, this.time_interval);
+    let multicast_hosts_guid = "{CD2F4C1D-688F-4B7C-AF50-A92B2280BF16}"
+    let host_x_multicast_guid = "{84EC1A12-E77D-4299-87B1-50FC6FDB3F2B}"
+    let senders_guid, receivers_guid;
 
+    if(this.multicast_mode) {
+      senders_guid = host_x_multicast_guid;
+      receivers_guid = host_x_multicast_guid;
+    } else {
+      let crosskey = this.cginfo.group_details.find( (item) => item.guid==this.selected_guid).crosskey
+      senders_guid = crosskey.parentguid;
+      multicast_hosts_guid = crosskey.crosskeyguid_1
+      receivers_guid = crosskey.crosskeyguid_2;
+    }
+    let opts = { 
+      container: wrapper,
+      multicastIP: multicast_ip,
+      port: port,
+      senders: senders,
+      receivers: receivers,
+      metricsStr: metrics_str,
+      time_interval: this.time_interval,
+      senders_guid: "",
+      receivers_guid: "",
+      senders_guid: senders_guid,
+      receivers_guid: receivers_guid,
+      multicast_hosts_guid: multicast_hosts_guid,
+      multicast_mode: this.multicast_mode
+    }
+    const diagram = new this.Diagram(opts);
+
+    this.diagrams.push(diagram);
     return card;
   }
 
   Diagram = class {
-    constructor(container, multicastIP, port, senders, receivers, metricsStr, time_interval) {
-      Object.assign(this, { container, senders, receivers, senderVisible: false, receiverVisible: false, metricsStr, time_interval });
+    constructor(opts) {
+      this.container = opts.container;
+      this.multicastIP = opts.multicastIP;
+      this.port = opts.port || null ;
+      this.senders = opts.senders;
+      this.receivers = opts.receivers;
+      this.metricsStr = opts.metricsStr;
+      this.time_interval = opts.time_interval;
+      this.senders_guid = opts.senders_guid;
+      this.receivers_guid = opts.receivers_guid;
+      this.multicast_hosts_guid = opts.multicast_hosts_guid;
+      this.multicast_mode = opts.multicast_mode;
+      this.senderVisible = false;
+      this.receiverVisible = false;
+
       this.baseWidth = 1200;
       this.baseHeight = 100;
-      this.container = container;
-      this.multicastIP = multicastIP;
-      this.multicast_hosts_guid = "{CD2F4C1D-688F-4B7C-AF50-A92B2280BF16}"
+      // this.multicast_hosts_guid = "{CD2F4C1D-688F-4B7C-AF50-A92B2280BF16}"
       this.host_x_multicast_guid = "{84EC1A12-E77D-4299-87B1-50FC6FDB3F2B}"
-      this.svg = d3.select(container).append("svg")
+
+      this.svg = d3.select(this.container).append("svg")
         .attr("viewBox", `0 0 ${this.baseWidth} ${this.baseHeight}`)
         .attr("preserveAspectRatio", "xMidYMid meet")
         .style("width", "100%").style("height", "auto");
       this.senderGroup = this.svg.append("g");
       this.receiverGroup = this.svg.append("g");
-      this.draw(multicastIP, port, metricsStr);
+      this.draw(this.multicastIP, this.port, this.metricsStr);
       window.addEventListener("resize", () => this.updateHeight());
     }
-  
+
     draw(multicastIP, port, metricsStr) {
       const [cx, cy] = [this.baseWidth / 2, 2];
       this.svg.append("defs").html(`
@@ -188,22 +299,24 @@ class MulticastView {
       `);
 
       // Multicast port
-      this.svg.append("rect")
-        .attr("x", cx - 40)
-        .attr("y", cy - 1)
-        .attr("width", 80)
-        .attr("height", 20)
-        .attr("rx", 12)
-        .attr("fill", "#02a682")
-        .attr("filter", "url(#boxShadow)")
-        .on("click", () => {
-          window.open("/newdash?" + $.param({
-            dash_key: "key",
-            guid: "{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}",
-            key: this.portInvertXform(port)
-          }), "_blank");
-        })
-        .attr("cursor", "pointer");
+      if (port) {
+        this.svg.append("rect")
+          .attr("x", cx - 40)
+          .attr("y", cy - 1)
+          .attr("width", 80)
+          .attr("height", 20)
+          .attr("rx", 12)
+          .attr("fill", "#02a682")
+          .attr("filter", "url(#boxShadow)")
+          .on("click", () => {
+            window.open("/newdash?" + $.param({
+              dash_key: "key",
+              guid: "{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}",
+              key: this.portInvertXform(port)
+            }), "_blank");
+          })
+          .attr("cursor", "pointer");
+      }
 
 
       this.svg.append("text")
@@ -367,7 +480,7 @@ class MulticastView {
         senderDiv.style.flex = "1";
         senderDiv.style.maxWidth = "50%";
         senderDiv.style.textAlign = "left";
-        senderDiv.innerHTML = this.generateListHtml(this.senders, "left");
+        senderDiv.innerHTML = this.generateListHtml(this.senders, "left", this.senders_guid);
 
         wrapper.appendChild(senderDiv);
       } else {
@@ -381,7 +494,7 @@ class MulticastView {
         receiverDiv.style.flex = "1";
         receiverDiv.style.maxWidth = "50%";
         receiverDiv.style.textAlign = "right";
-        receiverDiv.innerHTML = this.generateListHtml(this.receivers, "right");
+        receiverDiv.innerHTML = this.generateListHtml(this.receivers, "right", this.receivers_guid);
 
         wrapper.appendChild(receiverDiv);
       } else {
@@ -395,7 +508,7 @@ class MulticastView {
     }
     
   
-    generateListHtml(items, position) {
+    generateListHtml(items, position, guid) {
       const listHtml = items.map(item => {
         let margin;
         if (position === "left") {
@@ -403,15 +516,23 @@ class MulticastView {
         } else {
           margin = "margin-left: 50%; margin-right: 20%;";
         }
+
+        let key;
+        if (this.multicast_mode) {
+          key = `${convert_dotted_int_to_hex(item)}\\${convert_dotted_int_to_hex(this.multicastIP)}`
+        }else {
+          key = convert_to_key_format(item)
+        }
         
         var opts = {
-          models:JSON.stringify([{counter_group:this.host_x_multicast_guid,meter:0,key:`${convert_dotted_int_to_hex(item)}\\\\${convert_dotted_int_to_hex(this.multicastIP)}`}]),
+          models:JSON.stringify([{counter_group:guid ,meter:0,key: key}]),
           show_table:1,
           surface:"SQUARESTACKEDAREA",
           show_default_title:1,
           window_fromts:this.time_interval.from.tv_sec,
           window_tots:this.time_interval.to.tv_sec
-        }        
+        }
+
 
         return `
           <li style="line-height: 1.5; font-size: 0.9vw; text-align: ${position};" class="mb-1">
@@ -424,7 +545,7 @@ class MulticastView {
                   </a>
                   <ul class="dropdown-menu">
                     <li>
-                      <a class="dropdown-item" onclick="window.open('/newdash?' + '${$.param({dash_key: 'key',guid: this.host_x_multicast_guid, key: `${convert_dotted_int_to_hex(item)}\\${convert_dotted_int_to_hex(this.multicastIP)}`})}')">
+                      <a class="dropdown-item" onclick="window.open('/newdash?' + '${$.param({dash_key: 'key',guid: guid , key: key})}')">
                         Key Dashboard
                       </a>
                     </li>

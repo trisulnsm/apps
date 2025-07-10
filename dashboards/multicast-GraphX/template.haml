@@ -8,18 +8,39 @@
 
     .card-body.pe-0
       %form.form-dots#multicast_search_form
+
+        .row
+          .col-6
+            .row.mb-3
+              %label.col-form-label.col-4 Counter Group
+              .col-8
+                %select#cgguid
+          .col-6
+            .row.mb-3
+              %label.col-form-label.col-4 Meter
+              .col-8
+                %select#meters
+
+
         .row
           .col-6
             .row
-              .new_time_selector#new_time_selector
+              #rc_counter_group
           .col-6
             .row
-                %label.con-from-label.col-4 Filter
+              #rc_meters
+          .col-6
+            .row
+                %label.con-from-label.col-4 Key
               .col-8
                 %input{type:"text",class:"form-control",id:"key_filter",style:"width:300px"}
-                %span.form-help Enter Multicast IP Ex: 239.0.0.3 or 
+                %span.form-help Enter Multicast IP Ex: 239.0.0.3 or
                 %br
                 %span.form-help Multicast Port Ex: 19096
+          .col-6
+            .row
+              .new_time_selector#new_time_selector
+
         .row.justify-content-center.mt-3
           .col-auto
             %input#from_date{type:"hidden",name:"from_date"}
