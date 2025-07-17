@@ -1,6 +1,6 @@
 name: Multicast GraphX
 
-version: 1.0.3
+version: 1.0.4
 
 author: trisul
 
@@ -14,6 +14,6 @@ apptype: dashboard_js
 appresources: multicast_view.js template.haml
 
 dependencies: 
-  webtrisul: 7.0.2557
+  webtrisul: 7.0.2566
 
 jsparams:
