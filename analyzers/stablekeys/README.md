@@ -57,6 +57,20 @@ return  {
 	},
 }
 
+
+````
+
+If using CrossKeys ensure that you specify the keys with \\ double backslash to prevent escaped strings.
+For example
+
+````lua
+
+    -- use double backslash .. 
+    TrackIPs = {
+		"244.0.0.152\\10.68.78.33",
+    },
+}
+
 ````
 
 ## Viewing alerts
@@ -90,6 +104,7 @@ UPDATES
 =======
 
 ````
+1.0.8   Jul 17 2025     Logic to support alternate key forms like crosskeys IPs 
 1.0.7   Jul 10 2025     Added IP filtering to track only specific addresses
 1.0.6   Jul 7 2025      Debounce logic to prevent mass alert spam 
 1.0.3   Jan 2025        Added debouncing logic to prevent alert spam

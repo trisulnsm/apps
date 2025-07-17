@@ -12,21 +12,27 @@
 require 'mkconfig' 
 
 function ip_readable(key)
-  local ret,_, b1, b2, b3, b4 = string.find( key, "(%x+).(%x+).(%x+).(%x+)")
-  if ret then 
-    return string.format( "%d.%d.%d.%d", tonumber(b1,16), tonumber(b2,16),tonumber(b3,16), tonumber(b4,16)) 
-  else 
-    return key 
-  end 
+  -- Use gsub to find and replace all hex IP patterns with decimal format
+  local result = string.gsub(key, "(%x%x)%.(%x%x)%.(%x%x)%.(%x%x)", function(b1, b2, b3, b4)
+    return string.format("%d.%d.%d.%d", tonumber(b1,16), tonumber(b2,16), tonumber(b3,16), tonumber(b4,16))
+  end)
+  
+  return result
 end
 
 function ip_to_trisul_format(ip)
-  local ret,_, b1, b2, b3, b4 = string.find( ip, "(%d+).(%d+).(%d+).(%d+)")
-  if ret then 
-    return string.format( "%02X.%02X.%02X.%02X", tonumber(b1), tonumber(b2), tonumber(b3), tonumber(b4)) 
-  else 
-    return nil
-  end 
+  -- Use gsub to find and replace all decimal IP patterns with hex Trisul format
+  -- Use word boundary pattern to ensure we match complete IP addresses only
+  local result = string.gsub(ip, "([^%w])(%d+)%.(%d+)%.(%d+)%.(%d+)", function(prefix, b1, b2, b3, b4)
+    return prefix .. string.format("%02X.%02X.%02X.%02X", tonumber(b1), tonumber(b2), tonumber(b3), tonumber(b4))
+  end)
+  
+  -- Also handle IP addresses at the beginning of the string
+  result = string.gsub(result, "^(%d+)%.(%d+)%.(%d+)%.(%d+)", function(b1, b2, b3, b4)
+    return string.format("%02X.%02X.%02X.%02X", tonumber(b1), tonumber(b2), tonumber(b3), tonumber(b4))
+  end)
+  
+  return result
 end
 
 function should_track_key(key)
@@ -67,7 +73,7 @@ TrisulPlugin = {
     -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
     ----
 
-                T.active_config = make_config(
+    T.active_config = make_config(
       T.env.get_config("App>DBRoot").."/config/trisulnsm_stablekeys.lua",
       {
           -- By default FlowGens 
@@ -88,6 +94,11 @@ TrisulPlugin = {
     T.keys_prev_interval = { } 
     T.pending_keys={ }
     T.debounce_pending_keys = { }
+
+    -- Check if this IP is in our tracking list
+    for _, track_ip in ipairs(T.active_config.TrackIPs) do
+      print("track_ip ".. track_ip .. " readable_ip ".. ip_to_trisul_format(track_ip) )
+    end    
   end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
