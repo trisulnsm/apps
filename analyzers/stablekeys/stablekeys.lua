@@ -183,11 +183,7 @@ TrisulPlugin = {
             -- Generate individual alert for single missing key
             print("alert"..readable)
             local alert_message="No activity detected on the expected key "..readable.." - potentially inactive."
-            engine:add_alert( "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}", 
-                      nil,
-                      T.active_config.SigID,
-                      1, 
-                      alert_message.."mailsubject:"..T.active_config.mailsubject.." "..readable.." in the last "..T.active_config.NumStableIntervals.." minutes:mailsubject")
+            engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",  nil, T.active_config.SigID, 1,  "STABLE_KEYS_ALERT".."|"..T.active_config.mailsubject.."|"..T.active_config.NumStableIntervals.."|"..T.active_config.CounterGUID.."|"..k)
             T.logwarning(alert_message)
             T.pending_keys[k]=nil
           end

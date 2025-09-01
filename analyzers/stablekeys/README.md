@@ -110,6 +110,7 @@ UPDATES
 1.0.3   Jan 2025        Added debouncing logic to prevent alert spam
 1.0.2   Jun 21 2023     Changed default guid to flowgen 
 1.0.1   Jun 14 2023     Initial release 
+1.0.9   Jul 29 2025     Email alert format change 
 ````
 
 
