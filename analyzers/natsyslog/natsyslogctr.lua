@@ -89,10 +89,8 @@ TrisulPlugin = {
         T.re2_CiscoNATSyslog3 = T.re2(
             "(\\d+):\\s+(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d):\\s+.*(CREATED|DELETED):\\s+(\\w+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)")
 
-        -- microkit has firwall in that syslog message
-        T.re2_MikroTikNATSyslog = T.re2("firewall,info.*proto\\s(\\w+).*,\\s(\\S+):(\\d+)->(\\S+):(\\d+)")
-        T.re2_MikroTikNATSyslog2 = T.re2(
-            "firewall,info.*\\sproto\\s+(\\w+).*\\s(\\S+):(\\d+)->(\\S+):(\\d+),\\sNAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
+        T.re2_MikroTikNATSyslog=T.re2("firewall,info.*src-mac\\s(\\S+),\\sproto\\s(\\w+).*,\\s(\\S+):(\\d+)->(\\S+):(\\d+)")
+        T.re2_MikroTikNATSyslog2=T.re2("firewall,info.*src-mac\\s(\\S+),\\sproto\\s+(\\w+).*\\s(\\S+):(\\d+)->(\\S+):(\\d+),\\sNAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
 
         -- tacitine devices
         T.re2_TacitineNATSylog = T.re2(
@@ -346,7 +344,7 @@ TrisulPlugin = {
 
             elseif syslogstr:find("firewall,info nat", 1, true) then
                 -- tactine devices
-                local bret, proto, sip, sport, dip, dport, natsip, natsport, natsip1, natsport1, natdip, natdport =
+                local bret, srcmac,proto, sip, sport, dip, dport, natsip, natsport, natsip1, natsport1, natdip, natdport =
                     T.re2_MikroTikNATSyslog2:partial_match_n(syslogstr)
 
                 if bret == false then
@@ -364,7 +362,7 @@ TrisulPlugin = {
             elseif syslogstr:find("firewall,info", 1, true) then
 
                 -- MikroTik device 
-                local bret, proto, sip, sport, dip, dport = T.re2_MikroTikNATSyslog:partial_match_n(syslogstr)
+                local bret, srcmac,proto, sip, sport, dip, dport = T.re2_MikroTikNATSyslog:partial_match_n(syslogstr)
                 if bret == false then
                     return;
                 end
@@ -372,6 +370,7 @@ TrisulPlugin = {
                 local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
                 engine:update_flow_raw(fkey, 0, 1)
                 engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
+                engine:tag_flow(fkey, "[mac]" .. srcmac)
                 engine:update_flow_raw(fkey, 1, 1)
                 engine:terminate_flow(fkey)
             elseif syslogstr:find('trandisp="snat+dnat"', 1, true) then
