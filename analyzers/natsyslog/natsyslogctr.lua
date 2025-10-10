@@ -3,7 +3,6 @@
 -- 
 local Fk = require 'flowkey'
 local SB = require 'sweepbuf'
-local debug = require 'debugger'
 
 MONTHNAMES = {
     ['Jan'] = 1,
@@ -91,6 +90,9 @@ TrisulPlugin = {
 
         T.re2_MikroTikNATSyslog=T.re2("firewall,info.*src-mac\\s(\\S+),\\sproto\\s(\\w+).*,\\s(\\S+):(\\d+)->(\\S+):(\\d+)")
         T.re2_MikroTikNATSyslog2=T.re2("firewall,info.*src-mac\\s(\\S+),\\sproto\\s+(\\w+).*\\s(\\S+):(\\d+)->(\\S+):(\\d+),\\sNAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
+
+        T.re2_MikroTikNATSyslog3=T.re2("(\\w+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*srcnat.*\\ssrc-mac\\s(\\S+),\\sproto\\s(\\w+),\\s+(\\S+):(\\d+)->(\\S+):(\\d+)")
+        T.re2_MikroTikNATSyslog4=T.re2("(\\w+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*forward:.*\\ssrc-mac\\s(\\S+),\\sproto\\s(\\w+),.*NAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
 
         -- tacitine devices
         T.re2_TacitineNATSylog = T.re2(
@@ -468,6 +470,26 @@ TrisulPlugin = {
                     engine:update_flow_raw(fkey, 1, 1)
                     engine:terminate_flow(fkey)
                 end
+            elseif syslogstr:find("forward",1,true) and syslogstr:find("NAT",1,true) then
+                -- MikroTik device 4
+                local bret, mon, day, h, m, s, srcmac,proto, natsip1, natsport1, sip, sport, dip, dport =
+                    T.re2_MikroTikNATSyslog4:partial_match_n(syslogstr)
+
+                if bret == false then
+                    return;
+                end
+                proto = PROTOCOl[proto]
+                local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
+                engine:update_flow_raw(fkey, 0, 1)
+                engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
+                engine:tag_flow(fkey, "[natip]" .. natsip1)
+                engine:tag_flow(fkey, "[natport]" .. natsport1)
+                engine:tag_flow(fkey, "[mac]" .. srcmac)
+                engine:update_flow_raw(fkey, 1, 1)
+                engine:terminate_flow(fkey)
+            else
+                -- unrecognized syslog 
+                -- engine:add_resource( "{7B431613-9291-49BF-F8D3-73578A445310}", layer:packet():flowid():id(), "NAT SYSLOG UNRECOGNIZED", syslogstr)
 
             end
         end
