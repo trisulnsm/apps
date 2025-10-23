@@ -3,7 +3,6 @@
 -- 
 local Fk = require 'flowkey'
 local SB = require 'sweepbuf'
-local debug = require 'debugger'
 
 MONTHNAMES = {
     ['Jan'] = 1,
@@ -89,10 +88,18 @@ TrisulPlugin = {
         T.re2_CiscoNATSyslog3 = T.re2(
             "(\\d+):\\s+(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d):\\s+.*(CREATED|DELETED):\\s+(\\w+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)")
 
-        -- microkit has firwall in that syslog message
-        T.re2_MikroTikNATSyslog = T.re2("firewall,info.*proto\\s(\\w+).*,\\s(\\S+):(\\d+)->(\\S+):(\\d+)")
-        T.re2_MikroTikNATSyslog2 = T.re2(
-            "firewall,info.*\\sproto\\s+(\\w+).*\\s(\\S+):(\\d+)->(\\S+):(\\d+),\\sNAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
+        --cisco ASA syslog
+        T.re2_CiscoNATSyslog4=T.re2("(\\w+)\\s(\\d+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+):.*Built\\soutbound\\s(\\w+).*outside:(\\S+)\\/(\\d+)\\s.*:(\\S+)\\/(\\d+)\\s\\((\\S+)\\/(\\d+)\\)")
+        T.re2_CiscoNATSyslog5=T.re2("(\\w+)\\s(\\d+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*(?:inbound|Teardown)\\s(\\w+)\\sconnection.*faddr\\s(\\S+)\\/(\\d+)\\sgaddr\\s(\\S+)\\/(\\d+)\\sladdr\\s(\\S+)\\/(\\d+)")
+        --T.re2_CiscoNATSyslog6=T.re2("(\\w+)\\s(\\d+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+):.*(?:Deny|Teardown)\\s?(?:inbound|outbound)?\\s(\\w+).*(?:outside|inside):(\\S+).*(?:outside|inside):(\\S+)")
+        T.re2_CiscoNATSyslog6=T.re2("(\\w+)\\s(\\d+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*(?:Deny|Teardown)\\s?(?:inbound|outbound)?\\s(\\w+).*(?:outside|inside):(\\S+).*(?:outside|inside):(\\S+)")
+
+
+        T.re2_MikroTikNATSyslog=T.re2("firewall,info.*src-mac\\s(\\S+),\\sproto\\s(\\w+).*,\\s(\\S+):(\\d+)->(\\S+):(\\d+)")
+        T.re2_MikroTikNATSyslog2=T.re2("firewall,info.*src-mac\\s(\\S+),\\sproto\\s+(\\w+).*\\s(\\S+):(\\d+)->(\\S+):(\\d+),\\sNAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
+
+        T.re2_MikroTikNATSyslog3=T.re2("(\\w+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*srcnat.*\\ssrc-mac\\s(\\S+),\\sproto\\s(\\w+),\\s+(\\S+):(\\d+)->(\\S+):(\\d+)")
+        T.re2_MikroTikNATSyslog4=T.re2("(\\w+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*forward:.*\\ssrc-mac\\s(\\S+),\\sproto\\s(\\w+),.*NAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
 
         -- tacitine devices
         T.re2_TacitineNATSylog = T.re2(
@@ -346,7 +353,7 @@ TrisulPlugin = {
 
             elseif syslogstr:find("firewall,info nat", 1, true) then
                 -- tactine devices
-                local bret, proto, sip, sport, dip, dport, natsip, natsport, natsip1, natsport1, natdip, natdport =
+                local bret, srcmac,proto, sip, sport, dip, dport, natsip, natsport, natsip1, natsport1, natdip, natdport =
                     T.re2_MikroTikNATSyslog2:partial_match_n(syslogstr)
 
                 if bret == false then
@@ -364,7 +371,7 @@ TrisulPlugin = {
             elseif syslogstr:find("firewall,info", 1, true) then
 
                 -- MikroTik device 
-                local bret, proto, sip, sport, dip, dport = T.re2_MikroTikNATSyslog:partial_match_n(syslogstr)
+                local bret, srcmac,proto, sip, sport, dip, dport = T.re2_MikroTikNATSyslog:partial_match_n(syslogstr)
                 if bret == false then
                     return;
                 end
@@ -372,6 +379,7 @@ TrisulPlugin = {
                 local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
                 engine:update_flow_raw(fkey, 0, 1)
                 engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
+                engine:tag_flow(fkey, "[mac]" .. srcmac)
                 engine:update_flow_raw(fkey, 1, 1)
                 engine:terminate_flow(fkey)
             elseif syslogstr:find('trandisp="snat+dnat"', 1, true) then
@@ -469,6 +477,92 @@ TrisulPlugin = {
                     engine:update_flow_raw(fkey, 1, 1)
                     engine:terminate_flow(fkey)
                 end
+            elseif syslogstr:find("forward",1,true) and syslogstr:find("NAT",1,true) then
+                -- MikroTik device 4
+                local bret, mon, day, h, m, s, srcmac,proto, natsip1, natsport1, sip, sport, dip, dport =
+                    T.re2_MikroTikNATSyslog4:partial_match_n(syslogstr)
+
+                if bret == false then
+                    return;
+                end
+                proto = PROTOCOl[proto]
+                local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
+                engine:update_flow_raw(fkey, 0, 1)
+                engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
+                engine:tag_flow(fkey, "[natip]" .. natsip1)
+                engine:tag_flow(fkey, "[natport]" .. natsport1)
+                engine:tag_flow(fkey, "[mac]" .. srcmac)
+                engine:update_flow_raw(fkey, 1, 1)
+                engine:terminate_flow(fkey)
+            elseif syslogstr:find("ASA",1,true) and syslogstr:find("Built outbound",1,true) then
+                -- cisco asa
+                local bret, mon, day, year,h, m, s, proto, dip, dport, natsip1, natsport1, sip, sport =
+                    T.re2_CiscoNATSyslog4:partial_match_n(syslogstr)
+
+                if bret == false then
+                    return;
+                end
+                if is_private_ip(dip) then
+                    dip, dport, natsip1, natsport1 = natsip1, natsport, dip, dport
+                end
+                proto = PROTOCOl[proto]
+                local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
+                engine:update_flow_raw(fkey, 0, 1)
+                engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
+                engine:tag_flow(fkey, "[natip]" .. natsip1)
+                engine:tag_flow(fkey, "[natport]" .. natsport1)
+                engine:update_flow_raw(fkey, 1, 1)
+                engine:terminate_flow(fkey)
+            elseif (syslogstr:find("ASA",1,true) and syslogstr:find("Built inbound",1,true)) or (syslogstr:find("ASA",1,true) and syslogstr:find("Teardown",1,true) and syslogstr:find("gaddr",1,true) ) then
+                -- cisco asa
+               
+                local bret, mon, day, year,h, m, s, proto, dip, dport, sip, sport, natsip1, natsport1 =
+                    T.re2_CiscoNATSyslog5:partial_match_n(syslogstr)
+
+                if bret == false then
+                    return;
+                end
+
+                proto = PROTOCOl[proto]
+                local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
+                engine:update_flow_raw(fkey, 0, 1)
+                engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
+                engine:tag_flow(fkey, "[natip]" .. natsip1)
+                engine:tag_flow(fkey, "[natport]" .. natsport1)
+                engine:update_flow_raw(fkey, 1, 1)
+                engine:terminate_flow(fkey)
+
+                 engine:terminate_flow(fkey)
+            elseif syslogstr:find("ASA",1,true) and ( syslogstr:find("Deny",1,true) or  syslogstr:find("Teardown",1,true)) then
+                -- cisco asa
+                local sport =0
+                local dport = 0
+                local bret, mon, day, year,h, m, s, proto, sip, dip =
+                    T.re2_CiscoNATSyslog6:partial_match_n(syslogstr)
+
+                if bret == false then
+                    return;
+                end
+                if sip:match("/") then
+                    sip,sport = sip:match("([^/]+)/(%d+)")
+                end
+                if dip:match("/") then
+                    dip,dport = dip:match("([^/]+)/(%d+)")
+                end
+                
+                proto = PROTOCOl[string.upper(proto)]
+                local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
+                engine:update_flow_raw(fkey, 0, 1)
+                engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
+                engine:update_flow_raw(fkey, 1, 1)
+                engine:terminate_flow(fkey)
+
+
+
+            else
+                --print(syslogstr)
+                -- unrecognized syslog 
+                -- engine:add_resource( "{7B431613-9291-49BF-F8D3-73578A445310}", layer:packet():flowid():id(), "NAT SYSLOG UNRECOGNIZED", syslogstr)
 
             end
         end
