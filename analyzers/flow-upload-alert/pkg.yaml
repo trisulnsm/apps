@@ -1,0 +1,17 @@
+name: Flow Upload Alert
+
+version: 1.0.1
+
+author: Trisul
+
+description:
+  short: Alert for high upload flows
+  long: |
+    Generates alerts when internal hosts upload significant data to external networks.
+    Alerts are based on hard upload thresholds and upload/download byte ratios.
+
+apptype: lua
+
+appresources: flow_upload_alert.lua mkconfig.lua
+
+dependencies:  
