@@ -1,6 +1,6 @@
 # Rolling Cards
 
-Install this app to get access to the following useful Rolling Cards
+Install this app to get access to the following useful Rolling Cards.
 
 1. #### View counter group toppers in rolling cards
 
