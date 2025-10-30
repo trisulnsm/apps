@@ -54,10 +54,10 @@ TrisulPlugin = {
 
         --generate alert those upload is graater then this value
 
-        upload_bytes = 1.1*1000*1000,
+        upload_bytes = 2*1000*1000,
 
 
-        hard_upload_bytes=1.4*1000*1000,
+        hard_upload_bytes=5*1000*1000,
 
         -- geneate alert if upload is greater then 2% of the download 
 
