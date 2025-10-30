@@ -49,12 +49,12 @@ TrisulPlugin = {
           ["UDP"]=true,
         },
 
-        --ignore flows less than  1 MB
-        ignore_flows_bytes= 1*1000*1000,
+        --ignore flows less than  2 MB
+        ignore_flows_bytes= 2*1000*1000,
 
         --generate alert those upload is graater then this value
 
-        upload_bytes = 2*1000*1000,
+        upload_bytes = 3*1000*1000,
 
 
         hard_upload_bytes=5*1000*1000,
