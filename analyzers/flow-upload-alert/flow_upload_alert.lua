@@ -134,15 +134,15 @@ TrisulPlugin = {
       end
       
       if upload_bytes > T.config.hard_upload_bytes then
-        local readable_bytes_format = format_bytes(T.config.upload_bytes)
-        local msg = "Flow ID ("..flowid..") flow metric is now "..upload_bytes..", crossed ".. T.config.upload_bytes.."[Hard Upload Alert|Above "..readable_bytes_format.."]"
+        local readable_bytes_format = format_bytes(T.config.hard_upload_bytes)
+        local msg = "Flow ID ("..flowid..") flow metric is now "..upload_bytes..", crossed ".. T.config.hard_upload_bytes.."[Hard Upload Alert|Above "..readable_bytes_format.."]"
         T.loginfo("Lua flow tracker hard alert generated msg="..msg)
         engine:add_alert_tca("{BE7F367F-8533-45F7-9AE8-A33E5E1AA783}",T.config.fta_alert_id,"ALARM",msg)
         return
       end
 
       --if between ratio
-      if upload_ratio  > T.config.upload_download_bytes_ratio then
+      if upload_ratio  > T.config.upload_download_bytes_ratio and upload_bytes > T.config.upload_bytes then
         local msg = "Flow ID ("..flowid..") flow metric is now "..upload_bytes..", crossed ".. T.config.upload_bytes.."[Upload Alert Ratio|Above "..T.config.upload_download_bytes_ratio.."%]"
         T.loginfo("Lua flow tracker ratio alert  generated msg="..msg)
         engine:add_alert_tca("{BE7F367F-8533-45F7-9AE8-A33E5E1AA783}",T.config.fta_alert_id,"ALARM",msg)
