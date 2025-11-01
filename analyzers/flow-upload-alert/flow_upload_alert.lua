@@ -83,7 +83,13 @@ TrisulPlugin = {
     )
   end,
 
+
+
   sg_monitor = {
+
+    onbeginflush = function(engine,ts)
+      T.config.fired_alert_count  = 0
+    end,
 
     onflush = function(engine, flow)
       local session = flow:flow()
@@ -116,13 +122,17 @@ TrisulPlugin = {
       local portz_readable =  session:portz_readable()
 
 
+     
+
       if T.config.fired_alert_id_lists[flowid]  and  (T.config.fired_alert_id_lists[flowid] + T.config.alert_suppression_seconds) >= os.time() then
+        --print("Return key = "..k.."added at ="..os.date("%c", T.config.fired_alert_id_lists[flowid]+T.config.alert_suppression_seconds).."current time ="..os.date("%c"))
         return
       end
 
 
       --ignore flow < then a valye
-      if (upload_bytes < T.config.ignore_flows_bytes or download_bytes < T.config.ignore_flows_bytes) then 
+      if (total_bytes < T.config.ignore_flows_bytes) then 
+        --print("Return  key ="..flowid.." total bytes="..total_bytes.." less then ignore flow bytes"..T.config.ignore_flows_bytes)
         return
       end
 
@@ -161,6 +171,7 @@ TrisulPlugin = {
       if download_bytes > 0 then
         upload_ratio = (upload_bytes / download_bytes) * 100
       end
+
       if upload_bytes > T.config.hard_upload_bytes then
         --print("Adding hard alert "..flowid)
         local readable_bytes_format = format_bytes(T.config.hard_upload_bytes)
@@ -168,27 +179,32 @@ TrisulPlugin = {
         T.loginfo("Lua flow tracker hard alert generated msg="..msg)
         engine:add_alert_tca("{BE7F367F-8533-45F7-9AE8-A33E5E1AA783}",T.config.fta_alert_id,"ALARM",msg)
         T.config.fired_alert_id_lists[flowid]=os.time()
+        T.config.fired_alert_count = T.config.fired_alert_count + 1
         return
       end
 
       --if between ratio
       if upload_ratio  > T.config.upload_download_bytes_ratio and upload_bytes > T.config.upload_bytes then
-         --print("Adding ratio alert "..flowid)
+        --print("Adding ratio alert "..flowid)
         local msg = "Flow ID ("..flowid..") flow metric is now "..upload_bytes..", crossed ".. T.config.upload_bytes.."[Upload Alert Ratio|Above "..T.config.upload_download_bytes_ratio.."%]"
         T.loginfo("Lua flow tracker ratio alert  generated msg="..msg)
         engine:add_alert_tca("{BE7F367F-8533-45F7-9AE8-A33E5E1AA783}",T.config.fta_alert_id,"ALARM",msg)
         T.config.fired_alert_id_lists[flowid]=os.time()
+        T.config.fired_alert_count = T.config.fired_alert_count + 1
       end
 
     end,
 
     onendflush  = function(engine)
       for k, v in pairs(T.config.fired_alert_id_lists) do
-        if (v+T.config.alert_suppression_seconds) < os.time() then
+        if (v+T.config.alert_suppression_seconds) <= os.time() then
           --print("Deleteing key = "..k.."added at ="..os.date("%c", v+T.config.alert_suppression_seconds).."current time ="..os.date("%c"))
           T.config.fired_alert_id_lists[k]=nil
         end
       end
+      --print("Lua flow tracker added count="..T.config.fired_alert_count)
+      T.loginfo("Lua flow tracker added count="..T.config.fired_alert_count)
+      T.config.fired_alert_count = 0;
     end,
 
   },
