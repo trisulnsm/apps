@@ -1,0 +1,16 @@
+name: SNMP ARP Mapper
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: ARP Table to MAC Flow Tagger
+   long:  |
+      Walks SNMP ARP Table and adds MAC addresses to flows
+
+apptype: lua
+
+appresources: snmp-arp-flowtagger.lua sweepbuf.lua 
+
+dependencies:  
