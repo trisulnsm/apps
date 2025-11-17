@@ -31,6 +31,6 @@ return {
 # Version History
 
 ````
-1.0.0   Nov 15 2025      Initial version 
+1.0.1   Nov 15 2025      Initial version 
 
 ````
