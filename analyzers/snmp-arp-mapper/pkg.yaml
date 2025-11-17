@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: snmp-arp-flowtagger.lua sweepbuf.lua 
+appresources: snmp-arp-flowtagger.lua mkconfig.lua 
 
 dependencies:  
