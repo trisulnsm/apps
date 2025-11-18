@@ -63,8 +63,7 @@ TrisulPlugin = {
 		-- WHEN CALLED: when a flow FLUSH operation starts
 		-- by default called every "stream snapshot interval" of 60 seconds
 		onbeginflush = function(engine,ts)
-
-            if ts - T.last_poll_secs <= T.active_config.ResolutionSeconds then
+            if ts - T.last_poll_secs < T.active_config.ResolutionSeconds then
                 T.logdebug("Skipping poll for new targets, last poll was less than or equal to resolution seconds ago")
                 return
             end
@@ -149,7 +148,6 @@ TrisulPlugin = {
 		for ipkey, snmp in pairs(snmp_attributes) do
 			if
 				snmp["snmp.ip"] ~= nil
-				and T.util.hash(snmp["snmp.ip"], 1) == tonumber(engine_id)
 				and T.active_config.IsIPEnabled(snmp["snmp.ip"])
 			then
 				if snmp["snmp.version"] == "2c" then
