@@ -77,7 +77,7 @@ TrisulPlugin = {
 				T.poll_targets = new_targets
 			end
             
-            for _,agent in ipairs(new_targets) do
+            for _,agent in ipairs(T.poll_targets) do
                 local new_arp_entries = TrisulPlugin.do_bulk_walk(agent, ".1.3.6.1.2.1.4.22.1.2")
                 for ip_address, mac_address in pairs(new_arp_entries) do
                     T.arp_entries[ip_address] = mac_address
