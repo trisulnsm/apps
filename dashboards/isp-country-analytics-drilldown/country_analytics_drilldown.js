@@ -3,6 +3,16 @@
   Drilldown for  country analytics app
   View detailed usage for country across all interfaces
 */
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import TrisProgressBar from "tris_progress_bar";
+import InterfaeGauge from "interface_gauge";
+import TrisTablePagination from "tris_table_pagination";
+import ExportToPDF from "export_to_pdf";
+import {ApexChartLB} from "trp_apexcharts";
+import add_barspark from "barspark";
+import {show_host_menu,show_generic_menu} from "utils";
+
 class ISPCountryrilldownMapping{
   constructor(opts){
     //load app.css file 
@@ -328,34 +338,31 @@ class ISPCountryrilldownMapping{
     }
     this.traf_chart_id = `country_drilldown_${idx}_traffic_chart`
     this.dom.find(`#country_drilldown_${idx}`).find(`.traffic_chart`).attr("id",this.traf_chart_id);
-    let ref_model = [this.parent_cgguid,this.keyt.key,this.meters[meter_name],"Total"];
-    var model_data = {cgguid:this.crosskey_interface,
-        meter:this.meters[meter_name],
-        key:keys.join(","),
-        from_date:this.form.find("#from_date").val(),
-        to_date:this.form.find("#to_date").val(),
-        valid_input:1,
-        ref_model:ref_model,
-        show_title:false,
-        legend_position:"bottom"
-      };
     this.dom.find(`#country_drilldown_${idx}`).find(`.traffic_chart_div`).find(".animated-background").remove();
-
     if(keys.length==0){
       $('#'+this.traf_chart_id).html("no data found");
       return
     }
-    $.ajax({
-      url:"/trpjs/generate_chart",
-      data:model_data,
-      context:this,
-      success:function(resp){
-        $('#'+this.traf_chart_id).html(resp);
 
-      }
-    });
+    let refmodel = [{counter_group:this.parent_cgguid,key:this.keyt.key,meter:this.meters[meter_name],label:"Total"}];
+
+    let chart_models = [];
+    keys.forEach(key=>{
+      chart_models.push({counter_group:this.crosskey_interface,meter:this.meters[meter_name],key:key})
+    })
+
+    var model_data = {models:JSON.stringify(chart_models),
+        refmodel:JSON.stringify(refmodel),
+        from_date:this.form.find("#from_date"+this.rand_id).val(),
+        to_date:this.form.find("#to_date"+this.rand_id).val(),
+        valid_input:1,
+        surface:"STACKEDAREA",
+        divid:`#${this.traf_chart_id}`
+    };
+    draw_apex_chart(model_data)
   }
-   async draw_sankey_chart(meter_name,midx){
+    
+  async draw_sankey_chart(meter_name,midx){
 
     this.sankey_div_id = `country_drilldown_${midx}_sankey`;
     this.dom.find(`#country_drilldown_${midx}`).find(".interfaces_sankey_chart").append($("<div>",{id:this.sankey_div_id}));
@@ -537,7 +544,7 @@ class ISPCountryrilldownMapping{
 };
 
 
-function run(opts) {
+export function run(opts) {
   new ISPCountryrilldownMapping(opts);
 }
 

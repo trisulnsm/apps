@@ -14,6 +14,7 @@ import InterfaeGauge from "interface_gauge";
 import TrisTablePagination from "tris_table_pagination";
 import ExportToPDF from "export_to_pdf";
 import {ApexChartLB} from "trp_apexcharts";
+
 class ISPOverviewMapping{
   constructor(opts) {
     this.dom = $(opts.divid);
@@ -618,10 +619,11 @@ class ISPOverviewMapping{
     keys.forEach(k=>{
       models.push({counter_group:this.cgguid,meter:meter,key:k[0],label:k[1]})
     })
-    let ref_model = [{counter_group:cgguid,key:key,meter:meter}];
+    let refmodel = [{counter_group:cgguid,key:key,meter:meter}];
 
     var model_data = {
         models:JSON.stringify(models),
+        refmodel:JSON.stringify(refmodel),
         from_date:this.form.find("#from_date"+this.rand_id).val(),
         to_date:this.form.find("#to_date"+this.rand_id).val(),
         surface:"STACKEDAREA",

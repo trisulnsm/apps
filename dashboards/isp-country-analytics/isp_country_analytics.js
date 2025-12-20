@@ -1,6 +1,17 @@
 /*
   Explore router or interface usage details
 */
+
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import TrisProgressBar from "tris_progress_bar";
+import InterfaeGauge from "interface_gauge";
+import TrisTablePagination from "tris_table_pagination";
+import ExportToPDF from "export_to_pdf";
+import {ApexChartLB} from "trp_apexcharts";
+import add_barspark from "barspark";
+import {show_host_menu,show_generic_menu} from "utils";
+
 class ISPOverviewMapping{
   constructor(opts) {
 
@@ -459,7 +470,6 @@ class ISPOverviewMapping{
     let cgguid = this.cgguid;
     let key = this.filter_text;
     let meter = this.meter;
-    let ref_model =[];
     if(this.filter_text==null || this.filter_text == undefined){
       cgguid = GUID.GUID_CG_AGGREGATE();
       key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter];
@@ -468,26 +478,23 @@ class ISPOverviewMapping{
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
       meter = [2,1][this.meter_index];
     }
-    ref_model = [cgguid,key,meter,"Total"]
 
-    var model_data = {cgguid:this.cgguid,
-        meter:this.meter,
-        key:keys.join(","),
+    let refmodel = [{counter_group:cgguid,key:key,meter:meter,label:"Total"}];
+    let chart_models = [];
+    keys.forEach(key=>{
+      chart_models.push({counter_group:this.cgguid,meter:this.meter,key:key})
+    })
+
+
+    var model_data = {models:JSON.stringify(chart_models),
+        refmodel:JSON.stringify(refmodel),
         from_date:this.form.find("#from_date"+this.rand_id).val(),
         to_date:this.form.find("#to_date"+this.rand_id).val(),
         valid_input:1,
         surface:"STACKEDAREA",
-        ref_model:ref_model,
-    };``
-    await $.ajax({
-      url:"/trpjs/generate_chart",
-      data:model_data,
-      context:this,
-      success:function(resp){
-        $('#'+this.trfchart_div_id).html(resp);
-
-      }
-    });
+        divid:`#${this.trfchart_div_id}`
+    };
+    draw_apex_chart(model_data)
 
   }
   async draw_sankey_chart(){
@@ -616,16 +623,13 @@ class ISPOverviewMapping{
         let desc = this.form.find("#routers option:selected").text();
         desc = `${desc} / ${this.form.find("#interfaces option:selected").text()}`
         desc = `${desc} / ${tr.data("label")}`;
-        let params = {
-          key: tr.data("full_key").toString().replace(/\\/g,"\\\\"),
-          statids:tr.data("statid"),
-          cgguid:this.cgguid,
+        let chart_models = [{counter_group:this.cgguid,meter:tr.data("statid"),key:tr.data("full_key").toString().replace(/\\/g,"\\\\")}];
+        let data = {models:JSON.stringify(chart_models),
           window_fromts:this.tmint.from.tv_sec,
-          window_tots:this.tmint.to.tv_sec,
-          description:desc
+          window_tots:this.tmint.to.tv_sec
         }
-        let url = "/trpjs/generate_chart_lb?"+$.param(params);
-        load_modal(url);
+        new ApexChartLB(data,{"modal_title":desc})
+
         break;
         
       case 1:
@@ -748,7 +752,7 @@ async query_routes_for_as(event){
 
 
 
-function run(opts) {
+export function run(opts) {
   new ISPOverviewMapping(opts);
 }
 

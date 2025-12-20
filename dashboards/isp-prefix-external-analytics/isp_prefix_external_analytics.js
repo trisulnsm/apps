@@ -1,6 +1,16 @@
 /*
   Explore router or interface usage details
 */
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import {draw_apex_chart} from "application";
+import ShowNewTimeSelector from "show_new_time_selector";
+import TrisProgressBar from "tris_progress_bar";
+import InterfaeGauge from "interface_gauge";
+import TrisTablePagination from "tris_table_pagination";
+import ExportToPDF from "export_to_pdf";
+import {ApexChartLB} from "trp_apexcharts";
+import add_barspark from "barspark";
+
 class ISPPrefixExternalMapping{
   constructor(opts) {
 
@@ -229,10 +239,6 @@ class ISPPrefixExternalMapping{
     this.filter_text=null;
     this.report_nodes=[];
     this.section_headers=[];
-      $('#isp_prefix_external_overview_tabs a').click(function (e) {
-      e.preventDefault()
-      $(this).tab('show')
-    });
     //this.data_dom.find('.toppers_table_div').append("<span class='notify'><i class='fa fa-spinner fa-spin'></i>Please wait...</span>");
     //title part
 
@@ -511,7 +517,6 @@ class ISPPrefixExternalMapping{
     let cgguid = this.cgguid;
     let key = this.filter_text;
     let meter = this.meter;
-    let ref_model =[];
     if(this.filter_text==null || this.filter_text == undefined){
       cgguid = GUID.GUID_CG_AGGREGATE();
       key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter_index];
@@ -520,27 +525,22 @@ class ISPPrefixExternalMapping{
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
       //meter = [2,1][this.meter_index];
     }
-    ref_model = [cgguid,key,meter,"Total"]
+    let refmodel = [{counter_group:cgguid,key:key,meter:meter,label:"Total"}];
+    let chart_models = [];
+    keys.forEach(key=>{
+      chart_models.push({counter_group:this.cgguid,meter:this.meter,key:key})
+    })
 
-    var model_data = {cgguid:this.cgguid,
-        meter:this.meter,
-        key:keys.join(","),
+
+    var model_data = {models:JSON.stringify(chart_models),
+        refmodel:JSON.stringify(refmodel),
         from_date:this.form.find("#from_date"+this.rand_id).val(),
         to_date:this.form.find("#to_date"+this.rand_id).val(),
         valid_input:1,
         surface:"STACKEDAREA",
-        ref_model:ref_model
+        divid:`#${this.trfchart_div_id}`
     };
-    await $.ajax({
-      url:"/trpjs/generate_chart",
-      data:model_data,
-      context:this,
-      success:function(resp){
-        $('#'+this.trfchart_div_id).html(resp);
-
-      }
-    });
-
+    draw_apex_chart(model_data)
   }
   async draw_sankey_chart(){
     this.sankey_div_id = `sankey_chart_${this.meter_index}${this.rand_id}`;
@@ -665,15 +665,13 @@ class ISPPrefixExternalMapping{
     switch($.inArray(target.parent()[0],target.closest("td").find("li:not(.divider)"))){
       case 0:
       case -1:
-        let params = {
-          key: tr.data("full_key").toString().replace(/\\/g,"\\\\"),
-          statids:tr.data("statid"),
-          cgguid:this.cgguid,
+
+        let chart_models = [{counter_group:this.cgguid,meter:tr.data("statid"),key:tr.data("full_key").toString().replace(/\\/g,"\\\\")}];
+        let data = {models:JSON.stringify(chart_models),
           window_fromts:this.tmint.from.tv_sec,
-          window_tots:this.tmint.to.tv_sec,
+          window_tots:this.tmint.to.tv_sec
         }
-        let url = "/trpjs/generate_chart_lb?"+$.param(params);
-        load_modal(url);
+        new ApexChartLB(data,{"modal_title":desc})
         break;
         
       case 1:
@@ -883,7 +881,7 @@ async resolve_aspath(event){
 }; // class 
 
 
-function run(opts) {
+export function run(opts) {
   new ISPPrefixExternalMapping(opts);
 }
 
