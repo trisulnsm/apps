@@ -3,6 +3,15 @@
   Drilldown for  Peering analytics app
   View detailed usage for asn number across all interfaces
 */
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import TrisProgressBar from "tris_progress_bar";
+import InterfaeGauge from "interface_gauge";
+import TrisTablePagination from "tris_table_pagination";
+import ExportToPDF from "export_to_pdf";
+import {ApexChartLB} from "trp_apexcharts";
+import add_barspark from "barspark";
+import {show_host_menu,show_generic_menu} from "utils";
 class ISPDrilldownMapping{
   constructor(opts){
 
@@ -550,9 +559,9 @@ class ISPDrilldownMapping{
       };
       let duration = this.tmint.to.tv_sec - this.tmint.from.tv_sec;
       if(group_cg_map[group] == GUID.GUID_CG_ASN()){
-        show_advanced_retro_menu(mockEvent, group_cg_map[group], t.key, 0, this.tmint.from.tv_sec, duration)
+        show_generic_menu(mockEvent, group_cg_map[group], t.key, 0, this.tmint.from.tv_sec, duration)
       } else {
-        show_host_advanced_retro_menu(mockEvent, group_cg_map[group], t.key, 0, this.tmint.from.tv_sec, duration);
+        show_host_menu(mockEvent, group_cg_map[group], t.key, 0, this.tmint.from.tv_sec, duration);
       }
 
       rows.push(row);
@@ -582,7 +591,7 @@ class ISPDrilldownMapping{
 };
 
 
-function run(opts) {
+export function run(opts) {
   new ISPDrilldownMapping(opts);
 }
 

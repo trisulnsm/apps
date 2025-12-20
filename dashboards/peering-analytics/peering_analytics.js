@@ -7,6 +7,13 @@
 
   Explore router or interface usage details
 */
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import TrisProgressBar from "tris_progress_bar";
+import InterfaeGauge from "interface_gauge";
+import TrisTablePagination from "tris_table_pagination";
+import ExportToPDF from "export_to_pdf";
+import {ApexChartLB} from "trp_apexcharts";
 class ISPOverviewMapping{
   constructor(opts) {
     this.dom = $(opts.divid);
@@ -199,11 +206,15 @@ class ISPOverviewMapping{
     this.cgguid = null;
     this.crosskey_cgguid = null;
     this.filter_text=null;
-      $('#isp_overview_tabs a').click(function (e) {
-      e.preventDefault()
-      $(this).tab('show')
-    });
-    this.tris_pg_bar = new TrisProgressBar({max:5,
+    var triggerTabList = [].slice.call(document.querySelectorAll('#isp_overview_tabs a'))
+    triggerTabList.forEach(function (triggerEl) {
+      var tabTrigger = new bootstrap.Tab(triggerEl)
+      triggerEl.addEventListener('click', function (event) {
+        event.preventDefault()
+        tabTrigger.show()
+      })
+    })
+ this.tris_pg_bar = new TrisProgressBar({max:5,
                                             divid:'progress_bar_analytics',
                                             slim: true });
     this.report_nodes = [];
@@ -941,7 +952,7 @@ async query_routes_for_as(event){
 
 
 
-function run(opts) {
+export function run(opts) {
   new ISPOverviewMapping(opts);
 }
 

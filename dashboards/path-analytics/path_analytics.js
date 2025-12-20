@@ -1,4 +1,15 @@
 //ASN Path analytics
+
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp,is_error_response} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import TrisProgressBar from "tris_progress_bar";
+import InterfaeGauge from "interface_gauge";
+import TrisTablePagination from "tris_table_pagination";
+import ExportToPDF from "export_to_pdf";
+import {ApexChartLB} from "trp_apexcharts";
+import add_barspark from "barspark";
+import {show_host_menu,show_generic_menu} from "utils";
+
 class ASNPathAnalytics{
 
   constructor(opts){
@@ -507,7 +518,7 @@ class ASNPathAnalytics{
 
 
  
- function run(opts){
+export function run(opts){
   new ASNPathAnalytics(opts)
  }
 
