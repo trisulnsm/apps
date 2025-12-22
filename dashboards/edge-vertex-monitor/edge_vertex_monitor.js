@@ -5,9 +5,16 @@
   //Show the usage for keys and meters
   
 //
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,fetch_trp,mk_trp_request,get_response,get_counters_and_meters_json} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import CGMeterCombo from "cg_meter_combo";
+import TrisProgressBar from "tris_progress_bar";
+import mustache from "mustache";
 
-var EdgeVertexMonitor= $.klass({
-  init:function(opts){
+
+
+class EdgeVertexMonitor {
+  constructor(opts){
     this.domid = opts["divid"];
     this.new_time_selector = opts.new_time_selector;
     this.dash_params = opts.dash_params || {};
@@ -24,41 +31,74 @@ var EdgeVertexMonitor= $.klass({
     });
     deferq.resolve();
     this.data=[];
-  },
+  }
   //add the form to the dom
-  add_form:function(){
-    this.form=$(Haml.render(`
-    .card
-      .card-header
-        %h5.card-title
-          %i.fa.fa-search.fa-fw
+  add_form(){
+    this.form = `
+      <div class="card">
+        <div class="card-header">
+        <h5 class="card-title">
+          <i class="fa fa-search fa-fw"></i>
           Search Criteria
-      .card-body
-        %form.form-dots
-          .row
-            .col-6
-              .row.mb-3
-                %label.col-form-label.col-4 Counter Group
-                .col-8
-                  %select#cgguid.cg_id{name:"cgguid"}
-              .row.mb-3
-                %label.col-form-label.col-4 Keys
-                .col-8
-                  %textarea#keys{name:"keys"}
-                  %span.form-text comma seperated
-            .col-6
-              .row.mb-3
-                %label.col-form-label.col-4 Meter
-                .col-8
-                  %select#meters.meter_id{multiple:"multiple",name:"meter"}
-              .form-group
-                #new_time_selector
-          .row
-            .col-10.offset-md-4
-              %input#from_date{name:"from_date", type:"hidden"}
-              %input#to_date{name:"to_date", type:"hidden"}
-              %input#btn_submit.btn-submit{name:"commit", type:"submit", value:"Get Usage"}
-            `));
+        </h5>
+      </div>
+
+      <div class="card-body">
+        <form class="form-dots" id="edge_vertex_monitor">
+          <div class="row">
+            <div class="col-6">
+
+              <div class="row mb-3">
+                <label class="col-form-label col-4">Counter Group</label>
+                <div class="col-8">
+                  <select id="cgguid" class="cg_id" name="cgguid"></select>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-form-label col-4">Keys</label>
+                <div class="col-8">
+                  <textarea id="keys" name="keys"></textarea>
+                  <span class="form-text">comma separated</span>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="col-6">
+
+              <div class="row mb-3">
+                <label class="col-form-label col-4">Meter</label>
+                <div class="col-8">
+                  <select id="meters" class="meter_id" name="meter" multiple></select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div id="new_time_selector"></div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-10 offset-md-4">
+              <input id="from_date" name="from_date" type="hidden">
+              <input id="to_date" name="to_date" type="hidden">
+              <input
+                id="btn_submit"
+                class="btn-submit"
+                name="commit"
+                type="submit"
+                value="Get Usage"
+              >
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>`;
+    this.form=$(this.form);
     $(this.domid).append(this.form);
     auto_complete("keys",{"update":"autocomplete_key","top_count":20},{"txt_id":"keys","cg_id":"cgguid"});
 
@@ -105,10 +145,10 @@ var EdgeVertexMonitor= $.klass({
     }
 
     $(this.domid).append("<div class='clearfix' id='show_key_usage' class='hide' style='padding-top:20px'></div>");
-    this.form.submit($.proxy(this.submit_form,this));
-  },
+    $('#edge_vertex_monitor').submit($.proxy(this.submit_form,this));
+  }
    //submit the form
-  submit_form:function(){
+  submit_form(){
     this.keys = this.form.find("#keys").val();
     this.keys = this.keys.trim();
     if(this.keys.length ==  0 ){
@@ -118,10 +158,10 @@ var EdgeVertexMonitor= $.klass({
     this.reset_ui();
     
     return false;
-  },
+  }
 
  //UI
-  reset_ui:function(){
+  reset_ui(){
 
     this.data=[];
     this.cgguid = this.form.find('#cgguid').val();
@@ -165,9 +205,9 @@ var EdgeVertexMonitor= $.klass({
     this.get_usage();
     table.tablesorter();
 
-  },
+  }
 
-  get_usage:function(){
+  get_usage(){
     var deferq = $.Deferred();
     var prom = deferq.promise();
     var cgguid = this.form.find('#cgguid').val();
@@ -192,9 +232,9 @@ var EdgeVertexMonitor= $.klass({
     },this));
 
     deferq.resolve();
-  },
+  }
   //chain the resp
-  get_resp:function(req){
+  get_resp(req){
     var cthis = this;
     var meter_type = cthis.all_meters_type[cthis.cgguid];
     return  get_response(req,function(resp){
@@ -217,11 +257,11 @@ var EdgeVertexMonitor= $.klass({
       cthis.data.push(o);
       cthis.update_table();
     });
-  },
+  }
 
   //update the table
 
-  update_table:function(){
+  update_table(){
     var cthis = this;
     cthis.tris_pg_bar.update_progress_bar();
     $('#table_show_key_usage').find('tbody').html('');
@@ -243,12 +283,9 @@ var EdgeVertexMonitor= $.klass({
   }
 
 
+}
 
-
-
-});
-
-function run(opts){
+export function run(opts){
   var evm = new EdgeVertexMonitor(opts);
   $(document).ajaxStop(function () {
     var valid_input=localStorage.getItem("/trisul/edge_vertex/monitor/valid_input");

@@ -1,6 +1,11 @@
-var DailyKeyUsage = $.klass({
+import {TrpFormClass} from "trp_base";
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp,mk_trp_request,get_response} from "trp_base";
+import TrisProgressBar from "tris_progress_bar";
 
-  init:function(opts){
+
+class DailyKeyUsage {
+
+  constructor(opts){
     let card =$(get_card_shell());
     card.addClass('mb-3');
     card.find(".card-body");
@@ -9,12 +14,11 @@ var DailyKeyUsage = $.klass({
     card.attr("id","dail_key_key_report_form");
     opts["card_id"]="#dail_key_key_report_form";
     this.trp_form = new TrpFormClass(opts,$.proxy(function(){this.reset_ui()},this));
-    
 
-  },
+  }
 
   //reset the ui
-  reset_ui:function(){
+  reset_ui(){
     if(this.trp_form.key == "" || this.trp_form.key == undefined){
       alert("Key filed can't be blank");
       return true;
@@ -32,23 +36,23 @@ var DailyKeyUsage = $.klass({
     table.append($("<tbody>",{}));
     table.tablesorter();
     $('#mma_data').append(table);
-    new ExportToCSV({table_id:"mma_data_table",filename_prefix:"daily-key-report"});
+    //new ExportToCSV({table_id:"mma_data_table",filename_prefix:"daily-key-report"});
 
     this.load_tint_array();
 
-  },
+  }
 
   //get dates between to dates
-  load_tint_array:function(){
+  load_tint_array(){
    this.dates = get_dates(new Date($('#from_date').val()),new Date($('#to_date').val()));
    this.tris_pg_bar = new TrisProgressBar({max:this.dates.length,
                                             divid:'sq_content',
                                             slim: true});
    this.get_data();
-  },
+  }
 
   //send trp request to get data from trp server
-  get_data:function(){
+  get_data(){
 
     if(this.dates.length  == 0){
       return true;
@@ -76,7 +80,7 @@ var DailyKeyUsage = $.klass({
       this.get_data();
     },this));
   
-  },
+  }
 
   //update the table to show data
   update_table(cgguid,meter,data,date){
@@ -121,14 +125,24 @@ var DailyKeyUsage = $.klass({
     $('#mma_data').find("tbody").append("<tr>"+td+"</tr>");
     this.tris_pg_bar.update_progress_bar();
 
-  },
+  }
 
   
 
-});
+}
 
-function run(opts) {
+export function run(opts) {
  new DailyKeyUsage(opts); 
 }
 
-//# sourceURL=daily_key_report.js
+function get_dates(startDate, endDate) {
+  const dates = [];
+  let currentDate = new Date(startDate);
+
+  while (currentDate <= endDate) {
+    dates.push(new Date(currentDate)); // push a copy
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return dates;
+}
