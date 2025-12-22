@@ -2,6 +2,16 @@
   Customer  ASN traffic
  
 */
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import TrisProgressBar from "tris_progress_bar";
+import InterfaeGauge from "interface_gauge";
+import TrisTablePagination from "tris_table_pagination";
+import ExportToPDF from "export_to_pdf";
+import {ApexChartLB} from "trp_apexcharts";
+import {show_bs5_dropdown} from "utils";
+import add_barspark from "barspark";
+
 class CustomerASNTraffic{
   constructor(opts) {
 
@@ -433,8 +443,8 @@ class CustomerASNTraffic{
       title:tr.dataset.label,
       legend_position:"bottom"
     };
-    let url = "/trpjs/generate_chart_lb?"+$.param(model_data);
-    load_modal(url);
+    new ApexChartLB(model_data,{modal_title:tr.dataset.label});
+
   }
 
 
@@ -468,7 +478,7 @@ class CustomerASNTraffic{
 
 
 
-function run(opts) {
+export function run(opts) {
   new CustomerASNTraffic(opts);
 }
 

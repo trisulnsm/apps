@@ -1,6 +1,6 @@
 name: CIDR Explore Flows
 
-version: 2.0.20
+version: 8.0.21
 
 author: trisul
 
@@ -16,7 +16,7 @@ apptype: dashboard_js
 appresources: cidr_explore_flows.js app.css cidr_subnet_cg.json template.haml 
 
 dependencies: 
-  webtrisul: 6.5.2228
+  webtrisul: 8.0.2228
 
 jsparams:
   counter_group: "{889900CC-0063-11A5-8380-FEBDBABBDBEA}"

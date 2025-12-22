@@ -1,6 +1,17 @@
 // CIDR Explore flows
 // send Keyspace request and get all avilable keys
 // For each available keys send aggregate flows request and update UI
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import {multiple_cross_selects} from "utils";
+import ExportToPDF from "export_to_pdf";
+import TrisProgressBar from "tris_progress_bar";
+import mustache from "mustache";
+import {ApexChartLB} from "trp_apexcharts";
+import TFlowApp from "tflowapp";
+import {TFlow,TFlowModel,MakeFlowArray} from "tflowapp_model";
+import {TFlowUI} from "tflowapp";
+import TimeInterval from "time_interval";
 
 
 class CIDRTaggerToppers{
@@ -277,8 +288,23 @@ class CIDRExploreFlows{
 
   } 
 }
-function run(opts){
+export function run(opts){
   new CIDRExploreFlows(opts)
 }
 
   //# sourceURL=cid_tagger_explore_flows.js
+function intToIp4(int){
+  return [(int >>> 24) & 0xFF, (int >>> 16) & 0xFF,
+   (int >>> 8) & 0xFF, int & 0xFF].join('.');
+ }  
+  
+function ip4ToInt(ip){
+  return ip.split('.').reduce((int, oct) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
+}                 
+
+function calculateCidrRange(cidr) {
+  let [range, bits = 32] = cidr.split('/');
+  let mask = ~(2 ** (32 - bits) - 1);
+  return [intToIp4(ip4ToInt(range) & mask), intToIp4(ip4ToInt(range) | ~mask)];
+} 
+    
