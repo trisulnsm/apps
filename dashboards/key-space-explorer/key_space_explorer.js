@@ -6,12 +6,22 @@
 */
 
 // Build a class model
-var InKeysMagicMap   =  $.klass({
-  init:function(opts){
+import Haml from "haml";
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp,mk_trp_request,get_response} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import TrisProgressBar from "tris_progress_bar";
+import TrisTablePagination from "tris_table_pagination";
+import CGMeterCombo from "cg_meter_combo";
+import mustache from "mustache";
+
+
+
+class InKeysMagicMap {
+  constructor(opts){
     this.available_time = opts["available_time"];
     this.domid = opts["divid"];
-    deferq = $.Deferred();
-    prom = deferq.promise();
+    let deferq = $.Deferred();
+    let prom = deferq.promise();
     var cthis = this;
     this.available_inkeys = {};
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
@@ -29,10 +39,10 @@ var InKeysMagicMap   =  $.klass({
     this.max_group_size=16;
     this.recentsecs = 86400;
     this.default_selected_time = opts.new_time_selector;
-  },
+  }
   // Add a text box to filter the host
   // add table to show keys
-  add_form:function(){
+  add_form(){
     var form = $(Haml.render(`
       #inkey_search_form
         %form#fkeymatch.form-dots
@@ -85,11 +95,11 @@ var InKeysMagicMap   =  $.klass({
     new CGMeterCombo(JSON.stringify(js_params));
     form.submit($.proxy(this.submit_form,this));
 
-  },
+  }
 
 
   //submit the form
-  submit_form:function(){
+  submit_form(){
     this.meters = {};
     this.units = {};
     this.mk_time_interval();
@@ -108,8 +118,8 @@ var InKeysMagicMap   =  $.klass({
       alert("Invalid Keyspace");
       return false;
     }
-    deferq = $.Deferred();
-    prom = deferq.promise();
+    let deferq = $.Deferred();
+    let prom = deferq.promise();
     // build a callback chain
     //
     var cthis = this;
@@ -120,24 +130,24 @@ var InKeysMagicMap   =  $.klass({
     });
     deferq.resolve();
     return false;
-  },
+  }
 
-  mk_time_interval:function(){
+  mk_time_interval(){
     var selected_fromdate = $('#from_date_ks').val();
     var selected_todate = $('#to_date_ks').val();
     var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
     var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
     this.tmint = mk_time_interval([fromTS,toTS]);
-  },
+  }
   // send the ajax request and get all the matched host.
-  load_keys:function(){
+  load_keys(){
     //trp request 
     var cthis = this;
     cthis.cgguid = $('#inkeys_counter_guid').val();
     var meters  = $('#inkeys_meter_id').val();
     var length = meters.length;
 
-    for(i=0;i < length;i++){
+    for(let i=0;i < length;i++){
       meters[i] = parseInt(meters[i])
     }
     meters = meters.slice(0,3);
@@ -224,15 +234,15 @@ var InKeysMagicMap   =  $.klass({
      
     });
 
-  },
+  }
   //Get total usage for each hosts
-  load_total:function(){
+  load_total(){
     var cthis = this;
     if(this.all_inkeys.length <= 0){
       this.tris_pg_bar.update_progress_bar();
       return true;
     }
-    k = this.all_inkeys.shift();
+    let k = this.all_inkeys.shift();
 
     var req = mk_trp_request(TRP.Message.Command.COUNTER_ITEM_REQUEST,
     {
@@ -261,12 +271,9 @@ var InKeysMagicMap   =  $.klass({
       cthis.redraw();
       cthis.load_total();
     },this);
-  },
- 
-  
+  }
 
-
-  reset_ui:function(){
+  reset_ui(){
     var classname = 'col-'+Math.floor(12/_.size(this.meters))
     $('#trp_data_inkeys').html(" ");
     $('#in_keys_status').html('');
@@ -286,10 +293,10 @@ var InKeysMagicMap   =  $.klass({
       $('#inkey_treemap').append($("<div>",{class:classname,id:'inkey_treemap_'+meterid}))
     });
    
-  },
+  }
 
   
-  redraw_treemap : function(key) { 
+  redraw_treemap(key) { 
 
     var divid = '#inkey_treemap_'+key;
     var container_div = $(divid);
@@ -382,9 +389,9 @@ var InKeysMagicMap   =  $.klass({
         
     cell.append("title")
       .text(function(d) { return   d.data.label + "\n" + h_fmtvol(d.value); });
-  },
+  }
 
-  redraw:function(){
+  redraw(){
     this.update_status();
     $('table#in_keys_tbl').removeClass('hide');
     var data = _.chain(this.available_inkeys)
@@ -402,7 +409,7 @@ var InKeysMagicMap   =  $.klass({
       dash_key:'key'
     }
     var meterids = _.keys(this.meters);
-    for(i=0;i < meterids.length;i++){
+    for(let i=0;i < meterids.length;i++){
       meterids[i] = parseInt(meterids[i])
     }    
   
@@ -422,46 +429,35 @@ var InKeysMagicMap   =  $.klass({
             .html(function(d){
               var data_hsh = {};
               _.each(meterids,function(meterid){
-                key = 'h_'+meterid;
-                value = h_fmtvol(d[meterid]);
+                let key = 'h_'+meterid;
+                let value = h_fmtvol(d[meterid]);
                 data_hsh[key] =value;
               })
-              return Mustache.to_html(table_tmpl,$.extend({},data_hsh,d));
+              return mustache.render(table_tmpl,$.extend({},data_hsh,d));
             });
 
     trs
          .html(function(d){ 
            var data_hsh = {};
             _.each(meterids,function(meterid){
-              key = 'h_'+meterid;
-              value = h_fmtvol(d[meterid]);
+              let key = 'h_'+meterid;
+              let value = h_fmtvol(d[meterid]);
               data_hsh[key] =value;
             })
-            return Mustache.to_html(table_tmpl,$.extend({},data_hsh,d));
+            return mustache.render(table_tmpl,$.extend({},data_hsh,d));
           });
     trs.exit().remove();
-  },
-
-  update_status:function(){
-    this.tris_pg_bar.update_progress_bar();
-
-
   }
-});
+
+  update_status(){
+    this.tris_pg_bar.update_progress_bar();
+  }
+}
 // Run function should automatically called when page is loaded.
-function run(opts)
+export function run(opts)
 {
-  inkeys_magic_map = new InKeysMagicMap(opts);
+  window.inkeys_magic_map = new InKeysMagicMap(opts);
 }
 
 
 //# sourceURL=key_space_explorer.js
-
-/*
-
-
-      
-
-
-
-*/

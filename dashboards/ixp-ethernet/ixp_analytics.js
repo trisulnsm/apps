@@ -1,4 +1,8 @@
 // IXP - L2 Analytics
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import {key_popover} from "utils";
+
 
 const GUID_DIRMAC='{79F60A94-44BD-4C55-891A-77823D59161B}'
 const GUID_MAC=   '{4B09BD22-3B99-40FC-8215-94A430EA0A35}'
@@ -259,7 +263,7 @@ class IXPPathAnalytics {
 }
 
  
-function run(opts){
+export function run(opts){
   new IXPPathAnalytics(opts)
 }
 
