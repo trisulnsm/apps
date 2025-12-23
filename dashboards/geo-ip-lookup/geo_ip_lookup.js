@@ -3,6 +3,8 @@
   geo asn path  
 */
 
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+
 
 class IPGeoAsnPath{
   constructor(opts) {
@@ -71,7 +73,7 @@ class IPGeoAsnPath{
   
  
 }
-function run(opts){
+export function run(opts){
   new IPGeoAsnPath(opts)
 }
 

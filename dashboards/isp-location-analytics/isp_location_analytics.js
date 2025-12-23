@@ -7,6 +7,10 @@
 
   Explore router or interface usage details
 */
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+
+
 class ISPOverviewMapping{
   constructor(opts) {
     this.dom = $(opts.divid);
@@ -675,7 +679,7 @@ class ISPOverviewMapping{
 
 
 
-function run(opts) {
+export function run(opts) {
   new ISPOverviewMapping(opts);
 }
 

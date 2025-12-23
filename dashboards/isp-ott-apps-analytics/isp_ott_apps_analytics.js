@@ -1,7 +1,14 @@
 /*
   Explore router or interface usage details
 */
-class ISPOverviewMapping{
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import CGMeterCombo from "cg_meter_combo";
+import TrisTablePagination from "tris_table_pagination";
+import {ApexChartLB} from "trp_apexcharts";
+
+
+class ISPOTTAnalytics{
   constructor(opts) {
 
     this.dom = $(opts.divid);
@@ -200,10 +207,6 @@ class ISPOverviewMapping{
     this.cgguid = null;
     this.crosskey_cgguid = null;
     this.filter_text=null;
-      $('#isp_ott_apps_tabs a').click(function (e) {
-      e.preventDefault()
-      $(this).tab('show')
-    });
     //this.data_dom.find('.toppers_table_div').append("<span class='notify'><i class='fa fa-spinner fa-spin'></i>Please wait...</span>");
     //title part
 
@@ -334,11 +337,11 @@ class ISPOverviewMapping{
     for(let i= 0 ; i < cgtoppers.length  ; i++){
       let topper = cgtoppers[i];
       
-      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-toggle='dropdown' href='javascript:;;'><small>Options<i class='fa fa-caret-down fa-fw'></i></small></a></span>");
+      let dropdown = $("<span class='dropdown'><a class='dropdown-toggle' data-bs-toggle='dropdown' href='javascript:;;'><i class='fa fa-bars fa-fw'></i></a></span>");
       let dropdown_menu = $("<ul class='dropdown-menu  pull-right'></ul>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Traffic Chart</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Key Dashboard</a></li>");
-      dropdown_menu.append("<li><a href='javascript:;;'>Drilldown</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Traffic Chart</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Key Dashboard</a></li>");
+      dropdown_menu.append("<li><a class='dropdown-item' href='javascript:;;'>Drilldown</a></li>");
 
       dropdown.append(dropdown_menu);
 
@@ -377,7 +380,7 @@ class ISPOverviewMapping{
     },this));
     table.tablesorter();
     table.closest('.card').find(".badge").html(rows.length);
-    new ExportToCSV({table_id:this.table_id,filename_prefix:"top_upload_asn",append_to:"panel"});
+    //new ExportToCSV({table_id:this.table_id,filename_prefix:"top_upload_asn",append_to:"panel"});
   }
 
   pagination_callback(){
@@ -473,7 +476,6 @@ class ISPOverviewMapping{
     let cgguid = this.cgguid;
     let key = this.filter_text;
     let meter = this.meter;
-    let ref_model =[];
     if(this.filter_text==null || this.filter_text == undefined){
       cgguid = GUID.GUID_CG_AGGREGATE();
       key = ["DIR_OUTOFHOME","DIR_INTOHOME"][this.meter];
@@ -482,26 +484,20 @@ class ISPOverviewMapping{
       cgguid = GUID.GUID_CG_FLOWINTERFACE();
       meter = [2,1][this.meter_index];
     }
-    ref_model = [cgguid,key,meter,"Total"]
-
-    var model_data = {cgguid:this.cgguid,
-        meter:this.meter,
-        key:keys.join(","),
+    let refmodel =[{counter_group:cgguid,key:key,meter:meter,label:"Total"}];
+    let chart_models =[]
+    keys.forEach(key=>{
+      chart_models.push({counter_group:this.cgguid,meter:this.meter,key:key})
+    })
+    var opts = {models:JSON.stringify(chart_models),
         from_date:this.form.find("#from_date"+this.rand_id).val(),
         to_date:this.form.find("#to_date"+this.rand_id).val(),
         valid_input:1,
         surface:"STACKEDAREA",
-        ref_model:ref_model
+        refmodel:JSON.stringify(refmodel),
+        divid:'#'+this.trfchart_div_id
     };
-    await $.ajax({
-      url:"/trpjs/generate_chart",
-      data:model_data,
-      context:this,
-      success:function(resp){
-        $('#'+this.trfchart_div_id).html(resp);
-
-      }
-    });
+    draw_apex_chart(opts);
 
   }
   async draw_sankey_chart(){
@@ -627,15 +623,16 @@ class ISPOverviewMapping{
     switch($.inArray(target.parent()[0],target.closest("td").find("li:not(.divider)"))){
       case 0:
       case -1:
+        let models = [{counter_group:this.cgguid,meter:tr.data("statid"),key:tr.data("full_key").toString().replace(/\\/g,"\\\\")}];
         let params = {
-          key: tr.data("full_key").toString().replace(/\\/g,"\\\\"),
-          statids:tr.data("statid"),
-          cgguid:this.cgguid,
           window_fromts:this.tmint.from.tv_sec,
           window_tots:this.tmint.to.tv_sec,
+          models:JSON.stringify(models),
+          show_table:1,
+          surface:"mrtg"
         }
-        let url = "/trpjs/generate_chart_lb?"+$.param(params);
-        load_modal(url);
+        new ApexChartLB(params,{modal_title:tr.data("label")});
+       
         break;
         
       case 1:
@@ -763,8 +760,8 @@ async query_routes_for_as(event){
 
 
 
-function run(opts) {
-  new ISPOverviewMapping(opts);
+export function run(opts) {
+  new ISPOTTAnalytics(opts);
 }
 
 //# sourceURL=ott_apps_analytics.js
