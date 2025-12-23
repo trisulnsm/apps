@@ -1,4 +1,8 @@
 // ISP KPI top level dashboard
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import {ApexChartLB} from "trp_apexcharts";
+
+
 const kGUIDS  = [
   [ 'aspath',             '{47F48ED1-C3E1-4CEE-E3FA-E768558BC07E}'],
   [ 'flowas',             '{120A3124-E2BB-47BD-6C64-71BBB861C428}'],
@@ -9,7 +13,7 @@ const kGUIDS  = [
 ];
 
 // enter 
-async function run(opts)
+export async function run(opts)
 {
   let activeitems  =  await refresh_model(opts);
 
@@ -87,17 +91,17 @@ function repaint(datamodel,opts)
 // handle clickmeta, shows Lightbox chart of trends
 function clicktrends(evt, datamodel)
 {
-  let userlabel = $(evt.currentTarget).siblings('h2').attr('id');
-
+  let userlabel = evt.target.parentNode.parentElement.querySelector('h2').id;
   let dm = _.find(kGUIDS, a => a[0]==userlabel)
 
+  let models = [{counter_group:'{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}',key:dm[1],meter:0}]
   let params = {
-    cgguid:'{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}',
-    key: dm[1],
-    statids:0,
+    models:JSON.stringify(models),
+    show_table:1
   }
-  let url = "/trpjs/generate_chart_lb?"+$.param(params);
-  load_modal(url);
+          
+   
+  new ApexChartLB(params,{modal_title:`${userlabel} Trends`})
 
 }
 
@@ -130,28 +134,21 @@ async function draw_asn_traffic_chart(opts){
     }
     _.each(cgtoppers.keys,function(keyt,idx){
       if(keyt.key!="SYS:GROUP_TOTALS" && idx <=10){
-        models.push([cgguid,keyt.key,i,keyt.label])
+        models.push({counter_group:cgguid,meter:i,key:keyt.key,label:keyt.label});
       }
     });
-    let ref_mod = $.extend([],models[0]);
-    ref_mod[1]="SYS:GROUP_TOTALS";
-    ref_mod[3]="TOTAL"
+    let model = models[0];
+    let refmodel = [{counter_group:model[0],meter:model[2],key:"SYS:GROUP_TOTALS",label:"TOTAL"}];
 
-    await $.ajax({
-      url:"/trpjs/generate_chart",
-      data:{models:JSON.stringify(models),
-        valid_input:1,
-        surface:"STACKEDAREA",
-        show_legend:false,
-        chart_height:350,
-        ref_model:ref_mod
-      },
-      context:this,
-      success:function(resp){
-        $(`#asn_traffic_chart_${i}`).html(resp);
-      }
-    });
-
+    let data={models:JSON.stringify(models),
+      valid_input:1,
+      surface:"STACKEDAREA",
+      show_legend:false,
+      chart_height:350,
+      refmodel:JSON.stringify("refmodel"),
+      divid:`#asn_traffic_chart_${i}`
+    }
+    draw_apex_chart(data);
     _.each(cgtoppers.keys,function(keyt,idx){
       if(keyt.key!="SYS:GROUP_TOTALS" && idx <=9){
         let tr = `<tr><td>${keyt.label.substr(0,35)}</td><td>${h_fmtvol(keyt.metric.toNumber()*top_bucket )}</td></tr>`;
