@@ -1,3 +1,11 @@
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import CGMeterCombo from "cg_meter_combo";
+import ShowNewTimeSelector from "show_new_time_selector";
+import {show_hide_form,convert_dotted_int_to_hex} from "utils";
+import {ApexChartLB} from "trp_apexcharts";
+
+
+
 class MulticastView {
   constructor(opts) {
     this.divid = document.querySelector(opts.divid);
@@ -550,7 +558,7 @@ class MulticastView {
                       </a>
                     </li>
                     <li>
-                      <a class="dropdown-item" onclick='new ApexChartLB(${JSON.stringify(opts)}, {modal_title: "Explore Traffic History"})'>
+                      <a class="dropdown-item" onclick='load_ApexChartLB(${JSON.stringify(opts)}, {modal_title: "Explore Traffic History"})'>
                         Traffic Chart
                         </a>
                     </li>
@@ -573,6 +581,45 @@ class MulticastView {
   };
 }
 
-async function run(opts) {
+export async function run(opts) {
   let rc = new MulticastView(opts);
+}
+    
+function convert_to_key_format(label) {
+  if (!label) return label;
+  label = label.trim();
+  
+  if (label.includes(".")) {
+    return convert_dotted_int_to_hex(label);
+  }
+  if (/^-?\d+$/.test(label)) {
+    return `p-${parseInt(label, 10).toString(16).toUpperCase().padStart(2, "0")}`;
+  }
+  return label; 
+} 
+
+function get_multipliers(cg_meters,counter_group,meterid)
+{   
+    let meter = parseInt(meterid);
+    let bucket = cg_meters.all_cg_bucketsize[counter_group];
+    let meter_type = cg_meters.all_meters_type[counter_group][meter];
+    let bits_multiplier = 1;
+    let bucketsize = bucket["bucket_size"];
+    let bucketsize_multiplier =1;
+    let topper_bucketsize = bucket["top_bucket_size"];
+  
+    if((meter_type.type==10 || meter_type.type==4) && meter_type.units=="Bps"){
+      bits_multiplier=8;
+      bucketsize_multiplier =bucket["bucket_size"];
+
+
+    }else if((meter_type.type==10 || meter_type.type==4) && ["pps","rps"].includes(meter_type.units.toLowerCase())){
+      bits_multiplier=1;
+      bucketsize_multiplier =bucket["bucket_size"];
+    } 
+  
+    return {bits_multiplier:bits_multiplier,bucketsize:bucketsize,topper_bucketsize:topper_bucketsize,bucketsize_multiplier:bucketsize_multiplier,units:meter_type.units}
+}   
+window.load_ApexChartLB=function load_ApexChartLB(opts) {
+  new ApexChartLB(opts)
 }

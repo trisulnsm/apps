@@ -6,8 +6,12 @@
 */
 
 // Build a class model
-var HostTotal   =  $.klass({
-  init:function(opts){
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp,mk_trp_request,get_response} from "trp_base";
+import ShowNewTimeSelector from "show_new_time_selector";
+import mustache from "mustache";
+
+class HostTotal{
+  constructor(opts){
     this.available_time = opts["available_time"];
     this.default_selected_time = opts.new_time_selector;
     this.domid = opts["divid"];
@@ -16,10 +20,10 @@ var HostTotal   =  $.klass({
     this.bucketsize = 60;
     this.tzadj = window.trisul_tz_offset  + (new Date()).getTimezoneOffset()*60 ;
     this.ax_cancel = false;
-  },
+  }
   
   //submit the form
-  submit_form:function(){
+  submit_form(){
     this.reset_ui();
     var val = $('#search_host').val().trim();
     if(val.length ==  0 ){
@@ -27,8 +31,8 @@ var HostTotal   =  $.klass({
       return false;
     }
     this.mk_time_interval();
-    deferq = $.Deferred();
-    prom = deferq.promise();
+    let deferq = $.Deferred();
+    window.prom = deferq.promise();
     // build a callback chain
     //
     var cthis = this;
@@ -40,9 +44,9 @@ var HostTotal   =  $.klass({
     });
     deferq.resolve();
     return false;
-  },
+  }
   // send the ajax request and get all the matched host.
-  load_keys:function(){
+  load_keys(){
     //trp request 
     var cthis = this;
     var req = mk_trp_request(TRP.Message.Command.SEARCH_KEYS_REQUEST,
@@ -57,9 +61,9 @@ var HostTotal   =  $.klass({
       },cthis));
       cthis.available_host = cthis.available_host.slice(0,100);
     });
-  },
+  }
   //Get total usage for each hosts
-  load_total:function(){
+  load_total(){
     this.processed = 0;
     var cthis = this;
     _.each( this.available_host, $.proxy(function (k) {
@@ -90,11 +94,11 @@ var HostTotal   =  $.klass({
           cthis.redraw();
         });
     },this));
-  },
+  }
  
   // Add a text box to filter the host
   // add table to show keys
-  add_form:async function(opts){
+  async add_form(opts){
    let html_str = await get_html_from_hamltemplate(opts);
     this.haml_dom =$(html_str)
     var form = $(this.haml_dom[0]);
@@ -108,7 +112,7 @@ var HostTotal   =  $.klass({
                             });
 
     form.submit($.proxy(this.submit_form,this));
-  },
+  }
 
   mk_time_interval(){
     var selected_fromdate = $('#from_date').val();
@@ -116,8 +120,8 @@ var HostTotal   =  $.klass({
     var fromTS = parseInt((new Date(selected_fromdate).getTime()/1000)-this.tzadj);
     var toTS = parseInt((new Date(selected_todate).getTime()/1000)-this.tzadj);
     this.tmint = mk_time_interval([fromTS,toTS]);
-  },
-  reset_ui:function(){
+  }
+  reset_ui(){
     $('#search_host_staus').remove();
     this.processed = 0;
     this.available_host=[];
@@ -128,10 +132,10 @@ var HostTotal   =  $.klass({
     table.find("thead tr").append("<th>Host</th><th>IP</th><th>Total</th><th>Received</th><th>Transmit</th>");
     $('#trp_data_hosts').append(table);
 
-  },
+  }
 
   //redraw the table
-  redraw:function(){
+  redraw(){
     $('table#search_host_tbl').removeClass('hide');
     $('#process_status').html(this.processed+"/"+this.available_host.length);
     var total = _.reduce(this.available_host,function(acc,ai){
@@ -153,22 +157,22 @@ var HostTotal   =  $.klass({
     trs.enter()
             .insert("tr","tr")
             .html(function(d){ 
-              return Mustache.to_html(table_tmpl,$.extend(
+              return mustache.render(table_tmpl,$.extend(
                 {h_total:h_fmtvol(d.total),h_recv:h_fmtvol(d.recv),h_trans:h_fmtvol(d.transmit)},d));
             });
 
     trs
          .html(function(d){ 
-            return Mustache.to_html(table_tmpl,$.extend(
+            return mustache.render(table_tmpl,$.extend(
                 {h_total:h_fmtvol(d.total),h_recv:h_fmtvol(d.recv),h_trans:h_fmtvol(d.transmit)},d));
           });
 
     trs.exit().remove();
   }
-});
+}
 // Run function should automatically called when page is loaded.
-function run(opts)
+export function run(opts)
 {
-  host_totals = new HostTotal(opts);
+  window.host_totals = new HostTotal(opts);
 }
 

@@ -6,24 +6,27 @@
 */
 
 // Run function should automatically called when page is loaded.
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp,mk_trp_request,get_response} from "trp_base";
+import CGMeterCombo from "cg_meter_combo";
 
-var KeyActivityUsage = $.klass({
-  init:function(opts){
+
+class KeyActivityUsage{
+  constructor(opts){
     //
     this.domid = opts["divid"];
-    if(typeof get_dirname == "undefined"){
+    if(typeof this.get_dirname == "undefined"){
       this.show_error_box();
       return true;
     }
-    this.dirname = get_dirname(opts.jsfile);
+    this.dirname = this.get_dirname(opts.jsfile);
     this.available_time = opts.available_time;
     this.tint_arr = [];
     this.data = [];
     this.map_days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     this.days = [];
     this.no_of_days=7;
-    deferq = $.Deferred();
-    prom = deferq.promise();
+    let deferq = $.Deferred();
+    window.prom = deferq.promise();
     // build a callback chain
     var cthis = this;
     if(typeof get_counters_and_meters_json == "undefined"){
@@ -39,8 +42,8 @@ var KeyActivityUsage = $.klass({
       cthis.add_form(opts);
     });
     deferq.resolve();
-  },
-  load_assets:async function(opts)
+  }
+  async load_assets(opts)
   {
     // load app.css file
     load_css_file(opts);
@@ -48,9 +51,9 @@ var KeyActivityUsage = $.klass({
     // load template.haml file 
     let html_str = await get_html_from_hamltemplate(opts);
     this.haml_dom =$(html_str)
-  },
+  }
   //add the from for user to select guid and meter
-  add_form:async function(opts){
+  async add_form(opts){
     await this.load_assets(opts)
     var form = $(this.haml_dom[0]);
     $(this.domid).append(form);
@@ -63,10 +66,10 @@ var KeyActivityUsage = $.klass({
     new CGMeterCombo(JSON.stringify(js_params));
     auto_complete('hm_key',{"update":"autocomplete_key","top_count":20},{"txt_id":"hm_key","cg_id":"hm_cg_id"});
     form.submit($.proxy(this.load_tint_array,this));
-  },
+  }
 
   //calculate last 7 days time interval from the avialable time interval
-  load_tint_array:function(){
+  load_tint_array(){
     this.reset_ui();
     this.key= $('#hm_key').val().trim();
     if(this.key.length ==  0 ){
@@ -77,7 +80,7 @@ var KeyActivityUsage = $.klass({
     this.meter = parseInt($('#hm_meter_id').val());
     var date = new Date((this.available_time.window_tots-60)*1000);
     date.setHours(0,0,0,0);
-    for(i = 0; i < this.no_of_days; i++){
+    for(let i = 0; i < this.no_of_days; i++){
       var tv_sec = date.getTime()-(i*86400000);
       var d = new Date(tv_sec);
       // d3 heat map example always day starts from 0
@@ -90,9 +93,9 @@ var KeyActivityUsage = $.klass({
     $('#hm_status_bar').find("i").removeClass('hide');
     this.get_trp_data();
     return false;
-  },
+  }
   //get trp resppnse
-  get_trp_data:function(tint){
+  get_trp_data(tint){
     //for last 7 days
     if(this.tint_arr.length <=0 ){
       $('#hm_status_bar').find("i").addClass('hide');
@@ -123,7 +126,7 @@ var KeyActivityUsage = $.klass({
     get_response(req,$.proxy(function(resp){
       //initialize 0 to get empty rect box
       //data grouped by hour
-      for(i=1 ; i <=24 ; i++){
+      for(let i=1 ; i <=24 ; i++){
         group_by_hour[i] = [0]
       }
       _.each(resp.stats,function(ai){
@@ -139,17 +142,17 @@ var KeyActivityUsage = $.klass({
       this.get_trp_data();
     },this));
     return false;
-  },
+  }
   //reset ui for keys
-  reset_ui:function(){
+  reset_ui(){
     $('#hm_trp_data').remove();
     $(this.domid).append($(this.haml_dom[1]).clone());
     this.data = [];
     this.days = [];
     $(this.domid).find('#hm_trp_data').find('svg').remove();
-  },
+  }
   //drawing heatmap
-  draw_heatmap:function(){
+  draw_heatmap(){
     // d3 heat map has come css
     var cthis = this;
     const margin = { top: 50, right: 0, bottom: 100, left: 30 },
@@ -282,9 +285,9 @@ var KeyActivityUsage = $.klass({
 
     };
     heatmapChart(this.data);
-  },
+  }
 
-  rate_to_volume:function(val){
+  rate_to_volume(val){
     var meter_type = this.all_meters_type[this.guid][this.meter];
     var bs = this.all_cg_bucketsize[this.guid]
     if(meter_type.type == 4 ) 
@@ -293,18 +296,25 @@ var KeyActivityUsage = $.klass({
     }else{
       return val
     }
-  },
+  }
 
-  show_error_box:function(){
+  show_error_box(){
     var span = "<span>Please click <a href='https://trisul.org/download' target='_blank'> here </a> to  download lastest package. </span>";
     var error_box = "<div class = 'alert alert-danger'>You need to update your webtrisul package to use this feature.<br/>"+span+"</div>";
 
     $(this.domid).html(error_box);
     return true;
   }
+  get_dirname(path) {
+    if(path.split("/").length > 1){
+      return path.replace(/\\/g,'/').replace(/\/[^\/]*$/, '');
+    }else{
+      return "";
+    } 
+  }
 
-});
-function run(opts){
+}
+export function run(opts){
   
   new KeyActivityUsage(opts);
   

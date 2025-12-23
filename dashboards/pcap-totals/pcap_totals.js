@@ -4,6 +4,10 @@
 
 //TEMPLATE
 
+import Haml from "haml";
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp,mk_trp_request,get_response} from "trp_base";
+
+
 const HTML_TEMPLATE_O =Haml.render(`
   .card
     .card-header
@@ -23,8 +27,8 @@ const CARD_TEMPLATE = Haml.render(`
     .card{style:"min-height:110px"}
       .card-body{style:"padding:10px"}
   `)
-var TotalsModel = $.klass({
-  init : function() {
+class TotalsModel{
+  constructor() {
     this.time_duration = {title:"Total Duration",from_ts:0,to_ts:0,duration:0};
     this.totals = [
      {title:"Total Bytes",guid:GUID.GUID_CG_AGGREGATE(),key:"TOTALBW",meter:0,data:0,chart_data:[],ratecounter:true,url:"/newdash?dash_key=retrousage"},
@@ -50,25 +54,24 @@ var TotalsModel = $.klass({
      {title:"FTS DNS Records",key:"{09B305DF-078C-4B9E-8E2F-EA64B7326880}",data:0,class:"warning",url:this.mk_ftsurl("{09B305DF-078C-4B9E-8E2F-EA64B7326880}")}
     ];
 
-  },
+  }
   //Different url for totals
-  mk_idsalerturl:function(guid){
+  mk_idsalerturl(guid){
     return "/trisul_ids_alerts/show_by_sigid?"+$.param({agguid:guid});
-  },
-  mk_resurl:function(guid){
+  }
+  mk_resurl(guid){
     return "/resource/index?"+$.param({rguid:guid});
-  },
-  mk_ftsurl:function(guid){
+  }
+  mk_ftsurl(guid){
      return "ts/getfacets?"+$.param({fguid:guid});
   }
   
-});
-
+}
 
 // Start to  get totals for items defined in modal
-function run_model(mod,opts){
-  deferq = $.Deferred();
-  prom = deferq.promise();
+export function run_model(mod,opts){
+  let deferq = $.Deferred();
+  window.prom = deferq.promise();
   var kMod = mod;
   var kOpts = opts;
   prom = prom.then( function( f) {
@@ -259,117 +262,30 @@ function mkstatusupdater(mod,opts)
 }
 
 function update_chart(mod,k,i){ 
+
   var kMod = mod;
   var kUp = k;
   var pt = $(CHART_TEMPLATE);
   pt.find('.card').addClass('card-secondary');
   $('#chart_data').append(pt);
 
+  var chart_div = $(`<div id='chart_${i}'></div>`);
 
+  pt.find('.card-body').append(chart_div)
 
-  var chart_width = pt.width() - 20 ;
-  var aspect_ratio = 3;
-  var chart_height = parseInt(chart_width/aspect_ratio);
-  chart_width = parseInt(chart_width);
-  var canvas = $("<canvas>",{width:chart_width,height:chart_height,id:'canvas_'+i});
-
-  pt.find('.card-body').append(canvas)
-
-  var zoom = {
-    // Boolean to enable zooming
-    enabled: true,
-
-    // Enable drag-to-zoom behavior
-    drag: true,
-
-    // Zooming directions. Remove the appropriate direction to disable 
-    // Eg. 'y' would only allow zooming in the y direction
-    mode: 'x',
-    limits: {
-      max: 10,
-      min: 0.5
-    }
+  let models = [{counter_group:k.guid,key:k.key,meter:k.meter,label:k.title}]
+  let opts = {
+    models:JSON.stringify(models),
+    window_fromts:mod.active_interval().from.tv_sec,
+    window_tots:mod.active_interval().to.tv_sec,
+    divid:`#chart_${i}`
   }
-
-
-  var c10 = d3.schemeCategory10;
-  
-  var chart_datasets = [];
-  //collecting the data
-  
-  chart_datasets.push({
-    label:kUp.title,
-    borderWidth: 1 ,
-    fill:false,
-    backgroundColor:c10[i],
-    borderColor:c10[i],
-    data:kUp.chart_data,
-    steppedLine: true
-  });
-    
-  
-  var ctx = document.getElementById('canvas_'+i);
-  var label_string = "";
-  if(i==0){
-    label_string = "bps"
-  }else{
-    label_string = "pps"
-  }
-
-  window.pcap_totals_canvas =  new Chart(ctx, {
-    type:'line',
-    data:{
-      datasets:chart_datasets,
-    },
-    options: {
-      responsive:false,
-
-      scales: {
-        xAxes: [{
-          type: 'time',
-          time: {
-            displayFormats: {
-              'day': 'MMM DD',
-              'hour': 'hA MMM DD'
-            }
-          },
-          
-        }],
-        yAxes: [{
-          display:true,
-            scaleLabel: {
-              display: true,
-              labelString: 'Units '+label_string
-            },
-            ticks: {
-            autoSkip: true,
-            maxTicksLimit: 8,
-            callback: function(value, index, values) {
-              return h_fmtbw(value);
-            },
-          }
-        }]
-      },
-      tooltips: {
-        callbacks: {
-        label: function (tooltipItem, data) {
-          return [names[tooltipItem.datasetIndex]+" : "+h_fmtbw(tooltipItem.yLabel)];
-          }
-        }
-      },
-      animation:false,
-      elements: { point: { radius: 0 } },
-      zoom:zoom,
-      // Container for zoom options
-     
-    }
-    
-  });
+  draw_apex_chart(opts)
   
 }
 
 //called from trp js base
-function run(opts)
+export function run(opts)
 {
   var tmodel =  new TotalsModel();
   var domid = opts["divid"];

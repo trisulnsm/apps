@@ -1,7 +1,9 @@
 
 //security overview 
-SecurityOverview = $.klass({
-  init:function(opts){
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp,mk_trp_request,get_response} from "trp_base";
+
+class SecurityOverview {
+  constructor(opts){
     this.available_time = opts["available_time"];
     this.domid = opts["divid"];
     //convert homenetworks into ineterget arrau
@@ -33,8 +35,8 @@ SecurityOverview = $.klass({
     this.updatestatus = this.mkstatusupdater();
 
 
-    deferq = $.Deferred();
-    prom = deferq.promise();
+    let deferq = $.Deferred();
+    window.prom = deferq.promise();
 
     // build a callback chain
     //
@@ -59,24 +61,24 @@ SecurityOverview = $.klass({
       return cthis.update_UI();
     });
     deferq.resolve();
-  },
+  }
   //convert homenetworks ip to integer
   // We can easily check wheater the ip belongs to home networks or not
-  convert_iparr_to_intergerarr:function(home_networks){
+  convert_iparr_to_intergerarr(home_networks){
     var home_networks_arr= _.collect(home_networks,function(hn){
         return _.collect(hn,function(ip){
           return this.convert_ip_to_integer(ip)
         },this);
       },this);
     return home_networks_arr
-  },
+  }
   //conveet single ip to integer
-  convert_ip_to_integer:function(ip){
+  convert_ip_to_integer(ip){
     return ip.split('.').reduce(function(ipInt, octet) { return (ipInt<<8) + parseInt(octet, 10)}, 0) >>> 0;
-  },
+  }
 
   //get the data from trp.
-  ax_get_all_alerts:function(guid,priority)
+  ax_get_all_alerts(guid,priority)
   {
     var req = mk_trp_request(TRP.Message.Command.QUERY_ALERTS_REQUEST,
       {
@@ -89,12 +91,12 @@ SecurityOverview = $.klass({
     return get_response(req,function(resp){
      cthis.process_alerts(resp);
     });
-  },
+  }
 
   //count = [0,0,0,0,0]
   //Aarry pos 0 - IDS HIGH,IDS MEDIUM,IDS LOW,BADFELLAS,FireHOL
 
-  process_alerts:function(resp){
+  process_alerts(resp){
     var guid = resp.alert_group;
     _.each(resp.alerts,function(alert){
       var keyt = this.get_internal_key(alert);
@@ -133,10 +135,10 @@ SecurityOverview = $.klass({
       h_sigid.count = h_sigid.count + 1
     },this)
     
-  },
+  }
 
   // return internal ip
-  get_internal_key:function(alert){
+  get_internal_key(alert){
     var dip_int = this.convert_ip_to_integer(alert.destination_ip.readable);
     var internal_keyt = alert.source_ip;
     _.each(this.home_networks_arr,function(ai){
@@ -147,16 +149,16 @@ SecurityOverview = $.klass({
     });
     return internal_keyt;
    
-  },
+  }
 
 
-  reset_ui: async function(opts){
+  async reset_ui(opts){
     $(this.domid).html("<span id = 'statusline'></span>");
     let html_str = await get_html_from_hamltemplate(opts);
     this.card = $(html_str)
-  },
+  }
 
-  update_UI:function(){
+  update_UI(){
     var idx = 0;
     $('#statusline').remove();
     var header_panel = this.card.find('#sec_top_header').clone();
@@ -274,9 +276,9 @@ SecurityOverview = $.klass({
       idx = idx+1;
     },this);
     
-  },
+  }
 
-  mkstatusupdater:function()
+  mkstatusupdater()
   {
     var   max=5,
           cnt=0;
@@ -288,9 +290,9 @@ SecurityOverview = $.klass({
 
   }
 
-})
+}
 
-function run(opts)
+export function run(opts)
 {
   new SecurityOverview(opts);
 }

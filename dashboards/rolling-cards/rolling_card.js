@@ -1,4 +1,6 @@
 // Skeleton program to exchange a hello TRP Request and print response 
+import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
+import CGMeterCombo from "cg_meter_combo";
 
 class RollingCard {
   constructor(opts) {
@@ -197,7 +199,7 @@ class RollingCard {
  
 }//class
 
-async function run(opts) {
+export async function run(opts) {
   let rc = new RollingCard(opts);
 }
 
