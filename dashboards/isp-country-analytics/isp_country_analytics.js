@@ -10,7 +10,7 @@ import TrisTablePagination from "tris_table_pagination";
 import ExportToPDF from "export_to_pdf";
 import {ApexChartLB} from "trp_apexcharts";
 import add_barspark from "barspark";
-import {show_host_menu,show_generic_menu} from "utils";
+import {show_host_menu,show_generic_menu,create_shell_modal} from "utils";
 
 class ISPOverviewMapping{
   constructor(opts) {

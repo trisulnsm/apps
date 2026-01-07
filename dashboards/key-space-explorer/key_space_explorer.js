@@ -13,6 +13,7 @@ import TrisProgressBar from "tris_progress_bar";
 import TrisTablePagination from "tris_table_pagination";
 import CGMeterCombo from "cg_meter_combo";
 import mustache from "mustache";
+import {get_table_shell} from "utils";
 
 
 

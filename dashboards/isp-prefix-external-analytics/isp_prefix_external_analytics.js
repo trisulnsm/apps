@@ -10,6 +10,7 @@ import TrisTablePagination from "tris_table_pagination";
 import ExportToPDF from "export_to_pdf";
 import {ApexChartLB} from "trp_apexcharts";
 import add_barspark from "barspark";
+import {create_shell_modal} from "utils";
 
 class ISPPrefixExternalMapping{
   constructor(opts) {

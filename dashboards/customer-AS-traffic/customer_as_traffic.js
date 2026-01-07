@@ -9,8 +9,9 @@ import InterfaeGauge from "interface_gauge";
 import TrisTablePagination from "tris_table_pagination";
 import ExportToPDF from "export_to_pdf";
 import {ApexChartLB} from "trp_apexcharts";
-import {show_bs5_dropdown} from "utils";
+import {show_bs5_dropdown,truncate} from "utils";
 import add_barspark from "barspark";
+
 
 class CustomerASNTraffic{
   constructor(opts) {

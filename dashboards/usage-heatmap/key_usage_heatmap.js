@@ -8,6 +8,7 @@
 // Run function should automatically called when page is loaded.
 import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp,mk_trp_request,get_response} from "trp_base";
 import CGMeterCombo from "cg_meter_combo";
+import {auto_complete} from "utils";
 
 
 class KeyActivityUsage{

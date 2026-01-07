@@ -14,6 +14,7 @@ import InterfaeGauge from "interface_gauge";
 import TrisTablePagination from "tris_table_pagination";
 import ExportToPDF from "export_to_pdf";
 import {ApexChartLB} from "trp_apexcharts";
+import {create_shell_modal} from "utils";
 
 class ISPOverviewMapping{
   constructor(opts) {

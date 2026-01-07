@@ -6,6 +6,7 @@
 
 import Haml from "haml";
 import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp,mk_trp_request,get_response} from "trp_base";
+import {fmt_number} from "utils";
 
 
 const HTML_TEMPLATE_O =Haml.render(`

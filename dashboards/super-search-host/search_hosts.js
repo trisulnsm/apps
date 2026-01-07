@@ -9,6 +9,7 @@
 import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp,mk_trp_request,get_response} from "trp_base";
 import ShowNewTimeSelector from "show_new_time_selector";
 import mustache from "mustache";
+import {auto_complete,get_table_shell} from "utils";
 
 class HostTotal{
   constructor(opts){
@@ -103,7 +104,7 @@ class HostTotal{
     this.haml_dom =$(html_str)
     var form = $(this.haml_dom[0]);
     $(this.domid).append(form);
-    //auto_complete('search_host',{cgguid:GUID.GUID_CG_HOSTS()},{});
+    auto_complete('search_host',{cgguid:GUID.GUID_CG_HOSTS()},{});
 
     //new time selector 
     new ShowNewTimeSelector({divid:"#new_time_selector",

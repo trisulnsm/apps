@@ -10,6 +10,7 @@ import ShowNewTimeSelector from "show_new_time_selector";
 import CGMeterCombo from "cg_meter_combo";
 import TrisProgressBar from "tris_progress_bar";
 import mustache from "mustache";
+import {get_card_shell,auto_complete} from "utils";
 
 
 
