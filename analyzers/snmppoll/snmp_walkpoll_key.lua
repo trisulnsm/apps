@@ -45,7 +45,7 @@ TrisulPlugin = {
   onload = function()
     T.poll_targets =  nil
     T.last_poll_secs=0
-    T.snmp_agent_database = T.env.get_config("App>DBRoot").."/config/"..SNMP_DATABASE
+    T.snmp_agent_database = T.env.get_config("//App/DBRoot").."/config/"..SNMP_DATABASE
     T.async_task = require'async_tasks'
 
   -- --------------------------------------------
@@ -53,7 +53,7 @@ TrisulPlugin = {
   -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
   --
     T.active_config = make_config(
-            T.env.get_config("App>DBRoot").."/config/trisulnsm_snmpwalkpoll.lua",
+            T.env.get_config("//App/DBRoot").."/config/trisulnsm_snmpwalkpoll.lua",
             {
 				-- Resolution Seconds 
 				ResolutionSeconds=60,

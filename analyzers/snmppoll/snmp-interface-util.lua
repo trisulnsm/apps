@@ -36,7 +36,7 @@ TrisulPlugin = {
 
     -- reload if hash changed of persist mapping 
     onbeginflush = function(engine, timestamp) 
-		local persist_file = T.env.get_config("App>DBRoot").."/config/"..PERSIST_DB_FILENAME
+		local persist_file = T.env.get_config("//App/DBRoot").."/config/"..PERSIST_DB_FILENAME
 		local f = io.open(persist_file,"r")
 		if not f then
 			T.ifspeeds = nil
