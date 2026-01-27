@@ -39,7 +39,7 @@ TrisulPlugin = {
 
   onload = function()
     T.config = make_config(
-          T.env.get_config("App>DBRoot").."/config/trisulnsm_cidr-tagger.lua",
+          T.env.get_config("//App/DBRoot").."/config/trisulnsm_cidr-tagger.lua",
           {
             -- only tag these subnet networks
             tag_masks={26,27,28},

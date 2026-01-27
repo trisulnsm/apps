@@ -27,14 +27,14 @@ TrisulPlugin = {
 	onload = function()
 		T.poll_targets = nil
 		T.last_poll_secs = 0
-		T.snmp_agent_database = T.env.get_config("App>DBRoot") .. "/config/" .. SNMP_DATABASE
+		T.snmp_agent_database = T.env.get_config("//App/DBRoot") .. "/config/" .. SNMP_DATABASE
         T.arp_entries = {}
 
 		-- --------------------------------------------
 		-- override by trisulnsm_snmparp_flowtagger.lua
 		-- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config
 		--
-		T.active_config = make_config(T.env.get_config("App>DBRoot") .. "/config/trisulnsm_snmparp_flowtagger.lua", {
+		T.active_config = make_config(T.env.get_config("//App/DBRoot") .. "/config/trisulnsm_snmparp_flowtagger.lua", {
 			-- Resolution Seconds
 			ResolutionSeconds = 60,
 
@@ -70,7 +70,7 @@ TrisulPlugin = {
             T.logdebug("Polling for new targets, last poll was more than resolution seconds ago")
             T.last_poll_secs = ts
 
-			T.snmp_agent_database = T.env.get_config("App>DBRoot") .. "/config/" .. SNMP_DATABASE
+			T.snmp_agent_database = T.env.get_config("//App/DBRoot") .. "/config/" .. SNMP_DATABASE
 			local new_targets = TrisulPlugin.load_poll_targets(engine:instanceid(), T.snmp_agent_database)
 			if new_targets ~= nil then
 				T.poll_targets = new_targets

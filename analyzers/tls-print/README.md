@@ -84,6 +84,7 @@ UPDATES
 =======
 
 ````
+0.0.9   Jan 27 2026     Changed config to XPATH
 0.0.8   Aug 8  2018     Added JA3 Server Hash  and option to print to log file 
 0.0.7   Jul 3  2018     Minor error when no extensions are present. We cant do FP for that.
 0.0.6   Jun 28 2018     Dont log all hashes, instead update_key info if user wants to see JA3 string 

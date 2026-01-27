@@ -88,16 +88,16 @@ TrisulPlugin = {
   onload = function()
 
     -- check if the required config settings are ON
-    local enabled = T.env.get_config("Reassembly>TCPReassembly>Applications>EnableSSLRecordExtraction")
+    local enabled = T.env.get_config("//Reassembly/TCPReassembly/Applications/EnableSSLRecordExtraction")
     if  enabled:lower() ~= "true" then
-      T.logerror("TLS PRINT: needs the Reassembly>TCPReassembly>Applications>EnableSSLRecordExtraction be TRUE. Cant proceed. ");
+      T.logerror("TLS PRINT: needs the //Reassembly/TCPReassembly/Applications/EnableSSLRecordExtraction be TRUE. Cant proceed. ");
       return false
     end
 
 
   -- do you want to log every JA3 hash - default OFF to save disk space 
   T.active_config = make_config(
-          T.env.get_config("App>DBRoot").."/config/trisulnsm_tls-fingerprint.lua",
+          T.env.get_config("//App/DBRoot").."/config/trisulnsm_tls-fingerprint.lua",
           {
             -- logs for each TLS flow the FlowID, JA3-Hash, JA3-String
             -- default is false, override if you want to debug or harvest strings in  the following file
@@ -107,8 +107,8 @@ TrisulPlugin = {
 
     -- search these paths for fingerprint database 
     local PrintFiles = { 
-      T.env.get_config("App>DataDirectory").."/plugins/tls-fingerprints.json" ,
-      T.env.get_config("App>DBRoot").."/config/lua/github.com_trisulnsm_apps/tls-print/tls-fingerprints.json"
+      T.env.get_config("//App/DataDirectory").."/plugins/tls-fingerprints.json" ,
+      T.env.get_config("//App/DBRoot").."/config/lua/github.com_trisulnsm_apps/tls-print/tls-fingerprints.json"
     }
 
     local prints_file=nil 

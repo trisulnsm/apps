@@ -104,6 +104,7 @@ UPDATES
 =======
 
 ````
+1.0.7   Jan 27 2026     Changed config to XPATH
 1.0.8   Jul 17 2025     Logic to support alternate key forms like crosskeys IPs 
 1.0.7   Jul 10 2025     Added IP filtering to track only specific addresses
 1.0.6   Jul 7 2025      Debounce logic to prevent mass alert spam 

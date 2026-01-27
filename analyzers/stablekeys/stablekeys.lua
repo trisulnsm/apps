@@ -74,7 +74,7 @@ TrisulPlugin = {
     ----
 
     T.active_config = make_config(
-      T.env.get_config("App>DBRoot").."/config/trisulnsm_stablekeys.lua",
+      T.env.get_config("//App/DBRoot").."/config/trisulnsm_stablekeys.lua",
       {
           -- By default FlowGens 
           CounterGUID  ="{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",

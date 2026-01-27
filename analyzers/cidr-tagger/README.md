@@ -51,6 +51,7 @@ UPDATES
 =======
 
 ````
+0.0.2   Jan 27 2026    Changed config to XPATH
 0.0.1   Feb 2 2020     Initial release 
 ````
 

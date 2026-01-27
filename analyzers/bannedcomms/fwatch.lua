@@ -47,7 +47,7 @@ TrisulPlugin = {
 
 
    T.active_config = make_config(
-            T.env.get_config("App>DBRoot").."/config/trisulnsm_bannedcomms.lua",
+            T.env.get_config("//App/DBRoot").."/config/trisulnsm_bannedcomms.lua",
             {
 				WhiteList  =  {
 						{ ["0A.02.02.%x%x"] = "0A.02.00.F[BC]" },

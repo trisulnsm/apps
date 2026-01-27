@@ -66,15 +66,15 @@ TrisulPlugin = {
   -- make sure the output directory is present 
   onload = function()
 
-      local enabled = T.env.get_config("Reassembly>FileExtraction>Enabled")
+      local enabled = T.env.get_config("//Reassembly/FileExtraction/Enabled")
       if  enabled:lower() ~= "true" then
-          T.logwarning("Save Binaries : needs the Reassembly>FileExtraction>Enabled config setting to be TRUE. Cant proceed. ");
+          T.logwarning("Save Binaries : needs the //Reassembly/FileExtraction/Enabled config setting to be TRUE. Cant proceed. ");
           return false
       end
 
       -- load custom config if present 
       T.active_config = DEFAULT_CONFIG
-      local custom_config_file = T.env.get_config("App>DBRoot").."/config/trisulnsm_save_exe.config.lua"
+      local custom_config_file = T.env.get_config("//App/DBRoot").."/config/trisulnsm_save_exe.config.lua"
       if file_exists(custom_config_file) then 
         local newsettings = dofile(custom_config_file) 
         T.log("Loading custom settings from ".. custom_config_file)

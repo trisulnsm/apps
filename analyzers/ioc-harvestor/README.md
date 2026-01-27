@@ -65,6 +65,7 @@ UPDATES
 =======
 
 ````
+0.0.6		Jan 27 2026			Changed config to XPATH
 0.0.5		Jan 12 2021			intel_tester.lua supports plain and partial matching logic 	
 0.0.4		Jul 25 2018			By Default IOC-Harvestor wont save the Intel items (save disk)
 0.0.3		Jul 11 2018			IPv6 and also a config option to prevent saving to DB 

@@ -49,7 +49,7 @@ UPDATES
 =======
 
 ````
-
+0.0.3		Jan 27 2026			Changed config to XPATH
 0.0.2		Jun 27 2018			Added config options to control very long proxy external host names 
 0.0.1		Jun 26 2018			Initial release 
 ````

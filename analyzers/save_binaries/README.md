@@ -69,4 +69,11 @@ You can send these files for further analysis to platforms like
 
 ## Also install
 
-The **Save Binaries Dashboard App** gives you a neat dashboard of metrics related to this feature. 
+The **Save Binaries Dashboard App** gives you a neat dashboard of metrics related to this feature.
+
+UPDATES
+=======
+
+````
+0.0.7   Jan 27 2026      Changed config to XPATH
+```` 

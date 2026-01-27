@@ -20,7 +20,7 @@ TrisulPlugin = {
 
     -- load custom config if present 
     T.active_config = make_config(
-      T.env.get_config("App>DBRoot").."/config/trisulnsm_ioc-harvestor.lua",
+      T.env.get_config("//App/DBRoot").."/config/trisulnsm_ioc-harvestor.lua",
       {
         -- Save these to backend DB (can take up significant disk space) 
         -- in production override this to false  in 

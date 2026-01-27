@@ -31,6 +31,7 @@ return {
 # Version History
 
 ````
+1.0.4   Jan 27 2026      Changed config to XPATH
 1.0.1   Nov 15 2025      Initial version 
 
 ````

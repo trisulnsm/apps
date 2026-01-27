@@ -21,11 +21,11 @@ TrisulPlugin = {
     T.regex=T.re2(".*\\[natip\\]([\\d.]+)")
     T.host:log(T.K.loglevel.INFO, "TEST LUA loaded");
     T.active_config = make_config(
-      T.env.get_config("App>DBRoot").."/config/trisulnsm_ipdr_tag_userid.lua",
+      T.env.get_config("//App/DBRoot").."/config/trisulnsm_ipdr_tag_userid.lua",
       {
         DebugMode=false,
         RefreshInterval=3600, --in seconds/every one hour
-        DBFile=T.env.get_config("App>DBRoot").."/config/".."IPDRCONTROL.SQDB",
+        DBFile=T.env.get_config("//App/DBRoot").."/config/".."IPDRCONTROL.SQDB",
       }
     )
     local new_terminal_ip_mappings = TrisulPlugin.load_terminal_mappings(T.active_config.DBFile)

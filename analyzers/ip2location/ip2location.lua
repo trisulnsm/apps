@@ -18,7 +18,7 @@ TrisulPlugin = {
   onload = function() 
 
     -- required 
-    T.ldb_root = T.env.get_config("App>DataDirectory") .. "/plugins"
+    T.ldb_root = T.env.get_config("//App/DataDirectory") .. "/plugins"
   	T.ldb=nil 
 	T.key_labels_added = { } 
   end,

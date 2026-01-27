@@ -90,6 +90,7 @@ UPDATES
 =======
 
 ````
+0.0.7   Jan 27 2026     Changed config to XPATH
 0.0.6   Oct 4  2018     file handle leak fix in popen()
 0.0.5   Aug 18 2018     installfeed.sh to automate Feed download and Cron
 0.0.3   Feb 15 2018     Added FireHOL-Level3 support 

@@ -42,7 +42,7 @@ TrisulPlugin = {
 
   onload = function()
     T.config = make_config(
-      T.env.get_config("App>DBRoot").."/config/trisulnsm_flow-traker-alert.lua",
+      T.env.get_config("//App/DBRoot").."/config/trisulnsm_flow-traker-alert.lua",
       {
         --ignore proocols , UDP flow like webex
         ignore_protocols={

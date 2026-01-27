@@ -31,7 +31,7 @@ TrisulPlugin = {
     onbeginflush = function(engine) 
 
       T.ldb=LDB:new()
-      local umbrella1m_db = T.env.get_config("App>DataDirectory") .. "/plugins/umbrella.level." ..  engine:id()
+      local umbrella1m_db = T.env.get_config("//App/DataDirectory") .. "/plugins/umbrella.level." ..  engine:id()
       local stat,errmsg=T.ldb:open(umbrella1m_db)
       if not stat then
         T.logerror("Error opening Umbrella-Top-1M levelDB file msg="..errmsg)

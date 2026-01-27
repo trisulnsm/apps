@@ -126,7 +126,7 @@ TrisulPlugin = {
 
 	  -- lazy open of socket
 	  if T.socket ==nil then 
-		local api_socket_filename = T.env.get_config("App>RunStateDirectory").."/"..API_SOCKETFILE_NAME .."."..engine:instanceid() 
+		local api_socket_filename = T.env.get_config("//App/RunStateDirectory").."/"..API_SOCKETFILE_NAME .."."..engine:instanceid() 
 		if  not TrisulPlugin.open_api_socket( api_socket_filename) then
 			return false
 		end 

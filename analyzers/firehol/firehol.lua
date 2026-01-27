@@ -41,7 +41,7 @@ TrisulPlugin = {
   -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
   --
     T.active_config = make_config(
-            T.env.get_config("App>DBRoot").."/config/trisulnsm_firehol.lua",
+            T.env.get_config("//App/DBRoot").."/config/trisulnsm_firehol.lua",
             {
                 -- filename of FireHOL level1 Feed  - will trigger Sev-1 alert 
                 Firehol_Filename_Level1 ="firehol_level1.netset",
@@ -59,14 +59,14 @@ TrisulPlugin = {
     T.intel_file_hashes = {} 
   
     -- Firehol 1: required - load into iprangemap struct 
-    T.fhole_1 = TrisulPlugin.check_reload( T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level1) 
+    T.fhole_1 = TrisulPlugin.check_reload( T.env.get_config("//App/DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level1) 
     if T.fhole_1 == nil then 
       T.logerror("Sorry cant find firehol_level1 intel file. Follow instructions in README to download the file")
       return false
     end 
 
     -- Firehol 3 : optional 
-    T.fhole_3 = TrisulPlugin.check_reload( T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level3) 
+    T.fhole_3 = TrisulPlugin.check_reload( T.env.get_config("//App/DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level3) 
     if T.fhole_3 == nil then 
       T.loginfo("firehol_level3 intel file not found, wont generate those alerts")
     end 
@@ -122,13 +122,13 @@ TrisulPlugin = {
     onbeginflush = function(engine,timestamp)
 
       -- Firehol 1: required - load into iprangemap struct 
-      local new_map = TrisulPlugin.check_reload( T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level1) 
+      local new_map = TrisulPlugin.check_reload( T.env.get_config("//App/DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level1) 
       if new_map then
         T.fhole_1 = new_map
       end 
 
       -- Firehol 3: optional 
-      local new_map = TrisulPlugin.check_reload( T.env.get_config("App>DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level3) 
+      local new_map = TrisulPlugin.check_reload( T.env.get_config("//App/DataDirectory") .. "/plugins/" ..  T.active_config.Firehol_Filename_Level3) 
       if new_map then
         T.fhole_3 = new_map
       end 

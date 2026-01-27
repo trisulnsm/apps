@@ -23,7 +23,7 @@ TrisulPlugin = {
     -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
     --  
     T.active_config = make_config(
-            T.env.get_config("App>DBRoot").."/config/trisulnsm_subnet-flowcap.lua",
+            T.env.get_config("//App/DBRoot").."/config/trisulnsm_subnet-flowcap.lua",
             {   
                 -- which subnets
                 Subnets =  { },

@@ -39,7 +39,7 @@ TrisulPlugin = {
 
 	-- do you want to log every JA3 hash - default OFF to save disk space 
 	T.active_config = make_config(
-		  T.env.get_config("App>DBRoot").."/config/trisulnsm_passive-dns.lua",
+		  T.env.get_config("//App/DBRoot").."/config/trisulnsm_passive-dns.lua",
 		  {
 			-- only stores a basic IPv4 -> name mapping 
 			-- default is false, override if you dont need other name to IP 
@@ -74,7 +74,7 @@ TrisulPlugin = {
     -- levelDB is multithread 
       if T.LevelDB == nil then
         if engine:instanceid()=="0" then 
-          local dbfile = T.env.get_config("App>DBRoot").."/config/PassiveDNSDB.level";
+          local dbfile = T.env.get_config("//App/DBRoot").."/config/PassiveDNSDB.level";
           T.LevelDB = leveldb.new()
           T.LevelDB:open(dbfile); 
           engine:post_message_backend( '{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.LevelDB:toaddr() ) 

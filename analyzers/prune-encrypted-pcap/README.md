@@ -59,6 +59,7 @@ UPDATES
 =======
 
 ````
+0.0.7		Jan 27 2026			Changed config to XPATH
 0.0.6		Jul  6 2018			New leveldb lib, customization of regex, metrics with new
                                 counter group. 
 0.0.4		Jan  8 2017			Added acorn.tv,Amazon Prime, Hulu TV packets to be excluded 
