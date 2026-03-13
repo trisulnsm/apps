@@ -170,6 +170,24 @@ TrisulPlugin = {
         AlertDetails=p.alert["signature"]                             -- why waste a text field 'AlertDetails'?
       };
 
+      -- if metaalert is present, add it to the AlertDetails
+      if p.alert.metadata then
+        local mdata = p.alert.metadata
+
+        if mdata.mitre_tactic_id then
+            ret.MitreTacticID = mdata["mitre_tactic_id"][1]
+        end
+
+        if mdata.mitre_technique_id then
+            ret.MitreTechniqueID = mdata["mitre_technique_id"][1]
+        end
+
+        if mdata.mitre_subtechnique_id then
+            ret.MitreSubTechniqueID = mdata["mitre_subtechnique_id"][1]
+        end
+
+      end
+
 
       return ret;
     end

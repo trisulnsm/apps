@@ -34,6 +34,7 @@ suricata -D -l /usr/local/var/lib/trisul-probe/domain0/probe0/context0/run -c /e
 UPDATES
 =======
 
+0.0.7		Mar 13 2026			Support for MITRE fields 
 0.0.6		Jan 27 2026			Changed config to XPATH
 0.0.5		Oct 17 2017			Reuse a buffer once to avoid allocs on every alert
 
