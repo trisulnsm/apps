@@ -1,0 +1,17 @@
+name: DDOS Monitor
+
+version: 1.0.0
+
+author: trisul
+
+
+description: 
+   short: DDOS Monitor view 
+   long:  |
+        info
+
+apptype: dashboard_share
+
+appresources: DDoSMonitor.json  
+
+dependencies : 

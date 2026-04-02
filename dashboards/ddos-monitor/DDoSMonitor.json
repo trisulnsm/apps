@@ -1,0 +1,149 @@
+[
+    [
+        {
+            "name": "DDoS Metrics ",
+            "description": "Dashboard shows various common protocols used by DDoS attacks ",
+            "author": "trisul",
+            "version": "1.0"
+        }
+    ],
+    [
+        {
+            "id": 10001,
+            "webtrisul_addon_package_id": 1,
+            "trisul_web_user_id": 2,
+            "key": "ddosmetrics",
+            "name": "DDoS Metrics ",
+            "description": "Dashboard shows various common protocols used by DDoS attacks ",
+            "moduri": "/webtrisul_module/getmod",
+            "axupdateuri": "/newdash/traffic_axsavepos",
+            "collapsedmods": null,
+            "undecoratedmods": null,
+            "pos_head": null,
+            "pos_left": null,
+            "pos_right": null,
+            "pos_foot": null,
+            "pos_top1": "",
+            "pos_top2": "",
+            "pos_mid3": "",
+            "pos_bot2": "",
+            "pos_bot1": "",
+            "pos_mid4": "",
+            "pos_flexi": "10001:w6,10002:w6,10003:w6,10004:w6,10005:w6,10006:w6,10007:w6,10008:w6,10009:w6",
+            "pos_reserved2": null,
+            "pos_reserved3": null,
+            "dashboard_type": "RETRO"
+        }
+    ],
+    [
+        {
+            "id": 10001,
+            "webtrisul_addon_package_id": 2,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 101,
+            "name": "DNS - Ingress vs Egress",
+            "description": "DDoS attacks dramatically impact the INGRESS/EGRESS ratio of the ISP usually by causing large ingress into the target. ",
+            "options": "{\"surface\":\"MRTG\",\"title\":\"DNS IN/OUT\",\"models\":\"[{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"2\\\",\\\"key\\\":\\\"domain\\\",\\\"label\\\":\\\"DNS Ingress \\\"},{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"3\\\",\\\"key\\\":\\\"domain\\\",\\\"label\\\":\\\"DNS Egress\\\"}]\",\"show_table\":1}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10002,
+            "webtrisul_addon_package_id": 2,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 101,
+            "name": "Common DDoS flows",
+            "description": "DDoS attacks dramatically impact the INGRESS/EGRESS ratio of the ISP usually by causing large ingress into the target. ",
+            "options": "{\"surface\":\"LINE\",\"models\":\"[{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"7\\\",\\\"key\\\":\\\"domain\\\",\\\"label\\\":\\\"Active DNS flows\\\"},{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"7\\\",\\\"key\\\":\\\"ntp\\\",\\\"label\\\":\\\"Active NTP flows\\\"},{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"7\\\",\\\"key\\\":\\\"ldap\\\",\\\"label\\\":\\\"Active LDAP flows\\\"},{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"7\\\",\\\"key\\\":\\\"snmp\\\",\\\"label\\\":\\\"Active SNMP flows\\\"},{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"7\\\",\\\"key\\\":\\\"ssdp\\\",\\\"label\\\":\\\"SSDP Flows\\\"},{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"7\\\",\\\"key\\\":\\\"icmp01\\\",\\\"label\\\":\\\"ICMP\\\"}]\",\"refmodel\":\"[{}]\",\"show_table\":1,\"legend_position\":\"top\",\"title\":\"Common Amplification Attacks Flows\",\"height\":\"300\",\"key_filter\":\"\",\"inverse_key_filter\":\"\",\"show_range_slider\":0,\"pcap_range_marker\":0,\"show_time_selector\":0,\"cgguid\":\"{03E016FC-46AA-4340-90FC-0E278B93C677}\",\"meter\":\"0\",\"key\":\"\",\"label\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10003,
+            "webtrisul_addon_package_id": 2,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 101,
+            "name": "SSDP 1900",
+            "description": "DDoS attacks dramatically impact the INGRESS/EGRESS ratio of the ISP usually by causing large ingress into the target. ",
+            "options": "{\"surface\":\"MRTG\",\"title\":\"SSDP Ingress vs Egress\",\"models\":\"[{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"2\\\",\\\"key\\\":\\\"Port-1900\\\",\\\"label\\\":\\\"SSDP Ingress \\\"},{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"3\\\",\\\"key\\\":\\\"Port-1900\\\",\\\"label\\\":\\\"SSDP Egress\\\"}]\",\"show_table\":1}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10004,
+            "webtrisul_addon_package_id": 2,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 101,
+            "name": "Total Ingress vs Egress",
+            "description": "Shows total ingress vs Egress Traffic in the ISP network. DDoS attacks wil show abnormal increases ",
+            "options": "{\"surface\":\"MRTG\",\"title\":\"Flow Activity Monitor\",\"models\":\"[{\\\"cgguid\\\":\\\"{393B5EBC-AB41-4387-8F31-8077DB917336}\\\",\\\"meter\\\":0,\\\"key\\\":\\\"DIR_INTOHOME\\\",\\\"label\\\":\\\"Inbound\\\"},{\\\"cgguid\\\":\\\"{393B5EBC-AB41-4387-8F31-8077DB917336}\\\",\\\"meter\\\":0,\\\"key\\\":\\\"DIR_OUTOFHOME\\\",\\\"label\\\":\\\"Outbound\\\"}]\",\"show_table\":1}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10005,
+            "webtrisul_addon_package_id": 2,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 101,
+            "name": "ICMP Ingress vs Egress",
+            "description": "DDoS attacks dramatically impact the INGRESS/EGRESS ratio of the ISP usually by causing large ingress into the target. ",
+            "options": "{\"surface\":\"MRTG\",\"title\":\"ICMP Ingress vs Egress\",\"models\":\"[{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"2\\\",\\\"key\\\":\\\"icmp01\\\",\\\"label\\\":\\\"ICMP Ingress \\\"},{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"3\\\",\\\"key\\\":\\\"icmp01\\\",\\\"label\\\":\\\"ICMP Egress\\\"}]\",\"show_table\":1}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10006,
+            "webtrisul_addon_package_id": 2,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 101,
+            "name": "DDoS Flow Monitor",
+            "description": "DDoS can create a large spike in the number of flows while not much change is seen yet in the traffic volumes.",
+            "options": "{\"surface\":\"LINE\",\"models\":\"[{\\\"cgguid\\\":\\\"{594606BD-EEB2-4E0B-BAC4-84B7057088C8}\\\",\\\"meter\\\":\\\"0\\\",\\\"key\\\":\\\"{99A78737-4B41-4387-8F31-8077DB917336}\\\",\\\"label\\\":\\\"Active IP Flows\\\"},{\\\"cgguid\\\":\\\"{594606BD-EEB2-4E0B-BAC4-84B7057088C8}\\\",\\\"meter\\\":\\\"2\\\",\\\"key\\\":\\\"{99A78737-4B41-4387-8F31-8077DB917336}\\\",\\\"label\\\":\\\"New Flows\\\"},{\\\"cgguid\\\":\\\"{594606BD-EEB2-4E0B-BAC4-84B7057088C8}\\\",\\\"meter\\\":\\\"3\\\",\\\"key\\\":\\\"{99A78737-4B41-4387-8F31-8077DB917336}\\\",\\\"label\\\":\\\"Timeouts\\\"}]\",\"refmodel\":\"[{}]\",\"show_table\":1,\"legend_position\":\"top\",\"title\":\"Flow Activity Monitor\",\"height\":\"300\",\"key_filter\":\"\",\"inverse_key_filter\":\"\",\"show_range_slider\":0,\"pcap_range_marker\":0,\"show_time_selector\":0,\"cgguid\":\"{03E016FC-46AA-4340-90FC-0E278B93C677}\",\"meter\":\"0\",\"key\":\"\",\"label\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10007,
+            "webtrisul_addon_package_id": 2,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 101,
+            "name": "Ingress vs Egress ratio",
+            "description": "DDoS attacks dramatically impact the INGRESS/EGRESS ratio of the ISP usually by causing large ingress into the target.",
+            "options": "{\"surface\":\"LINE\",\"models\":\"[{\\\"cgguid\\\":\\\"{393B5EBC-AB41-4387-8F31-8077DB917336}\\\",\\\"meter\\\":\\\"0\\\",\\\"key\\\":\\\"DIR_INTOHOME\\\",\\\"label\\\":\\\"Inbound\\\"},{\\\"cgguid\\\":\\\"{393B5EBC-AB41-4387-8F31-8077DB917336}\\\",\\\"meter\\\":\\\"0\\\",\\\"key\\\":\\\"DIR_OUTOFHOME\\\",\\\"label\\\":\\\"Outbound\\\"}]\",\"refmodel\":\"[{}]\",\"show_table\":1,\"legend_position\":\"top\",\"title\":\"Ingress Egress Ratio\",\"height\":\"300\",\"key_filter\":\"\",\"inverse_key_filter\":\"\",\"show_range_slider\":0,\"pcap_range_marker\":0,\"show_time_selector\":0,\"cgguid\":\"{03E016FC-46AA-4340-90FC-0E278B93C677}\",\"meter\":\"0\",\"key\":\"\",\"label\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10008,
+            "webtrisul_addon_package_id": 2,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 101,
+            "name": "TCP vs UDP traffic",
+            "description": "Key Traffic module",
+            "options": "{\"surface\":\"LINE\",\"models\":\"[{\\\"cgguid\\\":\\\"{E89BCD56-30AD-40F5-B1C8-8B7683F440BD}\\\",\\\"meter\\\":\\\"0\\\",\\\"key\\\":\\\"11\\\",\\\"label\\\":\\\"UDP\\\"},{\\\"cgguid\\\":\\\"{E89BCD56-30AD-40F5-B1C8-8B7683F440BD}\\\",\\\"meter\\\":\\\"0\\\",\\\"key\\\":\\\"06\\\",\\\"label\\\":\\\"TCP\\\"}]\",\"refmodel\":\"[{}]\",\"show_table\":1,\"legend_position\":\"top\",\"title\":\"TCP vs UDP\",\"height\":\"300\",\"key_filter\":\"\",\"inverse_key_filter\":\"\",\"show_range_slider\":0,\"pcap_range_marker\":0,\"show_time_selector\":0,\"cgguid\":\"{03E016FC-46AA-4340-90FC-0E278B93C677}\",\"meter\":\"0\",\"key\":\"\",\"label\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10009,
+            "webtrisul_addon_package_id": 2,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 101,
+            "name": "NTP - Ingress v Egress",
+            "description": "DDoS attacks dramatically impact the INGRESS/EGRESS ratio of the ISP usually by causing large ingress into the target. ",
+            "options": "{\"surface\":\"MRTG\",\"title\":\"NTP IN/OUT\",\"models\":\"[{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"2\\\",\\\"key\\\":\\\"ntp\\\",\\\"label\\\":\\\"NTP Ingress \\\"},{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"3\\\",\\\"key\\\":\\\"ntp\\\",\\\"label\\\":\\\"NTP Egress\\\"}]\",\"show_table\":1}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        }
+        
+    ]
+]
