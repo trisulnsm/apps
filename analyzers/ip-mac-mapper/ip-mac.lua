@@ -5,6 +5,8 @@
 -- PURPOSE:     Protocol Handler, 
 -- 
 local SB=require'sweepbuf'
+require 'mkconfig'
+
 
 function ipstr_tokey(ipstr)
   local pmatch,_, b1,b2,b3,b4= ipstr:find("(%d+)%.(%d+)%.(%d+)%.(%d+)")
@@ -22,6 +24,14 @@ TrisulPlugin = {
     name = "IPMAC",
     description = "Count IP MAC together", -- optional
   },
+  onload = function()
+    T.active_config = make_config(
+      T.env.get_config("//App/DBRoot").."/config/trisulnsm_ip_mac.lua",
+      {
+        PacketCount = 0,
+        SamplingRate = 1
+      })
+  end,
 
   -- countergroup info block
   countergroup = {
@@ -54,6 +64,12 @@ TrisulPlugin = {
     --              above. In this case, every DNS packet
     -- 
     onpacket = function(engine,iplayer)
+      T.active_config.PacketCount=T.active_config.PacketCount+1
+      if (T.active_config.PacketCount % T.active_config.SamplingRate) ~= 0 then
+      print("Sampling "..T.active_config.PacketCount.."\n")
+        return
+      end
+      print("Called the mac pair with the sampling "..T.active_config.PacketCount.."\n")
 
       -- your code here 
 
