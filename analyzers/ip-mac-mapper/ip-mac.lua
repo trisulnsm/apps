@@ -66,10 +66,8 @@ TrisulPlugin = {
     onpacket = function(engine,iplayer)
       T.active_config.PacketCount=T.active_config.PacketCount+1
       if (T.active_config.PacketCount % T.active_config.SamplingRate) ~= 0 then
-      print("Sampling "..T.active_config.PacketCount.."\n")
         return
       end
-      print("Called the mac pair with the sampling "..T.active_config.PacketCount.."\n")
 
       -- your code here 
 
