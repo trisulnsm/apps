@@ -28,7 +28,7 @@ TrisulPlugin = {
         guid = "{22B6E494-382B-47D5-D914-591CF8572343}",
         name = "ShiftX Metrics",
         description = "Shift scoring metrics",
-        bucketsize = 30,
+        bucketsize = 60,
       },
   
       -- meters table
