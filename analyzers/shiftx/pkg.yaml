@@ -1,0 +1,16 @@
+name: Shift
+
+version: 1.0.1
+
+author: trisul
+
+description: 
+   short: Shift score computer for counter group top-k sketches 
+   long:  |
+     RBO index is Rank Biased Overlap number that can be used to detect
+
+apptype: lua
+
+appresources: shiftx.lua mkconfig.lua rbocounter.lua thumbnail.png
+
+dependencies:  
