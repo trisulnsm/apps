@@ -88,13 +88,15 @@ TrisulPlugin = {
           for k,v in pairs(m) do 
             local app = lmap[k] or k or dns_z or "INTERNET"
 
+			local XKCG = "{32A268B9-27BD-4661-9C9D-0A0D633C041D}"
+
             -- cross key
             local ifapp1 = flow:flow():netflow_router() .. "_".. flow:flow():netflow_ifindex_in() .. "\\" .. app
             local ifapp2 = flow:flow():netflow_router() .. "_".. flow:flow():netflow_ifindex_out() .. "\\" .. app
-            engine:update_counter("{113091EA-CF82-46E0-DE38-9A8C42DD0279}", ifapp1, 0, flow:az_bytes() ) 
-            engine:update_counter("{113091EA-CF82-46E0-DE38-9A8C42DD0279}", ifapp1, 1, flow:za_bytes() ) 
-            engine:update_counter("{113091EA-CF82-46E0-DE38-9A8C42DD0279}", ifapp2, 0, flow:az_bytes() ) 
-            engine:update_counter("{113091EA-CF82-46E0-DE38-9A8C42DD0279}", ifapp2, 1, flow:za_bytes() ) 
+            engine:update_counter(XKCG, ifapp1, 0, flow:az_bytes() ) 
+            engine:update_counter(XKCG, ifapp1, 1, flow:za_bytes() ) 
+            engine:update_counter(XKCG, ifapp2, 0, flow:az_bytes() ) 
+            engine:update_counter(XKCG, ifapp2, 1, flow:za_bytes() ) 
           end
         end
       end

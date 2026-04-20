@@ -1,6 +1,6 @@
 name: OTT Analytics
 
-version: 1.0.2
+version: 1.0.3
 
 author: trisul
 
@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: appmap.lua ottcg.lua ott_xkey.lua resolve-ext-toppers.lua flowapps.lua tris_leveldb.lua 
+appresources: appmap.lua ottcg.lua ott_xkey.lua resolve-ext-toppers.lua flowapps.lua tris_leveldb.lua crosskey_counter_group1776691388438.json
 
 dependencies:  
