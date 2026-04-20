@@ -18,6 +18,8 @@ return {
 
         ["android"] = "ANDROID",
 
+        ["hotstar"] = "HOTSTAR",
+
 
         ["mail.google"] = "GMAIL",
         ["gmail"] = "GMAIL",
