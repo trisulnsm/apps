@@ -15,6 +15,8 @@ import ExportToPDF from "export_to_pdf";
 import {ApexChartLB} from "trp_apexcharts";
 import add_barspark from "barspark";
 import {show_host_menu,show_generic_menu,auto_complete} from "utils";
+import {draw_apex_chart} from "utils";
+
 
 class ISPPrefixDrilldownMapping{
   constructor(opts){

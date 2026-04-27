@@ -7,6 +7,8 @@ import CGMeterCombo from "cg_meter_combo";
 import TrisTablePagination from "tris_table_pagination";
 import {ApexChartLB} from "trp_apexcharts";
 import {create_shell_modal} from "utils";
+import {draw_apex_chart} from "utils";
+
 
 
 class ISPOTTAnalytics{

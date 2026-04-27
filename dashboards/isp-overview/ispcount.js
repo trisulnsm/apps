@@ -1,6 +1,8 @@
 // ISP KPI top level dashboard
 import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
 import {ApexChartLB} from "trp_apexcharts";
+import {draw_apex_chart} from "utils";
+
 
 
 const kGUIDS  = [
