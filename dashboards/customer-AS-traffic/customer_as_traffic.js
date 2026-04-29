@@ -11,6 +11,7 @@ import ExportToPDF from "export_to_pdf";
 import {ApexChartLB} from "trp_apexcharts";
 import {show_bs5_dropdown,truncate} from "utils";
 import add_barspark from "barspark";
+import {draw_apex_chart} from "utils";
 
 
 class CustomerASNTraffic{

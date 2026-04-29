@@ -2,7 +2,7 @@
   Explore router or interface usage details
 */
 import {load_css_file,get_html_from_hamltemplate,mk_time_interval,load_routers_interfaces_dropdown,get_counters_and_meters_json,fetch_trp} from "trp_base";
-import {draw_apex_chart} from "application";
+import {draw_apex_chart} from "utils";
 import ShowNewTimeSelector from "show_new_time_selector";
 import TrisProgressBar from "tris_progress_bar";
 import InterfaeGauge from "interface_gauge";
