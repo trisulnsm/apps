@@ -30,6 +30,8 @@ TrisulPlugin = {
         max_records_per_packet = 24,
         tag_template_ids = { "COUNTRY", "TLS-SNI", "HOSTNAME", "ASN", "ALERT" },
         tag_field_max_len = 64,
+        ipfix_enterprise_number = 39499,
+        tag_v9_field_type_base = 200,
       }
     )
     local version = tostring(T.config.netflow_version or "v10"):lower()
@@ -72,6 +74,7 @@ TrisulPlugin = {
       if T.nfgen.state == nil then
         T.nfgen.state = Encoder.new_engine_state(engine:instanceid(), T.config, ts)
       end
+      Encoder.reset_batch(T.nfgen.state)
     end,
 
     onflush = function(engine, flow)
@@ -87,22 +90,40 @@ TrisulPlugin = {
       if state == nil then
         state = Encoder.new_engine_state(engine:instanceid(), T.config, os.time())
         T.nfgen.state = state
+        Encoder.reset_batch(state)
       end
 
-      if T.config.export_only_terminated then
-        local flow_state = flow:state() or 0
-        local SESS_FLOWEND = 0x09C0
-        if bit.band(flow_state, SESS_FLOWEND) == 0 then
-          return
-        end
-      end
-
-      Encoder.maybe_send_templates(state, sender, T.nfgen.fields, os.time(), T.config)
-      Encoder.add_flow_record(state, sender, T.nfgen.fields, flow, os.time(), T.config)
+      local template_key = Encoder.add_flow_record(state, T.nfgen.fields, flow)
+      Encoder.send_batch_if_full(state, sender, T.nfgen.fields, os.time(), T.config, template_key)
     end,
 
     onendflush = function(engine, ts)
-      -- no-op : each flow is exported immediately in onflush
+      if not T.config.enabled then
+        return
+      end
+
+      local sender = T.nfgen.sender
+      if sender == nil or not sender:is_open() then
+        return
+      end
+      local state = T.nfgen.state
+      if state == nil then
+        return
+      end
+      Encoder.flush_all(state, sender, T.nfgen.fields, os.time(), T.config)
+      local stats = Encoder.cycle_stats(state)
+      T.logdebug(
+        string.format(
+          "nfgen flush engine=%s added=%d sent_records=%d sent_packets=%d queued_v4=%d queued_v6=%d seq=%d",
+          tostring(engine:instanceid()),
+          stats.added_records,
+          stats.sent_records,
+          stats.sent_packets,
+          stats.queued_v4,
+          stats.queued_v6,
+          stats.sequence
+        )
+      )
     end,
   },
 }

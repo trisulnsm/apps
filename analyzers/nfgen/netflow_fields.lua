@@ -244,10 +244,30 @@ function NetflowFields.new(config)
     { id = 151, len = 4, kind = "u32", value = function(ctx) return ctx.end_sec end }, -- flowEndSeconds
   }
 
-  local next_tag_field_id = 50000
-  for _, tag_id in ipairs(obj.tag_ids) do
+  -- IPFIX (v10): IE ids with bit 15 set are enterprise-specific and MUST be
+  -- followed by a 4-byte PEN in the template (RFC 7011). Plain ids >= 0x8000
+  -- without PEN corrupt the template and mis-align all following fields.
+  -- We use explicit enterprise encoding via netflow_encoder.build_v10_template_set.
+  local pen = tonumber(config.ipfix_enterprise_number) or 39499
+  local v9_base = tonumber(config.tag_v9_field_type_base) or 200
+  local nfver = tostring(config.netflow_version or "v10"):lower()
+  if nfver == "10" or nfver == "ipfix" then
+    nfver = "v10"
+  elseif nfver == "9" then
+    nfver = "v9"
+  end
+
+  if nfver == "v9" and (#obj.tag_ids > 0) and (v9_base + #obj.tag_ids - 1) >= 0x8000 then
+    if T and T.logerror then
+      T.logerror(
+        "nfgen: tag_v9_field_type_base is too high for tag_template_ids count; "
+          .. "reduce tag_v9_field_type_base or use fewer tag_template_ids"
+      )
+    end
+  end
+
+  for i, tag_id in ipairs(obj.tag_ids) do
     local tf = {
-      id = next_tag_field_id,
       len = obj.tag_field_max_len,
       kind = "string_fixed",
       tag_id = tag_id,
@@ -255,9 +275,16 @@ function NetflowFields.new(config)
         return ctx.tags[tag_id] or ""
       end,
     }
+    if nfver == "v10" then
+      tf.enterprise = true
+      tf.id = i -- local IE number 1..N under ipfix_enterprise_number
+      tf.enterprise_id = pen
+    else
+      tf.enterprise = false
+      tf.id = v9_base + (i - 1)
+    end
     v4[#v4 + 1] = tf
     v6[#v6 + 1] = tf
-    next_tag_field_id = next_tag_field_id + 1
   end
 
   obj.templates = {

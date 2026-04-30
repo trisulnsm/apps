@@ -1,4 +1,5 @@
 local NetflowEncoder = {}
+local bit = require("bit")
 
 local function be_u16(n)
   local v = tonumber(n) or 0
@@ -58,6 +59,13 @@ function NetflowEncoder.new_engine_state(engine_id, config, now_sec)
     last_template_send_packet_count = 0,
     template_id_v4 = tonumber(config.template_id_base) or 256,
     template_id_v6 = (tonumber(config.template_id_base) or 256) + 1,
+    batch = {
+      v4 = {},
+      v6 = {},
+    },
+    cycle_added_records = 0,
+    cycle_sent_records = 0,
+    cycle_sent_packets = 0,
   }
 end
 
@@ -108,7 +116,16 @@ end
 local function build_v10_template_set(template_id, template_fields)
   local field_specs = {}
   for _, field in ipairs(template_fields) do
-    field_specs[#field_specs + 1] = be_u16(field.id) .. be_u16(field.len)
+    -- RFC 7011: enterprise-specific IEs use bit 15 of the IE id and are followed
+    -- by the 4-byte Enterprise Number (8 bytes total per field in the template).
+    if field.enterprise then
+      local local_id = bit.band(tonumber(field.id) or 0, 0x7FFF)
+      local pen = tonumber(field.enterprise_id) or 0
+      field_specs[#field_specs + 1] =
+        be_u16(bit.bor(0x8000, local_id)) .. be_u16(field.len) .. be_u32(pen)
+    else
+      field_specs[#field_specs + 1] = be_u16(field.id) .. be_u16(field.len)
+    end
   end
   local template_record = be_u16(template_id) .. be_u16(#template_fields) .. table.concat(field_specs)
   local body = be_u16(2) .. be_u16(4 + #template_record) .. template_record
@@ -189,32 +206,82 @@ function NetflowEncoder.maybe_send_templates(state, sender, fields, now_sec, con
   end
 end
 
-local function send_single_record(state, sender, template_key, record, now_sec, config)
+function NetflowEncoder.reset_batch(state)
+  state.batch.v4 = {}
+  state.batch.v6 = {}
+  state.cycle_added_records = 0
+  state.cycle_sent_records = 0
+  state.cycle_sent_packets = 0
+end
+
+function NetflowEncoder.is_full(state, config, template_key)
+  local max_per_packet = tonumber(config.max_records_per_packet) or 24
+  if max_per_packet <= 0 then
+    max_per_packet = 1
+  end
+  if template_key then
+    return #state.batch[template_key] >= max_per_packet
+  end
+  return #state.batch.v4 >= max_per_packet or #state.batch.v6 >= max_per_packet
+end
+
+local function send_batch(state, sender, template_key, now_sec, config)
+  local records = state.batch[template_key]
+  if records == nil or #records == 0 then
+    return
+  end
   local template_id = (template_key == "v6") and state.template_id_v6 or state.template_id_v4
   local data_set
   local packet
   if config.netflow_version == "v9" then
-    data_set = build_v9_data_flowset(template_id, { record })
-    packet = build_v9_header(state, now_sec, 1) .. data_set
+    data_set = build_v9_data_flowset(template_id, records)
+    packet = build_v9_header(state, now_sec, #records) .. data_set
   else
-    data_set = build_v10_data_set(template_id, { record })
+    data_set = build_v10_data_set(template_id, records)
     packet = build_v10_header(state, now_sec, #data_set) .. data_set
   end
 
   if sender:send(packet) then
-    state.seq = state.seq + 1
+    state.seq = state.seq + #records
     state.packet_count = state.packet_count + 1
+    state.cycle_sent_records = state.cycle_sent_records + #records
+    state.cycle_sent_packets = state.cycle_sent_packets + 1
+  end
+  state.batch[template_key] = {}
+end
+
+function NetflowEncoder.add_flow_record(state, fields, flow)
+  local key, template_fields, ctx = fields:template_for_flow(flow)
+  local record = encode_record(template_fields, ctx)
+  state.batch[key][#state.batch[key] + 1] = record
+  state.cycle_added_records = state.cycle_added_records + 1
+  return key
+end
+
+function NetflowEncoder.send_batch_if_full(state, sender, fields, now_sec, config, template_key)
+  if NetflowEncoder.is_full(state, config, template_key) then
+    NetflowEncoder.maybe_send_templates(state, sender, fields, now_sec, config)
+    send_batch(state, sender, template_key, now_sec, config)
   end
 end
 
-function NetflowEncoder.add_flow_record(state, sender, fields, flow, now_sec, config)
-  local key, template_fields, ctx = fields:template_for_flow(flow)
-  local record = encode_record(template_fields, ctx)
-  send_single_record(state, sender, key, record, now_sec, config)
+function NetflowEncoder.flush_all(state, sender, fields, now_sec, config)
+  if #state.batch.v4 > 0 or #state.batch.v6 > 0 then
+    NetflowEncoder.maybe_send_templates(state, sender, fields, now_sec, config)
+    send_batch(state, sender, "v4", now_sec, config)
+    send_batch(state, sender, "v6", now_sec, config)
+  end
 end
 
-function NetflowEncoder.flush_all(state, sender, fields, now_sec, config)
-  -- no-op; records are exported immediately in add_flow_record()
+function NetflowEncoder.cycle_stats(state)
+  return {
+    added_records = state.cycle_added_records or 0,
+    sent_records = state.cycle_sent_records or 0,
+    sent_packets = state.cycle_sent_packets or 0,
+    queued_v4 = #state.batch.v4,
+    queued_v6 = #state.batch.v6,
+    sequence = state.seq or 0,
+  }
 end
 
 return NetflowEncoder
