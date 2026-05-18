@@ -1,6 +1,6 @@
 name: NBAD Dashboards
 
-version: 1.0.4
+version: 1.0.5
 
 author: trisul
 
@@ -12,7 +12,7 @@ description:
 
 apptype: dashboard_share
 
-appresources: HTTP_Traffic.json IPv4and6.json L7Metrics.json
+appresources: HTTP_Traffic.json
 
 dependencies :
 
