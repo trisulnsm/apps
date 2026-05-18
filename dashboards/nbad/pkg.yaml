@@ -10,9 +10,9 @@ description:
    long:  |
         info
 
-apptype: dashboard_shared
+apptype: dashboard_share
 
-appresources: HTTP_Traffic.json  IPv4and6.json  L7Metrics.json
+appresources: HTTP_Traffic.json IPv4and6.json L7Metrics.json
 
 dependencies :
 
