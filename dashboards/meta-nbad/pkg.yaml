@@ -1,0 +1,18 @@
+name: Meta-NBAD
+
+version: 1.0.3
+
+author: trisul
+
+
+description:
+   short: Dashboard combining custom trackers, taggers, DDoS Monitor, TCP Analyser, TLS Fingerprinter, Flow Map
+   long:  |
+        info
+
+apptype: meta
+
+appresources: dashboards/nbad dashboards/ddos-monitor dashboards/flood-DNS-Activity analyzers/nfgen analyzers/sni-tls analyzers/tls-print analyzers/tcp-analyzer dashboards/tcp-analyzer-tool
+
+dependencies :
+

@@ -1,6 +1,6 @@
 name: NBAD Dashboards
 
-version: 1.0.2
+version: 1.0.3
 
 author: trisul
 
@@ -10,9 +10,9 @@ description:
    long:  |
         info
 
-apptype: meta
+apptype: dashboard_shared
 
-appresources: dashboards/ddos-monitor dashboards/flood-DNS-Activity analyzers/nfgen analyzers/sni-tls analyzers/tls-print analyzers/tcp-analyzer dashboards/tcp-analyzer-tool
+appresources: gre_tagger.json  gre_tracker.json  HTTP_Traffic.json  IPv4and6.json  L7Metrics.json  Tunnels.json
 
 dependencies :
 
