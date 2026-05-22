@@ -1,0 +1,52 @@
+[
+    [
+        {
+            "name": "Flow Map",
+            "description": "Showing the flows in world map",
+            "author": "trisul",
+            "version": "1.0"
+        }
+    ],
+    [
+        {
+            "id": 10036,
+            "webtrisul_addon_package_id": 1,
+            "trisul_web_user_id": 2,
+            "key": "flowmapapp",
+            "name": "Flow Map",
+            "description": "Dashboard for visualizing live network session flows on a geographic world map",
+            "moduri": "/webtrisul_module/getmod",
+            "axupdateuri": "/newdash/traffic_axsavepos",
+            "collapsedmods": null,
+            "undecoratedmods": "",
+            "pos_head": null,
+            "pos_left": null,
+            "pos_right": null,
+            "pos_foot": null,
+            "pos_top1": null,
+            "pos_top2": null,
+            "pos_mid3": null,
+            "pos_bot2": null,
+            "pos_bot1": null,
+            "pos_mid4": null,
+            "pos_flexi": "10166:w12",
+            "pos_reserved2": null,
+            "pos_reserved3": null,
+            "dashboard_type": null
+        }
+    ],
+    [
+        {
+            "id": 10166,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 107,
+            "name": "Flow map",
+            "description": "Renders session tracker flows as animated arcs between geo-located source and destination endpoints on an interactive map",
+            "options": "{\"url\":\"/sessions/flowmap\",\"url_params_json\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        }
+    ]
+]

@@ -1,0 +1,18 @@
+{
+  "TrisulMenu": {
+    "parent_menu": {
+      "name": "Flow Map",
+      "description": "Showing the flows in world map",
+      "imgurl": "fa fa-globe"
+    },
+    "sub_menus": [
+      {
+        "name": "Flow Map",
+        "description": "Showing the flows in world map",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {"dash_key": "flowmapapp"}
+      }
+    ]
+  }
+}
