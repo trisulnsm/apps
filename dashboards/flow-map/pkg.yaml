@@ -1,0 +1,10 @@
+name: Flow Map
+version: 1.0.0
+author: trisul
+description:
+   short: Geographic visualization of network flows on a world map
+   long: |
+      Plots network session flows as arcs on an interactive world map with geo-located endpoints. Visualize traffic patterns, identify cross-border flows, and drill into session details.
+apptype: dashboard_share
+appresources: flowmap.json flowmap_menu.json
+dependencies:
