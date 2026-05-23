@@ -7,7 +7,7 @@
             %label.col-form-label.col-2 IPs
             .col-10
               %textarea{name:"searchipasn",rows:10}
-              %span.form-help Please enter comma(,) seperated ips or one key per line.
+              %span.form-help Paste any text; IPv4, IPv6, and CIDR subnets are extracted automatically.
       .row.justify-content-center
         .col-auto.align-self-center{style:"padding-top:10px"}
           %input.btn-submit{id:"btn_submit",name:"commit",type:"submit",value:"Search"}
@@ -19,18 +19,8 @@
         .card-header.bg-primary.text-white
           %h5.card-title.text-light
             %i.fa.fa-table.fa-fw 
-            Geo lookup   
-            %small Showing ASNumber path,country,prefix etc..
-        .card-body#geo_lookup
+            Geo and BGP lookup   
+            %small Showing country, ASN, prefix, AS path 
+        .card-body#geo_bgp_lookup
           .animated-background
-          %pre.query_geo_output
-    .col-12.mt-3
-      .card.border-primary
-        .card-header.bg-primary.text-white
-          %h5.card-title.text-light
-            %i.fa.fa-table.fa-fw 
-            BGP lookup   
-            %small Showing ASpath,Prefix,AS
-        .card-body#bgp_lookup
-          .animated-background
-          %pre.query_bgp_output
+          .query_results

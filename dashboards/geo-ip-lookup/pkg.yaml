@@ -1,12 +1,12 @@
 name: Geo IP Lookup
 
-version: 8.0.6
+version: 8.0.8
 
 author: trisul
 
 
 description: 
-   short:   Shows the ip look up
+   short:   Lookup IPs in Geo and BGP databases
    long:  |
       Show ASNumber , ASNumber path,Country etc ..
 
