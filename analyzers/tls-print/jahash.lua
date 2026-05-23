@@ -12,7 +12,7 @@
 local ffi=require('ffi')
 
 local status,C
-for _,lib in ipairs( {'libcrypto.so.1.0.2k', 'libcrypto.so.1.0.0'} )
+for _,lib in ipairs({'libcrypto.so', 'libcrypto.so.3', 'libcrypto.so.1.1', 'libcrypto.so.1.0.2k', 'libcrypto.so.1.0.0'})
 do
   status, C = pcall(function() return  ffi.load(lib) end)
   if status then break end 

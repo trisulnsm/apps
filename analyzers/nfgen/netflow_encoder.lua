@@ -38,12 +38,26 @@ local function pad_fixed_string(s, max_len)
   return raw
 end
 
+-- pad4 is still used for v9 flowsets (v9 length fields do not need to
+-- account for padding, so the old behaviour is correct for v9).
 local function pad4(s)
   local rem = #s % 4
   if rem == 0 then
     return s
   end
   return s .. string.rep("\0", 4 - rem)
+end
+
+-- RFC 7011 §3.3.2: the Set Length field MUST include the Set Header,
+-- all records, AND any trailing padding bytes.  Compute padding first so
+-- the length field written into the wire bytes is already the full padded
+-- size.  This replaces the previous pattern of writing an unpadded length
+-- then calling pad4() on the assembled body.
+local function v10_padded_set(set_id, body_bytes)
+  local base_len  = 4 + #body_bytes          -- 4-byte set header + body
+  local pad_bytes = (4 - (base_len % 4)) % 4 -- 0-3 bytes to reach 32-bit boundary
+  local total_len = base_len + pad_bytes
+  return be_u16(set_id) .. be_u16(total_len) .. body_bytes .. string.rep("\0", pad_bytes)
 end
 
 function NetflowEncoder.new_engine_state(engine_id, config, now_sec)
@@ -109,6 +123,7 @@ local function build_v9_template_flowset(template_id, template_fields)
     field_specs[#field_specs + 1] = be_u16(field.id) .. be_u16(field.len)
   end
   local template_record = be_u16(template_id) .. be_u16(#template_fields) .. table.concat(field_specs)
+  -- v9: FlowSet ID 0, length does not need to cover padding (pad4 appends after).
   local body = be_u16(0) .. be_u16(4 + #template_record) .. template_record
   return pad4(body)
 end
@@ -127,21 +142,29 @@ local function build_v10_template_set(template_id, template_fields)
       field_specs[#field_specs + 1] = be_u16(field.id) .. be_u16(field.len)
     end
   end
+  -- Template record: template ID (2) + field count (2) + field specifiers.
   local template_record = be_u16(template_id) .. be_u16(#template_fields) .. table.concat(field_specs)
-  local body = be_u16(2) .. be_u16(4 + #template_record) .. template_record
-  return pad4(body)
+  -- FIX (Bug 1): Set ID = 2 for IPFIX Template Sets.  v10_padded_set()
+  -- writes the Length field AFTER computing padding so it includes padding bytes,
+  -- satisfying RFC 7011 §3.3.2.
+  return v10_padded_set(2, template_record)
 end
 
 local function build_v9_data_flowset(template_id, records)
   local payload = table.concat(records)
+  -- v9: FlowSet length field does not need to cover the pad4 trailer.
   local body = be_u16(template_id) .. be_u16(4 + #payload) .. payload
   return pad4(body)
 end
 
 local function build_v10_data_set(template_id, records)
   local payload = table.concat(records)
-  local body = be_u16(template_id) .. be_u16(4 + #payload) .. payload
-  return pad4(body)
+  -- FIX (Bug 1): Set ID = template_id (>= 256) for IPFIX Data Sets.
+  -- v10_padded_set() ensures the Length field includes padding bytes,
+  -- satisfying RFC 7011 §3.3.2.  Without this, collectors that use the
+  -- Set Length to advance their parse cursor will mis-align on all sets
+  -- after the first unaligned one and drop the entire IPFIX message.
+  return v10_padded_set(template_id, payload)
 end
 
 local function build_v9_header(state, now_sec, flow_count)
@@ -188,6 +211,8 @@ function NetflowEncoder.send_templates(state, sender, fields, now_sec, config)
     state.packet_count = state.packet_count + 1
     state.last_template_send_sec = now_sec
     state.last_template_send_packet_count = state.packet_count
+    -- Note: template records do NOT count toward the IPFIX sequence number
+    -- (RFC 7011 §3.1), so state.seq is intentionally not incremented here.
   end
 end
 
@@ -242,7 +267,15 @@ local function send_batch(state, sender, template_key, now_sec, config)
   end
 
   if sender:send(packet) then
-    state.seq = state.seq + #records
+    -- FIX (Bug 2): RFC 3954 §8 defines the v9 Sequence Number as a count of
+    -- export *packets* (increment by 1), not records.  RFC 7011 §3.1 defines
+    -- the v10/IPFIX Sequence Number as a count of prior *data records*
+    -- (increment by the number of records in this packet). Thanks to Claude
+    if config.netflow_version == "v9" then
+      state.seq = state.seq + 1
+    else
+      state.seq = state.seq + #records
+    end
     state.packet_count = state.packet_count + 1
     state.cycle_sent_records = state.cycle_sent_records + #records
     state.cycle_sent_packets = state.cycle_sent_packets + 1

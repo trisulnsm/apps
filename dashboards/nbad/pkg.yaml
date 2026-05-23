@@ -1,0 +1,18 @@
+name: NBAD Dashboards
+
+version: 1.0.7
+
+author: trisul
+
+
+description:
+   short: Custom dashboards for HTTP Traffic Monitoring, Tunnel Monitoring, IPv4 and v6 monitoring, L7 Monitoring and custom trackers/taggers
+   long:  |
+        info
+
+apptype: dashboard_share
+
+appresources: gre_tracker.json gre_tagger.json Tunnels.json IPv4and6.json L7Metrics.json HTTP_Traffic.json
+
+dependencies :
+
