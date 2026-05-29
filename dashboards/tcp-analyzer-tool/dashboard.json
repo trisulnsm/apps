@@ -5,7 +5,7 @@
         "id": 10004,
         "webtrisul_addon_package_id": 9,
         "trisul_web_user_id": 2,
-        "key": "tcpanalyzer",
+        "key": "tcpanalyzerk7m2q",
         "name": "TCP Analyzer",
         "description": " Analysis of TCP activity like Retransmission, Latency etc.",
         "moduri": "/webtrisul_module/getmod",
