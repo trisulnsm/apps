@@ -155,7 +155,7 @@ TrisulPlugin = {
 
     control = {
       guid = "{E8D5E68F-B320-49F3-C83D-66751C3B485F}",
-      name = "JA3 PRINT",
+      name = "JA3 FINGERPRINT",
       description = "JA3 TLS Client Hello Hash",
       bucketsize = 60,
     },
