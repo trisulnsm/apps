@@ -1,0 +1,19 @@
+name: SNMP QoS Poller
+
+version: 1.0.0
+
+author: trisul
+
+description:
+   short: SNMP Poller for Cisco CBQOS Traffic
+   long:  |
+      Polls Cisco CBQOS MIB for pre-policy and post-policy traffic per QoS class.
+      Creates QOS-Traffic (aggregated per router/class) and FlowIntf_bx_QOS
+      (per interface/class) counter groups.
+      Requires snmp package on probes and snmp.qosenabled=true on the agent.
+
+apptype: lua
+
+appresources: snmp_qos_walkpoll_key.lua async_tasks.lua mkconfig.lua cg_qos_class.lua cg_qos_traffic.lua cg_flowintf_bx_qos.lua FlowIntf_bx_QOS.json
+
+dependencies:

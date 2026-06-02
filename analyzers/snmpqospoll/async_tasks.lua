@@ -1,0 +1,158 @@
+
+local AsyncTasks= {}
+
+AsyncTasks.data = ""
+
+local GUID_QOS_TRAFFIC     = "{1AB9F248-1E49-4245-571A-55BCDA658843}"
+local GUID_QOS_CLASS       = "{116888A7-23B4-4873-5691-E6E0806CCB11}"
+local GUID_FLOWINTF_BX_QOS = "{D3F7A892-4E1B-4C6D-8A5F-2E1C9B7D4A63}"
+
+-- Cisco CBQOS MIB OIDs
+local OID_QOS_CLASS_NAME   = "1.3.6.1.4.1.9.9.166.1.7.1.1.1"
+local OID_QOS_OBJECT_INDEX = "1.3.6.1.4.1.9.9.166.1.5.1.1.2"
+local OID_QOS_IFINDEX      = "1.3.6.1.4.1.9.9.166.1.1.1.1.4"
+local OID_QOS_PRE_POLICY   = "1.3.6.1.4.1.9.9.166.1.15.1.1.10"
+local OID_QOS_POST_POLICY  = "1.3.6.1.4.1.9.9.166.1.15.1.1.11"
+
+-- execute ASYNC - dont worry about when and where this is called. Trisul will take care of it
+AsyncTasks.onexecute = function(in_data)
+
+	local ipstr_tokey=function(ipstr)
+		local pmatch,_, b1,b2,b3,b4= ipstr:find("(%d+)%.(%d+)%.(%d+)%.(%d+)")
+		return  string.format("%02X.%02X.%02X.%02X", b1,b2,b3,b4)
+	end
+
+	local ipstr_tonetflowkey=function(ipstr,ifindex)
+		local pmatch,_, b1,b2,b3,b4= ipstr:find("(%d+)%.(%d+)%.(%d+)%.(%d+)")
+		return  string.format("%02X.%02X.%02X.%02X_%08X", b1,b2,b3,b4,ifindex)
+	end
+
+	local parse_snmp_value=function(raw)
+		local v = raw:gsub('^%S+:%s*',''):gsub('"',''):gsub('^%s+',''):gsub('%s+$','')
+		return v
+	end
+
+	local do_qos_walk=function(agent,base_oid)
+		local ofile = os.tmpname()
+		os.execute(agent.walk_command.." "..agent.cmdargs.." ."..base_oid.." > "..ofile)
+
+		local ret = {}
+		local h=io.open(ofile)
+		if not h then
+			return ret
+		end
+
+		local escaped = base_oid:gsub("%.", "%%.")
+		local pattern = "%." .. escaped .. "%.([^%s]+)%s+(.+)$"
+
+		for oneline in h:lines()
+		do
+			local idx, rawval = oneline:match(pattern)
+			if idx then
+				ret[idx] = parse_snmp_value(rawval)
+			else
+				print("ERROR in snmp qos output line="..oneline)
+			end
+		end
+		h:close()
+		os.remove(ofile)
+		return ret
+	end
+
+	local JSON=require'JSON'
+	local agent=JSON:decode(in_data);
+	local async_results   =  {
+	  update_counters = {},
+	  update_key_info = {},
+	  add_alerts ={},
+	}
+
+	-- class id -> name  (cbQosPolicyMapName)
+	local class_names = do_qos_walk(agent, OID_QOS_CLASS_NAME)
+	local has_varbinds = next(class_names) ~= nil
+
+	if not has_varbinds then
+		local logmsg = "SNMP QoS Poll Failed for "..agent.agent_ip.." with v"..agent.agent_version
+		T.logerror(logmsg)
+		local dest_ip = ipstr_tokey(agent.agent_ip)
+		local flow_key = "11A:00.00.00.00:p-804D_"..dest_ip..":p-00A1"
+		table.insert(async_results.add_alerts,{ "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",flow_key,"SNMP QoS Poll Failed",1,logmsg} )
+		return JSON:encode(async_results)
+	end
+
+	-- policyIndex.objectsIndex -> class map index
+	local object_index = do_qos_walk(agent, OID_QOS_OBJECT_INDEX)
+
+	-- cbQos policy interface index -> ifIndex
+	local ifindex_map = do_qos_walk(agent, OID_QOS_IFINDEX)
+
+	local ipkey = ipstr_tokey(agent.agent_ip)
+
+	-- update class names periodically
+	if agent.poll_count % 60 == 0 then
+		for class_id, class_name in pairs(class_names) do
+			if class_name ~= "" then
+				table.insert(async_results.update_key_info, { GUID_QOS_CLASS, class_id, class_name })
+			end
+		end
+	end
+
+	local function process_policy_counters(oid, meter_id, qos_aggregate)
+		local counters = do_qos_walk(agent, oid)
+		for idx, rawval in pairs(counters) do
+			local policy_idx = idx:match("^(%d+)%.")
+			local class_id = object_index[idx]
+			local ifindex = policy_idx and ifindex_map[policy_idx]
+			if class_id and ifindex then
+				local val = tonumber(rawval) or 0
+				if val ~= 0 then
+					local ifkey = ipstr_tonetflowkey(agent.agent_ip, tonumber(ifindex))
+					local crosskey = ifkey.."\\"..class_id
+					table.insert(async_results.update_counters, { GUID_FLOWINTF_BX_QOS, crosskey, meter_id, val })
+
+					local aggkey = ipkey.."\\"..class_id
+					qos_aggregate[aggkey] = (qos_aggregate[aggkey] or 0) + val
+				end
+			end
+		end
+	end
+
+	local qos_pre_agg = {}
+	local qos_post_agg = {}
+	process_policy_counters(OID_QOS_PRE_POLICY, 0, qos_pre_agg)
+	process_policy_counters(OID_QOS_POST_POLICY, 1, qos_post_agg)
+
+	for aggkey, val in pairs(qos_pre_agg) do
+		if val ~= 0 then
+			table.insert(async_results.update_counters, { GUID_QOS_TRAFFIC, aggkey, 0, val })
+		end
+	end
+
+	for aggkey, val in pairs(qos_post_agg) do
+		if val ~= 0 then
+			table.insert(async_results.update_counters, { GUID_QOS_TRAFFIC, aggkey, 1, val })
+		end
+	end
+
+	return  JSON:encode(async_results)
+end
+
+-- update the counters after unpacking the JSON response
+AsyncTasks.onresult = function(engine,req,response)
+	local JSON=require'JSON'
+	local async_results=JSON:decode(response)
+	for _,v in ipairs(async_results.update_counters) do
+	  if v[4] ~= 0 then
+		  engine:update_counter(v[1],v[2],v[3],v[4])
+	  end
+	end
+
+	for _,v in ipairs(async_results.update_key_info)  do
+	  engine:update_key_info(v[1],v[2],v[3])
+	end
+	for _,v in ipairs(async_results.add_alerts)  do
+	  engine:add_alert(v[1],v[2],v[3],v[4],v[5])
+	end
+end
+
+return AsyncTasks;
