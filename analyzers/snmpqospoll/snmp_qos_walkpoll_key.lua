@@ -32,6 +32,7 @@ TrisulPlugin = {
   -- load polling targets from DB
   onload = function()
     T.poll_targets =  nil
+    T.dbhash = nil
     T.last_poll_secs=0
     T.snmp_agent_database = T.env.get_config("App>DBRoot").."/config/"..SNMP_DATABASE
     T.async_task = require'async_tasks'
@@ -64,6 +65,8 @@ TrisulPlugin = {
       local new_targets =  TrisulPlugin.load_poll_targets(engine:instanceid(), T.snmp_agent_database)
       if new_targets ~= nil then
         T.poll_targets = new_targets
+      elseif T.poll_targets == nil or #T.poll_targets == 0 then
+        T.log(T.K.loglevel.INFO, "SNMP QoS: no poll targets loaded yet")
       end
 
 	  if T.active_config.DebugMode then
@@ -88,12 +91,11 @@ TrisulPlugin = {
   load_poll_targets = function(engine_id, dbfile)
 
     local dbhash = TrisulPlugin.capture_oscmd("md5sum "..dbfile)
-	if T.poll_targets ~= nil and T.dbhash == dbhash then
+	if T.poll_targets ~= nil and #T.poll_targets > 0 and T.dbhash == dbhash then
         T.logdebug("No change detected in database contents, using existing agent mapping")
-		return nil
+		return T.poll_targets
 	end
-	T.dbhash=dbhash
-	print("DBHash = "..T.dbhash.." file hash "..dbhash)
+	print("DBHash = "..dbhash)
 
     T.log(T.K.loglevel.INFO, "Loading SNMP QoS targets for polling from DB "..dbfile)
 
@@ -160,6 +162,7 @@ TrisulPlugin = {
 		TrisulPlugin.create_commands_for_agent(agent)
 	end
 
+	T.dbhash = dbhash
     return targets
   end,
 

@@ -3,19 +3,18 @@ local AsyncTasks= {}
 
 AsyncTasks.data = ""
 
-local GUID_QOS_TRAFFIC     = "{1AB9F248-1E49-4245-571A-55BCDA658843}"
-local GUID_QOS_CLASS       = "{116888A7-23B4-4873-5691-E6E0806CCB11}"
-local GUID_FLOWINTF_BX_QOS = "{D3F7A892-4E1B-4C6D-8A5F-2E1C9B7D4A63}"
-
--- Cisco CBQOS MIB OIDs
-local OID_QOS_CLASS_NAME   = "1.3.6.1.4.1.9.9.166.1.7.1.1.1"
-local OID_QOS_OBJECT_INDEX = "1.3.6.1.4.1.9.9.166.1.5.1.1.2"
-local OID_QOS_IFINDEX      = "1.3.6.1.4.1.9.9.166.1.1.1.1.4"
-local OID_QOS_PRE_POLICY   = "1.3.6.1.4.1.9.9.166.1.15.1.1.10"
-local OID_QOS_POST_POLICY  = "1.3.6.1.4.1.9.9.166.1.15.1.1.11"
-
 -- execute ASYNC - dont worry about when and where this is called. Trisul will take care of it
 AsyncTasks.onexecute = function(in_data)
+
+	-- Counter group GUIDs and Cisco CBQOS MIB OIDs (inside onexecute: async workers do not see module locals)
+	local GUID_QOS_TRAFFIC     = "{1AB9F248-1E49-4245-571A-55BCDA658843}"
+	local GUID_QOS_CLASS       = "{116888A7-23B4-4873-5691-E6E0806CCB11}"
+	local GUID_FLOWINTF_BX_QOS = "{D3F7A892-4E1B-4C6D-8A5F-2E1C9B7D4A63}"
+	local OID_QOS_CLASS_NAME   = "1.3.6.1.4.1.9.9.166.1.7.1.1.1"
+	local OID_QOS_OBJECT_INDEX = "1.3.6.1.4.1.9.9.166.1.5.1.1.2"
+	local OID_QOS_IFINDEX      = "1.3.6.1.4.1.9.9.166.1.1.1.1.4"
+	local OID_QOS_PRE_POLICY   = "1.3.6.1.4.1.9.9.166.1.15.1.1.10"
+	local OID_QOS_POST_POLICY  = "1.3.6.1.4.1.9.9.166.1.15.1.1.11"
 
 	local ipstr_tokey=function(ipstr)
 		local pmatch,_, b1,b2,b3,b4= ipstr:find("(%d+)%.(%d+)%.(%d+)%.(%d+)")
@@ -32,7 +31,37 @@ AsyncTasks.onexecute = function(in_data)
 		return v
 	end
 
+	-- 1.3.6.1.4.1.9.9.166... -> enterprises.9.9.166... (snmpwalk -O q output)
+	local oid_enterprise_tail=function(base_oid)
+		local rest = base_oid:match("^1%.3%.6%.1%.4%.1%.(.+)$")
+		if rest then
+			return "enterprises." .. rest
+		end
+		return base_oid
+	end
+
+	local parse_qos_line=function(oneline, base_oid)
+		local escaped_num = base_oid:gsub("%.", "%%.")
+		local ent_tail = oid_enterprise_tail(base_oid):gsub("%.", "%%.")
+		local patterns = {
+			"%." .. escaped_num .. "%.([^%s]+)%s+(.+)$",
+			"::" .. ent_tail .. "%.([^%s]+)%s+(.+)$",
+			ent_tail .. "%.([^%s]+)%s+(.+)$",
+		}
+		for _, pat in ipairs(patterns) do
+			local idx, rawval = oneline:match(pat)
+			if idx then
+				return idx, rawval
+			end
+		end
+		return nil, nil
+	end
+
 	local do_qos_walk=function(agent,base_oid)
+		if base_oid == nil or base_oid == "" then
+			T.logerror("SNMP QoS: missing OID for "..tostring(agent.agent_ip))
+			return {}
+		end
 		local ofile = os.tmpname()
 		os.execute(agent.walk_command.." "..agent.cmdargs.." ."..base_oid.." > "..ofile)
 
@@ -42,16 +71,15 @@ AsyncTasks.onexecute = function(in_data)
 			return ret
 		end
 
-		local escaped = base_oid:gsub("%.", "%%.")
-		local pattern = "%." .. escaped .. "%.([^%s]+)%s+(.+)$"
-
 		for oneline in h:lines()
 		do
-			local idx, rawval = oneline:match(pattern)
-			if idx then
-				ret[idx] = parse_snmp_value(rawval)
-			else
-				print("ERROR in snmp qos output line="..oneline)
+			if oneline ~= "" and not oneline:match("^#") then
+				local idx, rawval = parse_qos_line(oneline, base_oid)
+				if idx then
+					ret[idx] = parse_snmp_value(rawval)
+				else
+					T.logdebug("SNMP QoS: unparseable line="..oneline)
+				end
 			end
 		end
 		h:close()
@@ -97,7 +125,7 @@ AsyncTasks.onexecute = function(in_data)
 		end
 	end
 
-	local function process_policy_counters(oid, meter_id, qos_aggregate)
+	local function process_policy_counters(oid, qos_by_class, flowintf_by_key)
 		local counters = do_qos_walk(agent, oid)
 		for idx, rawval in pairs(counters) do
 			local policy_idx = idx:match("^(%d+)%.")
@@ -106,12 +134,12 @@ AsyncTasks.onexecute = function(in_data)
 			if class_id and ifindex then
 				local val = tonumber(rawval) or 0
 				if val ~= 0 then
+					-- QOS-Traffic: resolver is QoS-Class; key is class id only (e.g. 288431494)
+					qos_by_class[class_id] = (qos_by_class[class_id] or 0) + val
+					-- FlowIntf_bx_QOS: flow interface key + class (e.g. 64.62.0B.1D_0000000A\288431494)
 					local ifkey = ipstr_tonetflowkey(agent.agent_ip, tonumber(ifindex))
 					local crosskey = ifkey.."\\"..class_id
-					table.insert(async_results.update_counters, { GUID_FLOWINTF_BX_QOS, crosskey, meter_id, val })
-
-					local aggkey = ipkey.."\\"..class_id
-					qos_aggregate[aggkey] = (qos_aggregate[aggkey] or 0) + val
+					flowintf_by_key[crosskey] = (flowintf_by_key[crosskey] or 0) + val
 				end
 			end
 		end
@@ -119,18 +147,32 @@ AsyncTasks.onexecute = function(in_data)
 
 	local qos_pre_agg = {}
 	local qos_post_agg = {}
-	process_policy_counters(OID_QOS_PRE_POLICY, 0, qos_pre_agg)
-	process_policy_counters(OID_QOS_POST_POLICY, 1, qos_post_agg)
+	local flowintf_pre_agg = {}
+	local flowintf_post_agg = {}
+	process_policy_counters(OID_QOS_PRE_POLICY, qos_pre_agg, flowintf_pre_agg)
+	process_policy_counters(OID_QOS_POST_POLICY, qos_post_agg, flowintf_post_agg)
 
-	for aggkey, val in pairs(qos_pre_agg) do
+	for class_id, val in pairs(qos_pre_agg) do
 		if val ~= 0 then
-			table.insert(async_results.update_counters, { GUID_QOS_TRAFFIC, aggkey, 0, val })
+			table.insert(async_results.update_counters, { GUID_QOS_TRAFFIC, class_id, 0, val })
 		end
 	end
 
-	for aggkey, val in pairs(qos_post_agg) do
+	for class_id, val in pairs(qos_post_agg) do
 		if val ~= 0 then
-			table.insert(async_results.update_counters, { GUID_QOS_TRAFFIC, aggkey, 1, val })
+			table.insert(async_results.update_counters, { GUID_QOS_TRAFFIC, class_id, 1, val })
+		end
+	end
+
+	for crosskey, val in pairs(flowintf_pre_agg) do
+		if val ~= 0 then
+			table.insert(async_results.update_counters, { GUID_FLOWINTF_BX_QOS, crosskey, 0, val })
+		end
+	end
+
+	for crosskey, val in pairs(flowintf_post_agg) do
+		if val ~= 0 then
+			table.insert(async_results.update_counters, { GUID_FLOWINTF_BX_QOS, crosskey, 1, val })
 		end
 	end
 

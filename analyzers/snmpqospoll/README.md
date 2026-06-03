@@ -29,8 +29,8 @@ This APP polls Cisco CBQOS SNMP OIDs and feeds pre-policy and post-policy traffi
 | Name | GUID | Key format |
 |------|------|------------|
 | QoS-Class | `{116888A7-23B4-4873-5691-E6E0806CCB11}` | class ID (e.g. `1593`) |
-| QOS-Traffic | `{1AB9F248-1E49-4245-571A-55BCDA658843}` | `{router_ip}\\{class_id}` |
-| FlowIntf_bx_QOS | `{D3F7A892-4E1B-4C6D-8A5F-2E1C9B7D4A63}` | `{router_ip}_{ifindex}\\{class_id}` |
+| QOS-Traffic | `{1AB9F248-1E49-4245-571A-55BCDA658843}` | `{class_id}` (resolves via QoS-Class) |
+| FlowIntf_bx_QOS | `{D3F7A892-4E1B-4C6D-8A5F-2E1C9B7D4A63}` | `{router_ip}_{ifindex}\\{class_id}` (ifindex is 8-digit hex, e.g. `_0000000A` for 10) |
 
 Each counter group has two meters:
 
