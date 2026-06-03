@@ -13,9 +13,9 @@ AsyncTasks.onexecute = function(in_data)
 	local OID_QOS_CLASS_NAME   = "1.3.6.1.4.1.9.9.166.1.7.1.1.1"
 	local OID_QOS_OBJECT_INDEX = "1.3.6.1.4.1.9.9.166.1.5.1.1.2"
 	local OID_QOS_IFINDEX      = "1.3.6.1.4.1.9.9.166.1.1.1.1.4"
-	local OID_QOS_PRE_POLICY      = "1.3.6.1.4.1.9.9.166.1.15.1.1.10"
-	local OID_QOS_POST_POLICY     = "1.3.6.1.4.1.9.9.166.1.15.1.1.6"
-	local OID_QOS_DROP_BYTES      = "1.3.6.1.4.1.9.9.166.1.15.1.1.17"
+	local OID_QOS_POST_POLICY     = "1.3.6.1.4.1.9.9.166.1.15.1.1.10"
+	local OID_QOS_PRE_POLICY      = "1.3.6.1.4.1.9.9.166.1.15.1.1.6"
+	local OID_QOS_DROP_BYTES      = "1.3.6.1.4.1.9.9.166.1.15.1.1.16"
 	local OID_QOS_QUEUE_BUFFER    = "1.3.6.1.4.1.9.9.166.1.18.1.1.1"
 	local OID_QOS_QUEUE_DROP_PKTS = "1.3.6.1.4.1.9.9.166.1.18.1.1.8"
 	local OID_QOS_QUEUE_DROP_BYTES= "1.3.6.1.4.1.9.9.166.1.18.1.1.4"
@@ -161,8 +161,8 @@ AsyncTasks.onexecute = function(in_data)
 	local qos_aggs = {}
 	local flowintf_aggs = {}
 	local meter_oids = {
-		{ OID_QOS_PRE_POLICY,       0 },
-		{ OID_QOS_POST_POLICY,      1 },
+		{ OID_QOS_POST_POLICY,      0 },
+		{ OID_QOS_PRE_POLICY,       1 },
 		{ OID_QOS_DROP_BYTES,       2 },
 		{ OID_QOS_QUEUE_BUFFER,     3 },
 		{ OID_QOS_QUEUE_DROP_PKTS,  4 },

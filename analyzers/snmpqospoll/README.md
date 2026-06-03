@@ -38,10 +38,10 @@ This APP polls Cisco CBQOS SNMP OIDs and feeds pre-policy and post-policy traffi
 
 Each counter group has six meters (scale factor 1000):
 
-- Meter 0: Pre Policy BW (Bps)
+- Meter 0: Pre Policy (Bps)
 - Meter 1: Post Policy (Bps)
-- Meter 2: Policy Drop BW (Bps)
-- Meter 3: Queue Buffer (Packets, gauge)
+- Meter 2: Drops (Bps)
+- Meter 3: Queue Buffer (packets, gauge)
 - Meter 4: Queue Drops (packets)
 - Meter 5: Queue Drop Bytes (Bps)
 
