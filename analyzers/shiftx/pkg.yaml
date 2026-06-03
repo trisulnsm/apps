@@ -1,6 +1,6 @@
 name: Shift
 
-version: 1.0.1
+version: 1.0.5
 
 author: trisul
 
@@ -11,6 +11,6 @@ description:
 
 apptype: lua
 
-appresources: shiftx.lua mkconfig.lua rbocounter.lua thumbnail.png
+appresources: shiftx.lua shiftx_core.lua shiftx_climb.lua mkconfig.lua rbocounter.lua thumbnail.png
 
 dependencies:  

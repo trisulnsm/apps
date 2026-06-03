@@ -40,6 +40,8 @@ TrisulPlugin = {
         {  2, T.K.vartype.GAUGE, 1000, 0, "JSD", "JSD Score",    "score" },
         {  3, T.K.vartype.GAUGE, 1000, 0, "Composite", "Composite Score",    "score" },
         {  4, T.K.vartype.GAUGE, 1000, 0, "Alert", "Alert",    "trigger" },
+        {  5, T.K.vartype.GAUGE, 1000, 0, "ClimbRate", "Climb Rate",    "wrate" },
+        {  6, T.K.vartype.GAUGE, 1000, 0, "ClimbNote", "Climb Note",    "note" },
       },
   
     },

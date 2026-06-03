@@ -60,9 +60,25 @@ return {
 Defined in `rbocounter.lua` (GUID `{22B6E494-382B-47D5-D914-591CF8572343}`). Each **key** is `{CounterGUID}-{meter}` (meter = source topper meter index). Gauges: RBO, Novelty, JSD, Composite, Alert (meters 0–4). Values are written as **score × 100**.
 
 
+## Track A — rank climb (`shiftx_climb.lua`)
+
+**Log-decay rank velocity** plus filters for stable top-K churn: habitual toppers suppressed; intra-elite shuffles only when fresh (≤1 lookback hit) from rank ≥8; cross-elite only from deep tail (`climb_cross_elite_min_prev`, default 19). `XX` / ASN `0` skipped. Meters **ClimbRate** (5) and **ClimbNote** (6).
+
+Override via `trisulnsm_shiftx.lua`: `climb_wrate_alert`, `climb_log_scale`, `climb_habitual_min_presence`, `climb_cross_elite_min_prev`, etc. (`Climb.default_cfg()`).
+
+Default **`top_n = 30`** (was 10) for topper ingest; JSD/RBO track unchanged.
+
+## Offline testing
+
+See [`test/README.md`](test/README.md) — export `.topi` topper history to Lua fixtures with Ruby, replay through `shiftx_core.lua` + `shiftx_climb.lua` with the Lua harness.
+
 UPDATES
 =======
 
 ````
+1.0.5   May 23 2026      shiftx_climb habitual/fresh/cross-elite filters; stable_m1 harness
+1.0.4   May 23 2026      shiftx_climb log-decay rank weighting (replaces step bands)
+1.0.3   May 23 2026      shiftx_climb.lua Track A rank climb; top_n=30; meters ClimbRate/ClimbNote
+1.0.2   May 23 2026      shiftx_core.lua extract; offline test harness under test/
 1.0.1   Apr 17 2026      First cut
 ```` 
