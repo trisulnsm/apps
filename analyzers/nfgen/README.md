@@ -19,7 +19,7 @@ Example:
 ```lua
 return {
   enabled = true,
-  netflow_version = "v10", -- "v9" or "v10"
+  netflow_version = "v10", -- "v5", "v9" or "v10"
   collector_ip = "127.0.0.1",
   collector_port = 2055,
   template_id_base = 256,

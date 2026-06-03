@@ -1,88 +1,172 @@
 [
-  [
-    {
-      "name": "HTTP Traffic",
-      "description": "HTTP Metrics",
-      "author": "trisul",
-      "version": "1.0"
-    }
-  ],
-  [
-    {
-      "id": 10004,
-      "webtrisul_addon_package_id": 1,
-      "trisul_web_user_id": 2,
-      "key": "dashboard10004",
-      "name": "HTTP Traffic",
-      "description": "HTTP Metrics",
-      "moduri": "/webtrisul_module/getmod",
-      "axupdateuri": "/newdash/traffic_axsavepos",
-      "collapsedmods": null,
-      "undecoratedmods": "",
-      "pos_head": null,
-      "pos_left": null,
-      "pos_right": null,
-      "pos_foot": null,
-      "pos_top1": null,
-      "pos_top2": null,
-      "pos_mid3": null,
-      "pos_bot2": null,
-      "pos_bot1": null,
-      "pos_mid4": null,
-      "pos_flexi": "10015:w6,10016:w6,10017:w6,10018:w6",
-      "pos_reserved2": null,
-      "pos_reserved3": null,
-      "dashboard_type": null
-    }
-  ],
-  [
-    {
-      "id": 10015,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "HTTP Hosts",
-      "description": "Top HTTP Hosts",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{D2AAD7C6-E129-4366-A2AD-A8CB9AA4C2F4}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    },
-    {
-      "id": 10016,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "HTTP Content Types",
-      "description": "Top Content",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{C0C9757F-2005-4CC5-BB96-D72F607E6188}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    },
-    {
-      "id": 10017,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "HTTP Methods",
-      "description": "Top Methods",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{2A6957EB-4992-46CD-8E49-BE32318669D3}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    },
-    {
-      "id": 10018,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "HTTP Status Codes",
-      "description": "Top Status Codes",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{25E80A84-C175-4C01-977C-1411F5D10B56}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    }
-  ]
+    [
+        {
+            "name": "HTTP Traffic",
+            "description": "HTTP Metrics",
+            "author": "trisul",
+            "version": "1.0"
+        }
+    ],
+    [
+        {
+            "id": 10004,
+            "webtrisul_addon_package_id": 1,
+            "trisul_web_user_id": 2,
+            "key": "nbadfttptraffick7m2q",
+            "name": "HTTP Traffic",
+            "description": "HTTP Metrics",
+            "moduri": "/webtrisul_module/getmod",
+            "axupdateuri": "/newdash/traffic_axsavepos",
+            "collapsedmods": "",
+            "undecoratedmods": ",10067,10073,10076,10077",
+            "pos_head": null,
+            "pos_left": null,
+            "pos_right": null,
+            "pos_foot": null,
+            "pos_top1": null,
+            "pos_top2": null,
+            "pos_mid3": null,
+            "pos_bot2": null,
+            "pos_bot1": null,
+            "pos_mid4": null,
+            "pos_flexi": "10067:w3,10073:w3,10076:w3,10077:w3,10058:w8,10082:w4,10168:w6,10170:w6,10169:w6,10171:w6,10062:w12",
+            "pos_reserved2": null,
+            "pos_reserved3": null,
+            "dashboard_type": null
+        }
+    ],
+    [
+        {
+            "id": 10067,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 61,
+            "name": "Total Connections",
+            "description": null,
+            "options": "{\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"statid\":\"7\",\"key\":\"http[[80]]\",\"label\":\"Total Active Connections\",\"color\":\"primary\",\"aggregation\":\"total\",\"show_trends\":0,\"chart_color\":\"#2794eb\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10073,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 61,
+            "name": "Volume of HTTP",
+            "description": null,
+            "options": "{\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"statid\":\"0\",\"key\":\"http[[80]]\",\"label\":\"Total Volume\",\"color\":\"primary\",\"aggregation\":\"total\",\"show_trends\":0,\"chart_color\":\"#2794eb\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10076,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 61,
+            "name": "Unique Hosts",
+            "description": null,
+            "options": "{\"cgguid\":\"{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}\",\"statid\":\"7\",\"key\":\"HTTP Hosts[[{D2AAD7C6-E129-4366-A2AD-A8CB9AA4C2F4}]]\",\"label\":\"Total Hosts\",\"color\":\"primary\",\"aggregation\":\"total\",\"show_trends\":0,\"chart_color\":\"#2794eb\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10077,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 105,
+            "name": "Some Other Metric",
+            "description": null,
+            "options": "{\"counter_group\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"meter\":\"10\",\"key\":\"http[[80]]\",\"label\":\"Total Alerts\",\"color\":\"primary\",\"show_gauge\":0,\"chart_color\":\"#2794eb\",\"probe\":\"probe0\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10058,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 101,
+            "name": "Total HTTP Traffic",
+            "description": "HTTP Visibility",
+            "options": "{\"surface\":\"MRTG\",\"models\":\"[{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"2\\\",\\\"key\\\":\\\"http[[80]]\\\",\\\"label\\\":\\\"Downloaded from outside\\\"},{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"3\\\",\\\"key\\\":\\\"http[[80]]\\\",\\\"label\\\":\\\"Uploaded to outside\\\"}]\",\"refmodel\":\"[{}]\",\"show_table\":0,\"legend_position\":\"top\",\"title\":\"\",\"height\":\"300\",\"key_filter\":\"\",\"inverse_key_filter\":\"\",\"show_range_slider\":0,\"pcap_range_marker\":0,\"show_time_selector\":0,\"cgguid\":\"{03E016FC-46AA-4340-90FC-0E278B93C677}\",\"meter\":\"0\",\"key\":\"\",\"label\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10082,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 102,
+            "name": "Method Type Split",
+            "description": null,
+            "options": "{\"surface\":\"PIE\",\"models\":\"[{\\\"cgguid\\\":\\\"{2A6957EB-4992-46CD-8E49-BE32318669D3}\\\",\\\"meter\\\":\\\"0\\\",\\\"topcount\\\":\\\"10\\\"}]\",\"refmodel\":\"[{}]\",\"show_table\":0,\"legend_position\":\"top\",\"title\":\"\",\"height\":\"300\",\"key_filter\":\"\",\"inverse_key_filter\":\"\",\"show_range_slider\":0,\"pcap_range_marker\":0,\"show_time_selector\":0,\"cgguid\":\"{03E016FC-46AA-4340-90FC-0E278B93C677}\",\"meter\":\"0\",\"key\":\"\",\"label\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10168,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 3,
+            "name": "Top HTTP Hosts",
+            "description": null,
+            "options": "{\"cgguid\":\"{D2AAD7C6-E129-4366-A2AD-A8CB9AA4C2F4}\",\"topcount\":\"5\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10170,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 3,
+            "name": "Top HTTP Status Codes",
+            "description": null,
+            "options": "{\"cgguid\":\"{25E80A84-C175-4C01-977C-1411F5D10B56}\",\"topcount\":\"5\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10169,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 3,
+            "name": "Top HTTP Method Type",
+            "description": null,
+            "options": "{\"cgguid\":\"{2A6957EB-4992-46CD-8E49-BE32318669D3}\",\"topcount\":\"10\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10171,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 3,
+            "name": "Top HTTP Content Types",
+            "description": null,
+            "options": "{\"cgguid\":\"{C0C9757F-2005-4CC5-BB96-D72F607E6188}\",\"topcount\":\"5\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10062,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 111,
+            "name": "Top HTTP URLs",
+            "description": null,
+            "options": "{\"rguid\":\"{4EF9DEB9-4332-4867-A667-6A30C5900E9E}\",\"ip_address\":\"\",\"message_regex\":\"\",\"topcount\":\"10\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        }
+    ]
 ]

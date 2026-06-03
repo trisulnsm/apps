@@ -1,6 +1,6 @@
 name: NetFlow Generator
 
-version: 1.0.4
+version: 1.0.5
 
 author: trisul
 
@@ -8,7 +8,7 @@ description:
   short: Export Trisul flows as NetFlow v9 or IPFIX
   long: |
     Exports Trisul IPv4 and v6 flows to an external collector using
-    NetFlow v9 or IPFIX(v10). Supports IPv4/IPv6 templates, per-engine
+    NetFlow v5, v9 or IPFIX(v10). Supports IPv4/IPv6 templates, per-engine
     domain IDs, periodic template refresh, and config-driven flow tag fields.
 
 apptype: lua

@@ -1,6 +1,6 @@
 name: Meta-NBAD
 
-version: 1.0.4
+version: 1.0.6
 
 author: trisul
 
@@ -12,7 +12,7 @@ description:
 
 apptype: meta
 
-appresources: dashboards/nbad dashboards/ddos-monitor dashboards/flood-DNS-Activity analyzers/nfgen analyzers/sni-tls analyzers/tls-print analyzers/tcp-analyzer dashboards/tcp-analyzer-tool
+appresources: dashboards/nbad dashboards/ddos-monitor dashboards/flood-DNS-Activity analyzers/nfgen analyzers/sni-tls analyzers/suricata-eve-unixsocket analyzers/tls-print analyzers/tcp-analyzer dashboards/tcp-analyzer-tool nbad_menu.json
 
 dependencies :
 

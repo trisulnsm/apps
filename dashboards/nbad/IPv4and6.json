@@ -1,112 +1,124 @@
 [
-  [
-    {
-      "name": "IPv4 / IPv6 Dashboard",
-      "description": "IPv4 and IPv6 breakdown",
-      "author": "trisul",
-      "version": "1.0"
-    }
-  ],
-  [
-    {
-      "id": 10005,
-      "webtrisul_addon_package_id": 1,
-      "trisul_web_user_id": 2,
-      "key": "dashboard10005",
-      "name": "IPv4 / IPv6 Dashboard",
-      "description": "IPv4 and IPv6 breakdown",
-      "moduri": "/webtrisul_module/getmod",
-      "axupdateuri": "/newdash/traffic_axsavepos",
-      "collapsedmods": null,
-      "undecoratedmods": "",
-      "pos_head": null,
-      "pos_left": null,
-      "pos_right": null,
-      "pos_foot": null,
-      "pos_top1": null,
-      "pos_top2": null,
-      "pos_mid3": null,
-      "pos_bot2": null,
-      "pos_bot1": null,
-      "pos_mid4": null,
-      "pos_flexi": "10019,10020,5,146,10021,10022",
-      "pos_reserved2": null,
-      "pos_reserved3": null,
-      "dashboard_type": null
-    }
-  ],
-  [
-    {
-      "id": 10019,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "IPv4 Hosts",
-      "description": "Top IPv4 Hosts",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    },
-    {
-      "id": 10020,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "IPv6 Hosts",
-      "description": "Top IPv6 Hosts",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{9807E97A-6CD2-442F-BB18-8C104C8EB204}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    },
-    {
-      "id": 5,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "Current Top Apps - List",
-      "description": "Top applications by total traffic",
-      "options": "{\"name\":\"Apps\",\"topcount\":10,\"autohref\":{\"autohref\":\"true\"},\"autotooltips\":true,\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"statid\":\"0\",\"ajaxfreq\":300,\"resolve_key\":true}",
-      "stretch_to_fit": 1,
-      "maintain_aspect_ratio": 0,
-      "show_decoration": 1
-    },
-    {
-      "id": 146,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": null,
-      "webtrisul_module_template_id": 1,
-      "name": "Current Apps by conns",
-      "description": "Top applications by connection count ",
-      "options": "{\"name\":\"Apps\",\"topcount\":10,\"autohref\":{\"autohref\":\"false\"},\"autotooltips\":true,\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"statid\":4,\"ajaxfreq\":300}",
-      "stretch_to_fit": 1,
-      "maintain_aspect_ratio": 0,
-      "show_decoration": 1
-    },
-    {
-      "id": 10021,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "Internal Hosts",
-      "description": "Top Internal Hosts",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{889900CC-0063-11A5-8380-FEBDBABBDBEA}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    },
-    {
-      "id": 10022,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "External Hosts",
-      "description": "Top External Hosts",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{00AA77BB-0063-11A5-8380-FEBDBABBDBEA}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    }
-  ]
+    [
+        {
+            "name": "IPv4 / IPv6 Dashboard",
+            "description": "IPv4 and IPv6 breakdown",
+            "author": "trisul",
+            "version": "1.0"
+        }
+    ],
+    [
+        {
+            "id": 10005,
+            "webtrisul_addon_package_id": 1,
+            "trisul_web_user_id": 2,
+            "key": "nbadipv46k7m2q",
+            "name": "IPv4 / IPv6 Dashboard",
+            "description": "IPv4 and IPv6 breakdown",
+            "moduri": "/webtrisul_module/getmod",
+            "axupdateuri": "/newdash/traffic_axsavepos",
+            "collapsedmods": null,
+            "undecoratedmods": ",10086,10087",
+            "pos_head": null,
+            "pos_left": null,
+            "pos_right": null,
+            "pos_foot": null,
+            "pos_top1": null,
+            "pos_top2": null,
+            "pos_mid3": null,
+            "pos_bot2": null,
+            "pos_bot1": null,
+            "pos_mid4": null,
+            "pos_flexi": "10165:w6,10166:w6,10086:w3,10087:w3,10167:w6,10021:w6,10022:w6",
+            "pos_reserved2": null,
+            "pos_reserved3": null,
+            "dashboard_type": null
+        }
+    ],
+    [
+        {
+            "id": 10165,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 3,
+            "name": "Top IPv4 Hosts",
+            "description": null,
+            "options": "{\"cgguid\":\"{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}\",\"topcount\":\"10\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10166,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 3,
+            "name": "Top IPv6 Hosts",
+            "description": null,
+            "options": "{\"cgguid\":\"{9807E97A-6CD2-442F-BB18-8C104C8EB204}\",\"topcount\":\"10\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10086,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 61,
+            "name": "IPv4 Host Count",
+            "description": null,
+            "options": "{\"cgguid\":\"{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}\",\"statid\":\"7\",\"key\":\"Hosts[[{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}]]\",\"label\":\"Unique IPv4 Hosts\",\"color\":\"primary\",\"aggregation\":\"total\",\"show_trends\":0,\"chart_color\":\"#2794eb\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10087,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 61,
+            "name": "IPv6 Host Count",
+            "description": null,
+            "options": "{\"cgguid\":\"{4D88CC23-2883-4DEA-A313-A23B60FE8BDA}\",\"statid\":\"7\",\"key\":\"HostsIPv6[[{9807E97A-6CD2-442F-BB18-8C104C8EB204}]]\",\"label\":\"Unique IPv6 Hosts\",\"color\":\"primary\",\"aggregation\":\"total\",\"show_trends\":0,\"chart_color\":\"#2794eb\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10167,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 3,
+            "name": "Top Apps over IPv4 and IPv6",
+            "description": null,
+            "options": "{\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"topcount\":\"10\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10021,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 1,
+            "name": "Internal Hosts",
+            "description": "Top Internal Hosts",
+            "options": "{\"topcount\":\"10\",\"cgguid\":\"{889900CC-0063-11A5-8380-FEBDBABBDBEA}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10022,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 1,
+            "name": "External Hosts",
+            "description": "Top External Hosts",
+            "options": "{\"topcount\":\"10\",\"cgguid\":\"{00AA77BB-0063-11A5-8380-FEBDBABBDBEA}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        }
+    ]
 ]

@@ -1,88 +1,124 @@
 [
-  [
-    {
-      "name": "Layer 7 Metrics",
-      "description": "L7 Breakdown",
-      "author": "trisul",
-      "version": "1.0"
-    }
-  ],
-  [
-    {
-      "id": 10003,
-      "webtrisul_addon_package_id": 1,
-      "trisul_web_user_id": 2,
-      "key": "dashboard10003",
-      "name": "Layer 7 Metrics",
-      "description": "L7 Breakdown",
-      "moduri": "/webtrisul_module/getmod",
-      "axupdateuri": "/newdash/traffic_axsavepos",
-      "collapsedmods": null,
-      "undecoratedmods": "",
-      "pos_head": null,
-      "pos_left": null,
-      "pos_right": null,
-      "pos_foot": null,
-      "pos_top1": null,
-      "pos_top2": null,
-      "pos_mid3": null,
-      "pos_bot2": null,
-      "pos_bot1": null,
-      "pos_mid4": null,
-      "pos_flexi": "10011:w6,10012:w6,10013:w6,10014:w6",
-      "pos_reserved2": null,
-      "pos_reserved3": null,
-      "dashboard_type": null
-    }
-  ],
-  [
-    {
-      "id": 10011,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "Applications",
-      "description": "Top Applications",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    },
-    {
-      "id": 10012,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "SNI",
-      "description": "Top SNIs",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{38497403-23FB-4206-65C2-0AD5C419DD53}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    },
-    {
-      "id": 10013,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "TLS Root CAs",
-      "description": "Top Root CAs",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{15856A98-7F87-46D7-84D2-18DD549F8A6F}\",\"statid\":\"1\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    },
-    {
-      "id": 10014,
-      "webtrisul_addon_package_id": 1,
-      "webtrisul_addon_package_mod_id": 0,
-      "webtrisul_module_template_id": 1,
-      "name": "TLS Inter CAs",
-      "description": "Top Inter CAs",
-      "options": "{\"topcount\":\"10\",\"cgguid\":\"{15856A98-7F87-46D7-84D2-18DD549F8A6F}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
-      "stretch_to_fit": null,
-      "maintain_aspect_ratio": null,
-      "show_decoration": null
-    }
-  ]
+    [
+        {
+            "name": "Layer 7 Metrics",
+            "description": "L7 Breakdown",
+            "author": "trisul",
+            "version": "1.0"
+        }
+    ],
+    [
+        {
+            "id": 10003,
+            "webtrisul_addon_package_id": 1,
+            "trisul_web_user_id": 2,
+            "key": "nbadlayer7k7m2q",
+            "name": "Layer 7 Metrics",
+            "description": "L7 Breakdown",
+            "moduri": "/webtrisul_module/getmod",
+            "axupdateuri": "/newdash/traffic_axsavepos",
+            "collapsedmods": "",
+            "undecoratedmods": "",
+            "pos_head": null,
+            "pos_left": null,
+            "pos_right": null,
+            "pos_foot": null,
+            "pos_top1": null,
+            "pos_top2": null,
+            "pos_mid3": null,
+            "pos_bot2": null,
+            "pos_bot1": null,
+            "pos_mid4": null,
+            "pos_flexi": "10011:w4,10084:w4,10085:w4,10101:w4,10081:w8,10102:w4,10080:w8",
+            "pos_reserved2": null,
+            "pos_reserved3": null,
+            "dashboard_type": null
+        }
+    ],
+    [
+        {
+            "id": 10011,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 1,
+            "name": "Applications",
+            "description": "Top Applications",
+            "options": "{\"topcount\":\"10\",\"cgguid\":\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10084,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 102,
+            "name": "App Split",
+            "description": null,
+            "options": "{\"surface\":\"PIE\",\"models\":\"[{\\\"cgguid\\\":\\\"{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\\\",\\\"meter\\\":\\\"0\\\",\\\"topcount\\\":\\\"7\\\"}]\",\"refmodel\":\"[{}]\",\"show_table\":1,\"legend_position\":\"top\",\"title\":\"\",\"height\":\"300\",\"key_filter\":\"\",\"inverse_key_filter\":\"\",\"show_range_slider\":0,\"pcap_range_marker\":0,\"show_time_selector\":0,\"cgguid\":\"{03E016FC-46AA-4340-90FC-0E278B93C677}\",\"meter\":\"0\",\"key\":\"\",\"label\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10085,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 102,
+            "name": "DNS Traffic",
+            "description": null,
+            "options": "{\"surface\":\"STACKEDAREA\",\"models\":\"[{\\\"cgguid\\\":\\\"{ABD3C4A5-29AD-17D6-7AC0-822827AB2365}\\\",\\\"meter\\\":\\\"0\\\",\\\"topcount\\\":\\\"5\\\"}]\",\"refmodel\":\"[{}]\",\"show_table\":1,\"legend_position\":\"top\",\"title\":\"\",\"height\":\"300\",\"key_filter\":\"\",\"inverse_key_filter\":\"\",\"show_range_slider\":0,\"pcap_range_marker\":0,\"show_time_selector\":0,\"cgguid\":\"{03E016FC-46AA-4340-90FC-0E278B93C677}\",\"meter\":\"0\",\"key\":\"\",\"label\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10101,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 3,
+            "name": "Top SNIs",
+            "description": null,
+            "options": "{\"cgguid\":\"{38497403-23FB-4206-65C2-0AD5C419DD53}\",\"topcount\":\"10\",\"statid\":\"0\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10081,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 111,
+            "name": "Top SSL Certs",
+            "description": null,
+            "options": "{\"rguid\":\"{5AEE3F0B-9304-44BE-BBD0-0467052CF468}\",\"ip_address\":\"\",\"message_regex\":\"\",\"topcount\":\"5\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10102,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 3,
+            "name": "Top TLS Root CAs",
+            "description": null,
+            "options": "{\"cgguid\":\"{15856A98-7F87-46D7-84D2-18DD549F8A6F}\",\"topcount\":\"10\",\"statid\":\"1\",\"key_filter\":\"\",\"inverse_key_filter\":\"\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        },
+        {
+            "id": 10080,
+            "webtrisul_addon_package_id": 1,
+            "webtrisul_addon_package_mod_id": 0,
+            "webtrisul_module_template_id": 111,
+            "name": "Top DNS Resources",
+            "description": null,
+            "options": "{\"rguid\":\"{D1E27FF0-6D66-4E57-BB91-99F76BB2143E}\",\"ip_address\":\"\",\"message_regex\":\"\",\"topcount\":\"5\"}",
+            "stretch_to_fit": null,
+            "maintain_aspect_ratio": null,
+            "show_decoration": null
+        }
+    ]
 ]
