@@ -20,8 +20,12 @@ TrisulPlugin = {
       resolver_guid = "{116888A7-23B4-4873-5691-E6E0806CCB11}",
     },
     meters = {
-      {  0, T.K.vartype.DELTA_RATE_COUNTER, 100, "bytes", "Pre Policy BW", "Bps" },
-      {  1, T.K.vartype.DELTA_RATE_COUNTER, 100, "bytes", "Post Policy",   "Bps" },
+      {  0, T.K.vartype.DELTA_RATE_COUNTER, 1000, "bytes",   "Pre Policy BW",     "Bps" },
+      {  1, T.K.vartype.DELTA_RATE_COUNTER, 1000, "bytes",   "Post Policy",       "Bps" },
+      {  2, T.K.vartype.DELTA_RATE_COUNTER, 1000, "bytes",   "Drop BW",           "Bps" },
+      {  3, T.K.vartype.GAUGE,              1000, "packets", "Queue Buffer",      "Packets" },
+      {  4, T.K.vartype.DELTA_RATE_COUNTER, 1000, "packets", "Queue Drops",       "packets" },
+      {  5, T.K.vartype.DELTA_RATE_COUNTER, 1000, "bytes",   "Queue Drop Bytes",  "Bps" },
     },
   },
 }

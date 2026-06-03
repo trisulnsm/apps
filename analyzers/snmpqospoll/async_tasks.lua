@@ -13,8 +13,12 @@ AsyncTasks.onexecute = function(in_data)
 	local OID_QOS_CLASS_NAME   = "1.3.6.1.4.1.9.9.166.1.7.1.1.1"
 	local OID_QOS_OBJECT_INDEX = "1.3.6.1.4.1.9.9.166.1.5.1.1.2"
 	local OID_QOS_IFINDEX      = "1.3.6.1.4.1.9.9.166.1.1.1.1.4"
-	local OID_QOS_PRE_POLICY   = "1.3.6.1.4.1.9.9.166.1.15.1.1.10"
-	local OID_QOS_POST_POLICY  = "1.3.6.1.4.1.9.9.166.1.15.1.1.6"
+	local OID_QOS_PRE_POLICY      = "1.3.6.1.4.1.9.9.166.1.15.1.1.10"
+	local OID_QOS_POST_POLICY     = "1.3.6.1.4.1.9.9.166.1.15.1.1.6"
+	local OID_QOS_DROP_BYTES      = "1.3.6.1.4.1.9.9.166.1.15.1.1.17"
+	local OID_QOS_QUEUE_BUFFER    = "1.3.6.1.4.1.9.9.166.1.18.1.1.1"
+	local OID_QOS_QUEUE_DROP_PKTS = "1.3.6.1.4.1.9.9.166.1.18.1.1.8"
+	local OID_QOS_QUEUE_DROP_BYTES= "1.3.6.1.4.1.9.9.166.1.18.1.1.4"
 
 	local ipstr_tokey=function(ipstr)
 		local pmatch,_, b1,b2,b3,b4= ipstr:find("(%d+)%.(%d+)%.(%d+)%.(%d+)")
@@ -145,35 +149,38 @@ AsyncTasks.onexecute = function(in_data)
 		end
 	end
 
-	local qos_pre_agg = {}
-	local qos_post_agg = {}
-	local flowintf_pre_agg = {}
-	local flowintf_post_agg = {}
-	process_policy_counters(OID_QOS_PRE_POLICY, qos_pre_agg, flowintf_pre_agg)
-	process_policy_counters(OID_QOS_POST_POLICY, qos_post_agg, flowintf_post_agg)
-
-	for class_id, val in pairs(qos_pre_agg) do
-		if val ~= 0 then
-			table.insert(async_results.update_counters, { GUID_QOS_TRAFFIC, class_id, 0, val })
+	local function emit_counters(guid, agg, meter_id)
+		for key, val in pairs(agg) do
+			if val ~= 0 then
+				table.insert(async_results.update_counters, { guid, key, meter_id, val })
+			end
 		end
 	end
 
-	for class_id, val in pairs(qos_post_agg) do
-		if val ~= 0 then
-			table.insert(async_results.update_counters, { GUID_QOS_TRAFFIC, class_id, 1, val })
-		end
+	-- meter id -> { qos aggregate, flowintf aggregate }
+	local qos_aggs = {}
+	local flowintf_aggs = {}
+	local meter_oids = {
+		{ OID_QOS_PRE_POLICY,       0 },
+		{ OID_QOS_POST_POLICY,      1 },
+		{ OID_QOS_DROP_BYTES,       2 },
+		{ OID_QOS_QUEUE_BUFFER,     3 },
+		{ OID_QOS_QUEUE_DROP_PKTS,  4 },
+		{ OID_QOS_QUEUE_DROP_BYTES, 5 },
+	}
+	for _, spec in ipairs(meter_oids) do
+		local qos_agg = {}
+		local flowintf_agg = {}
+		process_policy_counters(spec[1], qos_agg, flowintf_agg)
+		qos_aggs[spec[2]] = qos_agg
+		flowintf_aggs[spec[2]] = flowintf_agg
 	end
 
-	for crosskey, val in pairs(flowintf_pre_agg) do
-		if val ~= 0 then
-			table.insert(async_results.update_counters, { GUID_FLOWINTF_BX_QOS, crosskey, 0, val })
-		end
+	for meter_id, qos_agg in pairs(qos_aggs) do
+		emit_counters(GUID_QOS_TRAFFIC, qos_agg, meter_id)
 	end
-
-	for crosskey, val in pairs(flowintf_post_agg) do
-		if val ~= 0 then
-			table.insert(async_results.update_counters, { GUID_FLOWINTF_BX_QOS, crosskey, 1, val })
-		end
+	for meter_id, flowintf_agg in pairs(flowintf_aggs) do
+		emit_counters(GUID_FLOWINTF_BX_QOS, flowintf_agg, meter_id)
 	end
 
 	return  JSON:encode(async_results)

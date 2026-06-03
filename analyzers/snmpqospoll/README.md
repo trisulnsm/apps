@@ -22,7 +22,11 @@ This APP polls Cisco CBQOS SNMP OIDs and feeds pre-policy and post-policy traffi
 | Object/config index → class ID | 1.3.6.1.4.1.9.9.166.1.5.1.1.2 |
 | CBQOS ifIndex → ifIndex | 1.3.6.1.4.1.9.9.166.1.1.1.1.4 |
 | Pre-policy bytes | 1.3.6.1.4.1.9.9.166.1.15.1.1.10 |
-| Post-policy bytes | 1.3.6.1.4.1.9.9.166.1.15.1.1.11 |
+| Post-policy bytes | 1.3.6.1.4.1.9.9.166.1.15.1.1.6 |
+| Policy drop bytes | 1.3.6.1.4.1.9.9.166.1.15.1.1.17 |
+| Queue buffer | 1.3.6.1.4.1.9.9.166.1.18.1.1.1 |
+| Queue drop packets | 1.3.6.1.4.1.9.9.166.1.18.1.1.8 |
+| Queue drop bytes | 1.3.6.1.4.1.9.9.166.1.18.1.1.4 |
 
 ## Counter groups
 
@@ -32,10 +36,14 @@ This APP polls Cisco CBQOS SNMP OIDs and feeds pre-policy and post-policy traffi
 | QOS-Traffic | `{1AB9F248-1E49-4245-571A-55BCDA658843}` | `{class_id}` (resolves via QoS-Class) |
 | FlowIntf_bx_QOS | `{D3F7A892-4E1B-4C6D-8A5F-2E1C9B7D4A63}` | `{router_ip}_{ifindex}\\{class_id}` (ifindex is 8-digit hex, e.g. `_0000000A` for 10) |
 
-Each counter group has two meters:
+Each counter group has six meters (scale factor 1000):
 
 - Meter 0: Pre Policy BW (Bps)
 - Meter 1: Post Policy (Bps)
+- Meter 2: Policy Drop BW (Bps)
+- Meter 3: Queue Buffer (Packets, gauge)
+- Meter 4: Queue Drops (packets)
+- Meter 5: Queue Drop Bytes (Bps)
 
 ## How to use
 
