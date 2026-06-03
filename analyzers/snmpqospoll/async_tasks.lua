@@ -14,7 +14,7 @@ AsyncTasks.onexecute = function(in_data)
 	local OID_QOS_OBJECT_INDEX = "1.3.6.1.4.1.9.9.166.1.5.1.1.2"
 	local OID_QOS_IFINDEX      = "1.3.6.1.4.1.9.9.166.1.1.1.1.4"
 	local OID_QOS_PRE_POLICY   = "1.3.6.1.4.1.9.9.166.1.15.1.1.10"
-	local OID_QOS_POST_POLICY  = "1.3.6.1.4.1.9.9.166.1.15.1.1.11"
+	local OID_QOS_POST_POLICY  = "1.3.6.1.4.1.9.9.166.1.15.1.1.6"
 
 	local ipstr_tokey=function(ipstr)
 		local pmatch,_, b1,b2,b3,b4= ipstr:find("(%d+)%.(%d+)%.(%d+)%.(%d+)")
