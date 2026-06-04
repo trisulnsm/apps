@@ -41,6 +41,7 @@ TrisulPlugin = {
             T.env.get_config("App>DBRoot").."/config/trisulnsm_snmpqospoll.lua",
             {
 				ResolutionSeconds=60,
+				MapRefreshPolls=30,
                 DebugMode=false,
 				IsIPEnabled=function(ip)
 					return true
@@ -79,6 +80,7 @@ TrisulPlugin = {
     schedule_polls  = function(engine, tv)
       if T.poll_targets == nil then return end
       for _,agent in ipairs(T.poll_targets) do
+        agent.map_refresh_polls = T.active_config.MapRefreshPolls
         T.async_task.data =JSON:encode(agent)
         T.async:schedule ( T.async_task)
 		agent.poll_count=agent.poll_count+1

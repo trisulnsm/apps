@@ -12,6 +12,7 @@ AsyncTasks.onexecute = function(in_data)
 	local GUID_FLOWINTF_BX_QOS = "{D3F7A892-4E1B-4C6D-8A5F-2E1C9B7D4A63}"
 	local OID_QOS_CLASS_NAME   = "1.3.6.1.4.1.9.9.166.1.7.1.1.1"
 	local OID_QOS_OBJECT_INDEX = "1.3.6.1.4.1.9.9.166.1.5.1.1.2"
+	local OID_QOS_CONFIG_INDEX = "1.3.6.1.4.1.9.9.166.1.5.1.1.4"
 	local OID_QOS_IFINDEX      = "1.3.6.1.4.1.9.9.166.1.1.1.1.4"
 	local OID_QOS_POST_POLICY     = "1.3.6.1.4.1.9.9.166.1.15.1.1.10"
 	local OID_QOS_PRE_POLICY      = "1.3.6.1.4.1.9.9.166.1.15.1.1.6"
@@ -99,51 +100,87 @@ AsyncTasks.onexecute = function(in_data)
 	  add_alerts ={},
 	}
 
-	-- class id -> name  (cbQosPolicyMapName)
-	local class_names = do_qos_walk(agent, OID_QOS_CLASS_NAME)
-	local has_varbinds = next(class_names) ~= nil
-
-	if not has_varbinds then
-		local logmsg = "SNMP QoS Poll Failed for "..agent.agent_ip.." with v"..agent.agent_version
-		T.logerror(logmsg)
-		local dest_ip = ipstr_tokey(agent.agent_ip)
-		local flow_key = "11A:00.00.00.00:p-804D_"..dest_ip..":p-00A1"
-		table.insert(async_results.add_alerts,{ "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",flow_key,"SNMP QoS Poll Failed",1,logmsg} )
-		return JSON:encode(async_results)
+	local map_refresh_polls = tonumber(agent.map_refresh_polls) or 30
+	if map_refresh_polls < 1 then
+		map_refresh_polls = 30
 	end
+	local refresh_map = agent.qos_map_cache == nil
+		or agent.poll_count % map_refresh_polls == 0
 
-	-- policyIndex.objectsIndex -> class map index
-	local object_index = do_qos_walk(agent, OID_QOS_OBJECT_INDEX)
-
-	-- cbQos policy interface index -> ifIndex
-	local ifindex_map = do_qos_walk(agent, OID_QOS_IFINDEX)
-
-	local ipkey = ipstr_tokey(agent.agent_ip)
-
-	-- update class names periodically
-	if agent.poll_count % 60 == 0 then
+	local class_names, object_index, config_index, ifindex_map
+	if refresh_map then
+		class_names = do_qos_walk(agent, OID_QOS_CLASS_NAME)
+		if next(class_names) == nil then
+			local logmsg = "SNMP QoS Poll Failed for "..agent.agent_ip.." with v"..agent.agent_version
+			T.logerror(logmsg)
+			local dest_ip = ipstr_tokey(agent.agent_ip)
+			local flow_key = "11A:00.00.00.00:p-804D_"..dest_ip..":p-00A1"
+			table.insert(async_results.add_alerts,{ "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",flow_key,"SNMP QoS Poll Failed",1,logmsg} )
+			return JSON:encode(async_results)
+		end
+		-- ifIndex.configIndex -> class id (cbQosObjectsIndex)
+		object_index = do_qos_walk(agent, OID_QOS_OBJECT_INDEX)
+		-- ifIndex.policyIndex -> configIndex (queue lookup chain)
+		config_index = do_qos_walk(agent, OID_QOS_CONFIG_INDEX)
+		-- cbQos policy index -> ifIndex
+		ifindex_map = do_qos_walk(agent, OID_QOS_IFINDEX)
+		async_results.qos_map_cache = {
+			agent_ip = agent.agent_ip,
+			class_names = class_names,
+			object_index = object_index,
+			config_index = config_index,
+			ifindex_map = ifindex_map,
+		}
 		for class_id, class_name in pairs(class_names) do
 			if class_name ~= "" then
 				table.insert(async_results.update_key_info, { GUID_QOS_CLASS, class_id, class_name })
 			end
 		end
+	else
+		class_names = agent.qos_map_cache.class_names
+		object_index = agent.qos_map_cache.object_index
+		config_index = agent.qos_map_cache.config_index or {}
+		ifindex_map = agent.qos_map_cache.ifindex_map
 	end
 
+	local function add_counter(qos_by_class, flowintf_by_key, class_id, ifindex, rawval)
+		local val = tonumber(rawval) or 0
+		if val == 0 then
+			return
+		end
+		qos_by_class[class_id] = (qos_by_class[class_id] or 0) + val
+		local ifkey = ipstr_tonetflowkey(agent.agent_ip, tonumber(ifindex))
+		local crosskey = ifkey.."\\"..class_id
+		flowintf_by_key[crosskey] = (flowintf_by_key[crosskey] or 0) + val
+	end
+
+	-- policy stats (1.15): index is policyIndex.classObjectIndex; class id is second component
 	local function process_policy_counters(oid, qos_by_class, flowintf_by_key)
 		local counters = do_qos_walk(agent, oid)
 		for idx, rawval in pairs(counters) do
-			local policy_idx = idx:match("^(%d+)%.")
-			local class_id = object_index[idx]
+			local policy_idx, class_id = idx:match("^(%d+)%.(%d+)$")
 			local ifindex = policy_idx and ifindex_map[policy_idx]
 			if class_id and ifindex then
-				local val = tonumber(rawval) or 0
-				if val ~= 0 then
-					-- QOS-Traffic: resolver is QoS-Class; key is class id only (e.g. 288431494)
-					qos_by_class[class_id] = (qos_by_class[class_id] or 0) + val
-					-- FlowIntf_bx_QOS: flow interface key + class (e.g. 64.62.0B.1D_0000000A\288431494)
-					local ifkey = ipstr_tonetflowkey(agent.agent_ip, tonumber(ifindex))
-					local crosskey = ifkey.."\\"..class_id
-					flowintf_by_key[crosskey] = (flowintf_by_key[crosskey] or 0) + val
+				add_counter(qos_by_class, flowintf_by_key, class_id, ifindex, rawval)
+			end
+		end
+	end
+
+	-- queue stats (1.18): resolve policyIndex.configIndex -> class via ifIndex + object_index
+	local function process_queue_counters(oid, qos_by_class, flowintf_by_key)
+		local counters = do_qos_walk(agent, oid)
+		for idx, rawval in pairs(counters) do
+			local policy_idx, second_idx = idx:match("^(%d+)%.(%d+)$")
+			local ifindex = policy_idx and ifindex_map[policy_idx]
+			if ifindex and second_idx then
+				local config_idx = second_idx
+				local class_id = object_index[ifindex.."."..config_idx]
+				if not class_id then
+					config_idx = config_index[ifindex.."."..policy_idx]
+					class_id = config_idx and object_index[ifindex.."."..config_idx]
+				end
+				if class_id then
+					add_counter(qos_by_class, flowintf_by_key, class_id, ifindex, rawval)
 				end
 			end
 		end
@@ -157,21 +194,30 @@ AsyncTasks.onexecute = function(in_data)
 		end
 	end
 
-	-- meter id -> { qos aggregate, flowintf aggregate }
+	-- policy meters polled every cycle; queue meters use cached ifIndex.configIndex map
 	local qos_aggs = {}
 	local flowintf_aggs = {}
-	local meter_oids = {
-		{ OID_QOS_POST_POLICY,      0 },
-		{ OID_QOS_PRE_POLICY,       1 },
-		{ OID_QOS_DROP_BYTES,       2 },
+	local policy_meter_oids = {
+		{ OID_QOS_POST_POLICY, 0 },
+		{ OID_QOS_PRE_POLICY,  1 },
+		{ OID_QOS_DROP_BYTES,  2 },
+	}
+	local queue_meter_oids = {
 		{ OID_QOS_QUEUE_BUFFER,     3 },
 		{ OID_QOS_QUEUE_DROP_PKTS,  4 },
 		{ OID_QOS_QUEUE_DROP_BYTES, 5 },
 	}
-	for _, spec in ipairs(meter_oids) do
+	for _, spec in ipairs(policy_meter_oids) do
 		local qos_agg = {}
 		local flowintf_agg = {}
 		process_policy_counters(spec[1], qos_agg, flowintf_agg)
+		qos_aggs[spec[2]] = qos_agg
+		flowintf_aggs[spec[2]] = flowintf_agg
+	end
+	for _, spec in ipairs(queue_meter_oids) do
+		local qos_agg = {}
+		local flowintf_agg = {}
+		process_queue_counters(spec[1], qos_agg, flowintf_agg)
 		qos_aggs[spec[2]] = qos_agg
 		flowintf_aggs[spec[2]] = flowintf_agg
 	end
@@ -201,6 +247,14 @@ AsyncTasks.onresult = function(engine,req,response)
 	end
 	for _,v in ipairs(async_results.add_alerts)  do
 	  engine:add_alert(v[1],v[2],v[3],v[4],v[5])
+	end
+	if async_results.qos_map_cache and async_results.qos_map_cache.agent_ip and T.poll_targets then
+		for _, agent in ipairs(T.poll_targets) do
+			if agent.agent_ip == async_results.qos_map_cache.agent_ip then
+				agent.qos_map_cache = async_results.qos_map_cache
+				break
+			end
+		end
 	end
 end
 
