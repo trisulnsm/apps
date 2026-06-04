@@ -180,17 +180,15 @@ AsyncTasks.onexecute = function(in_data)
 
 	-- Queue (1.18): 3-level lookup
 	--   counter policyIndex.queueIndex -> 1.5.1.1.4 -> configIndex
-	--     -> ifIndex via policy map -> 1.5.1.1.2 -> class id -> 1.7.1.1.1 name
-	--   e.g. 18.196611 -> config_index[18.196611]=196608 -> object_index[114.196608]=288431494
+	--     -> 1.5.1.1.2 -> class id -> 1.7.1.1.1 name
+	--   e.g. 18.196611 -> config_index[18.196611]=196608 -> object_index[18.196608]=288431494
+	--   (some devices key 1.5.1.1.2 by ifIndex.configIndex instead of policyIndex.configIndex)
 	local function resolve_queue_class_and_ifindex(idx)
 		local policy_idx, queue_idx = idx:match("^(%d+)%.(%d+)$")
 		if not policy_idx or not queue_idx then
 			return nil, nil
 		end
-		local ifindex = ifindex_map[policy_idx]
-		if not ifindex then
-			return nil, nil
-		end
+		local ifindex = ifindex_map[policy_idx] or policy_idx
 		-- level 1: counter index -> configIndex via 1.5.1.1.4
 		local config_idx = config_index[idx]
 			or config_index[policy_idx.."."..queue_idx]
@@ -198,8 +196,9 @@ AsyncTasks.onexecute = function(in_data)
 		if not config_idx then
 			return nil, nil
 		end
-		-- level 2: ifIndex.configIndex -> class id via 1.5.1.1.2
-		local class_id = object_index[ifindex.."."..config_idx]
+		-- level 2: policyIndex.configIndex or ifIndex.configIndex -> class id via 1.5.1.1.2
+		local class_id = object_index[policy_idx.."."..config_idx]
+			or object_index[ifindex.."."..config_idx]
 		return class_id, ifindex
 	end
 
