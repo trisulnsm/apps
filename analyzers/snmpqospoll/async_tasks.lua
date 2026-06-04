@@ -104,6 +104,7 @@ AsyncTasks.onexecute = function(in_data)
 	if map_refresh_polls < 1 then
 		map_refresh_polls = 30
 	end
+	-- nil cache: first poll loads mapping immediately; thereafter refresh every MapRefreshPolls
 	local refresh_map = agent.qos_map_cache == nil
 		or agent.poll_count % map_refresh_polls == 0
 
@@ -118,11 +119,11 @@ AsyncTasks.onexecute = function(in_data)
 			table.insert(async_results.add_alerts,{ "{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",flow_key,"SNMP QoS Poll Failed",1,logmsg} )
 			return JSON:encode(async_results)
 		end
-		-- ifIndex.configIndex -> class id (cbQosObjectsIndex)
+		-- 1.5.1.1.2: ifIndex.configIndex -> class id
 		object_index = do_qos_walk(agent, OID_QOS_OBJECT_INDEX)
-		-- ifIndex.policyIndex -> configIndex (queue lookup chain)
+		-- 1.5.1.1.4: policyIndex.queueIndex (or ifIndex.queueIndex) -> configIndex
 		config_index = do_qos_walk(agent, OID_QOS_CONFIG_INDEX)
-		-- cbQos policy index -> ifIndex
+		-- 1.1.1.1.4: policyIndex -> ifIndex
 		ifindex_map = do_qos_walk(agent, OID_QOS_IFINDEX)
 		async_results.qos_map_cache = {
 			agent_ip = agent.agent_ip,
@@ -154,34 +155,65 @@ AsyncTasks.onexecute = function(in_data)
 		flowintf_by_key[crosskey] = (flowintf_by_key[crosskey] or 0) + val
 	end
 
-	-- policy stats (1.15): index is policyIndex.classObjectIndex; class id is second component
-	local function process_policy_counters(oid, qos_by_class, flowintf_by_key)
-		local counters = do_qos_walk(agent, oid)
-		for idx, rawval in pairs(counters) do
-			local policy_idx, class_id = idx:match("^(%d+)%.(%d+)$")
-			local ifindex = policy_idx and ifindex_map[policy_idx]
-			if class_id and ifindex then
-				add_counter(qos_by_class, flowintf_by_key, class_id, ifindex, rawval)
+	-- Policy (1.15): 2-level lookup
+	--   counter policyIndex.configIndex -> 1.5.1.1.2 -> class id -> 1.7.1.1.1 name
+	--   e.g. 18.65536 -> object_index[18.65536]=1593
+	local function resolve_policy_class_and_ifindex(idx)
+		local policy_idx, config_idx = idx:match("^(%d+)%.(%d+)$")
+		if not policy_idx or not config_idx then
+			return nil, nil
+		end
+		-- level 1: counter index -> class id via 1.5.1.1.2
+		local class_id = object_index[idx]
+		if not class_id then
+			local ifindex = ifindex_map[policy_idx]
+			if ifindex then
+				class_id = object_index[ifindex.."."..config_idx]
 			end
 		end
+		if not class_id then
+			return nil, nil
+		end
+		local ifindex = ifindex_map[policy_idx] or policy_idx
+		return class_id, ifindex
 	end
 
-	-- queue stats (1.18): resolve policyIndex.configIndex -> class via ifIndex + object_index
-	local function process_queue_counters(oid, qos_by_class, flowintf_by_key)
+	-- Queue (1.18): 3-level lookup
+	--   counter policyIndex.queueIndex -> 1.5.1.1.4 -> configIndex
+	--     -> ifIndex via policy map -> 1.5.1.1.2 -> class id -> 1.7.1.1.1 name
+	--   e.g. 18.196611 -> config_index[18.196611]=196608 -> object_index[114.196608]=288431494
+	local function resolve_queue_class_and_ifindex(idx)
+		local policy_idx, queue_idx = idx:match("^(%d+)%.(%d+)$")
+		if not policy_idx or not queue_idx then
+			return nil, nil
+		end
+		local ifindex = ifindex_map[policy_idx]
+		if not ifindex then
+			return nil, nil
+		end
+		-- level 1: counter index -> configIndex via 1.5.1.1.4
+		local config_idx = config_index[idx]
+			or config_index[policy_idx.."."..queue_idx]
+			or config_index[ifindex.."."..queue_idx]
+		if not config_idx then
+			return nil, nil
+		end
+		-- level 2: ifIndex.configIndex -> class id via 1.5.1.1.2
+		local class_id = object_index[ifindex.."."..config_idx]
+		return class_id, ifindex
+	end
+
+	local function process_qos_counters(oid, qos_by_class, flowintf_by_key, is_queue)
 		local counters = do_qos_walk(agent, oid)
 		for idx, rawval in pairs(counters) do
-			local policy_idx, second_idx = idx:match("^(%d+)%.(%d+)$")
-			local ifindex = policy_idx and ifindex_map[policy_idx]
-			if ifindex and second_idx then
-				local config_idx = second_idx
-				local class_id = object_index[ifindex.."."..config_idx]
-				if not class_id then
-					config_idx = config_index[ifindex.."."..policy_idx]
-					class_id = config_idx and object_index[ifindex.."."..config_idx]
-				end
-				if class_id then
-					add_counter(qos_by_class, flowintf_by_key, class_id, ifindex, rawval)
-				end
+			local class_id, ifindex
+			if is_queue then
+				class_id, ifindex = resolve_queue_class_and_ifindex(idx)
+			else
+				class_id, ifindex = resolve_policy_class_and_ifindex(idx)
+			end
+			if class_id and ifindex then
+				add_counter(qos_by_class, flowintf_by_key, class_id, ifindex, rawval)
 			end
 		end
 	end
@@ -210,14 +242,14 @@ AsyncTasks.onexecute = function(in_data)
 	for _, spec in ipairs(policy_meter_oids) do
 		local qos_agg = {}
 		local flowintf_agg = {}
-		process_policy_counters(spec[1], qos_agg, flowintf_agg)
+		process_qos_counters(spec[1], qos_agg, flowintf_agg, false)
 		qos_aggs[spec[2]] = qos_agg
 		flowintf_aggs[spec[2]] = flowintf_agg
 	end
 	for _, spec in ipairs(queue_meter_oids) do
 		local qos_agg = {}
 		local flowintf_agg = {}
-		process_queue_counters(spec[1], qos_agg, flowintf_agg)
+		process_qos_counters(spec[1], qos_agg, flowintf_agg, true)
 		qos_aggs[spec[2]] = qos_agg
 		flowintf_aggs[spec[2]] = flowintf_agg
 	end
