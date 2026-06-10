@@ -38,7 +38,7 @@ TrisulPlugin = {
     T.async_task = require'async_tasks'
 
     T.active_config = make_config(
-            T.env.get_config("App>DBRoot").."/config/trisulnsm_snmpqospoll.lua",
+            T.env.get_config("//App/DBRoot").."/config/trisulnsm_snmpqospoll.lua",
             {
 				ResolutionSeconds=60,
 				MapRefreshPolls=30,
