@@ -1,0 +1,17 @@
+name: File ARP Mapper
+
+version: 1.0.0
+
+author: trisul
+
+description: 
+   short: File ARP Table to MAC Flow Tagger
+   long:  |
+      Reads ARP/SSM JSON-line records from the latest file in a directory
+      and adds MAC addresses to flows matching LAN (ipa/ipz) or WAN (natip) IPs
+
+apptype: lua
+
+appresources: file-arp-flowtagger.lua mkconfig.lua 
+
+dependencies:  
