@@ -81,6 +81,14 @@ TrisulPlugin = {
 				return
 			end
 
+			-- already loaded this file, reuse cached entries (no re-unzip/parse)
+			if latest_file == T.last_file then
+				if T.active_config.DebugMode then
+					print("[file-arp-mapper] latest file unchanged, reusing cached entries = " .. latest_file)
+				end
+				return
+			end
+
 			local new_arp_entries = TrisulPlugin.load_arp_entries(latest_file)
 			if new_arp_entries ~= nil then
 				T.arp_entries = new_arp_entries
@@ -136,11 +144,20 @@ TrisulPlugin = {
 			T.last_file = filename
 		end
 
+		-- gzipped files (.gz) are read by piping through gunzip, plain files
+		-- are opened directly
+		local is_gzip = filename:sub(-3) == ".gz"
+
 		if T.active_config.DebugMode then
-			print("[file-arp-mapper] loading file = " .. filename)
+			print("[file-arp-mapper] loading file = " .. filename .. (is_gzip and " (gzip)" or " (plain)"))
 		end
 
-		local h = io.open(filename, "r")
+		local h
+		if is_gzip then
+			h = io.popen("gunzip -c '" .. filename .. "' 2>/dev/null", "r")
+		else
+			h = io.open(filename, "r")
+		end
 		if h == nil then
 			T.logerror("Could not open ARP file " .. filename)
 			return nil
