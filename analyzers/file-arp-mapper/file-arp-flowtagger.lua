@@ -114,9 +114,17 @@ TrisulPlugin = {
 	-- find the most recently modified file in dir whose name starts with prefix
 	find_latest_file = function(dir, prefix)
 		local cmd = "ls -1t " .. dir .. "/" .. prefix .. "* 2>/dev/null | head -1"
+		if T.active_config.DebugMode then
+			print("[file-arp-mapper] FilePath  = " .. dir)
+			print("[file-arp-mapper] FilePrefix= " .. prefix)
+			print("[file-arp-mapper] command   = " .. cmd)
+		end
 		local latest = TrisulPlugin.capture_oscmd(cmd)
 		if latest == nil or #latest == 0 then
 			return nil
+		end
+		if T.active_config.DebugMode then
+			print("[file-arp-mapper] latest file = " .. latest)
 		end
 		return latest
 	end,
@@ -126,6 +134,10 @@ TrisulPlugin = {
 		if T.last_file ~= filename then
 			T.log(T.K.loglevel.INFO, "Loading ARP entries from file " .. filename)
 			T.last_file = filename
+		end
+
+		if T.active_config.DebugMode then
+			print("[file-arp-mapper] loading file = " .. filename)
 		end
 
 		local h = io.open(filename, "r")
@@ -157,6 +169,14 @@ TrisulPlugin = {
 			end
 		end
 		h:close()
+
+		if T.active_config.DebugMode then
+			local ip_count = 0
+			for _ in pairs(ret) do
+				ip_count = ip_count + 1
+			end
+			print("[file-arp-mapper] loaded " .. ip_count .. " IP -> MAC entries from " .. filename)
+		end
 
 		return ret
 	end,
