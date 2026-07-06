@@ -26,7 +26,7 @@ TrisulPlugin = {
   },
   onload = function()
     T.active_config = make_config(
-      T.env.get_config("//App/DBRoot").."/config/trisulnsm_ip_mac.lua",
+      T.env.get_config("App>DBRoot").."/config/trisulnsm_ip_mac.lua",
       {
         PacketCount = 0,
         SamplingRate = 1
