@@ -84,7 +84,7 @@ TrisulPlugin = {
 			-- already loaded this file, reuse cached entries (no re-unzip/parse)
 			if latest_file == T.last_file then
 				if T.active_config.DebugMode then
-					print("[file-arp-mapper] latest file unchanged, reusing cached entries = " .. latest_file)
+					print("[file-arp-mapper] latest file unchanged, reusing cached entries = " .. latest_file .. ", old file = " .. tostring(T.last_file))
 				end
 				return
 			end
@@ -92,6 +92,9 @@ TrisulPlugin = {
 			local new_arp_entries = TrisulPlugin.load_arp_entries(latest_file)
 			if new_arp_entries ~= nil then
 				T.arp_entries = new_arp_entries
+				-- only mark this file as loaded once it parsed successfully, so a
+				-- failed load is retried on the next poll instead of being cached
+				T.last_file = latest_file
 			end
 
 			if T.active_config.DebugMode then
@@ -139,10 +142,7 @@ TrisulPlugin = {
 
 	-- read JSON-line records from file and build an ip_address -> mac_address map
 	load_arp_entries = function(filename)
-		if T.last_file ~= filename then
-			T.log(T.K.loglevel.INFO, "Loading ARP entries from file " .. filename)
-			T.last_file = filename
-		end
+		T.log(T.K.loglevel.INFO, "Loading ARP entries from file " .. filename)
 
 		-- gzipped files (.gz) are read by piping through gunzip, plain files
 		-- are opened directly
