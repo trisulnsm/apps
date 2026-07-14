@@ -161,6 +161,7 @@ TrisulPlugin = {
             engine:update_counter(COUNTERID_FLOWGEN, ipkey, 0, #syslogstr)
             engine:update_counter(COUNTERID_FLOWGEN, ipkey, 1, #syslogstr)
             engine:update_counter(COUNTERID_FLOWGEN, ipkey, 2, 1)
+			engine:update_counter(COUNTERID_FLOWGEN, ipkey, 15, 1) -- syslog (even if not matched to flow) 
 
             -- maintain the netflow.feed_type=SYSLOG attribute for this source IP.
             -- new IP  -> tag immediately
