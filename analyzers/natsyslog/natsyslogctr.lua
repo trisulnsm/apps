@@ -70,11 +70,13 @@ TrisulPlugin = {
     -- 
     -- WHEN CALLED : your LUA script is loaded into Trisul 
     onload = function()
+        -- Unused fields use non-capturing groups to keep BitState cheaper.
         T.re2_NetElasticBNGNATSyslog = T.re2(
-            'NAT\\s+\\d+\\s+(SADD|SDEL)\\s\\[nsess\\sTRIG="(\\w+)"\\sPROTO="(\\d+)"\\sSSUBIX="(\\d)"\\sIATYP="(\\w+)"\\sUSERNAME="(\\w+)"\\sISADDR="(\\S+)"\\sIDADDR="(\\S+)"\\sISPORT="(\\d+)"\\sIDPORT="(\\d+)"\\sXATYP="(\\w+)"\\sXSADDR="(\\S+)"\\sXDADDR="(\\S+)"\\sXSPORT="(\\d+)"\\sXDPORT="(\\d+)"\\]\\stime=\'(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})\'')
+            'NAT\\s+\\d+\\s+(SADD|SDEL)\\s\\[nsess\\sTRIG="\\w+"\\sPROTO="(\\d+)"\\sSSUBIX="\\d"\\sIATYP="\\w+"\\sUSERNAME="(\\w+)"\\sISADDR="(\\S+)"\\sIDADDR="(\\S+)"\\sISPORT="(\\d+)"\\sIDPORT="(\\d+)"\\sXATYP="\\w+"\\sXSADDR="(\\S+)"\\sXDADDR="\\S+"\\sXSPORT="(\\d+)"\\sXDPORT="\\d+"\\]\\stime=\'(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})\'')
 
+        -- No leading .*; PartialMatch already searches from any offset.
         T.re2_HuaweiNATSyslog = T.re2(
-            ".*<NAT444>:<(\\w+)>\\s(\\d+)\\|(\\d+|-)\\|(\\S+)\\|(\\S+)\\|(\\d+)\\|(\\S+)\\|(\\d+)\\|(\\d+)")
+            "<NAT444>:<(\\w+)>\\s(\\d+)\\|(\\d+|-)\\|(\\S+)\\|(\\S+)\\|(\\d+)\\|(\\S+)\\|(\\d+)\\|(\\d+)")
 
         T.re2_JioDeviceNATSyslog = T.re2(
             "<141>(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d)\\s+(\\S+)\\s+NAT_ACCT:(\\w+)\\s+(\\w+)\\s+SourceIp\\s+:(\\S+)\\s+Sourceport:(\\d+)\\s+TransIP\\s+:(\\S+)\\s+TransPort:(\\d+)\\s+DestIp\\s+:(\\S+)\\s+Destport:(\\d+)\\s*")
@@ -88,31 +90,31 @@ TrisulPlugin = {
         T.re2_CiscoNATSyslog3 = T.re2(
             "(\\d+):\\s+(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d):\\s+.*(CREATED|DELETED):\\s+(\\w+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)")
 
-        --cisco ASA syslog
-        T.re2_CiscoNATSyslog4=T.re2("(\\w+)\\s(\\d+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+):.*Built\\soutbound\\s(\\w+).*outside:(\\S+)\\/(\\d+)\\s.*:(\\S+)\\/(\\d+)\\s\\((\\S+)\\/(\\d+)\\)")
-        T.re2_CiscoNATSyslog5=T.re2("(\\w+)\\s(\\d+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*(?:inbound|Teardown)\\s(\\w+)\\sconnection.*faddr\\s(\\S+)\\/(\\d+)\\sgaddr\\s(\\S+)\\/(\\d+)\\sladdr\\s(\\S+)\\/(\\d+)")
-        --T.re2_CiscoNATSyslog6=T.re2("(\\w+)\\s(\\d+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+):.*(?:Deny|Teardown)\\s?(?:inbound|outbound)?\\s(\\w+).*(?:outside|inside):(\\S+).*(?:outside|inside):(\\S+)")
-        T.re2_CiscoNATSyslog6=T.re2("(\\w+)\\s(\\d+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*(?:Deny|Teardown)\\s?(?:inbound|outbound)?\\s(\\w+).*(?:outside|inside):(\\S+).*(?:outside|inside):(\\S+)")
+        -- cisco ASA: start at the gated literal; drop unused timestamp captures
+        T.re2_CiscoNATSyslog4=T.re2("Built\\soutbound\\s(\\w+).*outside:(\\S+)\\/(\\d+)\\s\\S+:(\\S+)\\/(\\d+)\\s\\((\\S+)\\/(\\d+)\\)")
+        T.re2_CiscoNATSyslog5=T.re2("(?:inbound|Teardown)\\s(\\w+)\\sconnection\\s+.*faddr\\s(\\S+)\\/(\\d+)\\sgaddr\\s(\\S+)\\/(\\d+)\\sladdr\\s(\\S+)\\/(\\d+)")
+        T.re2_CiscoNATSyslog6=T.re2("(?:Deny|Teardown)\\s?(?:inbound|outbound)?\\s(\\w+).*(?:outside|inside):(\\S+).*(?:outside|inside):(\\S+)")
 
 
-        T.re2_MikroTikNATSyslog=T.re2("firewall,info.*src-mac\\s(\\S+),\\sproto\\s(\\w+).*,\\s(\\S+):(\\d+)->(\\S+):(\\d+)")
-        T.re2_MikroTikNATSyslog2=T.re2("firewall,info.*src-mac\\s(\\S+),\\sproto\\s+(\\w+).*\\s(\\S+):(\\d+)->(\\S+):(\\d+),\\sNAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
+        -- Start at gated literals (src-mac / proto); optional TCP flags group; no leading firewall,info.*
+        T.re2_MikroTikNATSyslog=T.re2("src-mac\\s(\\S+),\\sproto\\s(\\w+)(?:\\s+\\([^)]*\\))?,\\s+(\\S+):(\\d+)->(\\S+):(\\d+)")
+        T.re2_MikroTikNATSyslog2=T.re2("(?:src-mac\\s\\S+,\\s)?proto\\s+(\\w+)(?:\\s+\\([^)]*\\))?,\\s+(\\S+):(\\d+)->(\\S+):(\\d+),\\s+NAT\\s+\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
 
-        T.re2_MikroTikNATSyslog3=T.re2("(\\w+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*srcnat.*\\ssrc-mac\\s(\\S+),\\sproto\\s(\\w+),\\s+(\\S+):(\\d+)->(\\S+):(\\d+)")
-        T.re2_MikroTikNATSyslog4=T.re2("(\\w+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*forward:.*\\ssrc-mac\\s(\\S+),\\sproto\\s(\\w+),.*NAT\\s\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
+        T.re2_MikroTikNATSyslog3=T.re2("srcnat:.*\\ssrc-mac\\s(\\S+),\\sproto\\s(\\w+)(?:\\s+\\([^)]*\\))?,\\s+(\\S+):(\\d+)->(\\S+):(\\d+)")
+        -- BSD-timestamped MikroTik (rare on rainbow); still avoid firewall,info.* / forward:.* sandwiches
+        T.re2_MikroTikNATSyslog4=T.re2("(\\w+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*src-mac\\s(\\S+),\\sproto\\s(\\w+)(?:\\s+\\([^)]*\\))?,\\s+(\\S+):(\\d+)->(\\S+):(\\d+),\\s+NAT\\s+\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
 
         -- tacitine devices
         T.re2_TacitineNATSylog = T.re2(
             "<6>(\\w+)\\s\\s(\\d+)\\s(\\d\\d):(\\d+):(\\d+).*SRC=(\\S+)\\sDST=(\\S+)\\s.*PROTO=(\\S+)\\sSPT=(\\d+)\\sDPT=(\\d+)")
-        -- Fortigate firewall snat+dnat
+        -- Fortigate: drop leading .*
         T.re2_FortigateNATSylog = T.re2(
-            ".*date=(\\S+)\\stime=(\\S+).*srcip=(\\S+)\\ssrcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+).*tranip=(\\S+)\\stranport=(\\d+)\\stransip=(\\S+)\\stransport=(\\d+)")
-        -- Fortigate firewall noop
+            "date=(\\S+)\\stime=(\\S+).*srcip=(\\S+)\\ssrcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+).*tranip=(\\S+)\\stranport=(\\d+)\\stransip=(\\S+)\\stransport=(\\d+)")
         T.re2_FortigateNATSylogNoopPort = T.re2(
-            ".*date=(\\S+)\\stime=(\\S+).*srcip=(\\S+)\\ssrcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+)")
-        T.re2_FortigateNATSylogNoop = T.re2(".*date=(\\S+)\\stime=(\\S+).*srcip=(\\S+).*dstip=(\\S+).*proto=(\\w+)")
+            "date=(\\S+)\\stime=(\\S+).*srcip=(\\S+)\\ssrcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+)")
+        T.re2_FortigateNATSylogNoop = T.re2("date=(\\S+)\\stime=(\\S+).*srcip=(\\S+).*dstip=(\\S+).*proto=(\\w+)")
         T.re2_FortigateNATSylogSNat = T.re2(
-            ".*date=(\\S+)\\stime=(\\S+).*srcip=(\\S+)\\s.*srcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+).*transip=(\\S+)\\stransport=(\\d+)")
+            "date=(\\S+)\\stime=(\\S+).*srcip=(\\S+).*srcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+).*transip=(\\S+)\\stransport=(\\d+)")
 
         -- Checkpoint devices 
         T.re2_CheckPointAccept = T.re2(
@@ -296,10 +298,10 @@ TrisulPlugin = {
                     engine:terminate_flow(fkey)
                 end
 
-            elseif syslogstr:find("TRIG=", 1, true) then
+            elseif syslogstr:find("[nsess ", 1, true) then
 
-                -- NetElastic BNG 
-                local bret, adddel, _, proto, _, ipversion, username, sip, dip, sport, dport, _, natip, _, natsport, _,
+                -- NetElastic BNG session NAT (not nprng port-range TRIG= lines)
+                local bret, adddel, proto, username, sip, dip, sport, dport, natip, natsport,
                     year, mon, day, h, m, s = T.re2_NetElasticBNGNATSyslog:partial_match_n(syslogstr)
 
                 if bret == false then
@@ -330,7 +332,7 @@ TrisulPlugin = {
                     engine:terminate_flow(fkey)
                 end
 
-            elseif syslogstr:find(":<Session", 1, true) then
+            elseif syslogstr:find("<NAT444>:<Session", 1, true) then
                 -- Huawei device 
                 local bret, adddel, stvsec, etvsec, sip, natip, sport, dip, dport, proto =
                     T.re2_HuaweiNATSyslog:partial_match_n(syslogstr)
@@ -351,37 +353,37 @@ TrisulPlugin = {
                     engine:terminate_flow(fkey)
                 end
 
-            elseif syslogstr:find("firewall,info nat", 1, true) then
-                -- tactine devices
-                local bret, srcmac,proto, sip, sport, dip, dport, natsip, natsport, natsip1, natsport1, natdip, natdport =
-                    T.re2_MikroTikNATSyslog2:partial_match_n(syslogstr)
-
-                if bret == false then
-                    return;
-                end
-                proto = PROTOCOl[proto]
-                local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
-                engine:update_flow_raw(fkey, 0, 1)
-                engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
-                engine:tag_flow(fkey, "[natip]" .. natsip1)
-                engine:tag_flow(fkey, "[natport]" .. natsport1)
-                engine:update_flow_raw(fkey, 1, 1)
-                engine:terminate_flow(fkey)
-
             elseif syslogstr:find("firewall,info", 1, true) then
+                -- MikroTik: gate on NAT ( vs src-mac so we skip RE2 on unrelated firewall,info noise
+                if syslogstr:find("NAT (", 1, true) then
+                    local bret, proto, sip, sport, dip, dport, natsip, natsport, natsip1, natsport1, natdip, natdport =
+                        T.re2_MikroTikNATSyslog2:partial_match_n(syslogstr)
 
-                -- MikroTik device 
-                local bret, srcmac,proto, sip, sport, dip, dport = T.re2_MikroTikNATSyslog:partial_match_n(syslogstr)
-                if bret == false then
-                    return;
+                    if bret == false then
+                        return;
+                    end
+                    proto = PROTOCOl[proto]
+                    local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
+                    engine:update_flow_raw(fkey, 0, 1)
+                    engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
+                    engine:tag_flow(fkey, "[natip]" .. natsip1)
+                    engine:tag_flow(fkey, "[natport]" .. natsport1)
+                    engine:update_flow_raw(fkey, 1, 1)
+                    engine:terminate_flow(fkey)
+                elseif syslogstr:find("src-mac", 1, true) then
+                    local bret, srcmac, proto, sip, sport, dip, dport =
+                        T.re2_MikroTikNATSyslog:partial_match_n(syslogstr)
+                    if bret == false then
+                        return;
+                    end
+                    proto = PROTOCOl[proto]
+                    local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
+                    engine:update_flow_raw(fkey, 0, 1)
+                    engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
+                    engine:tag_flow(fkey, "[mac]" .. srcmac)
+                    engine:update_flow_raw(fkey, 1, 1)
+                    engine:terminate_flow(fkey)
                 end
-                proto = PROTOCOl[proto]
-                local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
-                engine:update_flow_raw(fkey, 0, 1)
-                engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
-                engine:tag_flow(fkey, "[mac]" .. srcmac)
-                engine:update_flow_raw(fkey, 1, 1)
-                engine:terminate_flow(fkey)
             elseif syslogstr:find('trandisp="snat+dnat"', 1, true) then
                 local bret, date, time, sip, sport, dip, dport, proto, tranip, tranport, transip, transport =
                     T.re2_FortigateNATSylog:partial_match_n(syslogstr)
@@ -410,7 +412,7 @@ TrisulPlugin = {
                 engine:tag_flow(fkey, "[natport]" .. transport)
                 engine:update_flow_raw(fkey, 1, 1)
                 engine:terminate_flow(fkey)
-            elseif syslogstr:match('srcport.*trandisp="noop"') then
+            elseif syslogstr:find('trandisp="noop"', 1, true) and syslogstr:find("srcport", 1, true) then
                 local bret, date, time, sip, sport, dip, dport, proto =
                     T.re2_FortigateNATSylogNoopPort:partial_match_n(syslogstr)
                 if bret == false then
@@ -421,7 +423,7 @@ TrisulPlugin = {
                 engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
                 engine:update_flow_raw(fkey, 1, 1)
                 engine:terminate_flow(fkey)
-            elseif syslogstr:match('trandisp="noop"') then
+            elseif syslogstr:find('trandisp="noop"', 1, true) then
                 local bret, date, time, sip, dip, proto = T.re2_FortigateNATSylogNoop:partial_match_n(syslogstr)
 
                 if bret == false then
@@ -477,9 +479,9 @@ TrisulPlugin = {
                     engine:update_flow_raw(fkey, 1, 1)
                     engine:terminate_flow(fkey)
                 end
-            elseif syslogstr:find("forward",1,true) and syslogstr:find("NAT",1,true) then
-                -- MikroTik device 4
-                local bret, mon, day, h, m, s, srcmac,proto, natsip1, natsport1, sip, sport, dip, dport =
+            elseif syslogstr:find("src-mac", 1, true) and syslogstr:find("NAT (", 1, true) then
+                -- MikroTik BSD-timestamped NAT (no firewall,info prefix)
+                local bret, mon, day, h, m, s, srcmac, proto, sip, sport, dip, dport, natsip, natsport, natsip1, natsport1, natdip, natdport =
                     T.re2_MikroTikNATSyslog4:partial_match_n(syslogstr)
 
                 if bret == false then
@@ -496,14 +498,14 @@ TrisulPlugin = {
                 engine:terminate_flow(fkey)
             elseif syslogstr:find("ASA",1,true) and syslogstr:find("Built outbound",1,true) then
                 -- cisco asa
-                local bret, mon, day, year,h, m, s, proto, dip, dport, natsip1, natsport1, sip, sport =
+                local bret, proto, dip, dport, natsip1, natsport1, sip, sport =
                     T.re2_CiscoNATSyslog4:partial_match_n(syslogstr)
 
                 if bret == false then
                     return;
                 end
                 if is_private_ip(dip) then
-                    dip, dport, natsip1, natsport1 = natsip1, natsport, dip, dport
+                    dip, dport, natsip1, natsport1 = natsip1, natsport1, dip, dport
                 end
                 proto = PROTOCOl[proto]
                 local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
@@ -516,7 +518,7 @@ TrisulPlugin = {
             elseif (syslogstr:find("ASA",1,true) and syslogstr:find("Built inbound",1,true)) or (syslogstr:find("ASA",1,true) and syslogstr:find("Teardown",1,true) and syslogstr:find("gaddr",1,true) ) then
                 -- cisco asa
                
-                local bret, mon, day, year,h, m, s, proto, dip, dport, sip, sport, natsip1, natsport1 =
+                local bret, proto, dip, dport, sip, sport, natsip1, natsport1 =
                     T.re2_CiscoNATSyslog5:partial_match_n(syslogstr)
 
                 if bret == false then
@@ -537,7 +539,7 @@ TrisulPlugin = {
                 -- cisco asa
                 local sport =0
                 local dport = 0
-                local bret, mon, day, year,h, m, s, proto, sip, dip =
+                local bret, proto, sip, dip =
                     T.re2_CiscoNATSyslog6:partial_match_n(syslogstr)
 
                 if bret == false then
