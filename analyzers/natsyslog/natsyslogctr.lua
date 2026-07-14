@@ -30,6 +30,15 @@ PROTOCOl = {
 
 COUNTERID_FLOWGEN = "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}"
 
+-- refresh the netflow.feed_type attribute for each syslog source IP at most once
+-- every FEED_REFRESH_SECS (10 minutes); brand new IPs are updated immediately
+FEED_REFRESH_SECS = 600
+FEED_TYPE_ATTR = "netflow.feed_type"
+FEED_TYPE_VALUE = "SYSLOG"
+
+-- last-update-window table: ipkey (e.g. C0.A0.01.02) -> last attribute update time
+SYSLOG_FEED_LUW = {}
+
 -- in trisul: ipv4 keys look like XX.XX.XX.XX 
 function toip_format(dotted_ip)
     local b1, b2, b3, b4 = dotted_ip:match("(%d+).(%d+).(%d+).(%d+)")
@@ -152,6 +161,16 @@ TrisulPlugin = {
             engine:update_counter(COUNTERID_FLOWGEN, ipkey, 0, #syslogstr)
             engine:update_counter(COUNTERID_FLOWGEN, ipkey, 1, #syslogstr)
             engine:update_counter(COUNTERID_FLOWGEN, ipkey, 2, 1)
+
+            -- maintain the netflow.feed_type=SYSLOG attribute for this source IP.
+            -- new IP  -> tag immediately
+            -- known IP -> refresh only once every FEED_REFRESH_SECS (10 minutes)
+            local now = os.time()
+            local last_update = SYSLOG_FEED_LUW[ipkey]
+            if last_update == nil or (now - last_update) >= FEED_REFRESH_SECS then
+                engine:set_key_attribute(COUNTERID_FLOWGEN, ipkey, FEED_TYPE_ATTR, FEED_TYPE_VALUE)
+                SYSLOG_FEED_LUW[ipkey] = now
+            end
 
             if syslogstr:find("NAT_ACCT", 1, true) then
                 -- JIO device 
