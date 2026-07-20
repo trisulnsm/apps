@@ -113,9 +113,9 @@ TrisulPlugin = {
         -- BSD-timestamped MikroTik (rare on rainbow); still avoid firewall,info.* / forward:.* sandwiches
         T.re2_MikroTikNATSyslog4=T.re2("(\\w+)\\s(\\d+)\\s(\\d+):(\\d+):(\\d+).*src-mac\\s(\\S+),\\sproto\\s(\\w+)(?:\\s+\\([^)]*\\))?,\\s+(\\S+):(\\d+)->(\\S+):(\\d+),\\s+NAT\\s+\\((\\S+):(\\d+)->(\\S+):(\\d+)\\)->(\\S+):(\\d+)")
 
-        -- tacitine devices
         T.re2_TacitineNATSylog = T.re2(
-            "<6>(\\w+)\\s\\s(\\d+)\\s(\\d\\d):(\\d+):(\\d+).*SRC=(\\S+)\\sDST=(\\S+)\\s.*PROTO=(\\S+)\\sSPT=(\\d+)\\sDPT=(\\d+)")
+            "<6>(\\w+)\\s(\\d+)\\s(\\d\\d):(\\d+):(\\d+).*SRC=(\\S+)\\sDST=(\\S+)\\s.*PROTO=(\\S+)\\sSPT=(\\d+)\\sDPT=(\\d+)")
+
         -- Fortigate: drop leading .*
         T.re2_FortigateNATSylog = T.re2(
             "date=(\\S+)\\stime=(\\S+).*srcip=(\\S+)\\ssrcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+).*tranip=(\\S+)\\stranport=(\\d+)\\stransip=(\\S+)\\stransport=(\\d+)")
