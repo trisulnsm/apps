@@ -111,12 +111,7 @@ TrisulPlugin = {
   -- 
   cg_monitor  = {
 
-    counter_guid = function() 
-      if not T.active_config then 
-        TrisulPlugin.onload()
-      end 
-      return T.active_config.CounterGUID 
-    end, 
+    counter_guid = "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
 
 
     -- WHEN CALLED: when a FLUSH operation starts 

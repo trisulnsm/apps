@@ -11,6 +11,23 @@ local JSON=require'JSON'
 -- local dbg = require("debugger")
 local SNMP_DATABASE="c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
 require'mkconfig'
+function should_track_ip(ip)
+  -- If no specific IPs configured, track all keys
+  if not T.active_config.TrackIPs or #T.active_config.TrackIPs == 0 then
+    return true
+  end
+
+  -- Convert key to readable IP format for comparison
+
+  -- Check if this IP is in our tracking list
+  for _, track_ip in ipairs(T.active_config.TrackIPs) do
+    if ip == track_ip then
+      return true
+    end
+  end
+
+  return false
+end
 
 TrisulPlugin = {
 
@@ -55,17 +72,20 @@ TrisulPlugin = {
     T.active_config = make_config(
             T.env.get_config("App>DBRoot").."/config/trisulnsm_snmpwalkpoll.lua",
             {
-				-- Resolution Seconds 
-				ResolutionSeconds=60,
+								-- Resolution Seconds 
+								ResolutionSeconds=60,
 
                 -- Print debug messages 
                 DebugMode=false,
 
-				-- Filter these IP, default all are allowed 
-				IsIPEnabled=function(ip) 
-					return true
-				end 
+						    -- Filter these IP, default all are allowed 
+								TrackIPs={}
             })
+		if T.active_config.DebugMode then
+				for _, track_ip in ipairs(T.active_config.TrackIPs) do
+					 print("track_ip ".. track_ip)
+				end
+		end
 
    end,
 
@@ -150,7 +170,7 @@ TrisulPlugin = {
     end
 
     for ipkey,snmp in pairs(snmp_attributes) do
-      if snmp["snmp.ip"] ~=nil and T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id)  and T.active_config.IsIPEnabled(snmp["snmp.ip"]) then 
+      if snmp["snmp.ip"] ~=nil and T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id)  and should_track_ip(snmp["snmp.ip"]) then 
         if snmp["snmp.version"] =="2c" then
           if snmp['snmp.community'] ~= nil and #snmp['snmp.community'] > 0  then 
             targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], 
