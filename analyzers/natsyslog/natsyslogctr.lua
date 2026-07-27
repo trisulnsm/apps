@@ -130,6 +130,7 @@ TrisulPlugin = {
             'action:"Accept".*\\stime:"(\\d+).*\\sdst:"(\\S+)".*\\sproto:"(\\d+)".*\\ss_port:"(\\d+)".*\\sservice:"(\\d+)".*\\ssrc:"(\\S+)"')
         T.re2_CheckPointNAT = T.re2(
             'xlatedport:"(\\d+)".*\\sxlatedst:"(\\S+)".*\\sxlatesport:"(\\d+)".*\\sxlatesrc:"(\\S+)"')
+	T.re2_A10NAT=T.re2('^LSN_(\\w+),(\\S+),(\\d+),\\d+,(\\w+),(\\S+),\\d+,(\\d+),(\\S+),(\\d+),(\\d{4})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(?:,\\d+)?$')
     end,
 
     -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
@@ -224,6 +225,31 @@ TrisulPlugin = {
                 engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
                 engine:update_flow_raw(fkey, 1, 1)
                 engine:terminate_flow(fkey)
+	    elseif syslogstr:find("LSN_",1,true) then
+	      local bret,cmd,natip,natport,proto,sip,sport,dip,dport,
+	      	year,month,day,h,m,s=T.re2_A10NAT:partial_match_n(syslogstr)
+		if bret == false then
+			return;
+	        end
+                local tvsec = os.time({
+                    year = tonumber(year),
+                    month =tonumber(month),
+                    day = tonumber(day),
+                    hour = h,
+                    min = m,
+                    sec = s
+                })
+                local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
+                if cmd == "Created" then
+                    engine:update_flow_raw(fkey, 0, 1)
+                    engine:tag_flow(fkey, "[natip]" .. natip)
+                    engine:tag_flow(fkey, "[natport]" .. natport)
+                    engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
+
+                elseif cmd == "Deleted" then
+                    engine:update_flow_raw(fkey, 1, 1)
+                    engine:terminate_flow(fkey)
+                end
 
             elseif syslogstr:find("LOG_TRANSLATION", 1, true) then
                 -- CISCO device 
