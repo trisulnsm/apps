@@ -5,7 +5,7 @@
         "id": 10005,
         "webtrisul_addon_package_id": 1,
         "trisul_web_user_id": 2,
-        "key": "flood",
+        "key": "nbaddnsak7m2q",
         "name": "Common Flood - DNS/TCPSYN",
         "description": "Common Flood and Denial of Service protocols",
         "moduri": "/webtrisul_module/getmod",
