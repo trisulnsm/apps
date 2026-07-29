@@ -72,7 +72,7 @@ TrisulPlugin = {
     -- override by trisulnsm_stablekeys.lua 
     -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
     ----
-
+    print("ONload")
     T.active_config = make_config(
       T.env.get_config("//App/DBRoot").."/config/trisulnsm_stablekeys.lua",
       {
@@ -111,24 +111,20 @@ TrisulPlugin = {
   -- 
   cg_monitor  = {
 
-    counter_guid = function() 
-      if not T.active_config then 
-        TrisulPlugin.onload()
-      end 
-      return T.active_config.CounterGUID 
-    end, 
+    counter_guid = "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}",
 
 
     -- WHEN CALLED: when a FLUSH operation starts 
     -- by default called every "stream snapshot interval" of 60 seconds
     onbeginflush = function(engine, timestamp) 
       T.keys_this_interval = { } 
-      
+      print("Being flush calculated") 
     end,
 
   
     -- WHEN CALLED: before an item  is flushed to the Hub node  
     onflush = function(engine, timestamp,key, metrics) 
+     print("Onflush")
       if key == "SYS:GROUP_TOTALS"  then return; end 
       
       -- Only track keys that are in our configured IP list (if any)
