@@ -148,6 +148,7 @@ TrisulPlugin = {
         onpacket = function(engine, layer)
 
             local syslogstr = layer:rawbytes():tostring()
+            local syslog_len = #syslogstr
             -- ip_layer protocol
             local iplayer = layer:packet():find_layer("{0A2C724B-5B9F-4BA6-9C97-B05080558574}");
             local ip_sb = SB.new(iplayer:rawbytes():tostring())
@@ -158,8 +159,8 @@ TrisulPlugin = {
 
             -- sources 
             local ipkey = toip_format(iplayer_deviceip)
-            engine:update_counter(COUNTERID_FLOWGEN, ipkey, 0, #syslogstr)
-            engine:update_counter(COUNTERID_FLOWGEN, ipkey, 1, #syslogstr)
+            engine:update_counter(COUNTERID_FLOWGEN, ipkey, 0, syslog_len)
+            engine:update_counter(COUNTERID_FLOWGEN, ipkey, 1, syslog_len)
             engine:update_counter(COUNTERID_FLOWGEN, ipkey, 2, 1)
 			engine:update_counter(COUNTERID_FLOWGEN, ipkey, 15, 1) -- syslog (even if not matched to flow) 
 
