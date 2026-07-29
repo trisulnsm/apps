@@ -13,14 +13,15 @@ description:
 apptype: meta
 
 appresources: |
+    dashboards/isp-overview
+    dashboards/isp-router-geo-map
     dashboards/isp-country-analytics
     dashboards/isp-country-analytics-drilldown
-    dashboards/isp-overview
-    dashboards/isp-prefix-analytics-drilldown
     dashboards/isp-prefix-external-analytics
-    dashboards/isp-router-geo-map
+    dashboards/isp-prefix-analytics-drilldown
     dashboards/peering-analytics
     dashboards/peering-analytics-drilldown
+    isp_menu.json
 
 
 dependencies :

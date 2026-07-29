@@ -768,7 +768,7 @@ class ISPOverviewMapping{
                         window_fromts:this.tmint.from.tv_sec,
                         window_tots:this.tmint.to.tv_sec,
                         valid_input:1,
-                        "dash_key_regex":"gitPeeringAnalyticsDrilldown"
+                        "dash_key_regex":"PeeringAnalyticsDrilldown"
                     }));
         break;
       case 1:
