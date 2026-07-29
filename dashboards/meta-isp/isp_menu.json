@@ -1,0 +1,101 @@
+{
+  "TrisulMenu": {
+    "parent_menu": {
+      "name": "ISP",
+      "description": "ISP Operations Dashboards",
+      "imgurl": "fa fa-shield"
+    },
+    "sub_menus": [
+      {
+        "name": "Layer 7 Metrics",
+        "description": "L7 Breakdown",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbadlayer7k7m2q"
+        }
+      },
+      {
+        "name": "HTTP Traffic",
+        "description": "HTTP Metrics",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbadfttptraffick7m2q"
+        }
+      },
+      {
+        "name": "IPv4 / IPv6 Dashboard",
+        "description": "IPv4 and IPv6 breakdown",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbadipv46k7m2q"
+        }
+      },
+      {
+        "name": "Tunnels",
+        "description": "Tunnel Traffic Breakdown",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbadtunnelsk7m2q"
+        }
+      },
+      {
+        "name": "P2P Analytics",
+        "description": "Breakdown of P2P traffic in the network",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbadp2pk7m2q"
+        }
+      },
+      {
+        "name": "TCP Analyzer",
+        "description": "Analysis of TCP activity like Retransmission, Latency etc.",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "tcpanalyzerk7m2q"
+        }
+      },
+      {
+        "name": "Flow Map",
+        "description": "Dashboard for visualizing live network session flows on a geographic world map",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbadflowmapk7m2q"
+        }
+      },
+      {
+        "name": "MITRE ATT&CK",
+        "description": "MITRE Framework Stats",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbadmitrek7m2q"
+        }
+      },
+      {
+        "name": "DDoS Monitor",
+	      "description" : "Dashboard shows various common protocols used by DDoS attacks",
+	      "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbadddosk7m2q"
+	        }
+      },
+      {
+	      "name" : "DNS Flood Activity",
+	      "description" : "Common Flood and Denial of Service protocols",
+	      "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbaddnsak7m2q"
+	        }
+      }
+    ]
+  }
+}
