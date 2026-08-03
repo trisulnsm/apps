@@ -19,7 +19,7 @@ Example:
 ```lua
 return {
   enabled = true,
-  netflow_version = "v10", -- "v5", "v9" or "v10"
+  netflow_version = "v10", -- "v5", "v9" or "v10" to export IPFIX records as defined in IETF RFC 7011
   collector_ip = "127.0.0.1",
   collector_port = 2055,
   template_id_base = 256,
