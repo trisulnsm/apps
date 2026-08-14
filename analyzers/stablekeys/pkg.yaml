@@ -1,6 +1,6 @@
 name: Stable Keys
 
-version: 1.0.11
+version: 1.0.12
 
 author: trisul
 
@@ -14,3 +14,5 @@ apptype: lua
 appresources: stablekeys.lua mkconfig.lua
 
 dependencies:  
+
+luaconfigfile: stablekeys.lua
