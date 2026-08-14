@@ -1,6 +1,9 @@
 name: ISP Prefixes Analytics
 
-version: 8.0.4
+dash_id: PrefixExternalAnalytics6AkabQ3h
+
+
+version: 8.0.5
 
 author: trisul
 

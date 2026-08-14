@@ -653,7 +653,7 @@ class ISPOverviewMapping{
                         window_fromts:this.tmint.from.tv_sec,
                         window_tots:this.tmint.to.tv_sec,
                         valid_input:1,
-                        "dash_key_regex":"gitCountryAnalyticsDrilldown"
+                        "dash_key_regex":"CountryAnalyticsDrilldown"
                     }));
         break;
 

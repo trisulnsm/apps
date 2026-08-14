@@ -77,6 +77,24 @@
         "params_json": {
           "dash_key": "nbadmitrek7m2q"
         }
+      },
+      {
+        "name": "DDoS Monitor",
+	      "description" : "Dashboard shows various common protocols used by DDoS attacks",
+	      "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbadddosk7m2q"
+	        }
+      },
+      {
+	      "name" : "DNS Flood Activity",
+	      "description" : "Common Flood and Denial of Service protocols",
+	      "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "nbaddnsak7m2q"
+	        }
       }
     ]
   }

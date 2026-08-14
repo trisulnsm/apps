@@ -1,0 +1,28 @@
+name: Meta-ISP
+
+version: 1.0.1
+
+author: trisul
+
+
+description:
+   short: Meta APP for Trisul ISP Applications
+   long:  |
+        info
+
+apptype: meta
+
+appresources: |
+    dashboards/isp-overview
+    dashboards/isp-router-geo-map
+    dashboards/isp-country-analytics
+    dashboards/isp-country-analytics-drilldown
+    dashboards/isp-prefix-external-analytics
+    dashboards/isp-prefix-analytics-drilldown
+    dashboards/peering-analytics
+    dashboards/peering-analytics-drilldown
+    isp_menu.json
+
+
+dependencies :
+

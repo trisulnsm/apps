@@ -1,0 +1,83 @@
+{
+  "TrisulMenu": {
+    "parent_menu": {
+      "name": "ISP",
+      "description": "ISP Operations Dashboards",
+      "imgurl": "fa fa-shield"
+    },
+    "sub_menus": [
+      {
+        "name": "ISP Overview",
+        "description": "Provides a comprehensive view of overall ISP network traffic and routing metrics.",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "ISPOverviewRt10zf8E"
+        }
+      },
+      {
+        "name": "Router Geo Map",
+        "description": "Visualizes the geographic location of routers and regional traffic distribution.",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "ISPRouterGeoMapk5L6f5wW"
+        }
+      },
+      {
+        "name": "Peering Analytics",
+        "description": "Analyzes peering traffic volume, exchange points, and autonomous system metrics.",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "PeeringAnalytics96fF5t2U"
+        }
+      },
+      {
+        "name": "Peering Analytics Drilldown",
+        "description": "Provides a detailed breakdown of traffic for specific peering partners and ASNs.",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "PeeringAnalyticsDrilldownh2y0jQ7A"
+        }
+      },
+      {
+        "name": "Country Analytics",
+        "description": "Analyzes traffic patterns and bandwidth consumption grouped by destination and source country.",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "IspCountryAnalyticsj3GQSxL4"
+        }
+      },
+      {
+        "name": "Country Analytics Drilldown",
+        "description": "Drills down into traffic analytics for specific countries and IP subnets.",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "CountryAnalyticsDrilldownk2ujiHXQ"
+        }
+      },
+      {
+        "name": "Prefix External Analytics",
+        "description": "Analyzes external BGP prefix advertisements, routing paths, and traffic volume.",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "PrefixExternalAnalytics6AkabQ3h"
+        }
+      },
+      {
+        "name": "Prefix Analytics Drilldown",
+        "description": "Drills down into traffic metrics and active IP allocations for specific prefixes.",
+        "controller": "newdash",
+        "action": "index",
+        "params_json": {
+          "dash_key": "PrefixAnalyticsDrilldownh2y0jQ7A"
+        }
+      }
+    ]
+  }
+}
