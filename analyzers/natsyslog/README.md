@@ -7,6 +7,8 @@ UPDATES
 =======
 
 ````
+1.0.19  Aug 20 2026    Fortinet Parser ensure Key is made from public IP and Private
+                       IP are tagged with NAT. Extract and Tag dstmac when available
 1.0.16  Jul 14 2026    Rewrote regexes for performance , minimize .* usage and
                        strengthen the gate check 
 1.0.13  Oct 10 2025    Mikrotik NAT logs 
