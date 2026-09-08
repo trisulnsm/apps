@@ -72,7 +72,6 @@ TrisulPlugin = {
     -- override by trisulnsm_stablekeys.lua 
     -- in probe config directory /usr/local/var/lib/trisul-probe/dX/pX/contextX/config 
     ----
-    print("ONload")
     T.active_config = make_config(
       T.env.get_config("//App/DBRoot").."/config/trisulnsm_stablekeys.lua",
       {
@@ -95,10 +94,6 @@ TrisulPlugin = {
     T.pending_keys={ }
     T.debounce_pending_keys = { }
 
-    -- Check if this IP is in our tracking list
-    for _, track_ip in ipairs(T.active_config.TrackIPs) do
-      print("track_ip ".. track_ip .. " readable_ip ".. ip_to_trisul_format(track_ip) )
-    end    
   end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
@@ -118,13 +113,11 @@ TrisulPlugin = {
     -- by default called every "stream snapshot interval" of 60 seconds
     onbeginflush = function(engine, timestamp) 
       T.keys_this_interval = { } 
-      print("Being flush calculated") 
     end,
 
   
     -- WHEN CALLED: before an item  is flushed to the Hub node  
     onflush = function(engine, timestamp,key, metrics) 
-     print("Onflush")
       if key == "SYS:GROUP_TOTALS"  then return; end 
       
       -- Only track keys that are in our configured IP list (if any)
@@ -177,7 +170,6 @@ TrisulPlugin = {
             T.pending_keys[k] = nil
           else
             -- Generate individual alert for single missing key
-            print("alert"..readable)
             local alert_message="No activity detected on the expected key "..readable.." - potentially inactive."
             engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",  nil, T.active_config.SigID, 1,  "STABLE_KEYS_ALERT".."|"..T.active_config.mailsubject.."|"..T.active_config.NumStableIntervals.."|"..T.active_config.CounterGUID.."|"..k)
             T.logwarning(alert_message)
