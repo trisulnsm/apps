@@ -15,4 +15,4 @@ appresources: stablekeys.lua mkconfig.lua
 
 dependencies:  
 
-luaconfigfile: stablekeys.lua
+luaconfigfile: stablekeys.conf

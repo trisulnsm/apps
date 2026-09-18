@@ -1,6 +1,6 @@
 name: IP to MAC Mapper
 
-version: 1.0.4
+version: 1.0.5
 
 author: trisul
 
@@ -14,3 +14,5 @@ apptype: lua
 appresources: ip-mac.lua sweepbuf.lua README.md 
 
 dependencies:  
+
+luaconfigfile: ip_mac.conf

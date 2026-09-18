@@ -28,8 +28,12 @@ TrisulPlugin = {
     T.active_config = make_config(
       T.env.get_config("//App/DBRoot").."/config/trisulnsm_ip_mac.lua",
       {
+	-- Running count of packets received/processed for sampling.
         PacketCount = 0,
-        SamplingRate = 1
+	-- Number of packets between sampled packets (1 = sample every packet).
+        SamplingRate = 1,
+	-- this will load into the contexts(empty means all contexts)
+	Contexts={}
       })
   end,
 
