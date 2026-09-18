@@ -66,6 +66,19 @@ function is_private_ip(ip)
     return false
 end
 
+-- normalize NAT, return as public.. , natip, natport 
+function adjust_nat(sip, sport, dip, dport, translatedip, translatedport)
+   if is_private_ip(sip) then
+	   -- SNAT: private source was translated -> key on public, tag the private
+	   return translatedip, translatedport, dip, dport, sip, sport
+   elseif is_private_ip(dip) then
+	   -- DNAT: private destination was translated -> key on public, tag the private
+	   return sip, sport, translatedip, translatedport, dip, dport
+   end
+   -- no private side: pass through untouched
+   return sip, sport, dip, dport, "", ""
+end
+
 TrisulPlugin = {
 
     -- the ID block, you can skip the fields marked 'optional '
@@ -123,7 +136,7 @@ TrisulPlugin = {
             "date=(\\S+)\\stime=(\\S+).*srcip=(\\S+)\\ssrcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+)")
         T.re2_FortigateNATSylogNoop = T.re2("date=(\\S+)\\stime=(\\S+).*srcip=(\\S+).*dstip=(\\S+).*proto=(\\w+)")
         T.re2_FortigateNATSylogSNat = T.re2(
-            "date=(\\S+)\\stime=(\\S+).*srcip=(\\S+).*srcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+).*transip=(\\S+)\\stransport=(\\d+)")
+            "date=(\\S+)\\stime=(\\S+).*srcip=(\\S+).*srcport=(\\w+).*dstip=(\\S+)\\sdstport=(\\w+).*proto=(\\w+).*transip=(\\S+)\\stransport=(\\d+)(?:.*dstmac=\"([^\"]+)\")?")
 
         -- Checkpoint devices 
         T.re2_CheckPointAccept = T.re2(
@@ -297,13 +310,8 @@ TrisulPlugin = {
                     sec = s
                 })
 
-                -- lua double swapper 
-                if is_private_ip(sip) then
-                    sip, tsip, sport, tsport = tsip, sip, tsport, sport
-                elseif is_private(dip) then
-                    dip, tsip, dport, tsport = tsip, dip, tsport, dport
-                end
-                local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
+                -- adjust the private as Translated 
+				sip, sport, dip, dport, tsip, tsport = adjust_nat( sip, sport, dip, dport, tsip, tsport)
 
                 engine:tag_flow(fkey, "[natip]" .. tsip)
                 engine:tag_flow(fkey, "[natport]" .. tsport)
@@ -446,11 +454,14 @@ TrisulPlugin = {
                 engine:update_flow_raw(fkey, 1, 1)
                 engine:terminate_flow(fkey)
             elseif syslogstr:find('trandisp="snat"', 1, true) then
-                local bret, date, time, sip, sport, dip, dport, proto, transip, transport =
+                local bret, date, time, sip, sport, dip, dport, proto, transip, transport, dstmac =
                     T.re2_FortigateNATSylogSNat:partial_match_n(syslogstr)
                 if bret == false then
                     return;
                 end
+
+				-- adjust 
+				sip, sport, dip, dport, transip, transport = adjust_nat( sip, sport, dip, dport, transip, transport)
 
                 local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
 
@@ -458,6 +469,9 @@ TrisulPlugin = {
                 engine:tag_flow(fkey, "[deviceip]" .. iplayer_deviceip)
                 engine:tag_flow(fkey, "[natip]" .. transip)
                 engine:tag_flow(fkey, "[natport]" .. transport)
+                if dstmac ~= "" then
+                    engine:tag_flow(fkey, "[mac]" .. dstmac)
+                end
                 engine:update_flow_raw(fkey, 1, 1)
                 engine:terminate_flow(fkey)
             elseif syslogstr:find('trandisp="noop"', 1, true) and syslogstr:find("srcport", 1, true) then
@@ -552,9 +566,9 @@ TrisulPlugin = {
                 if bret == false then
                     return;
                 end
-                if is_private_ip(dip) then
-                    dip, dport, natsip1, natsport1 = natsip1, natsport1, dip, dport
-                end
+                -- adjust the private as Translated 
+				sip, sport, dip, dport, natsip1, natsport1 = adjust_nat( sip, sport, dip, dport, natsip1, natsport1)
+
                 proto = PROTOCOl[proto]
                 local fkey = Fk.toflow_format_v4(proto, sip, sport, dip, dport)
                 engine:update_flow_raw(fkey, 0, 1)

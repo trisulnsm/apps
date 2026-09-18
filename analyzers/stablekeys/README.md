@@ -104,7 +104,7 @@ UPDATES
 =======
 
 ````
-1.0.10  Sep 18 2026     Added contexts support to load app for selected contexts
+1.0.14  Sep 18 2026     Added contexts support to load app for selected contexts
 1.0.10  Jan 27 2026     Changed config to XPATH
 1.0.8   Jul 17 2025     Logic to support alternate key forms like crosskeys IPs 
 1.0.7   Jul 10 2025     Added IP filtering to track only specific addresses
