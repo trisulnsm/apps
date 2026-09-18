@@ -41,6 +41,9 @@ TrisulPlugin = {
 			-- Print debug messages
 			DebugMode = false,
 
+			-- Subnets larger than this many addresses are not expanded into T.arp_entries
+			MaxSubnetHosts = 4096,
+
 			-- Filter these IP, default all are allowed
 			IsIPEnabled = function(ip)
 				return true
@@ -76,17 +79,45 @@ TrisulPlugin = {
 				T.poll_targets = new_targets
 			end
             
+            if T.poll_targets == nil then
+                T.logdebug("No SNMP poll targets loaded, nothing to walk")
+                return
+            end
+
+            -- rebuilt from scratch on every poll so stale IPs age out
+            local new_entries = {}
+            local exact_entries = {}
+            local total = 0
+
             for _,agent in ipairs(T.poll_targets) do
-                local new_arp_entries = TrisulPlugin.do_bulk_walk(agent, ".1.3.6.1.2.1.4.22.1.2")
-                for ip_address, mac_address in pairs(new_arp_entries) do
-                    T.arp_entries[ip_address] = mac_address
+                local arp = TrisulPlugin.do_bulk_walk(agent, ".1.3.6.1.2.1.4.22.1.2")
+                local netmasks = TrisulPlugin.do_netmask_walk(agent, ".1.3.6.1.2.1.4.20.1.3")
+
+                -- every IP of a local subnet gets the MAC of the interface owning that subnet
+                for interface_ip, netmask in pairs(netmasks) do
+                    local mac_address = arp[interface_ip]
+                    if mac_address then
+                        total = total + TrisulPlugin.expand_subnet(interface_ip, netmask, mac_address, new_entries)
+                    else
+                        T.logdebug("No ARP MAC for interface " .. interface_ip .. ", subnet not expanded")
+                    end
+                end
+
+                for ip_address, mac_address in pairs(arp) do
+                    exact_entries[ip_address] = mac_address
                 end
             end
 
-            -- print the arp_entries
-            for ip_address, mac_address in pairs(T.arp_entries) do
-                print("ip_address", ip_address, "mac_address", mac_address)
+            -- a real ARP entry always wins over the subnet wide interface MAC
+            for ip_address, mac_address in pairs(exact_entries) do
+                new_entries[ip_address] = mac_address
             end
+
+            T.arp_entries = new_entries
+			for key, value in pairs(T.arp_entries) do
+				print(key .. ": " .. tostring(value))
+			end
+            T.logdebug("arp_entries rebuilt, subnet addresses=" .. total)
 		end,
 
 		-- WHEN CALLED: before a flow is flushed to the Hub node
@@ -261,23 +292,36 @@ TrisulPlugin = {
 		agent.poll_count = 0
 	end,
 
-	do_bulk_walk=function(agent,oid)
-        local tstart = os.time()
-        local ofile = os.tmpname() 
-  
+	run_walk=function(agent,oid,parse_line)
+        local ofile = os.tmpname()
+
         os.execute(agent.walk_command.." "..agent.cmdargs.. " " .. oid .. " > "..ofile)
-  
-        local ret = { } 
+
+        local ret = { }
         local h=io.open(ofile)
-        for oneline in h:lines()
-        do
+        if h then
+            for oneline in h:lines()
+            do
+                parse_line(oneline, ret)
+            end
+            h:close()
+        else
+            T.logerror("Cannot read snmp walk output for oid="..oid)
+        end
+        os.remove(ofile)
+        return ret
+      end,
+
+	-- walk ipNetToMediaPhysAddress .1.3.6.1.2.1.4.22.1.2 -> { ip = mac }
+	do_bulk_walk=function(agent,oid)
+        return TrisulPlugin.run_walk(agent, oid, function(oneline, ret)
             -- Parse line like: iso.3.6.1.2.1.4.22.1.2.9.192.168.2.1 "44 95 3B B2 DB C0 "
             -- Extract IP address from OID (the IP appears as part of the OID before the quoted MAC)
             -- Match pattern: .192.168.2.1 "MAC" or 192.168.2.1 "MAC"
             local ip_address = oneline:match("(%d+%.%d+%.%d+%.%d+)%s+\"")
             -- Extract MAC address from quoted string
             local mac_address = oneline:match('"([^"]+)"')
-            
+
             if ip_address and mac_address then
                 -- Convert MAC address from space-separated to colon-separated format
                 -- Remove leading/trailing spaces and convert spaces to colons
@@ -287,11 +331,100 @@ TrisulPlugin = {
                 ret[ip_address] = mac_address
             else
                 print("ERROR in snmp output line="..oneline)
-            end 
-        end 
-        h:close()
-        os.remove(ofile)
-        return ret
-      end
+            end
+        end)
+      end,
+
+	-- walk ipAdEntNetMask .1.3.6.1.2.1.4.20.1.3 -> { interface_ip = netmask }
+	do_netmask_walk=function(agent,oid)
+        return TrisulPlugin.run_walk(agent, oid, function(oneline, ret)
+            -- Parse line like: iso.3.6.1.2.1.4.20.1.3.192.168.2.1 255.255.255.0
+            -- the IP is the tail of the OID, the value is the netmask
+            local interface_ip, netmask = oneline:match("4%.20%.1%.3%.(%d+%.%d+%.%d+%.%d+)%s+(%d+%.%d+%.%d+%.%d+)")
+
+            if interface_ip and netmask then
+                if interface_ip:match("^127%.") or interface_ip == "0.0.0.0" or netmask == "0.0.0.0" then
+                    return
+                end
+                ret[interface_ip] = netmask
+            else
+                print("ERROR in snmp netmask output line="..oneline)
+            end
+        end)
+      end,
+
+	ip_to_u32 = function(ip)
+		local a, b, c, d = ip:match("^(%d+)%.(%d+)%.(%d+)%.(%d+)$")
+		if a == nil then
+			return nil
+		end
+		a, b, c, d = tonumber(a), tonumber(b), tonumber(c), tonumber(d)
+		if a > 255 or b > 255 or c > 255 or d > 255 then
+			return nil
+		end
+		return a * 16777216 + b * 65536 + c * 256 + d
+	end,
+
+	u32_to_ip = function(n)
+		return math.floor(n / 16777216) % 256
+			.. "."
+			.. math.floor(n / 65536) % 256
+			.. "."
+			.. math.floor(n / 256) % 256
+			.. "."
+			.. n % 256
+	end,
+
+	-- addresses in the block described by this mask, nil if the mask is not contiguous
+	mask_to_blocksize = function(mask_u32)
+		local remaining = mask_u32
+		local ones = 0
+		for i = 31, 0, -1 do
+			local bitval = 2 ^ i
+			if remaining >= bitval then
+				remaining = remaining - bitval
+				ones = ones + 1
+			else
+				break
+			end
+		end
+		if remaining ~= 0 then
+			return nil
+		end
+		return 2 ^ (32 - ones)
+	end,
+
+	-- write every host IP of interface_ip/netmask into out, all pointing at mac_address
+	expand_subnet = function(interface_ip, netmask, mac_address, out)
+		local ip_u32 = TrisulPlugin.ip_to_u32(interface_ip)
+		local mask_u32 = TrisulPlugin.ip_to_u32(netmask)
+		if ip_u32 == nil or mask_u32 == nil then
+			T.logdebug("Bad subnet " .. interface_ip .. "/" .. netmask)
+			return 0
+		end
+
+		local blocksize = TrisulPlugin.mask_to_blocksize(mask_u32)
+		if blocksize == nil then
+			T.logdebug("Non contiguous netmask " .. netmask .. " on " .. interface_ip)
+			return 0
+		end
+
+		if blocksize > T.active_config.MaxSubnetHosts then
+			T.logdebug("Skipping oversized subnet " .. interface_ip .. "/" .. netmask)
+			return 0
+		end
+
+		local network = ip_u32 - (ip_u32 % blocksize)
+		local first, last = network, network + blocksize - 1
+		if blocksize > 2 then
+			-- skip network and broadcast addresses
+			first, last = network + 1, network + blocksize - 2
+		end
+
+		for h = first, last do
+			out[TrisulPlugin.u32_to_ip(h)] = mac_address
+		end
+		return last - first + 1
+	end,
 
 }

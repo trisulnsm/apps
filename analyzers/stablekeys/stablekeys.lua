@@ -83,11 +83,13 @@ TrisulPlugin = {
           -- number of stable intervals 
           NumStableIntervals =1,
           -- mail subject
-  	        mailsubject="IPDR Alert-No Netflow received for IP",
+  	  MailSubject="IPDR Alert-No Netflow received for IP",
           -- debouncing threshold - if more than this many keys are missing, generate single alert
           DebounceThreshold = 5,
           -- list of IP addresses to track (empty means track all)
-          TrackIPs = {}
+          TrackIPs = {},
+	  -- This Lua file will load into the contexts(empty means all contexts)
+	  Contexts={}
 
       })
 
@@ -179,7 +181,7 @@ TrisulPlugin = {
             -- Generate individual alert for single missing key
             print("alert"..readable)
             local alert_message="No activity detected on the expected key "..readable.." - potentially inactive."
-            engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",  nil, T.active_config.SigID, 1,  "STABLE_KEYS_ALERT".."|"..T.active_config.mailsubject.."|"..T.active_config.NumStableIntervals.."|"..T.active_config.CounterGUID.."|"..k)
+            engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",  nil, T.active_config.SigID, 1,  "STABLE_KEYS_ALERT".."|"..T.active_config.MailSubject.."|"..T.active_config.NumStableIntervals.."|"..T.active_config.CounterGUID.."|"..k)
             T.logwarning(alert_message)
             T.pending_keys[k]=nil
           end
@@ -199,7 +201,7 @@ TrisulPlugin = {
                   nil,
                   T.active_config.SigID .. "_DEBOUNCED",
                   1, 
-                  alert_message.."mailsubject:"..T.active_config.mailsubject.." Multiple keys inactive in the last "..T.active_config.NumStableIntervals.." minutes:mailsubject")
+                  alert_message.."mailsubject:"..T.active_config.MailSubject.." Multiple keys inactive in the last "..T.active_config.NumStableIntervals.." minutes:mailsubject")
         T.logwarning(alert_message)
         
         -- Clear debounced keys after alert
