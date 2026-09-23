@@ -26,7 +26,13 @@ TrisulPlugin = {
     --    m : a number M that is the metric used in the Top-K for this flow tracker (eg, total volume )
     --
     getmetric = function(engine, newflow) 
-      local retrans_rate = 100*newflow:retransmissions()/(newflow:az_packets()+newflow:az_packets());
+      -- both directions, and guard the divide: a flow seen in one direction only
+      -- has no packets in the other, and 100*n/0 is inf, which compares > 5 and
+      -- puts every such flow in the tracker.
+      local packets = newflow:az_packets() + newflow:za_packets()
+      if packets == 0 then return 0 end
+
+      local retrans_rate = 100*newflow:retransmissions()/packets
       if retrans_rate > 5 then 
         return retrans_rate 
       else
