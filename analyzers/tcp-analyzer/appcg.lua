@@ -14,6 +14,9 @@ local SESS_DONE         = bit.bor(SESS_TIMEDOUT, SESS_TERMINATED)
 -- flushed once more as TERMINATED or TIMEDOUT before deletion, so this cannot grow.
 local rtt_reported = {}
 
+-- Below this a retransmission RATE is noise. Keep in step with tcp_analyzer.lua.
+local MIN_PACKETS_FOR_RATE = 50
+
 -- The "app" is the port the server listened on. The SYN / SYN-ACK direction tells
 -- us which end that is, so use it rather than guessing. Fall back to the lower port
 -- number when neither end was identified - that guess is wrong whenever the service
@@ -93,13 +96,6 @@ TrisulPlugin = {
 
       local packets       = newflow:az_packets() + newflow:za_packets()
       local retrans       = newflow:retransmissions()
-      local retrans_rate  = packets > 0 and 100*retrans/packets or 0
-
-      -- high retrans
-      if retrans_rate  > 10  then 
-        engine:update_counter("{24DBD78F-CBB6-4383-7A78-B2C734FC480F}", appport, 3, 1)
-        newflow:add_tag("BADQUALITY")
-      end 
 
       -- timeout : did not terminate with RST/FIN. Only count connections that were
       -- established - without a SYN-ACK there was never a session to time out.
@@ -109,14 +105,27 @@ TrisulPlugin = {
         newflow:add_tag("BADQUALITY")
       end
 
+      -- retransmitted packets is a volume, so it is counted for every flow
       engine:update_counter("{24DBD78F-CBB6-4383-7A78-B2C734FC480F}", appport, 1, retrans)
-      engine:update_counter("{24DBD78F-CBB6-4383-7A78-B2C734FC480F}", appport, 2, retrans_rate)
 
 	  -- tag unidirectional also (maybe packet capture issue
-	  if  (newflow:az_bytes() > 0 and newflow:za_bytes() == 0) or 
-	      (newflow:za_bytes() > 0 and newflow:az_bytes() == 0) then 
+	  if  (newflow:az_bytes() > 0 and newflow:za_bytes() == 0) or
+	      (newflow:za_bytes() > 0 and newflow:az_bytes() == 0) then
 		  engine:update_counter("{24DBD78F-CBB6-4383-7A78-B2C734FC480F}", appport, 5, 1)
-	  end 
+	  end
+
+      -- the rate needs a big enough sample, or it tags healthy flows
+      if packets < MIN_PACKETS_FOR_RATE then return end
+
+      local retrans_rate = 100*retrans/packets
+
+      -- high retrans
+      if retrans_rate > 10 then
+        engine:update_counter("{24DBD78F-CBB6-4383-7A78-B2C734FC480F}", appport, 3, 1)
+        newflow:add_tag("BADQUALITY")
+      end
+
+      engine:update_counter("{24DBD78F-CBB6-4383-7A78-B2C734FC480F}", appport, 2, retrans_rate)
     end,
   },
 }

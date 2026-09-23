@@ -15,6 +15,10 @@ local SESS_DONE         = bit.bor(SESS_TIMEDOUT, SESS_TERMINATED)
 -- before it is deleted, so this cannot accumulate.
 local rtt_reported = {}
 
+-- Below this a retransmission RATE is noise - one retransmission in a 16 packet
+-- flow is 6.25%. Gates the rate and BADQUALITY only, not latency or timeouts.
+local MIN_PACKETS_FOR_RATE = 50
+
 TrisulPlugin = {
 
   id =  {
@@ -94,14 +98,6 @@ TrisulPlugin = {
 
       local packets       = newflow:az_packets() + newflow:za_packets()
       local retrans       = newflow:retransmissions()
-      local retrans_rate  = packets > 0 and 100*retrans/packets or 0
-
-      -- high retrans
-      if retrans_rate  > 5  then
-        engine:update_counter(CG, ipa, 6, 1)
-        engine:update_counter(CG, ipz, 6, 1)
-        newflow:add_tag("BADQUALITY")
-      end
 
       -- timeout : did not terminate with RST/FIN. Only count connections that were
       -- established - without a SYN-ACK there was never a session to time out, and
@@ -124,10 +120,23 @@ TrisulPlugin = {
         engine:update_counter(CG, ipz, 8, 1)
       end
 
+      -- retransmitted packets is a volume, so it is counted for every flow
       engine:update_counter(CG, ipa, 2+a, retrans)
-      engine:update_counter(CG, ipa, 4+a, retrans_rate)
-
       engine:update_counter(CG, ipz, 2+z, retrans)
+
+      -- the rate needs a big enough sample, or it tags healthy flows
+      if packets < MIN_PACKETS_FOR_RATE then return end
+
+      local retrans_rate = 100*retrans/packets
+
+      -- high retrans
+      if retrans_rate > 5 then
+        engine:update_counter(CG, ipa, 6, 1)
+        engine:update_counter(CG, ipz, 6, 1)
+        newflow:add_tag("BADQUALITY")
+      end
+
+      engine:update_counter(CG, ipa, 4+a, retrans_rate)
       engine:update_counter(CG, ipz, 4+z, retrans_rate)
 
     end,
