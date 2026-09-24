@@ -33,5 +33,6 @@ UPDATES
 =======
 
 ````
+8.0.9   Sep 24 2026     Using the new API for Geo and BGP queries 
 8.0.8   May 23 2026     Merged Geo and BGP output into a single HTML table; paste-friendly IP extraction
 ````
