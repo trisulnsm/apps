@@ -144,13 +144,13 @@ class IPGeoAsnPath{
     this.data = {};
     const raw_text = this.form.find("textarea").val();
     if(_.isEmpty(raw_text)){
-      alert("Search ip field can't be empty.");
+      console.log("Search ip field can't be empty.");
       this.dom.find(".ui_data").remove();
       return true;
     }
     this.ips = this.extract_ips(raw_text);
     if(_.isEmpty(this.ips)){
-      alert("No IPv4, IPv6, or CIDR subnets found in the pasted text.");
+      console.log("No IPv4, IPv6, or CIDR subnets found in the pasted text.");
       this.dom.find(".ui_data").remove();
       return true;
     }
@@ -160,7 +160,7 @@ class IPGeoAsnPath{
     const hosts = this.ips.map(ip => this.lookup_host(ip));
     const geoserver_endpoint = await this.get_geoserver_endpoint();
     if (!geoserver_endpoint) {
-      alert("Geo server is not available.");
+      console.log("Geo server is not available.");
       this.dom.find(".ui_data").remove();
       return true;
     }
@@ -177,15 +177,15 @@ class IPGeoAsnPath{
     ]);
     this.data_dom.find("#geo_bgp_lookup").find(".animated-background").remove();
     if (!geo_data || geo_data.error_message) {
-      alert((geo_data && geo_data.error_message) || "Geo lookup failed.");
+      console.log((geo_data && geo_data.error_message) || "Geo lookup failed.");
       this.dom.find(".ui_data").remove();
       return true;
     }
     const bgp_error = bgp_data && (bgp_data.error || bgp_data.error_message);
     if (bgp_error) {
-      alert(bgp_error);
+      console.log(bgp_error);
     }
-    this.render_results_table(geo_data, bgp_data);
+    this.render_results_table(geo_data, bgp_error ? null : bgp_data);
   }
 
 
