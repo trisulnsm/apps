@@ -1,5 +1,8 @@
 -- A new FLOW TRACKER
--- that tracks poor quality flows with > 5% retransmission rate 
+-- that tracks poor quality flows with > 5% retransmission rate
+
+-- Below this a retransmission rate is noise and the top-K fills with tiny flows.
+local MIN_PACKETS_FOR_RATE = 50
 
 TrisulPlugin = {
 
@@ -26,7 +29,11 @@ TrisulPlugin = {
     --    m : a number M that is the metric used in the Top-K for this flow tracker (eg, total volume )
     --
     getmetric = function(engine, newflow) 
-      local retrans_rate = 100*newflow:retransmissions()/(newflow:az_packets()+newflow:az_packets());
+      -- both directions; the floor also guards the divide by zero
+      local packets = newflow:az_packets() + newflow:za_packets()
+      if packets < MIN_PACKETS_FOR_RATE then return 0 end
+
+      local retrans_rate = 100*newflow:retransmissions()/packets
       if retrans_rate > 5 then 
         return retrans_rate 
       else
