@@ -1,0 +1,19 @@
+name: Login Connector
+
+version: 0.1.0
+
+author: trisul
+
+description: 
+   short: Connects to login syslog
+   long:  |
+      The Login connector consumes login syslog messages (ClientId, Ip, source)
+      and uses that to meter IP based network usage per ClientId and per login
+      source.
+
+apptype: lua
+
+appresources: mmon.lua login-syslog.lua login-syslog-protocol.lua newcg-clientid.lua newcg-clientsource.lua HostsXClientId.json HostsXClientSource.json FlowIntfsXClientId.json FlowIntfsXClientSource.json ClientXClientSource.json FlowtaggerClientId.json FlowtaggerClientSource.json
+
+
+dependencies:  
