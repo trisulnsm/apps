@@ -29,14 +29,15 @@ TrisulPlugin = {
 	  if etype==0x0800 then
 
 	  	local ihl = sb:next_bitfield_u8( {4,4} ) 
-	  	sb:skip(6)
-		local flags_fragoff = sb:next_bitfield_u8( {1,1,1,1,12})
+	  	sb:skip(5)
+		-- bytes 6-7: reserved, DF, MF, 13-bit fragment offset
+		local flags_fragoff = sb:next_bitfield_u16( {1,1,1,13})
 		sb:skip(1)
 		local proto=sb:next_u8()
 		sb:skip(4*ihl[2] - 10 ) 
 		table.insert(protostack,proto)
 
-		if flags_fragoff[3]==1 or flags_fragoff[5] > 0 then
+		if flags_fragoff[3]==1 or flags_fragoff[4] > 0 then
 			table.insert(protostack,"frag")
 		elseif proto == 6 or proto == 17 then 
 			local useport  = math.min(sb:next_u16(), sb:next_u16())
