@@ -7,6 +7,13 @@ Exports Trisul flow flush events to a NetFlow collector as either NetFlow v9 or 
 - IPv4 and IPv6 are exported using different templates.
 - Uses standard field IDs for source/destination IP, ports, and protocol.
 - Exports `ifIndexIn` and `ifIndexOut` as `0`.
+- Each Trisul flow is exported as two unidirectional records, A->Z and Z->A (endpoints
+  swapped), each with its own bytes/packets in `octetDeltaCount` / `packetDeltaCount` (IE 1/2).
+  Collectors that merge directions (Trisul `MatchBiDirectionalFlows`) rebuild the flow.
+- Long flows that Trisul flushes more than once are exported as increments: each export
+  carries only the bytes/packets since the previous one, and starts where it ended.
+  A direction with nothing new is not exported.
+- ICMP flows are exported with ports `0`.
 
 ## Config
 
@@ -25,7 +32,7 @@ return {
   template_id_base = 256,
   template_refresh_seconds = 30,
   template_refresh_packets = 20,
-  export_only_terminated = false,
+  export_only_terminated = false, -- true: export a flow only once it has terminated
   source_id_base = 5000,
   max_records_per_packet = 24,
   tag_template_ids = { "COUNTRY", "TLS-SNI", "HOSTNAME", "ASN", "ALERT" },
@@ -63,6 +70,10 @@ UPDATES
 =======
 
 ````
+1.0.6  Nov 18 2026    Fix crash in onendflush (no timestamp from Trisul) that dropped records;
+                      one record per direction instead of Z->A in IE 23/24; export increments
+                      for long flows instead of running totals; ICMP ports 0 instead of 12;
+                      export_only_terminated implemented
 1.0.2  Apr 30 2026    Customizable PEN number for IPFIX 
 1.0.1  Apr 29 2026    Revised to do bidirectional netflow 
 1.0.0  Oct 10 2024    First version 

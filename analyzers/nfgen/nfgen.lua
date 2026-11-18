@@ -5,6 +5,13 @@ local Fields  = require("netflow_fields")
 local Encoder = require("netflow_encoder")
 local UdpSender = require("udp_sender")
 
+-- flow:state() bits for a finished flow, as used by trisul-scripts/backend_scripts/netflow_generator
+local FLOW_DONE_MASK = 0x0900
+-- how long to remember the exported totals of a flow that is no longer flushed
+local EXPORTED_TTL_SECS = 3600
+-- ... and of a finished flow, in case Trisul flushes it once more
+local DONE_TTL_SECS = 300
+
 TrisulPlugin = {
   id = {
     name        = "NetFlow Generator",
@@ -56,6 +63,9 @@ TrisulPlugin = {
       sender     = nil,
       state      = nil,
       current_ts = nil,
+      -- per flow id: running totals already exported, so the next export of a long flow
+      -- carries only what is new (IE 1/2 are delta counts; Trisul flushes long flows more than once)
+      exported   = {},
     }
   end,
 
@@ -72,6 +82,8 @@ TrisulPlugin = {
 
     onbeginflush = function(engine, ts)
       if not T.config.enabled then return end
+      -- Trisul calls onbeginflush(engine) / onendflush(engine) without a timestamp
+      ts = ts or os.time()
 
       if T.nfgen.sender == nil then
         T.nfgen.sender = UdpSender.new(T.config.collector_ip, T.config.collector_port)
@@ -101,12 +113,50 @@ TrisulPlugin = {
       end
 
       local now = T.nfgen.current_ts or os.time()
-      local template_key = Encoder.add_flow_record(state, T.nfgen.fields, flow)
-      Encoder.send_batch_if_full(state, sender, T.nfgen.fields, now, T.config, template_key)
+      local key, template_fields, ctx = T.nfgen.fields:template_for_flow(flow)
+
+      -- terminated / closed flows (same state bits the original trisul-scripts nfgen used)
+      local done = bit.band(ctx.state, FLOW_DONE_MASK) ~= 0
+      if T.config.export_only_terminated and not done then return end
+
+      -- report only what is new since this flow was last exported
+      local prev = T.nfgen.exported[ctx.flow_id]
+      local function delta(name)
+        local d = ctx[name] - (prev and prev[name] or 0)
+        if d < 0 then d = ctx[name] end -- counters went back: treat as a new flow
+        return d
+      end
+      local d = {
+        az_bytes = delta("az_bytes"), az_packets = delta("az_packets"),
+        za_bytes = delta("za_bytes"), za_packets = delta("za_packets"),
+      }
+      local start_sec = prev and prev.end_sec or ctx.start_sec
+
+      -- finished flows are kept a little while too, so a repeat flush of the same flow
+      -- reports nothing new instead of its whole totals again
+      T.nfgen.exported[ctx.flow_id] = {
+        az_bytes = ctx.az_bytes, az_packets = ctx.az_packets,
+        za_bytes = ctx.za_bytes, za_packets = ctx.za_packets,
+        end_sec = ctx.end_sec, seen = now, done = done,
+      }
+
+      for _, rec in ipairs(Fields.directional_records(ctx, d, start_sec)) do
+        Encoder.add_flow_record(state, key, template_fields, rec)
+        Encoder.send_batch_if_full(state, sender, T.nfgen.fields, now, T.config, key)
+      end
     end,
 
     onendflush = function(engine, ts)
       if not T.config.enabled then return end
+      -- Trisul calls onbeginflush(engine) / onendflush(engine) without a timestamp
+      ts = ts or os.time()
+
+      -- forget finished flows after a few minutes, and flows Trisul stopped flushing without
+      -- marking them finished (idle UDP etc.) after an hour
+      for id, e in pairs(T.nfgen.exported) do
+        local ttl = e.done and DONE_TTL_SECS or EXPORTED_TTL_SECS
+        if ts - e.seen > ttl then T.nfgen.exported[id] = nil end
+      end
 
       local sender = T.nfgen.sender
       if sender == nil or not sender:is_open() then return end

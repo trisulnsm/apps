@@ -80,12 +80,9 @@ local function build_v5_record(ctx)
   local dst_bytes = ctx.is_ipv6 and string.char(0, 0, 0, 0)
                     or parse_ipv4_to_bytes_v5(ctx.dst_ip)
 
-  local packets = math.min(
-    (tonumber(ctx.az_packets) or 0) + (tonumber(ctx.za_packets) or 0),
-    0xFFFFFFFF)
-  local bytes = math.min(
-    (tonumber(ctx.az_bytes) or 0) + (tonumber(ctx.za_bytes) or 0),
-    0xFFFFFFFF)
+  -- one direction per record (see NetflowFields.directional_records)
+  local packets = math.min(tonumber(ctx.packets) or 0, 0xFFFFFFFF)
+  local bytes = math.min(tonumber(ctx.bytes) or 0, 0xFFFFFFFF)
 
   -- v5 First/Last are uptime-relative ms; we only have epoch seconds,
   -- so we encode 0 for both (acceptable for most collectors).
@@ -340,9 +337,8 @@ local function send_batch(state, sender, template_key, now_sec, config)
   state.batch[template_key] = {}
 end
 
-function NetflowEncoder.add_flow_record(state, fields, flow)
-  local key, template_fields, ctx = fields:template_for_flow(flow)
-
+-- Queue one unidirectional record (a ctx from NetflowFields.directional_records)
+function NetflowEncoder.add_flow_record(state, key, template_fields, ctx)
   if state.config_version == "v5" then
     -- v5: skip IPv6 flows entirely (no IPv6 support in v5 spec)
     if ctx.is_ipv6 then return key end
