@@ -12,7 +12,13 @@ Exports Trisul flow flush events to a NetFlow collector as either NetFlow v9 or 
   Collectors that merge directions (Trisul `MatchBiDirectionalFlows`) rebuild the flow.
 - Long flows that Trisul flushes more than once are exported as increments: each export
   carries only the bytes/packets since the previous one, and starts where it ended.
-  A direction with nothing new is not exported.
+  A direction with nothing new is not exported. A new flow that reuses a 5-tuple (different
+  start time) is exported in full.
+- To do that, the exported totals of each flow are remembered: finished flows for
+  `done_ttl_seconds`, unfinished ones for `exported_ttl_seconds` after their last flush, at most
+  `max_tracked_flows` per engine (least recently flushed dropped first). If a dropped unfinished
+  flow is flushed again, its totals so far are not re-sent (they may already have been exported);
+  only later increments are. The flush log line shows `tracked=` and `skipped=` counts.
 - ICMP flows are exported with ports `0`.
 
 ## Config
@@ -42,6 +48,9 @@ return {
   ipfix_enterprise_number = 39499,
   -- NetFlow v9 only: first field type number used for tag strings (next tags use base+1, ...).
   tag_v9_field_type_base = 200,
+  exported_ttl_seconds = 3600,   -- remember an unfinished flow's exported totals this long
+  done_ttl_seconds = 300,        -- ... and a finished flow's, in case it is flushed again
+  max_tracked_flows = 1000000,   -- per engine; 0 = no limit
 }
 ```
 
@@ -70,6 +79,9 @@ UPDATES
 =======
 
 ````
+1.0.8  Nov 18 2026    v9 FlowSet length includes padding; v9 sequence counts template packets;
+                      reused 5-tuple no longer undercounted; dropped flows not exported twice;
+                      compact flow table with max_tracked_flows; v5 First/Last filled in
 1.0.6  Nov 18 2026    Fix crash in onendflush (no timestamp from Trisul) that dropped records;
                       one record per direction instead of Z->A in IE 23/24; export increments
                       for long flows instead of running totals; ICMP ports 0 instead of 12;

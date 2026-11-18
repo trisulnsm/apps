@@ -7,10 +7,26 @@ local UdpSender = require("udp_sender")
 
 -- flow:state() bits for a finished flow, as used by trisul-scripts/backend_scripts/netflow_generator
 local FLOW_DONE_MASK = 0x0900
--- how long to remember the exported totals of a flow that is no longer flushed
-local EXPORTED_TTL_SECS = 3600
--- ... and of a finished flow, in case Trisul flushes it once more
-local DONE_TTL_SECS = 300
+
+-- T.nfgen.exported[flow_id] entries are arrays, indexed by:
+local E_AZB, E_AZP, E_ZAB, E_ZAP = 1, 2, 3, 4  -- running totals already exported
+local E_START, E_END             = 5, 6        -- flow start (tells a reused 5-tuple apart), last export end
+local E_SEEN, E_DONE             = 7, 8        -- last flushed (os.time), finished flow
+
+-- Drop entries not flushed for longer than their TTL. Remembers the latest start among dropped
+-- unfinished flows: if one of them is flushed again it must not be exported from zero.
+local function forget_flows(now, ttl, done_ttl)
+  local tracked = T.nfgen.exported
+  for id, e in pairs(tracked) do
+    if now - e[E_SEEN] > (e[E_DONE] and done_ttl or ttl) then
+      if not e[E_DONE] and e[E_START] > T.nfgen.forgot_upto then
+        T.nfgen.forgot_upto = e[E_START]
+      end
+      tracked[id] = nil
+      T.nfgen.tracked_count = T.nfgen.tracked_count - 1
+    end
+  end
+end
 
 TrisulPlugin = {
   id = {
@@ -39,6 +55,9 @@ TrisulPlugin = {
         tag_field_max_len        = 64,
         ipfix_enterprise_number  = 39499,
         tag_v9_field_type_base   = 200,
+        exported_ttl_seconds     = 3600,    -- remember an unfinished flow's exported totals this long
+        done_ttl_seconds         = 300,     -- ... and a finished flow's (in case it is flushed again)
+        max_tracked_flows        = 1000000, -- per engine; 0 = no limit
       }
     )
 
@@ -65,7 +84,11 @@ TrisulPlugin = {
       current_ts = nil,
       -- per flow id: running totals already exported, so the next export of a long flow
       -- carries only what is new (IE 1/2 are delta counts; Trisul flushes long flows more than once)
-      exported   = {},
+      exported      = {},
+      tracked_count = 0,
+      -- latest start time among unfinished flows dropped from `exported` (see forget_flows)
+      forgot_upto   = 0,
+      skipped       = 0,
     }
   end,
 
@@ -119,27 +142,45 @@ TrisulPlugin = {
       local done = bit.band(ctx.state, FLOW_DONE_MASK) ~= 0
       if T.config.export_only_terminated and not done then return end
 
+      local tracked = T.nfgen.exported
+      local prev = tracked[ctx.flow_id]
+
+      -- same 5-tuple but a different start: a new flow reusing the key, nothing to subtract
+      if prev and prev[E_START] ~= ctx.start_sec then
+        prev = nil
+      end
+
+      local skip = false
+      if prev == nil and T.nfgen.forgot_upto > 0 and ctx.start_sec <= T.nfgen.forgot_upto then
+        -- No entry, but the flow started no later than a flow whose entry was dropped while
+        -- still unfinished (TTL or max_tracked_flows). It may be one of them, already exported:
+        -- record its totals and send only later increments, rather than all of it twice.
+        skip = true
+        T.nfgen.skipped = T.nfgen.skipped + 1
+      end
+
       -- report only what is new since this flow was last exported
-      local prev = T.nfgen.exported[ctx.flow_id]
-      local function delta(name)
-        local d = ctx[name] - (prev and prev[name] or 0)
-        if d < 0 then d = ctx[name] end -- counters went back: treat as a new flow
+      local function delta(now_total, idx)
+        local d = now_total - (prev and prev[idx] or 0)
+        if d < 0 then d = now_total end -- counters went back: treat as a new flow
         return d
       end
       local d = {
-        az_bytes = delta("az_bytes"), az_packets = delta("az_packets"),
-        za_bytes = delta("za_bytes"), za_packets = delta("za_packets"),
+        az_bytes = delta(ctx.az_bytes, E_AZB), az_packets = delta(ctx.az_packets, E_AZP),
+        za_bytes = delta(ctx.za_bytes, E_ZAB), za_packets = delta(ctx.za_packets, E_ZAP),
       }
-      local start_sec = prev and prev.end_sec or ctx.start_sec
+      local start_sec = prev and prev[E_END] or ctx.start_sec
 
       -- finished flows are kept a little while too, so a repeat flush of the same flow
-      -- reports nothing new instead of its whole totals again
-      T.nfgen.exported[ctx.flow_id] = {
-        az_bytes = ctx.az_bytes, az_packets = ctx.az_packets,
-        za_bytes = ctx.za_bytes, za_packets = ctx.za_packets,
-        end_sec = ctx.end_sec, seen = now, done = done,
+      -- reports nothing new instead of its whole totals again.
+      -- Array entry (see E_* indexes): about a third of the memory of a keyed table.
+      if tracked[ctx.flow_id] == nil then T.nfgen.tracked_count = T.nfgen.tracked_count + 1 end
+      tracked[ctx.flow_id] = {
+        ctx.az_bytes, ctx.az_packets, ctx.za_bytes, ctx.za_packets,
+        ctx.start_sec, ctx.end_sec, now, done,
       }
 
+      if skip then return end
       for _, rec in ipairs(Fields.directional_records(ctx, d, start_sec)) do
         Encoder.add_flow_record(state, key, template_fields, rec)
         Encoder.send_batch_if_full(state, sender, T.nfgen.fields, now, T.config, key)
@@ -151,11 +192,15 @@ TrisulPlugin = {
       -- Trisul calls onbeginflush(engine) / onendflush(engine) without a timestamp
       ts = ts or os.time()
 
-      -- forget finished flows after a few minutes, and flows Trisul stopped flushing without
-      -- marking them finished (idle UDP etc.) after an hour
-      for id, e in pairs(T.nfgen.exported) do
-        local ttl = e.done and DONE_TTL_SECS or EXPORTED_TTL_SECS
-        if ts - e.seen > ttl then T.nfgen.exported[id] = nil end
+      -- forget finished flows after done_ttl_seconds, and flows Trisul stopped flushing without
+      -- marking them finished (idle UDP etc.) after exported_ttl_seconds
+      forget_flows(ts, tonumber(T.config.exported_ttl_seconds) or 3600, tonumber(T.config.done_ttl_seconds) or 300)
+      -- over max_tracked_flows: drop the least recently seen first, halving the age limit each pass
+      local cap = tonumber(T.config.max_tracked_flows) or 0
+      local age = (tonumber(T.config.exported_ttl_seconds) or 3600) / 2
+      while cap > 0 and T.nfgen.tracked_count > cap and age >= 1 do
+        forget_flows(ts, age, age)
+        age = age / 2
       end
 
       local sender = T.nfgen.sender
@@ -168,15 +213,18 @@ TrisulPlugin = {
 
       local stats = Encoder.cycle_stats(state)
       T.logdebug(string.format(
-        "nfgen flush engine=%s added=%d sent_records=%d sent_packets=%d queued_v4=%d queued_v6=%d seq=%d",
+        "nfgen flush engine=%s added=%d sent_records=%d sent_packets=%d queued_v4=%d queued_v6=%d seq=%d tracked=%d skipped=%d",
         tostring(engine:instanceid()),
         stats.added_records,
         stats.sent_records,
         stats.sent_packets,
         stats.queued_v4,
         stats.queued_v6,
-        stats.sequence
+        stats.sequence,
+        T.nfgen.tracked_count,
+        T.nfgen.skipped
       ))
+      T.nfgen.skipped = 0
     end,
   },
 }
