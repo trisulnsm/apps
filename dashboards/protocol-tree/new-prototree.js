@@ -1,5 +1,4 @@
-
-
+import { fetch_trp, mk_time_interval } from "trp_base";
 
 class NewProtoTree {
 
@@ -16,9 +15,13 @@ class NewProtoTree {
 		div.className += 'col-xs-12 well' 
 		dom.appendChild(div);
 
+		const bytes = Number(this.totals.bytes) || 0;
+		const packets = Number(this.totals.packets) || 0;
+		const bytesPerPacket = packets ? (bytes / packets).toFixed(2) : "0";
+
 		div.innerHTML = `<h2>Protocol tree breakup</h2> \
 			         <h4>Time interval ${new Date(this.fromTS * 1000)} to ${new Date(this.toTS * 1000)} </h4> \
-				 <h4>Total bytes=${Number(this.totals.bytes).toLocaleString()}  packets=${Number(this.totals.packets).toLocaleString()}</h4>`
+				 <h4>Total bytes=${bytes.toLocaleString()}  packets=${packets.toLocaleString()}</h4>`
 
 
 		let ul = document.createElement('ul');
@@ -30,11 +33,11 @@ class NewProtoTree {
 			                <span class="percent text-right"> ( %total) </span>\
 			                <span class="bytespkt text-right"> bytes/pkt </span></li>`
 			ul.innerHTML += `<li><span class="key">total counts</span> \
-			                <span class="metric text-right"> ${this.totals.bytes} </span>\
+			                <span class="metric text-right"> ${bytes} </span>\
 			                <span class="percent text-right"> ( 100% ) </span> \
-			                <span class="metric text-right"> ${this.totals.packets} </span> \
+			                <span class="metric text-right"> ${packets} </span> \
 			                <span class="percent text-right"> ( 100% ) </span>\
-			                <span class="bytespkt text-right"> ${ (this.totals.bytes/this.totals.packets).toFixed(2)} </span></li>`
+			                <span class="bytespkt text-right"> ${bytesPerPacket} </span></li>`
 		dom.appendChild(ul);
 	}
 
@@ -43,17 +46,24 @@ class NewProtoTree {
 		dom.appendChild(ul);
 
 
+		const totalBytes = Number(this.totals.bytes) || 0;
+		const totalPackets = Number(this.totals.packets) || 0;
+
 		for ( let k of Object.entries(subtree)
-                              .slice().filter( a => !['bytes','packets'].includes(a[0]) && a[1].bytes>0 && a[1].packets>0 )
+                              .slice().filter( a => !['bytes','packets'].includes(a[0]) && a[1] && a[1].bytes>0 && a[1].packets>0 )
                               .sort( (a,b) => b[1].bytes - a[1].bytes) ) {
+
+			const bytePct = totalBytes ? (k[1].bytes / totalBytes * 100).toFixed(2) : "0";
+			const packetPct = totalPackets ? (k[1].packets / totalPackets * 100).toFixed(2) : "0";
+			const bytesPerPacket = k[1].packets ? (k[1].bytes / k[1].packets).toFixed(2) : "0";
 
 			let li = document.createElement('li')
 			li.innerHTML = `<span class="key">${k[0]}</span> \
 			                <span class="metric text-right">${ k[1].bytes} </span>\
-			                <span class="percent text-right"> (${ (k[1].bytes/this.totals.bytes*100).toFixed(2)} %)</span> \
+			                <span class="percent text-right"> (${bytePct} %)</span> \
 			                <span class="metric text-right">${ k[1].packets}</span> \
-			                <span class="percent text-right"> (${ (k[1].packets/this.totals.packets*100).toFixed(2)} %)</span>\
-			                <span class="bytespkt text-right"> ${ (k[1].bytes/k[1].packets).toFixed(2)}</span>`
+			                <span class="percent text-right"> (${packetPct} %)</span>\
+			                <span class="bytespkt text-right"> ${bytesPerPacket}</span>`
 			ul.appendChild(li);
 
 			if (k[1].nodetype !='leaf') {
@@ -104,7 +114,8 @@ class NewProtoTree {
 		let cgtoppers_bytes=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
 			counter_group: cg.guid,
 			time_interval: mk_time_interval([this.fromTS,this.toTS]),
-			meter:0
+			meter:0,
+			maxitems:10000
 		});
 		this.loadtree( cgtoppers_bytes, "bytes");
 
@@ -112,12 +123,13 @@ class NewProtoTree {
 		let cgtoppers_packets=await fetch_trp(TRP.Message.Command.COUNTER_GROUP_TOPPER_REQUEST, {
 			counter_group: cg.guid,
 			time_interval: mk_time_interval([this.fromTS,this.toTS]),
-			meter:1
+			meter:1,
+			maxitems:10000
 		});
 		this.loadtree( cgtoppers_packets, "packets");
 
-		this.totals= this.tree['SYS:GROUP_TOTALS']
-		delete this.tree['SYS:GROUP_TOTALS']
+		this.fillTotals("bytes");
+		this.fillTotals("packets");
 
 		this.paintHeading(document.querySelector(this.divid));
 		this.paint(document.querySelector(this.divid), this.tree);
@@ -125,15 +137,35 @@ class NewProtoTree {
 
 	}
 
+	metricValue(metric) {
+		if (metric == null) return 0;
+		if (typeof metric === "object" && typeof metric.toNumber === "function") {
+			return metric.toNumber();
+		}
+		const n = parseInt(metric, 10);
+		return Number.isFinite(n) ? n : 0;
+	}
+
+	// SYS:GROUP_TOTALS is the counter key. Its label is not that string,
+	// so it never lands on this.tree["SYS:GROUP_TOTALS"].
 	loadtree(cgtoppers,  meterid) {
-		// load tree
-		cgtoppers.keys.forEach( (ai) => {
-	
+		const keys = (cgtoppers && cgtoppers.keys) || [];
+		keys.forEach( (ai) => {
+			const metric = this.metricValue(ai.metric);
+			if (ai.key === "SYS:GROUP_TOTALS") {
+				this.totals[meterid] = metric;
+				return;
+			}
+
+			const label = ai.label || ai.readable || ai.key;
+			if (!label) return;
+
 			let h = this.tree;
-			ai.label.split('/').forEach( (kp) => {
+			label.split('/').forEach( (kp) => {
+				if (!kp) return;
 				h[kp] = h[kp] || { }
 				h=h[kp]
-				h[meterid] = ( h[meterid] || 0 ) +  parseInt(ai.metric)				
+				h[meterid] = ( h[meterid] || 0 ) + metric
 			});
 
 			h.nodetype = 'leaf'
@@ -141,11 +173,22 @@ class NewProtoTree {
 		});
 
 	}
+
+	fillTotals(meterid) {
+		if (this.totals[meterid] != null) return;
+		let sum = 0;
+		for (const node of Object.values(this.tree)) {
+			if (!node || typeof node !== "object") continue;
+			sum += Number(node[meterid]) || 0;
+		}
+		this.totals[meterid] = sum;
+	}
 }
 
-function run(opts)
+export function run(opts)
 {
 	new NewProtoTree(opts).run() 	
 }
 
 //# sourceURL=new-prototree.js
+
