@@ -4,7 +4,7 @@
 -- TYPE:        FRONTEND SCRIPT
 -- PURPOSE:     message monitor
 -- DESCRIPTION: MMON listens to TMS frontend messages and meters flow bytes
---              per ClientId and per client source.
+--              per ClientId, per client source, and per devCode.
 --
 function mysplit(inputstr, sep)
   if sep == nil then
@@ -40,14 +40,17 @@ TrisulPlugin = {
 		T.clientids[ t[2] ] = t[3]
 	elseif t[1] == "SOURCE" then
 		T.clientsources[ t[2] ] = t[3]
+	elseif t[1] == "DEVCODE" then
+		T.clientdevcodes[ t[2] ] = t[3]
 	end
 
   end,
 
   onload = function()
 
-	T.clientids     = { }
-	T.clientsources = { }
+	T.clientids      = { }
+	T.clientsources  = { }
+	T.clientdevcodes = { }
 
   end,
 
@@ -61,8 +64,9 @@ TrisulPlugin = {
 	local ipz = flowid:ipz_readable()
 
 	-- client IP can be on either side of the flow
-	local clientid     = T.clientids[ ipa ]     or T.clientids[ ipz ]
-	local clientsource = T.clientsources[ ipa ] or T.clientsources[ ipz ]
+	local clientid     = T.clientids[ ipa ]      or T.clientids[ ipz ]
+	local clientsource = T.clientsources[ ipa ]  or T.clientsources[ ipz ]
+	local clientdevcode = T.clientdevcodes[ ipa ] or T.clientdevcodes[ ipz ]
 
 	local t, x, r = bytes_az + bytes_za , bytes_az, bytes_za
 
@@ -80,7 +84,15 @@ TrisulPlugin = {
           engine:update_counter("{009EBF17-72A7-49E7-81B0-3979497509D5}", clientsource, 2, x)
 	end
 
+	if clientdevcode then
+          -- update ClientDevcode counter group
+          engine:update_counter("{373024C2-6018-43FA-B39B-1AB628E65878}", clientdevcode, 0, t)
+          engine:update_counter("{373024C2-6018-43FA-B39B-1AB628E65878}", clientdevcode, 1, r)
+          engine:update_counter("{373024C2-6018-43FA-B39B-1AB628E65878}", clientdevcode, 2, x)
+	end
+
   end,
 
   },
 }
+
