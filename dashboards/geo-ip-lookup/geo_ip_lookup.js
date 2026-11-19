@@ -101,6 +101,7 @@ class IPGeoAsnPath{
         $("<th>").text("Country"),
         $("<th>").text("Country Name"),
         $("<th>").text("ASN"),
+        $("<th>").text("ASN Code"),
         $("<th>").text("ASN Name"),
         $("<th>").text("BGP Prefix"),
         $("<th>").text("AS Path")
@@ -115,6 +116,7 @@ class IPGeoAsnPath{
           $("<td>").text(row.ip),
           $("<td>").text(geo.country_code || "-"),
           $("<td>").text(geo.country_name || "-"),
+          $("<td>").text(geo.asn || "-"),
           $("<td>").text(geo.asn_code || "-"),
           $("<td>").text(geo.asn_name || "-"),
           $("<td>").text(row.bgp_prefix || "-"),
