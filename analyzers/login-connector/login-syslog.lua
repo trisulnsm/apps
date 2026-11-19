@@ -2,10 +2,10 @@
 -- Login syslog parser
 --
 -- Sample message:
---   LOCAL7.INFO: 2026-11-01T17:55:00+05:30 ftc-mum-kvm3-inhouse1 logins[2270828]: \
---       ClientId="FT045507" Ip="2405:201:680e:11d4:75c0:289d:935b:6297" source="FTC_OAUTH" ts=1793535679
+--   <190>2026-11-19T11:30:00+05:30 ftc-mum-kvm3-inhouse1 logins[2898354]: \
+--       ClientId="FZ56358" Ip="187.127.149.145" source="API" devCode="FTC_OAUTH" ts=1795067670
 --
--- The syslog only carries label mappings (IP -> ClientId, IP -> source).
+-- The syslog only carries label mappings (IP -> ClientId, IP -> source, IP -> devCode).
 -- Actual byte counts come from flow records and are metered in mmon.lua.
 --
 TrisulPlugin = {
@@ -38,6 +38,7 @@ TrisulPlugin = {
             t["ClientId"] = ""
             t["Ip"] = ""
             t["source"] = ""
+            t["devCode"] = ""
 
             -- key="value"  (value may contain colons for IPv6, so match anything but a quote)
             for k, v in string.gmatch(syslogstr, '(%w+)="([^"]+)"') do
@@ -69,6 +70,14 @@ TrisulPlugin = {
                 engine:post_message_frontend(
                     "{A563693D-A2EC-41BB-8481-C4EB0316AFF8}",
                     "SOURCE|" .. t["Ip"] .. "|" .. t["source"]
+                )
+            end
+
+            -- IP -> devCode mapping
+            if #t["devCode"] > 0 then
+                engine:post_message_frontend(
+                    "{A563693D-A2EC-41BB-8481-C4EB0316AFF8}",
+                    "DEVCODE|" .. t["Ip"] .. "|" .. t["devCode"]
                 )
             end
 

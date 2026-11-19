@@ -151,7 +151,7 @@ TrisulPlugin = {
 
     for ipkey,snmp in pairs(snmp_attributes) do
       if snmp["snmp.ip"] ~=nil and T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id)  and T.active_config.IsIPEnabled(snmp["snmp.ip"]) then 
-        if snmp["snmp.version"] =="2c" then
+        if snmp["snmp.version"] =="2c" or snmp["snmp.version"] =="1" then
           if snmp['snmp.community'] ~= nil and #snmp['snmp.community'] > 0  then 
             targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], 
 								       agent_community = snmp["snmp.community"], 
@@ -205,7 +205,7 @@ TrisulPlugin = {
 	  if agent.agent_version == "1" then command="snmpwalk" end
 	  local level='noAuthNoPriv'
 
-	  if agent.agent_version=="2c" then
+	  if agent.agent_version=="2c" or agent.agent_version=="1" then
 			cmdargs =" -r 1 -O q -t 3  -v"..agent.agent_version.." -c '"..agent.agent_community.."' "..agent.agent_ip
 	  elseif agent.agent_version=="3" then
 			cmdargs =" -r 1 -O q -t 3  -v"..agent.agent_version.." -u "..agent.agent_username

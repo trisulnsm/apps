@@ -138,8 +138,9 @@ TrisulPlugin = {
     for oneline in f:lines() do
       if not oneline:match("^%s*#") then 
         local jj = JSON:decode(oneline)
-        if jj then 
-          T.print_tbl[jj["ja3_hash"]]=jj["desc"]
+        if jj and jj["ja3_hash"] then 
+          -- keys are uppercase hex (T.util.bin2hex), the JSON file is lowercase; drop stray non-hex chars
+          T.print_tbl[jj["ja3_hash"]:gsub("%X",""):upper()]=jj["desc"]
           cnt=cnt+1
         end
       end 

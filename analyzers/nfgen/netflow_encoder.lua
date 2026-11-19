@@ -32,11 +32,12 @@ local function pad_fixed_string(s, max_len)
   return raw
 end
 
--- pad4: used for v9 flowsets only.
-local function pad4(s)
-  local rem = #s % 4
-  if rem == 0 then return s end
-  return s .. string.rep("\0", 4 - rem)
+-- RFC 3954 §5.3: a v9 FlowSet's Length covers the FlowSet ID, Length, records and padding,
+-- padding the FlowSet to a 4-byte boundary.
+local function v9_padded_flowset(flowset_id, body_bytes)
+  local base_len  = 4 + #body_bytes
+  local pad_bytes = (4 - (base_len % 4)) % 4
+  return be_u16(flowset_id) .. be_u16(base_len + pad_bytes) .. body_bytes .. string.rep("\0", pad_bytes)
 end
 
 -- RFC 7011 §3.3.2: Set Length includes header + body + padding.
@@ -73,22 +74,25 @@ local function build_v5_header(state, now_sec, flow_count)
     .. be_u16(0)                                     -- sampling_interval (0 = none)
 end
 
-local function build_v5_record(ctx)
+-- SysUptime (ms) of an epoch-seconds time, relative to the engine's boot time; 0 if earlier
+local function v5_uptime_ms(state, epoch_sec)
+  local ms = (tonumber(epoch_sec) or 0) * 1000 - state.boot_time_ms
+  if ms < 0 then return 0 end
+  return ms
+end
+
+local function build_v5_record(state, ctx)
   -- IPv6 src/dst mapped to 0.0.0.0 (v5 does not support IPv6)
   local src_bytes = ctx.is_ipv6 and string.char(0, 0, 0, 0)
                     or parse_ipv4_to_bytes_v5(ctx.src_ip)
   local dst_bytes = ctx.is_ipv6 and string.char(0, 0, 0, 0)
                     or parse_ipv4_to_bytes_v5(ctx.dst_ip)
 
-  local packets = math.min(
-    (tonumber(ctx.az_packets) or 0) + (tonumber(ctx.za_packets) or 0),
-    0xFFFFFFFF)
-  local bytes = math.min(
-    (tonumber(ctx.az_bytes) or 0) + (tonumber(ctx.za_bytes) or 0),
-    0xFFFFFFFF)
+  -- one direction per record (see NetflowFields.directional_records)
+  local packets = math.min(tonumber(ctx.packets) or 0, 0xFFFFFFFF)
+  local bytes = math.min(tonumber(ctx.bytes) or 0, 0xFFFFFFFF)
 
-  -- v5 First/Last are uptime-relative ms; we only have epoch seconds,
-  -- so we encode 0 for both (acceptable for most collectors).
+  -- v5 First/Last are SysUptime ms, like the header's SysUptime (same boot time)
   return src_bytes                       -- srcaddr   (4)
     .. dst_bytes                         -- dstaddr   (4)
     .. string.char(0, 0, 0, 0)          -- nexthop   (4)
@@ -96,8 +100,8 @@ local function build_v5_record(ctx)
     .. be_u16(0)                         -- output    (2)
     .. be_u32(packets)                   -- dPkts     (4)
     .. be_u32(bytes)                     -- dOctets   (4)
-    .. be_u32(0)                         -- First     (4)
-    .. be_u32(0)                         -- Last      (4)
+    .. be_u32(v5_uptime_ms(state, ctx.start_sec)) -- First (4)
+    .. be_u32(v5_uptime_ms(state, ctx.end_sec))   -- Last  (4)
     .. be_u16(ctx.src_port or 0)         -- srcport   (2)
     .. be_u16(ctx.dst_port or 0)         -- dstport   (2)
     .. string.char(0)                    -- pad1      (1)
@@ -123,7 +127,9 @@ function NetflowEncoder.new_engine_state(engine_id, config, now_sec)
     source_id                       = source_id,
     seq                             = 0,
     packet_count                    = 0,
-    boot_time_ms                    = (tonumber(now_sec) or os.time()) * 1000,
+    -- SysUptime origin for v5/v9 headers and v5 First/Last. Placed a day before the plugin
+    -- started, so flows already running at load time do not get negative (clamped 0) times.
+    boot_time_ms                    = ((tonumber(now_sec) or os.time()) - 86400) * 1000,
     last_template_send_sec          = 0,
     last_template_send_packet_count = 0,
     template_id_v4                  = tonumber(config.template_id_base) or 256,
@@ -175,8 +181,7 @@ local function build_v9_template_flowset(template_id, template_fields)
     field_specs[#field_specs + 1] = be_u16(field.id) .. be_u16(field.len)
   end
   local template_record = be_u16(template_id) .. be_u16(#template_fields) .. table.concat(field_specs)
-  local body = be_u16(0) .. be_u16(4 + #template_record) .. template_record
-  return pad4(body)
+  return v9_padded_flowset(0, template_record)
 end
 
 local function build_v10_template_set(template_id, template_fields)
@@ -196,9 +201,7 @@ local function build_v10_template_set(template_id, template_fields)
 end
 
 local function build_v9_data_flowset(template_id, records)
-  local payload = table.concat(records)
-  local body    = be_u16(template_id) .. be_u16(4 + #payload) .. payload
-  return pad4(body)
+  return v9_padded_flowset(template_id, table.concat(records))
 end
 
 local function build_v10_data_set(template_id, records)
@@ -246,6 +249,11 @@ function NetflowEncoder.send_templates(state, sender, fields, now_sec, config)
   if sender:send(payload) then
     state.last_template_send_sec          = now_sec
     state.last_template_send_packet_count = state.packet_count
+    -- v9 sequence counts every export packet, templates included (RFC 3954 §5.1).
+    -- IPFIX counts data records only (RFC 7011 §3.1), so v10 leaves it alone.
+    if config.netflow_version == "v9" then
+      state.seq = state.seq + 1
+    end
   end
 end
 
@@ -340,13 +348,12 @@ local function send_batch(state, sender, template_key, now_sec, config)
   state.batch[template_key] = {}
 end
 
-function NetflowEncoder.add_flow_record(state, fields, flow)
-  local key, template_fields, ctx = fields:template_for_flow(flow)
-
+-- Queue one unidirectional record (a ctx from NetflowFields.directional_records)
+function NetflowEncoder.add_flow_record(state, key, template_fields, ctx)
   if state.config_version == "v5" then
     -- v5: skip IPv6 flows entirely (no IPv6 support in v5 spec)
     if ctx.is_ipv6 then return key end
-    local record = build_v5_record(ctx)
+    local record = build_v5_record(state, ctx)
     state.batch[key][#state.batch[key] + 1] = record
     state.cycle_added_records = state.cycle_added_records + 1
     return key

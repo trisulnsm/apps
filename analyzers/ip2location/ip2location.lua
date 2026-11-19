@@ -8,6 +8,21 @@
 local ipprefixdb=require'ipprefixdb' 
 local bit=require'bit'
 
+-- IP2Proxy proxy types (https://lite.ip2location.com/database/px2-ip-proxytype-country)
+-- the PROXY database stores "<type> <country code>"; the country of one IP is
+-- not a label for the type, so the type description is used instead
+local PROXY_TYPES = {
+	VPN = "Anonymizing VPN",
+	TOR = "Tor exit node",
+	DCH = "Hosting provider / data center / CDN",
+	PUB = "Public proxy",
+	WEB = "Web proxy",
+	SES = "Search engine robot",
+	RES = "Residential proxy",
+	CPN = "Consumer privacy network",
+	EPN = "Enterprise private network",
+}
+
 TrisulPlugin = { 
 
   id =  {
@@ -111,8 +126,8 @@ TrisulPlugin = {
 		T.ldb:set_databasename("PROXY")
 		local val = T.ldb:lookup_prefix(ip)
 		if val then 
-			local key,label = val:match("(%S+)%s*(.*)")
-			TrisulPlugin.update_metrics(engine, flow, "{2DCA13EB-0EB3-46F6-CAA2-9989EA904051}",  key, label) 
+			local key = val:match("(%S+)")
+			TrisulPlugin.update_metrics(engine, flow, "{2DCA13EB-0EB3-46F6-CAA2-9989EA904051}",  key, PROXY_TYPES[key]) 
 		end
 
     end,
@@ -139,9 +154,11 @@ TrisulPlugin = {
 			engine:update_counter ( guid ,  key, 1, flow:za_bytes())
 		end
 
-		if label and not T.key_labels_added[key] then 
+		-- one label per group+key (keys like "US" exist in more than one group)
+		local lkey = guid..key
+		if label and #label > 0 and not T.key_labels_added[lkey] then 
 			engine:update_key_info (guid ,  key, label) 
-			T.key_labels_added[key]=true 
+			T.key_labels_added[lkey]=true 
 		end
 
 		engine:add_flow_edges(flow:key(), guid, key) 

@@ -10,6 +10,14 @@
 -- 
 local IPPrefixDB=require'ipprefixdb'
 
+-- key part: no whitespace (lookups split "key label" on the first space)
+local function nospace(s) return (s:gsub('%s','')) end
+-- "key label"; label left out when IP2Location has no value ("-")
+local function keylabel(key, label)
+	if label == nil or label == '' or label == '-' then return key end
+	return key..' '..label
+end
+
 
 local bit=require'bit'
 
@@ -27,7 +35,7 @@ function do_compile(csv_file_path, leveldb_path )
 					 function(ldb, linearr)
 						local k1 = linearr[1]
 						local k2 = linearr[2]
-						ldb:put_ipnum(k1,k2,linearr[4]..' '..linearr[5])
+						ldb:put_ipnum(k1,k2,keylabel(nospace(linearr[4]), linearr[5]))
 				 end)
 
 	-- IPC (Ip country )
@@ -36,7 +44,7 @@ function do_compile(csv_file_path, leveldb_path )
 						local k1 = linearr[1]
 						local k2 = linearr[2]
 						ldb:set_databasename("CTRY");
-						ldb:put_ipnum(k1,k2,linearr[3]..' '..linearr[4])
+						ldb:put_ipnum(k1,k2,keylabel(nospace(linearr[3]), linearr[4]))
 				 end)
 
 
@@ -48,11 +56,11 @@ function do_compile(csv_file_path, leveldb_path )
 						local k1 = linearr[1]
 						local k2 = linearr[2]
 						ldb:set_databasename("CTRY");
-						ldb:put_ipnum(k1,k2,linearr[3]..' '..linearr[4])
+						ldb:put_ipnum(k1,k2,keylabel(nospace(linearr[3]), linearr[4]))
 						ldb:set_databasename("STATE");
-						ldb:put_ipnum(k1,k2,linearr[3]..'_'..linearr[5])
+						ldb:put_ipnum(k1,k2,keylabel(nospace(linearr[3]..'_'..linearr[5]), linearr[5] ~= '-' and linearr[5]..', '..linearr[3] or nil))
 						ldb:set_databasename("CITY");
-						ldb:put_ipnum(k1,k2,linearr[3]..'_'..linearr[6])
+						ldb:put_ipnum(k1,k2,keylabel(nospace(linearr[3]..'_'..linearr[6]), linearr[6] ~= '-' and linearr[6]..', '..linearr[3] or nil))
 				 end)
 
 
@@ -62,7 +70,7 @@ function do_compile(csv_file_path, leveldb_path )
 						local k1 = linearr[1]
 						local k2 = linearr[2]
 						ldb:set_databasename("PROXY");
-						ldb:put_ipnum(k1,k2,linearr[3]..' '..linearr[4])
+						ldb:put_ipnum(k1,k2,keylabel(nospace(linearr[3]), linearr[4]))
 				 end)
 
 	ldb:putraw("last_updated_tm",tostring(os.time()))
@@ -108,7 +116,9 @@ process_csv_file=function( ldb, csv_file, cbfunc)
 	  if validline  then 
 		local linearr={}
 		for k in l:gmatch('".-"')  do
-			linearr[#linearr+1] = k:gsub('["%s]','')
+			-- strip the quotes only; spaces are kept for labels ("United States of America").
+			-- key fields are made space free with nospace() in the callbacks
+			linearr[#linearr+1] = (k:gsub('"',''))
 		end 
 		cbfunc( ldb, linearr) 
 		nitems = nitems + 1

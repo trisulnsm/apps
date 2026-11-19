@@ -5,23 +5,26 @@ local function trim(s)
   return (s:gsub("^%s+", ""):gsub("%s+$", ""))
 end
 
-local function parse_port(val)
-  if val == nil then
-    return 0
-  end
-  local n = tonumber(val)
-  if n then
-    return n
-  end
-
-  local phex = tostring(val):match("p%-([0-9A-Fa-f]+)")
+-- Port of a flow end. Trisul port keys look like "p-01BB" (readable "443"); ICMP flows have
+-- "icmp00" / "icmp01" with no type or code in them. The old catch-all hex match turned "icmp01"
+-- into 12 (the "c"), so only a raw p-XXXX key or a plain number is trusted; anything else,
+-- ICMP included, is exported as port 0.
+local unknown_port_keys_logged = 0
+local function parse_port(raw, readable)
+  local phex = tostring(raw or ""):match("^p%-(%x+)$")
   if phex then
     return tonumber(phex, 16) or 0
   end
-
-  local hex = tostring(val):match("([0-9A-Fa-f]+)")
-  if hex then
-    return tonumber(hex, 16) or 0
+  local n = tonumber(readable)
+  if n and n >= 0 and n <= 65535 then
+    return n
+  end
+  if tostring(raw or ""):match("^icmp%x%x$") then
+    return 0
+  end
+  if unknown_port_keys_logged < 10 and T and T.logdebug then
+    unknown_port_keys_logged = unknown_port_keys_logged + 1
+    T.logdebug(string.format("nfgen: non-port key raw=%s readable=%s, exported as 0", tostring(raw), tostring(readable)))
   end
   return 0
 end
@@ -175,30 +178,52 @@ local function build_context(flow, allowed_tags)
   local src_ip = f:ipa_readable() or ""
   local dst_ip = f:ipz_readable() or ""
 
-  local src_port = parse_port(f:porta_readable() or f:porta())
-  local dst_port = parse_port(f:portz_readable() or f:portz())
+  local src_port = parse_port(f:porta(), f:porta_readable())
+  local dst_port = parse_port(f:portz(), f:portz_readable())
   local proto = parse_protocol(f:protocol())
 
-  local bytes = (flow:az_bytes() or 0) + (flow:za_bytes() or 0)
-  local packets = (flow:az_packets() or 0) + (flow:za_packets() or 0)
-
   return {
+    flow_id = f:id(),
+    state = flow:state() or 0,
     is_ipv6 = src_ip:find(":", 1, true) ~= nil or dst_ip:find(":", 1, true) ~= nil,
     src_ip = src_ip,
     dst_ip = dst_ip,
     src_port = src_port,
     dst_port = dst_port,
     proto = proto,
-    bytes = bytes,
-    packets = packets,
-    az_bytes = flow:az_bytes(),
-    za_bytes = flow:za_bytes(),
-    az_packets = flow:az_packets(),
-    za_packets = flow:za_packets(),
+    -- running totals since the flow started (Trisul counters)
+    az_bytes = tonumber(flow:az_bytes()) or 0,
+    za_bytes = tonumber(flow:za_bytes()) or 0,
+    az_packets = tonumber(flow:az_packets()) or 0,
+    za_packets = tonumber(flow:za_packets()) or 0,
     start_sec = start_sec or 0,
-    end_sec = end_sec or start_sec,
+    end_sec = end_sec or start_sec or 0,
     tags = parse_tag_map(flow:tags() or "", allowed_tags),
   }
+end
+
+-- NetFlow/IPFIX records are unidirectional: a Trisul flow becomes an A->Z record and a Z->A
+-- record (endpoints swapped), each carrying its own bytes/packets in IE 1/2. Collectors such as
+-- Trisul (MatchBiDirectionalFlows) merge the pair back. `delta` holds the counts to report for
+-- this export (not running totals), `start_sec` the start of the period they cover.
+-- A direction with no new packets is left out.
+function NetflowFields.directional_records(ctx, delta, start_sec)
+  local out = {}
+  local function add(src_ip, dst_ip, src_port, dst_port, bytes, packets)
+    if packets <= 0 and bytes <= 0 then return end
+    out[#out + 1] = {
+      is_ipv6 = ctx.is_ipv6,
+      src_ip = src_ip, dst_ip = dst_ip,
+      src_port = src_port, dst_port = dst_port,
+      proto = ctx.proto,
+      bytes = bytes, packets = packets,
+      start_sec = start_sec, end_sec = ctx.end_sec,
+      tags = ctx.tags,
+    }
+  end
+  add(ctx.src_ip, ctx.dst_ip, ctx.src_port, ctx.dst_port, delta.az_bytes, delta.az_packets)
+  add(ctx.dst_ip, ctx.src_ip, ctx.dst_port, ctx.src_port, delta.za_bytes, delta.za_packets)
+  return out
 end
 
 function NetflowFields.new(config)
@@ -220,10 +245,8 @@ function NetflowFields.new(config)
     { id = 11, len = 2, kind = "u16", value = function(ctx) return ctx.dst_port end }, -- dest port
     { id = 10, len = 4, kind = "u32", value = function() return 0 end }, -- ifindex in
     { id = 14, len = 4, kind = "u32", value = function() return 0 end }, -- ifindex out
-    { id = 1, len = 8, kind = "u64", value = function(ctx) return ctx.az_bytes end }, -- IN_BYTES (A->Z)
-    { id = 2, len = 8, kind = "u64", value = function(ctx) return ctx.az_packets end }, -- IN_PKTS (A->Z)
-    { id = 23, len = 8, kind = "u64", value = function(ctx) return ctx.za_bytes end }, -- OUT_BYTES (Z->A)
-    { id = 24, len = 8, kind = "u64", value = function(ctx) return ctx.za_packets end }, -- OUT_PKTS (Z->A)
+    { id = 1, len = 8, kind = "u64", value = function(ctx) return ctx.bytes end }, -- octetDeltaCount (this direction)
+    { id = 2, len = 8, kind = "u64", value = function(ctx) return ctx.packets end }, -- packetDeltaCount (this direction)
     { id = 150, len = 4, kind = "u32", value = function(ctx) return ctx.start_sec end }, -- flowStartSeconds
     { id = 151, len = 4, kind = "u32", value = function(ctx) return ctx.end_sec end }, -- flowEndSeconds
   }
@@ -236,10 +259,8 @@ function NetflowFields.new(config)
     { id = 11, len = 2, kind = "u16", value = function(ctx) return ctx.dst_port end }, -- dest port
     { id = 10, len = 4, kind = "u32", value = function() return 0 end }, -- ifindex in
     { id = 14, len = 4, kind = "u32", value = function() return 0 end }, -- ifindex out
-    { id = 1, len = 8, kind = "u64", value = function(ctx) return ctx.az_bytes end }, -- IN_BYTES (A->Z)
-    { id = 2, len = 8, kind = "u64", value = function(ctx) return ctx.az_packets end }, -- IN_PKTS (A->Z)
-    { id = 23, len = 8, kind = "u64", value = function(ctx) return ctx.za_bytes end }, -- OUT_BYTES (Z->A)
-    { id = 24, len = 8, kind = "u64", value = function(ctx) return ctx.za_packets end }, -- OUT_PKTS (Z->A)
+    { id = 1, len = 8, kind = "u64", value = function(ctx) return ctx.bytes end }, -- octetDeltaCount (this direction)
+    { id = 2, len = 8, kind = "u64", value = function(ctx) return ctx.packets end }, -- packetDeltaCount (this direction)
     { id = 150, len = 4, kind = "u32", value = function(ctx) return ctx.start_sec end }, -- flowStartSeconds
     { id = 151, len = 4, kind = "u32", value = function(ctx) return ctx.end_sec end }, -- flowEndSeconds
   }

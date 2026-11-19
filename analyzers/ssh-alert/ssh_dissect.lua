@@ -83,6 +83,9 @@ local SSHDissector =
     if tbl.ssh_state ==  tbl.ST.START then
       tbl.ssh_version_string = strbuf:gsub("[\r\n]","")
       tbl.ssh_state=tbl.ST.BEFORE_NEWKEYS
+      -- banner types: meter 0 = server, meter 1 = client (once per side per session)
+      pdur.engine:update_counter( "{E6A387F4-5B51-4C8B-86FD-DE6258D3F214}", tbl.ssh_version_string,
+                                  tbl.role == "server" and 0 or 1, 1)
     elseif tbl.ssh_state == tbl.ST.ETM_PAYLOAD then 
       -- check if login successful using the SSH-MSG-CHANNEL-REQUEST for pty
       -- 
@@ -203,8 +206,9 @@ local SSHDissector =
             "Successful login "  );
 
 
-		pdur.engine:update_counter( "{E6A387F4-5B51-4C8B-86FD-DE6258D3F214}", tbl.ssh_version_string, 0,1);
-		pdur.engine:update_counter( "{E6A387F4-5B51-4C8B-86FD-DE6258D3F214}", tbl.paired_with.ssh_version_string, 1,1);
+		-- logins: meter 2 = server banner, meter 3 = client banner (tbl is the client side here)
+		pdur.engine:update_counter( "{E6A387F4-5B51-4C8B-86FD-DE6258D3F214}", tbl.paired_with.ssh_version_string, 2,1);
+		pdur.engine:update_counter( "{E6A387F4-5B51-4C8B-86FD-DE6258D3F214}", tbl.ssh_version_string, 3,1);
 
 		print(tbl.ssh_version_string)
 		print(tbl.paired_with.ssh_version_string)
