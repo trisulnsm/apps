@@ -440,7 +440,7 @@ class SankeyCrossDrill  {
          for(let j=1;j < parts.length; j++){
             links.source.push(keylookup[parts[j-1]]);
             links.target.push(keylookup[parts[j]]);
-            links.value.push(parseInt(item.metric))
+            links.value.push(Number(item.metric));
         }
 
     }
@@ -461,7 +461,17 @@ class SankeyCrossDrill  {
         label: labels,
       },
 
-      link: links
+      link: {
+        ...links,
+    
+        customdata: links.value.map(v =>
+            h_fmtvol(v).replace(/\s+/g, '') + 'B'
+        ),
+    
+        hovertemplate:
+            '%{customdata} source: %{source.label}<br>' +
+            'target: %{target.label}<extra></extra>'
+      }
     }
 
     //width of div widht
